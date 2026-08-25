@@ -1,0 +1,105 @@
+<?php
+
+declare(strict_types=1);
+
+namespace GreatMarketrealmTabletop\Tests\Unit\Architecture;
+
+use PHPUnit\Framework\TestCase;
+
+final class PluginFoundationTest extends TestCase
+{
+    private string $root;
+
+    protected function setUp(): void
+    {
+        $this->root = dirname(__DIR__, 3);
+    }
+
+    public function testPluginBootstrapHasStableIdentity(): void
+    {
+        $source = $this->source('great-marketrealm-tabletop.php');
+
+        self::assertStringContainsString(
+            'Plugin Name: Great Marketrealm Tabletop',
+            $source
+        );
+        self::assertStringContainsString(
+            "define('GMRT_VERSION', '0.1.0-alpha.1')",
+            $source
+        );
+        self::assertStringContainsString(
+            'Text Domain: great-marketrealm-tabletop',
+            $source
+        );
+    }
+
+    public function testProductionBootUsesSelfContainedAutoloader(): void
+    {
+        $source = $this->source('great-marketrealm-tabletop.php');
+
+        self::assertStringContainsString(
+            "require_once GMRT_PATH . 'autoload.php';",
+            $source
+        );
+        self::assertStringNotContainsString(
+            'vendor/autoload.php',
+            $source
+        );
+    }
+
+    public function testCompanionNamespaceIsIsolatedToIntegrationBoundary(): void
+    {
+        $violations = [];
+
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator(
+                $this->root . '/app',
+                \FilesystemIterator::SKIP_DOTS
+            )
+        );
+
+        foreach ($iterator as $file) {
+            if (! $file->isFile() || $file->getExtension() !== 'php') {
+                continue;
+            }
+
+            $relative = str_replace(
+                $this->root . '/',
+                '',
+                $file->getPathname()
+            );
+
+            if (str_starts_with(
+                $relative,
+                'app/Integration/Companion/'
+            )) {
+                continue;
+            }
+
+            if (str_contains(
+                (string) file_get_contents($file->getPathname()),
+                'GreatMarketrealmCompanion\\'
+            )) {
+                $violations[] = $relative;
+            }
+        }
+
+        self::assertSame([], $violations);
+    }
+
+    public function testInitialRoadmapNamesTheEmptyTable(): void
+    {
+        self::assertStringContainsString(
+            'Phase IV.1 — The Empty Table',
+            $this->source('ROADMAP.md')
+        );
+    }
+
+    private function source(string $relative): string
+    {
+        $source = file_get_contents($this->root . '/' . $relative);
+        self::assertIsString($source);
+
+        return $source;
+    }
+}
