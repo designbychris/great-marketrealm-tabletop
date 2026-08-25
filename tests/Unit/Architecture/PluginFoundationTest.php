@@ -47,6 +47,20 @@ final class PluginFoundationTest extends TestCase
         );
     }
 
+    public function testComposerDoesNotEagerlyLoadWordPressGuardedHelpers(): void
+    {
+        $composer = json_decode(
+            $this->source('composer.json'),
+            true
+        );
+
+        self::assertIsArray($composer);
+        self::assertArrayNotHasKey(
+            'files',
+            $composer['autoload'] ?? []
+        );
+    }
+
     public function testCompanionNamespaceIsIsolatedToIntegrationBoundary(): void
     {
         $violations = [];
