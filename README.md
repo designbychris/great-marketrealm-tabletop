@@ -18,7 +18,7 @@ Gameplay code must not reach directly into arbitrary Companion internals.
 
 ## Current Milestone
 
-### Phase IV.2 — The First Table
+### Phase IV.3 — The Steward's Table Rules
 
 The foundation is certified. IV.2 introduces the first real VTT domain:
 

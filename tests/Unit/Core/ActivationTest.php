@@ -27,6 +27,14 @@ final class ActivationTest extends TestCase
         );
     }
 
+    public function testActivationSeedsLeaseSafetyDefaults(): void
+    {
+        Activation::activate();
+        self::assertSame(900, $GLOBALS['gmrt_test_options']['gmrt_table_lease_seconds']['value']);
+        self::assertSame(120, $GLOBALS['gmrt_test_options']['gmrt_table_heartbeat_grace_seconds']['value']);
+        self::assertSame([], $GLOBALS['gmrt_test_options']['gmrt_capacity_override_user_ids']['value']);
+    }
+
     public function testActivationStartsWithTwoConcurrentTableSlots(): void
     {
         Activation::activate();

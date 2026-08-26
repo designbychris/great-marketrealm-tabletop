@@ -9,6 +9,8 @@ use GreatMarketrealmTabletop\Tables\Contracts\TableCapacityPolicy;
 use GreatMarketrealmTabletop\Tables\Contracts\TableClock;
 use GreatMarketrealmTabletop\Tables\Contracts\TableIdGenerator;
 use GreatMarketrealmTabletop\Tables\Contracts\TableRepository;
+use GreatMarketrealmTabletop\Tables\Contracts\TableLeasePolicy;
+use GreatMarketrealmTabletop\Tables\Contracts\TableStewardOverride;
 use GreatMarketrealmTabletop\Tables\Models\Table;
 
 final class InMemoryTableRepository implements TableRepository
@@ -75,5 +77,23 @@ final class SequenceIdGenerator implements TableIdGenerator
     public function generate(): string
     {
         return 'table-' . $this->next++;
+    }
+}
+
+
+final class FixedLeasePolicy implements TableLeasePolicy
+{
+    public function __construct(private int $lease = 900, private int $grace = 120) {}
+    public function leaseSeconds(): int { return $this->lease; }
+    public function heartbeatGraceSeconds(): int { return $this->grace; }
+}
+
+final class FixedStewardOverride implements TableStewardOverride
+{
+    /** @param array<int,int> $allowed */
+    public function __construct(private array $allowed = []) {}
+    public function mayBypassCapacity(int $dungeonMasterUserId): bool
+    {
+        return in_array($dungeonMasterUserId, $this->allowed, true);
     }
 }

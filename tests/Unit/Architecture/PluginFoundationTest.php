@@ -24,7 +24,7 @@ final class PluginFoundationTest extends TestCase
             $source
         );
         self::assertStringContainsString(
-            "define('GMRT_VERSION', '0.2.0-alpha.1')",
+            "define('GMRT_VERSION', '0.3.0-alpha.1')",
             $source
         );
         self::assertStringContainsString(
@@ -127,6 +127,13 @@ final class PluginFoundationTest extends TestCase
         }
 
         self::assertSame([], $violations);
+    }
+
+    public function testOperationalTableRulesRemainInTableDomain(): void
+    {
+        self::assertFileExists($this->root . '/app/Tables/Services/TableLeaseManager.php');
+        self::assertFileExists($this->root . '/app/Tables/Policies/WordPressTableLeasePolicy.php');
+        self::assertFileExists($this->root . '/app/Tables/Policies/WordPressTableStewardOverride.php');
     }
 
     public function testInitialRoadmapNamesTheEmptyTable(): void

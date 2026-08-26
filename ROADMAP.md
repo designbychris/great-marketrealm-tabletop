@@ -30,7 +30,16 @@
 
 ### Phase IV.3 — The Steward's Table Rules
 
-Capacity, leases, heartbeats, expiry, overrides, and diagnostics.
+- [x] Configurable active-table capacity
+- [x] Renewable active Table leases
+- [x] Heartbeat-based lease renewal
+- [x] Heartbeat grace window
+- [x] Automatic expired-session reclamation
+- [x] Capacity reclaimed before activation
+- [x] Steward capacity overrides
+- [x] Safe minimum lease/grace settings
+- [x] Server-load regression coverage
+- [ ] Server-side certification on the deployment environment
 
 ### Phase IV.4 — The Gathering of Adventurers
 

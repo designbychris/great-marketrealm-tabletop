@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.3.0-alpha.1] - 2026-08-26
+
+### Added
+
+- Phase IV.3 — The Steward's Table Rules.
+- Renewable active-Table leases and persisted heartbeat timestamps.
+- Heartbeat grace windows and automatic expired-session reclamation.
+- Capacity reclamation before new activation checks.
+- Steward capacity override identities for controlled testing.
+- Operational policy regression coverage.
+
+
 ## [0.2.0-alpha.1] - 2026-08-25
 
 ### Added

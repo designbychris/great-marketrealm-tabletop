@@ -23,5 +23,23 @@ final class Activation
             2,
             false
         );
+
+        update_option(
+            'gmrt_table_lease_seconds',
+            900,
+            false
+        );
+
+        update_option(
+            'gmrt_table_heartbeat_grace_seconds',
+            120,
+            false
+        );
+
+        update_option(
+            'gmrt_capacity_override_user_ids',
+            [],
+            false
+        );
     }
 }
