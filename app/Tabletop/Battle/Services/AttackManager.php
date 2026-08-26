@@ -7,6 +7,7 @@ namespace GreatMarketrealmTabletop\Tabletop\Battle\Services;
 use GreatMarketrealmTabletop\Tabletop\Battle\Contracts\BattleEventRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Contracts\CombatProfileRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Contracts\DamageProfileRepository;
+use GreatMarketrealmTabletop\Tabletop\Battle\Contracts\DeathSaveRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Contracts\VitalityRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Exceptions\AttackDenied;
 use GreatMarketrealmTabletop\Tabletop\Battle\Models\BattleDeed;
@@ -29,6 +30,7 @@ final class AttackManager
         private CombatProfileRepository $profiles,
         private DamageProfileRepository $damageProfiles,
         private VitalityRepository $vitality,
+        private DeathSaveRepository $deathSaves,
         private BattleEventRepository $events,
         private AttackResolver $resolver,
         private DamageResolver $damageResolver,
@@ -170,14 +172,46 @@ final class AttackManager
                 $tableId,
                 $target->id()
             );
+            $hpBefore = $vitality->currentHp();
 
             $application = $vitality->damage(
                 $damageRoll->total()
             );
 
+            $deathSaveState = $this->deathSaves->forToken(
+                $tableId,
+                $target->id()
+            );
+            $deathConsequence = 'none';
+
+            if ($hpBefore === 0) {
+                $failureCount = $outcome->result()
+                    === \GreatMarketrealmTabletop\Tabletop\Battle\Models\AttackOutcome::CRITICAL_HIT
+                    ? 2
+                    : 1;
+
+                $deathSaveState->recordDamageFailure(
+                    $failureCount
+                );
+                $deathConsequence = $failureCount === 2
+                    ? 'critical-damage-failures'
+                    : 'damage-failure';
+            } elseif (
+                $vitality->currentHp() === 0
+                && (int) ($application['excess_damage'] ?? 0)
+                    >= $vitality->maximumHp()
+            ) {
+                $deathSaveState->markFallen();
+                $deathConsequence = 'massive-damage';
+            }
+
             $this->vitality->save(
                 $tableId,
                 $vitality
+            );
+            $this->deathSaves->save(
+                $tableId,
+                $deathSaveState
             );
 
             $damageEvent = new BattleEvent(
@@ -194,6 +228,8 @@ final class AttackManager
                     'damage' => $damageRoll->toArray(),
                     'application' => $application,
                     'vitality' => $vitality->toArray(),
+                    'death_consequence' => $deathConsequence,
+                    'death_saves' => $deathSaveState->toArray(),
                 ]
             );
 
@@ -208,6 +244,9 @@ final class AttackManager
             'outcome' => $outcome,
             'damage' => $damageRoll,
             'vitality' => $vitality,
+            'death_saves' => isset($deathSaveState)
+                ? $deathSaveState
+                : null,
         ];
     }
 }

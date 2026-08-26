@@ -18,6 +18,16 @@ Gameplay code must not reach directly into arbitrary Companion internals.
 
 ## Current Milestone
 
+### Phase IV.14 — Death at the Door
+
+Damage now has authoritative consequences after a combatant reaches 0 HP.
+Further hits cause death-save failures, critical hits cause two failures,
+damage breaks Stable state, and massive excess damage can immediately mark a
+combatant Fallen.
+
+Healing above 0 HP clears the current death-save sequence through the shared
+recovery service.
+
 ### Phase IV.13 — When Heroes Fall
 
 Combatants at 0 HP now enter an authoritative death-save flow. Three successes

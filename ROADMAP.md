@@ -219,3 +219,21 @@ Lower-latency shared-state synchronisation, presence and reconnection foundation
 - [ ] Instant-death / massive-damage rules
 - [ ] GMRC character-state synchronisation
 - [ ] Server-side certification on deployment
+
+
+### Phase IV.14 — Death at the Door
+
+- [x] Damage at 0 HP causes death-save failures
+- [x] Critical damage at 0 HP causes two failures
+- [x] Damage breaks Stable state
+- [x] Three damage failures produce Fallen state
+- [x] Excess damage is tracked after Temp HP and Current HP
+- [x] Massive damage can cause immediate Fallen state
+- [x] Massive-damage calculation only applies when dropping from above 0 HP
+- [x] Healing above 0 HP clears death-save successes/failures
+- [x] Damage events include death consequence and death-save state
+- [x] Attack endpoint returns updated death-save projection
+- [ ] Melee-distance auto-critical rules for unconscious targets
+- [ ] Resurrection policy
+- [ ] GMRC character-state synchronisation
+- [ ] Server-side certification on deployment

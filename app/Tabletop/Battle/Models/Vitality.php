@@ -84,13 +84,19 @@ final class Vitality
         $this->temporaryHp -= $absorbed;
         $amount -= $absorbed;
 
+        $hpBefore = $this->currentHp;
         $hpLost = min($this->currentHp, $amount);
         $this->currentHp -= $hpLost;
+        $excessDamage = max(
+            0,
+            $amount - $hpBefore
+        );
 
         return [
             'incoming' => $incoming,
             'temporary_absorbed' => $absorbed,
             'hp_lost' => $hpLost,
+            'excess_damage' => $excessDamage,
             'current_hp' => $this->currentHp,
             'temporary_hp' => $this->temporaryHp,
             'state' => $this->state(),

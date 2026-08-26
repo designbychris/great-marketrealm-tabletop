@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.14.0-alpha.1] - 2026-08-26
+
+### Added
+
+- Phase IV.14 — Death at the Door.
+- Death-save failures from damage received at 0 HP.
+- Two death-save failures from critical damage at 0 HP.
+- Stable-state interruption when a downed combatant takes damage.
+- Excess-damage tracking for massive-damage resolution.
+- Immediate Fallen state when qualifying massive damage reaches 0 HP.
+- Shared vitality recovery service that clears death saves after healing.
+- Death consequences embedded in `damage-applied` Battle Events.
+
+
 ## [0.13.0-alpha.1] - 2026-08-26
 
 ### Added

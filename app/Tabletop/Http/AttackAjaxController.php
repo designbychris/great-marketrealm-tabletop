@@ -53,6 +53,7 @@ final class AttackAjaxController
                 'attack' => $result['outcome']->toArray(),
                 'damage' => $result['damage']?->toArray(),
                 'vitality' => $result['vitality']?->toArray(),
+                'death_saves' => $result['death_saves']?->toArray(),
                 'event' => $result['attack_event']->toArray(),
                 'damage_event' => $result['damage_event']?->toArray(),
             ]);

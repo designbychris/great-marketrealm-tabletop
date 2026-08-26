@@ -67,6 +67,26 @@ final class DeathSaveState
         $this->failures = min(3, $this->failures + $amount);
     }
 
+    public function recordDamageFailure(
+        int $amount = 1
+    ): void {
+        if ($this->dead()) {
+            return;
+        }
+
+        $this->stable = false;
+        $this->failures = min(
+            3,
+            $this->failures + max(0, $amount)
+        );
+    }
+
+    public function markFallen(): void
+    {
+        $this->stable = false;
+        $this->failures = 3;
+    }
+
     public function stabilize(): void
     {
         if (! $this->dead()) {

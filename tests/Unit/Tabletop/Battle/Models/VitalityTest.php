@@ -81,4 +81,25 @@ final class VitalityTest extends TestCase
         self::assertSame(VitalityState::WOUNDED, $vitality->state());
     }
 
+
+    public function testDamageReportsExcessBeyondZeroHp(): void
+    {
+        $vitality = new Vitality('token-a', 10, 4);
+
+        $result = $vitality->damage(15);
+
+        self::assertSame(11, $result['excess_damage']);
+        self::assertSame(0, $vitality->currentHp());
+    }
+
+    public function testTemporaryHpReducesMassiveDamageOverflow(): void
+    {
+        $vitality = new Vitality('token-a', 10, 10, 5);
+
+        $result = $vitality->damage(22);
+
+        self::assertSame(7, $result['excess_damage']);
+        self::assertSame(5, $result['temporary_absorbed']);
+    }
+
 }
