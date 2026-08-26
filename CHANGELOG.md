@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.8.0-alpha.1] - 2026-08-26
+
+### Added
+
+- Phase IV.8 — The Living Table.
+- Server-authoritative Tabletop movement policy.
+- Dungeon Master movement of active-Scene tokens.
+- Player movement limited to their matching assigned Character token.
+- Token revision numbers and stale-update conflict protection.
+- Authenticated nonce-protected AJAX movement and state endpoints.
+- Five-second authoritative Table state refresh.
+- Keyboard and click token movement controls.
+- Selected-token and live-status presentation states.
+- No WebSocket dependency; transport remains intentionally simple.
+
+
 ## [0.7.0-alpha.1] - 2026-08-26
 
 ### Added

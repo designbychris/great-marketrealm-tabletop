@@ -24,7 +24,7 @@ final class PluginFoundationTest extends TestCase
             $source
         );
         self::assertStringContainsString(
-            "define('GMRT_VERSION', '0.7.0-alpha.1')",
+            "define('GMRT_VERSION', '0.8.0-alpha.1')",
             $source
         );
         self::assertStringContainsString(
@@ -304,6 +304,34 @@ final class PluginFoundationTest extends TestCase
         self::assertStringNotContainsString(
             'gmrc_route',
             $route
+        );
+    }
+
+
+    public function testLivingTableRulesStayServerAuthoritative(): void
+    {
+        $movement = $this->source(
+            'app/Tabletop/Movement/Services/TabletopMovement.php'
+        );
+        $client = $this->source(
+            'assets/js/tabletop.js'
+        );
+
+        self::assertStringContainsString(
+            'TabletopMovementPolicy',
+            $movement
+        );
+        self::assertStringContainsString(
+            'expectedRevision',
+            $movement
+        );
+        self::assertStringContainsString(
+            'gmrt_move_token',
+            $client
+        );
+        self::assertStringNotContainsString(
+            'update_option(',
+            $client
         );
     }
 

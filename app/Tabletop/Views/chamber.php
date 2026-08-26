@@ -31,7 +31,16 @@ $sceneImage = $scene !== null
     <?php wp_head(); ?>
 </head>
 <body class="gmrt-tabletop-page">
-<main class="gmrt-chamber" id="main-content">
+<main
+    class="gmrt-chamber"
+    id="main-content"
+    data-table-id="<?php echo esc_attr(
+        (string) ($table['id'] ?? '')
+    ); ?>"
+    data-viewer-role="<?php echo esc_attr(
+        (string) ($viewer['role'] ?? '')
+    ); ?>"
+>
     <header class="gmrt-chamber__masthead">
         <div>
             <p class="gmrt-chamber__eyebrow">
@@ -232,6 +241,21 @@ $sceneImage = $scene !== null
                                 title="<?php echo esc_attr(
                                     (string) $token['label']
                                 ); ?>"
+                                data-token-id="<?php echo esc_attr(
+                                    (string) $token['id']
+                                ); ?>"
+                                data-token-revision="<?php echo esc_attr(
+                                    (string) ($token['revision'] ?? 1)
+                                ); ?>"
+                                data-token-controller="<?php echo esc_attr(
+                                    (string) ($token['controller_user_id'] ?? '')
+                                ); ?>"
+                                tabindex="0"
+                                role="button"
+                                aria-label="<?php echo esc_attr(
+                                    'Select token: '
+                                    . (string) $token['label']
+                                ); ?>"
                             >
                                 <span aria-hidden="true">
                                     <?php echo esc_html(
@@ -308,14 +332,22 @@ $sceneImage = $scene !== null
                         Chamber mode
                     </strong>
                     <p>
-                        This first chamber is read-only.
-                        Movement and live synchronisation arrive
-                        in later certified phases.
+                        Select a token and use the arrow keys,
+                        or click a position on the battlemap.
+                        Movement is validated and persisted by
+                        the Tabletop server.
                     </p>
                 </div>
             </aside>
         </div>
     <?php endif; ?>
+
+    <div
+        class="gmrt-chamber__status"
+        id="gmrt-tabletop-status"
+        role="status"
+        aria-live="polite"
+    ></div>
 </main>
 <?php wp_footer(); ?>
 </body>

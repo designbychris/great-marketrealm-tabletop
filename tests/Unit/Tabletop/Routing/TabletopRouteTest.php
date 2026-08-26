@@ -64,4 +64,27 @@ final class TabletopRouteTest extends TestCase
             $source
         );
     }
+
+    public function testProviderRegistersAuthenticatedLivingTableAjaxActions(): void
+    {
+        $source = file_get_contents(
+            $this->root
+                . '/app/Tabletop/TabletopServiceProvider.php'
+        );
+
+        self::assertIsString($source);
+        self::assertStringContainsString(
+            "'wp_ajax_gmrt_tabletop_state'",
+            $source
+        );
+        self::assertStringContainsString(
+            "'wp_ajax_gmrt_move_token'",
+            $source
+        );
+        self::assertStringNotContainsString(
+            "'wp_ajax_nopriv_gmrt_move_token'",
+            $source
+        );
+    }
+
 }

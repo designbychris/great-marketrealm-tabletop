@@ -47,7 +47,6 @@ if (! function_exists('add_action')) {
     }
 }
 
-
 if (! function_exists('add_filter')) {
     function add_filter(
         string $hook,

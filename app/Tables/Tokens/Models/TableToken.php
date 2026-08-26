@@ -24,7 +24,8 @@ final class TableToken
         private float $widthUnits,
         private float $heightUnits,
         private string $visibility,
-        private DateTimeImmutable $createdAt
+        private DateTimeImmutable $createdAt,
+        private int $revision = 1
     ) {}
 
     public static function create(
@@ -78,7 +79,8 @@ final class TableToken
             $widthUnits,
             $heightUnits,
             $visibility,
-            $createdAt
+            $createdAt,
+            1
         );
     }
 
@@ -109,6 +111,10 @@ final class TableToken
                     $record['created_at']
                     ?? 'now'
                 )
+            ),
+            max(
+                1,
+                (int) ($record['revision'] ?? 1)
             )
         );
     }
@@ -119,6 +125,7 @@ final class TableToken
 
         $this->x = $x;
         $this->y = $y;
+        ++$this->revision;
     }
 
     public function resize(
@@ -132,18 +139,31 @@ final class TableToken
 
         $this->widthUnits = $widthUnits;
         $this->heightUnits = $heightUnits;
+        ++$this->revision;
     }
 
     public function show(): void
     {
-        $this->visibility =
-            TableTokenVisibility::VISIBLE;
+        if (
+            $this->visibility
+            !== TableTokenVisibility::VISIBLE
+        ) {
+            $this->visibility =
+                TableTokenVisibility::VISIBLE;
+            ++$this->revision;
+        }
     }
 
     public function hide(): void
     {
-        $this->visibility =
-            TableTokenVisibility::HIDDEN;
+        if (
+            $this->visibility
+            !== TableTokenVisibility::HIDDEN
+        ) {
+            $this->visibility =
+                TableTokenVisibility::HIDDEN;
+            ++$this->revision;
+        }
     }
 
     public function id(): string
@@ -206,6 +226,11 @@ final class TableToken
         return $this->visibility;
     }
 
+    public function revision(): int
+    {
+        return $this->revision;
+    }
+
     public function isVisible(): bool
     {
         return $this->visibility
@@ -230,6 +255,7 @@ final class TableToken
             'visibility' => $this->visibility,
             'created_at' => $this->createdAt
                 ->format(DATE_ATOM),
+            'revision' => $this->revision,
         ];
     }
 

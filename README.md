@@ -18,6 +18,18 @@ Gameplay code must not reach directly into arbitrary Companion internals.
 
 ## Current Milestone
 
+### Phase IV.8 — The Living Table
+
+The Chamber is now interactive while PHP remains authoritative:
+
+- selectable tokens
+- DM movement of active-Scene tokens
+- Player movement of their assigned Character token only
+- keyboard and click movement
+- token revision conflict protection
+- authenticated state refresh every five seconds
+- no WebSocket dependency yet
+
 ### Phase IV.7 — The Tabletop Chamber
 
 The VTT now owns its first visible front-end at **`/tabletop/`**.

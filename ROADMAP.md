@@ -101,14 +101,19 @@
 
 ### Phase IV.8 — The Living Table
 
-Interactive client-side movement and state refresh foundations.
+- [x] Keyboard/click token selection
+- [x] Dungeon Master token movement
+- [x] Player movement of matching assigned Character token only
+- [x] Server-authoritative movement policy
+- [x] Authenticated nonce-protected AJAX movement endpoint
+- [x] Incremental authoritative Table state refresh
+- [x] Token revision numbers for stale-update protection
+- [x] HTTP 409 conflict semantics for stale token movement
+- [x] Active-Scene-only movement
+- [x] Read-only hidden-token filtering remains server-side
+- [x] No WebSocket dependency
+- [ ] Server-side certification on the deployment environment
 
-Planned foundations:
+### Phase IV.9 — The Shared Table
 
-- Token selection
-- Dungeon Master token movement
-- Player-controlled Character token movement
-- Server-authoritative movement endpoints
-- Incremental Table state refresh
-- Optimistic UI with authoritative reconciliation
-- No WebSocket requirement yet
+Lower-latency shared-state synchronisation, presence and reconnection foundations.

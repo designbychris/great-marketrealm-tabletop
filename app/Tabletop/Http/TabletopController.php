@@ -77,5 +77,24 @@ final class TabletopController
             [],
             GMRT_VERSION
         );
+
+        wp_enqueue_script(
+            'gmrt-tabletop',
+            GMRT_URL . 'assets/js/tabletop.js',
+            [],
+            GMRT_VERSION,
+            true
+        );
+
+        wp_localize_script(
+            'gmrt-tabletop',
+            'gmrtTabletop',
+            [
+                'ajaxUrl' => admin_url('admin-ajax.php'),
+                'nonce' => wp_create_nonce(
+                    TabletopAjaxController::NONCE_ACTION
+                ),
+            ]
+        );
     }
 }
