@@ -114,6 +114,36 @@ $sceneImage = $scene !== null
                     </span>
                 <?php endif; ?>
             </div>
+
+        <?php if (
+            ($encounter['status'] ?? '') === 'active'
+            && ! empty($encounter['current_token_id'])
+        ) : ?>
+            <div
+                class="gmrt-deeds"
+                aria-label="Battle deeds"
+                data-current-token="<?php echo esc_attr(
+                    (string) $encounter['current_token_id']
+                ); ?>"
+            >
+                <?php foreach (
+                    ['attack' => 'Attack', 'dash' => 'Dash',
+                     'disengage' => 'Disengage', 'dodge' => 'Dodge',
+                     'help' => 'Help']
+                    as $deedKey => $deedLabel
+                ) : ?>
+                    <button
+                        type="button"
+                        class="gmrt-deed"
+                        data-battle-deed="<?php echo esc_attr(
+                            $deedKey
+                        ); ?>"
+                    >
+                        <?php echo esc_html($deedLabel); ?>
+                    </button>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
         </section>
     <?php endif; ?>
 

@@ -18,6 +18,14 @@ Gameplay code must not reach directly into arbitrary Companion internals.
 
 ## Current Milestone
 
+### Phase IV.10 — Deeds in Battle
+
+Active Encounters now have a server-authoritative turn economy and first
+canonical Deeds: Attack, Dash, Disengage, Dodge and Help.
+
+Successful deeds spend their required turn resource and append a structured
+battle event for future logs, combat HUDs and Pixel Auby/Sage reactions.
+
 ### Phase IV.10A — Tabletop Page Host Integration
 
 The visible Tabletop now follows the Companion-style WordPress Page host

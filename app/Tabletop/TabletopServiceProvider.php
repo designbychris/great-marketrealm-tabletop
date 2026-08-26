@@ -6,6 +6,8 @@ namespace GreatMarketrealmTabletop\Tabletop;
 
 use GreatMarketrealmTabletop\Tabletop\Encounters\Services\EncounterManagerFactory;
 use GreatMarketrealmTabletop\Tabletop\Http\EncounterAjaxController;
+use GreatMarketrealmTabletop\Tabletop\Http\BattleDeedAjaxController;
+use GreatMarketrealmTabletop\Tabletop\Battle\Services\BattleDeedManagerFactory;
 use GreatMarketrealmTabletop\Tabletop\Http\TabletopAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Movement\Services\TabletopMovementFactory;
 use GreatMarketrealmTabletop\Tabletop\Presentation\TabletopChamberRenderer;
@@ -21,6 +23,8 @@ final class TabletopServiceProvider
     private TabletopAjaxController $ajax;
 
     private EncounterAjaxController $encounterAjax;
+
+    private BattleDeedAjaxController $battleDeedAjax;
 
     public function __construct()
     {
@@ -38,6 +42,10 @@ final class TabletopServiceProvider
 
         $this->encounterAjax = new EncounterAjaxController(
             EncounterManagerFactory::make()
+        );
+
+        $this->battleDeedAjax = new BattleDeedAjaxController(
+            BattleDeedManagerFactory::make()
         );
     }
 
@@ -91,6 +99,11 @@ final class TabletopServiceProvider
         add_action(
             'wp_ajax_gmrt_end_encounter',
             [$this->encounterAjax, 'end']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_perform_battle_deed',
+            [$this->battleDeedAjax, 'perform']
         );
     }
 }

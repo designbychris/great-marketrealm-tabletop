@@ -176,6 +176,42 @@
         moveSelected(point.x, point.y);
     });
 
+
+    document.querySelectorAll('[data-battle-deed]').forEach((button) => {
+        button.addEventListener('click', async () => {
+            const encounter = document.querySelector('[data-encounter-id]');
+
+            if (!encounter) {
+                return;
+            }
+
+            try {
+                const data = await request('gmrt_perform_battle_deed', {
+                    encounter_id: encounter.dataset.encounterId || '',
+                    deed: button.dataset.battleDeed || '',
+                    revision: encounter.dataset.encounterRevision || '1'
+                });
+
+                if (data.encounter) {
+                    encounter.dataset.encounterRevision =
+                        String(data.encounter.revision || 1);
+                }
+
+                const deed = data.event
+                    && data.event.payload
+                    && data.event.payload.deed
+                    ? data.event.payload.deed
+                    : 'deed';
+
+                say('Battle deed recorded: ' + deed + '.');
+            } catch (error) {
+                say(error.message);
+                await refresh();
+            }
+        });
+    });
+
+
     refreshTimer = window.setInterval(refresh, 5000);
 
     window.addEventListener('beforeunload', () => {

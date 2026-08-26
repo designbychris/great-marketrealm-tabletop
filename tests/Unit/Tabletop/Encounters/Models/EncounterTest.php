@@ -112,4 +112,31 @@ final class EncounterTest extends TestCase
             new DateTimeImmutable('2026-08-26T10:00:00+01:00')
         );
     }
+
+    public function testAdvancingTurnResetsTurnEconomy(): void
+    {
+        $encounter = $this->encounter();
+        $encounter->addCombatant(new EncounterCombatant('token-a', 20));
+        $encounter->addCombatant(new EncounterCombatant('token-b', 10));
+        $encounter->start();
+
+        $encounter->spendTurnResource(
+            \GreatMarketrealmTabletop\Tabletop\Battle\Models\TurnResource::ACTION
+        );
+
+        self::assertTrue(
+            $encounter->turnEconomy()->isSpent(
+                \GreatMarketrealmTabletop\Tabletop\Battle\Models\TurnResource::ACTION
+            )
+        );
+
+        $encounter->advanceTurn();
+
+        self::assertFalse(
+            $encounter->turnEconomy()->isSpent(
+                \GreatMarketrealmTabletop\Tabletop\Battle\Models\TurnResource::ACTION
+            )
+        );
+    }
+
 }

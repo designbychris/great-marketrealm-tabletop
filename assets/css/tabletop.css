@@ -301,3 +301,26 @@
     font-family: system-ui, sans-serif;
     font-size: .82rem;
 }
+
+
+.gmrt-deeds {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    justify-content: flex-end;
+}
+
+.gmrt-deed {
+    border: 1px solid rgba(244, 234, 214, .35);
+    border-radius: 8px;
+    padding: .45rem .7rem;
+    background: rgba(0, 0, 0, .22);
+    color: inherit;
+    font: 700 .78rem system-ui, sans-serif;
+    cursor: pointer;
+}
+
+.gmrt-deed:hover,
+.gmrt-deed:focus-visible {
+    background: rgba(244, 234, 214, .14);
+}

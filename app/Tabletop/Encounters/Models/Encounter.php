@@ -6,6 +6,7 @@ namespace GreatMarketrealmTabletop\Tabletop\Encounters\Models;
 
 use DateTimeImmutable;
 use GreatMarketrealmTabletop\Tabletop\Encounters\Exceptions\EncounterStateException;
+use GreatMarketrealmTabletop\Tabletop\Battle\Models\TurnEconomy;
 use InvalidArgumentException;
 
 defined('ABSPATH') || exit;
@@ -23,7 +24,8 @@ final class Encounter
         private int $round,
         private int $turnIndex,
         private int $revision,
-        private DateTimeImmutable $createdAt
+        private DateTimeImmutable $createdAt,
+        private TurnEconomy $turnEconomy
     ) {}
 
     public static function prepare(
@@ -51,7 +53,8 @@ final class Encounter
             0,
             0,
             1,
-            $createdAt
+            $createdAt,
+            new TurnEconomy()
         );
     }
 
@@ -76,7 +79,12 @@ final class Encounter
             max(0, (int) ($record['round'] ?? 0)),
             max(0, (int) ($record['turn_index'] ?? 0)),
             max(1, (int) ($record['revision'] ?? 1)),
-            new DateTimeImmutable((string) ($record['created_at'] ?? 'now'))
+            new DateTimeImmutable((string) ($record['created_at'] ?? 'now')),
+            new TurnEconomy(
+                is_array($record['turn_economy'] ?? null)
+                    ? $record['turn_economy']
+                    : []
+            )
         );
     }
 
@@ -137,6 +145,7 @@ final class Encounter
         $this->status = EncounterStatus::ACTIVE;
         $this->round = 1;
         $this->turnIndex = 0;
+        $this->turnEconomy->reset();
         ++$this->revision;
     }
 
@@ -176,6 +185,7 @@ final class Encounter
             ++$this->round;
         }
 
+        $this->turnEconomy->reset();
         ++$this->revision;
     }
 
@@ -197,6 +207,22 @@ final class Encounter
     public function round(): int { return $this->round; }
     public function turnIndex(): int { return $this->turnIndex; }
     public function revision(): int { return $this->revision; }
+
+    public function turnEconomy(): TurnEconomy
+    {
+        return $this->turnEconomy;
+    }
+
+    public function spendTurnResource(string $resource): void
+    {
+        $this->requireStatus(
+            EncounterStatus::ACTIVE,
+            'Turn resources may only be spent during an active Encounter.'
+        );
+
+        $this->turnEconomy->spend($resource);
+        ++$this->revision;
+    }
 
     /** @return array<int,EncounterCombatant> */
     public function combatants(): array
@@ -243,6 +269,7 @@ final class Encounter
             'current_token_id' => $this->currentCombatant()?->tokenId(),
             'revision' => $this->revision,
             'created_at' => $this->createdAt->format(DATE_ATOM),
+            'turn_economy' => $this->turnEconomy->toArray(),
         ];
     }
 

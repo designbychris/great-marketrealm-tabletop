@@ -145,3 +145,18 @@
 ### Phase IV.10 — The Shared Table
 
 Lower-latency shared-state synchronisation, presence and reconnection foundations.
+
+
+### Phase IV.10 — Deeds in Battle
+
+- [x] Canonical Action / Bonus Action / Movement / Reaction resources
+- [x] First canonical Deeds: Attack, Dash, Disengage, Dodge, Help
+- [x] Server-owned turn-resource expenditure
+- [x] Automatic turn-resource reset on turn advancement
+- [x] Current-combatant authority checks
+- [x] Dungeon Master or controlling Player deed permissions
+- [x] Encounter revision conflict protection
+- [x] Structured persistent battle-event log
+- [x] Authenticated nonce-protected Deed endpoint
+- [x] First visible Chamber Deed controls
+- [ ] Server-side certification on the deployment environment

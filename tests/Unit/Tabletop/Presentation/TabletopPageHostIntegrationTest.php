@@ -102,4 +102,22 @@ final class TabletopPageHostIntegrationTest extends TestCase
             $view
         );
     }
+
+    public function testProviderRegistersBattleDeedEndpoint(): void
+    {
+        $source = (string) file_get_contents(
+            $this->root
+                . '/app/Tabletop/TabletopServiceProvider.php'
+        );
+
+        self::assertStringContainsString(
+            "'wp_ajax_gmrt_perform_battle_deed'",
+            $source
+        );
+        self::assertStringNotContainsString(
+            "'wp_ajax_nopriv_gmrt_perform_battle_deed'",
+            $source
+        );
+    }
+
 }

@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.10.0-alpha.2] - 2026-08-26
+
+### Added
+
+- Phase IV.10 — Deeds in Battle.
+- Action, Bonus Action, Movement and Reaction turn-resource model.
+- Attack, Dash, Disengage, Dodge and Help deed vocabulary.
+- Server-authoritative current-combatant deed permissions.
+- Automatic turn-resource reset during turn advancement.
+- Persistent structured Battle Event log.
+- Authenticated nonce-protected battle-deed endpoint.
+- First visible Deed controls in the Tabletop Chamber.
+
+
 ## [0.10.0-alpha.1] - 2026-08-26
 
 ### Changed
