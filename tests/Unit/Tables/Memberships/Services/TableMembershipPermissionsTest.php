@@ -6,6 +6,7 @@ namespace GreatMarketrealmTabletop\Tests\Unit\Tables\Memberships\Services;
 
 use DateTimeImmutable;
 use GreatMarketrealmTabletop\Tables\Memberships\Models\TableMember;
+use GreatMarketrealmTabletop\Tables\Memberships\Services\TableMembershipPermissions;
 use PHPUnit\Framework\TestCase;
 
 final class TableMembershipPermissionsTest extends TestCase

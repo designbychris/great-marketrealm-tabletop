@@ -14,6 +14,7 @@ use GreatMarketrealmTabletop\Tables\Memberships\Models\TableMemberStatus;
 use GreatMarketrealmTabletop\Tables\Models\Table;
 use GreatMarketrealmTabletop\Tests\Unit\Tables\Services\FixedClock;
 use GreatMarketrealmTabletop\Tests\Unit\Tables\Services\InMemoryTableRepository;
+use GreatMarketrealmTabletop\Tables\Memberships\Services\TableGathering;
 use PHPUnit\Framework\TestCase;
 
 final class TableGatheringTest extends TestCase
