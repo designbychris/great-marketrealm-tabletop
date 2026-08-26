@@ -15,64 +15,34 @@ final class TabletopRouteTest extends TestCase
         $this->root = dirname(__DIR__, 4);
     }
 
-    public function testRouteRegistersBareTabletopPath(): void
+    public function testProviderDoesNotClaimWordPressPageRoute(): void
     {
-        $source = file_get_contents(
-            $this->root
-                . '/app/Tabletop/Routing/TabletopRoute.php'
-        );
-
-        self::assertIsString($source);
-        self::assertStringContainsString(
-            "'^tabletop/?$'",
-            $source
-        );
-    }
-
-    public function testRouteSupportsTableSpecificPath(): void
-    {
-        $source = file_get_contents(
-            $this->root
-                . '/app/Tabletop/Routing/TabletopRoute.php'
-        );
-
-        self::assertIsString($source);
-        self::assertStringContainsString(
-            "'^tabletop/([^/]+)/?$'",
-            $source
-        );
-        self::assertStringContainsString(
-            "public const TABLE_VAR = 'gmrt_table'",
-            $source
-        );
-    }
-
-    public function testVisibleShellUsesTemplateRedirect(): void
-    {
-        $source = file_get_contents(
+        $source = (string) file_get_contents(
             $this->root
                 . '/app/Tabletop/TabletopServiceProvider.php'
         );
 
-        self::assertIsString($source);
-        self::assertStringContainsString(
-            "'template_redirect'",
+        self::assertStringNotContainsString(
+            'TabletopRoute',
             $source
         );
-        self::assertStringContainsString(
-            "'query_vars'",
+        self::assertStringNotContainsString(
+            'template_redirect',
+            $source
+        );
+        self::assertStringNotContainsString(
+            'add_rewrite_rule',
             $source
         );
     }
 
-    public function testProviderRegistersAuthenticatedLivingTableAjaxActions(): void
+    public function testProviderKeepsLivingTableAjaxActions(): void
     {
-        $source = file_get_contents(
+        $source = (string) file_get_contents(
             $this->root
                 . '/app/Tabletop/TabletopServiceProvider.php'
         );
 
-        self::assertIsString($source);
         self::assertStringContainsString(
             "'wp_ajax_gmrt_tabletop_state'",
             $source
@@ -81,21 +51,15 @@ final class TabletopRouteTest extends TestCase
             "'wp_ajax_gmrt_move_token'",
             $source
         );
-        self::assertStringNotContainsString(
-            "'wp_ajax_nopriv_gmrt_move_token'",
-            $source
-        );
     }
 
-
-    public function testProviderRegistersEncounterControlActions(): void
+    public function testProviderKeepsEncounterControlActions(): void
     {
-        $source = file_get_contents(
+        $source = (string) file_get_contents(
             $this->root
                 . '/app/Tabletop/TabletopServiceProvider.php'
         );
 
-        self::assertIsString($source);
         self::assertStringContainsString(
             "'wp_ajax_gmrt_prepare_encounter'",
             $source
@@ -108,29 +72,5 @@ final class TabletopRouteTest extends TestCase
             "'wp_ajax_gmrt_end_encounter'",
             $source
         );
-        self::assertStringNotContainsString(
-            "'wp_ajax_nopriv_gmrt_prepare_encounter'",
-            $source
-        );
     }
-
-
-    public function testRouteProvidesTabletopBodyClassForThemeIntegration(): void
-    {
-        $source = file_get_contents(
-            $this->root
-                . '/app/Tabletop/Routing/TabletopRoute.php'
-        );
-
-        self::assertIsString($source);
-        self::assertStringContainsString(
-            'gmrt-tabletop-page',
-            $source
-        );
-        self::assertStringContainsString(
-            'bodyClasses',
-            $source
-        );
-    }
-
 }

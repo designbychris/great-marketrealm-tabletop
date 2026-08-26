@@ -47,6 +47,15 @@ if (! function_exists('add_action')) {
     }
 }
 
+if (! function_exists('add_shortcode')) {
+    function add_shortcode(
+        string $tag,
+        callable $callback
+    ): void {
+        $GLOBALS['gmrt_test_shortcodes'][$tag] = $callback;
+    }
+}
+
 if (! function_exists('add_filter')) {
     function add_filter(
         string $hook,

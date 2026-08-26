@@ -24,7 +24,7 @@ final class PluginFoundationTest extends TestCase
             $source
         );
         self::assertStringContainsString(
-            "define('GMRT_VERSION', '0.9.0-alpha.1')",
+            "define('GMRT_VERSION', '0.10.0-alpha.1')",
             $source
         );
         self::assertStringContainsString(
@@ -291,19 +291,23 @@ final class PluginFoundationTest extends TestCase
         self::assertSame([], $violations);
     }
 
-    public function testTabletopChamberOwnsItsFrontEndPath(): void
+    public function testTabletopPageHostDoesNotOwnWordPressRewritePath(): void
     {
-        $route = $this->source(
-            'app/Tabletop/Routing/TabletopRoute.php'
+        $provider = $this->source(
+            'app/Tabletop/TabletopServiceProvider.php'
         );
 
         self::assertStringContainsString(
-            '^tabletop/',
-            $route
+            'TabletopShortcode',
+            $provider
         );
         self::assertStringNotContainsString(
-            'gmrc_route',
-            $route
+            'TabletopRoute',
+            $provider
+        );
+        self::assertStringNotContainsString(
+            'template_redirect',
+            $provider
         );
     }
 

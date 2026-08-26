@@ -18,6 +18,16 @@ Gameplay code must not reach directly into arbitrary Companion internals.
 
 ## Current Milestone
 
+### Phase IV.10A — Tabletop Page Host Integration
+
+The visible Tabletop now follows the Companion-style WordPress Page host
+pattern. Create a normal `/tabletop/` Page and place:
+
+`[great_marketrealm_tabletop]`
+
+Elementor/theme code owns the site shell while GMRT owns the Chamber and all
+authoritative VTT behaviour.
+
 ### Phase IV.9 — The Turn of Battle
 
 The Tabletop now has a persistent server-authoritative Encounter engine:

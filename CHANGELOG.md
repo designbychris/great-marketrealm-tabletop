@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.10.0-alpha.1] - 2026-08-26
+
+### Changed
+
+- Phase IV.10A — Tabletop Page Host Integration.
+- Replaced direct `/tabletop/` rewrite interception with the Companion-style
+  `[great_marketrealm_tabletop]` shortcode.
+- WordPress/Elementor now owns the Tabletop Page header, footer and layout.
+- Chamber rendering is now a content fragment suitable for shortcode hosting.
+- Table selection supports shortcode attributes and `?table=` navigation.
+- Existing movement, state and Encounter AJAX endpoints remain unchanged.
+- Removed the Tabletop rewrite-flush activation dependency.
+
+
 ## [0.9.0-alpha.1] - 2026-08-26
 
 ### Added

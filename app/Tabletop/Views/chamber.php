@@ -21,8 +21,6 @@ $sceneImage = $scene !== null
     )
     : false;
 ?>
-<?php get_header(); ?>
-
 <main
     class="gmrt-chamber"
     id="main-content"
@@ -392,4 +390,3 @@ $sceneImage = $scene !== null
     ></div>
 </main>
 
-<?php get_footer(); ?>

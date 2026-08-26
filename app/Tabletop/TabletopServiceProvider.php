@@ -4,22 +4,19 @@ declare(strict_types=1);
 
 namespace GreatMarketrealmTabletop\Tabletop;
 
-use GreatMarketrealmTabletop\Tabletop\Http\TabletopController;
-use GreatMarketrealmTabletop\Tabletop\Http\TabletopAjaxController;
-use GreatMarketrealmTabletop\Tabletop\Http\EncounterAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Encounters\Services\EncounterManagerFactory;
+use GreatMarketrealmTabletop\Tabletop\Http\EncounterAjaxController;
+use GreatMarketrealmTabletop\Tabletop\Http\TabletopAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Movement\Services\TabletopMovementFactory;
 use GreatMarketrealmTabletop\Tabletop\Presentation\TabletopChamberRenderer;
-use GreatMarketrealmTabletop\Tabletop\Routing\TabletopRoute;
+use GreatMarketrealmTabletop\Tabletop\Presentation\TabletopShortcode;
 use GreatMarketrealmTabletop\Tabletop\Services\TabletopChamberFactory;
 
 defined('ABSPATH') || exit;
 
 final class TabletopServiceProvider
 {
-    private TabletopRoute $route;
-
-    private TabletopController $controller;
+    private TabletopShortcode $shortcode;
 
     private TabletopAjaxController $ajax;
 
@@ -27,11 +24,9 @@ final class TabletopServiceProvider
 
     public function __construct()
     {
-        $this->route = new TabletopRoute();
         $chamber = TabletopChamberFactory::make();
 
-        $this->controller = new TabletopController(
-            $this->route,
+        $this->shortcode = new TabletopShortcode(
             $chamber,
             new TabletopChamberRenderer()
         );
@@ -48,24 +43,9 @@ final class TabletopServiceProvider
 
     public function register(): void
     {
-        add_action(
-            'init',
-            [$this->route, 'register']
-        );
-
-        add_filter(
-            'query_vars',
-            [$this->route, 'queryVars']
-        );
-
-        add_filter(
-            'body_class',
-            [$this->route, 'bodyClasses']
-        );
-
-        add_action(
-            'template_redirect',
-            [$this->controller, 'dispatch']
+        add_shortcode(
+            TabletopShortcode::TAG,
+            [$this->shortcode, 'render']
         );
 
         add_action(

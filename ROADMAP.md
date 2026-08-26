@@ -130,6 +130,18 @@
 - [x] Chamber battle-state projection for future combat HUD
 - [ ] Server-side certification on the deployment environment
 
+### Phase IV.10A — Tabletop Page Host Integration
+
+- [x] Real WordPress/Elementor Page owns `/tabletop/`
+- [x] Companion-style `[great_marketrealm_tabletop]` shortcode
+- [x] GMRT renders Chamber content as a page fragment
+- [x] Theme/Elementor owns header, footer and surrounding layout
+- [x] Existing Tabletop AJAX and Encounter endpoints preserved
+- [x] Table selection supported by shortcode attribute or `?table=` query
+- [x] Direct `/tabletop/` rewrite interception retired
+- [x] Rewrite-flush activation dependency removed
+- [ ] Server-side certification on the deployment environment
+
 ### Phase IV.10 — The Shared Table
 
 Lower-latency shared-state synchronisation, presence and reconnection foundations.

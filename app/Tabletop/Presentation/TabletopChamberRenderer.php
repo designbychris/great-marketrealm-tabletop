@@ -13,10 +13,13 @@ final class TabletopChamberRenderer
     public function render(
         ?TabletopChamberState $state,
         ?string $message = null
-    ): void {
+    ): string {
         $view = GMRT_PATH
             . 'app/Tabletop/Views/chamber.php';
 
+        ob_start();
         require $view;
+
+        return (string) ob_get_clean();
     }
 }
