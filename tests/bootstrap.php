@@ -47,6 +47,17 @@ if (! function_exists('add_action')) {
     }
 }
 
+
+if (! function_exists('add_filter')) {
+    function add_filter(
+        string $hook,
+        callable $callback,
+        int $priority = 10
+    ): void {
+        $GLOBALS['gmrt_test_actions'][$hook][$priority][] = $callback;
+    }
+}
+
 if (! function_exists('do_action')) {
     function do_action(string $hook, mixed ...$args): void
     {
