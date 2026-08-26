@@ -24,7 +24,7 @@ final class PluginFoundationTest extends TestCase
             $source
         );
         self::assertStringContainsString(
-            "define('GMRT_VERSION', '0.5.0-alpha.1')",
+            "define('GMRT_VERSION', '0.4.0-alpha.1')",
             $source
         );
         self::assertStringContainsString(
@@ -207,6 +207,55 @@ final class PluginFoundationTest extends TestCase
         }
 
         self::assertSame([], $violations);
+    }
+
+
+    public function testTokenDomainKeepsCompanionSourcesOpaque(): void
+    {
+        $path = $this->root
+            . '/app/Tables/Tokens';
+        $violations = [];
+
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator(
+                $path,
+                \FilesystemIterator::SKIP_DOTS
+            )
+        );
+
+        foreach ($iterator as $file) {
+            if (
+                $file->isFile()
+                && $file->getExtension() === 'php'
+                && str_contains(
+                    (string) file_get_contents(
+                        $file->getPathname()
+                    ),
+                    'GreatMarketrealmCompanion\\'
+                )
+            ) {
+                $violations[] =
+                    $file->getPathname();
+            }
+        }
+
+        self::assertSame([], $violations);
+    }
+
+    public function testTabletopRouteIsReservedForVisibleShell(): void
+    {
+        $roadmap = $this->source(
+            'ROADMAP.md'
+        );
+
+        self::assertStringContainsString(
+            '/tabletop/',
+            $roadmap
+        );
+        self::assertStringContainsString(
+            'Phase IV.7 — The Tabletop Chamber',
+            $roadmap
+        );
     }
 
 }

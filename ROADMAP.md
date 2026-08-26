@@ -71,4 +71,29 @@
 
 ### Phase IV.6 — Tokens on the Table
 
-Persistent token identity and placement on the active Scene.
+- [x] Persistent token identity
+- [x] Character, Creature and Object token vocabulary
+- [x] Opaque Companion/Bestiary source references
+- [x] Optional WordPress user controller identity
+- [x] Scene-bound token placement
+- [x] Normalised X/Y movement
+- [x] Width/height footprint foundations
+- [x] Visible/Hidden token state
+- [x] Token persistence across Scene switching
+- [x] Ended Tables preserve tokens but reject token mutation
+- [x] Token domain and persistence regression coverage
+- [ ] Server-side certification on the deployment environment
+
+### Phase IV.7 — The Tabletop Chamber
+
+The first visible VTT application shell will live at **`/tabletop/`**.
+
+Planned foundations:
+
+- Front-end Tabletop route and application shell
+- Active Scene battlemap rendering
+- Token rendering from IV.6 records
+- Dungeon Master and Player view boundaries
+- Table/member context
+- Accessible loading and empty states
+- No real-time drag transport yet

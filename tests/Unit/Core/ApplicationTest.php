@@ -30,7 +30,7 @@ final class ApplicationTest extends TestCase
     public function testApplicationExposesInitialVersion(): void
     {
         self::assertSame(
-            '0.5.0-alpha.1',
+            '0.4.0-alpha.1',
             Application::instance()->version()
         );
     }
@@ -40,6 +40,15 @@ final class ApplicationTest extends TestCase
         self::assertInstanceOf(
             \GreatMarketrealmTabletop\Tables\Scenes\Services\TableSceneManager::class,
             \GreatMarketrealmTabletop\Core\Application::instance()->scenes()
+        );
+    }
+
+
+    public function testApplicationExposesTableTokens(): void
+    {
+        self::assertInstanceOf(
+            \GreatMarketrealmTabletop\Tables\Tokens\Services\TableTokenManager::class,
+            \GreatMarketrealmTabletop\Core\Application::instance()->tokens()
         );
     }
 

@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.6.0-alpha.1] - 2026-08-26
+
+### Added
+
+- Phase IV.6 — Tokens on the Table.
+- Persistent Character, Creature and Object token records.
+- Opaque external source references without direct Companion coupling.
+- Optional token controller WordPress user IDs.
+- Normalised Scene placement and movement.
+- Width/height token footprint foundations.
+- Visible and Hidden token preparation state.
+- WordPress token persistence adapter and application manager.
+- Ended-Table token preservation and mutation guards.
+- `/tabletop/` reserved for the IV.7 visible VTT shell.
+
+
 ## [0.5.0-alpha.1] - 2026-08-26
 
 ### Added

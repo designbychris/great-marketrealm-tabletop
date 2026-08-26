@@ -18,6 +18,20 @@ Gameplay code must not reach directly into arbitrary Companion internals.
 
 ## Current Milestone
 
+### Phase IV.6 — Tokens on the Table
+
+IV.6 places persistent game pieces onto Table Scenes:
+
+- Character, Creature and Object tokens
+- opaque GMRC/Bestiary source references
+- optional controlling WordPress users
+- normalised Scene positioning
+- token footprint sizing
+- Visible/Hidden preparation state
+- persistence across Scene switches
+
+The visible VTT shell is reserved for **IV.7 — The Tabletop Chamber** at **`/tabletop/`**.
+
 ### Phase IV.5 — The First Battlemap
 
 IV.5 gives each Table persistent battlemap Scenes:
