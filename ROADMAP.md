@@ -198,3 +198,24 @@ Lower-latency shared-state synchronisation, presence and reconnection foundation
 - [ ] Death saves and unconsciousness rules
 - [ ] GMRC HP synchronisation
 - [ ] Server-side certification on deployment
+
+
+### Phase IV.13 — When Heroes Fall
+
+- [x] Persistent per-token death-save state
+- [x] Server-side secure d20 death saves
+- [x] 10+ success / 9- failure
+- [x] Natural 1 counts as two failures
+- [x] Natural 20 restores the combatant to 1 HP
+- [x] Three successes stabilize
+- [x] Three failures mark the combatant Fallen
+- [x] Only downed combatants may roll death saves
+- [x] Player authority restricted to controlled token
+- [x] Downed combatants blocked from ordinary Battle Deeds
+- [x] Structured `death-save-resolved` Battle Events
+- [x] Chamber death-save projection
+- [x] First DOWN / Saves / Failures combat HUD
+- [ ] Damage-at-zero death-save failures
+- [ ] Instant-death / massive-damage rules
+- [ ] GMRC character-state synchronisation
+- [ ] Server-side certification on deployment

@@ -71,4 +71,14 @@ final class VitalityTest extends TestCase
             Vitality::reconstitute($vitality->toArray())->toArray()
         );
     }
+
+    public function testNaturalTwentyRevivalCanRestoreOneHp(): void
+    {
+        $vitality = new Vitality('token-a', 20, 0);
+        $vitality->reviveAtOneHp();
+
+        self::assertSame(1, $vitality->currentHp());
+        self::assertSame(VitalityState::WOUNDED, $vitality->state());
+    }
+
 }

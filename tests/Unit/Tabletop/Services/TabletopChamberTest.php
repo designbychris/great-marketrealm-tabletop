@@ -26,6 +26,7 @@ final class TabletopChamberTest extends TestCase
     private ChamberTokens $tokens;
     private ChamberEncounters $encounters;
     private ChamberVitality $vitality;
+    private ChamberDeathSaves $deathSaves;
     private TabletopChamber $chamber;
 
     protected function setUp(): void
@@ -40,6 +41,7 @@ final class TabletopChamberTest extends TestCase
         $this->tokens = new ChamberTokens();
         $this->encounters = new ChamberEncounters();
         $this->vitality = new ChamberVitality();
+        $this->deathSaves = new ChamberDeathSaves();
 
         $table = Table::prepare(
             'table-1',
@@ -122,7 +124,8 @@ final class TabletopChamberTest extends TestCase
             $this->scenes,
             $this->tokens,
             $this->encounters,
-            $this->vitality
+            $this->vitality,
+            $this->deathSaves
         );
     }
 
@@ -216,6 +219,18 @@ final class TabletopChamberTest extends TestCase
         self::assertSame(
             10,
             $state->vitality()['token-visible']['maximum_hp']
+        );
+    }
+
+
+    public function testChamberProjectsDeathSaveStateForVisibleTokens(): void
+    {
+        $state = $this->chamber->state('table-1', 42);
+
+        self::assertArrayHasKey('token-visible', $state->deathSaves());
+        self::assertSame(
+            0,
+            $state->deathSaves()['token-visible']['failures']
         );
     }
 

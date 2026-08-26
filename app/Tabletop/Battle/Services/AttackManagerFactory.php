@@ -31,7 +31,8 @@ final class AttackManagerFactory
                 $members,
                 $tokens,
                 $events,
-                $clock
+                $clock,
+                new WordPressVitalityRepository()
             ),
             $encounters,
             $members,

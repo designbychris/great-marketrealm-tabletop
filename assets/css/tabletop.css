@@ -371,3 +371,32 @@
     font-size: .7rem;
     opacity: .72;
 }
+
+
+.gmrt-death-saves {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: .55rem;
+    padding: .55rem .7rem;
+    border: 1px solid rgba(244, 234, 214, .25);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, .24);
+    font-family: system-ui, sans-serif;
+    font-size: .78rem;
+}
+
+.gmrt-death-saves strong {
+    letter-spacing: .08em;
+}
+
+.gmrt-death-saves button {
+    border: 1px solid currentColor;
+    border-radius: 7px;
+    padding: .38rem .58rem;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}

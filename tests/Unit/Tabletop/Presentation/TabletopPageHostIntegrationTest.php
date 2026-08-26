@@ -138,4 +138,21 @@ final class TabletopPageHostIntegrationTest extends TestCase
         );
     }
 
+
+    public function testProviderRegistersDeathSaveEndpoint(): void
+    {
+        $source = (string) file_get_contents(
+            $this->root . '/app/Tabletop/TabletopServiceProvider.php'
+        );
+
+        self::assertStringContainsString(
+            "'wp_ajax_gmrt_roll_death_save'",
+            $source
+        );
+        self::assertStringNotContainsString(
+            "'wp_ajax_nopriv_gmrt_roll_death_save'",
+            $source
+        );
+    }
+
 }

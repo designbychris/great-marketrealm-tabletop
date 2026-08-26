@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace GreatMarketrealmTabletop\Tabletop\Battle\Services;
 
 use GreatMarketrealmTabletop\Tabletop\Battle\Repositories\WordPressBattleEventRepository;
+use GreatMarketrealmTabletop\Tabletop\Battle\Repositories\WordPressDeathSaveRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Repositories\WordPressVitalityRepository;
 use GreatMarketrealmTabletop\Tabletop\Encounters\Repositories\WordPressEncounterRepository;
 use GreatMarketrealmTabletop\Tables\Memberships\Repositories\WordPressTableMembershipRepository;
@@ -13,17 +14,21 @@ use GreatMarketrealmTabletop\Tables\Tokens\Repositories\WordPressTableTokenRepos
 
 defined('ABSPATH') || exit;
 
-final class BattleDeedManagerFactory
+final class DeathSaveManagerFactory
 {
-    public static function make(): BattleDeedManager
+    public static function make(): DeathSaveManager
     {
-        return new BattleDeedManager(
+        return new DeathSaveManager(
             new WordPressEncounterRepository(),
             new WordPressTableMembershipRepository(),
             new WordPressTableTokenRepository(),
+            new WordPressVitalityRepository(),
+            new WordPressDeathSaveRepository(),
             new WordPressBattleEventRepository(),
-            new SystemTableClock(),
-            new WordPressVitalityRepository()
+            new DeathSaveResolver(
+                new SecureDeathSaveRoller()
+            ),
+            new SystemTableClock()
         );
     }
 }

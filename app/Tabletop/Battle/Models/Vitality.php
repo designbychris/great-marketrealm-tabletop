@@ -115,6 +115,13 @@ final class Vitality
         return $this->currentHp - $before;
     }
 
+    public function reviveAtOneHp(): void
+    {
+        if ($this->currentHp === 0) {
+            $this->currentHp = 1;
+        }
+    }
+
     public function grantTemporaryHp(int $amount): void
     {
         if ($amount < 0) {

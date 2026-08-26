@@ -14,6 +14,7 @@ $tokens = $state?->tokens() ?? [];
 $members = $state?->members() ?? [];
 $encounter = $state?->encounter();
 $vitality = $state?->vitality() ?? [];
+$deathSaves = $state?->deathSaves() ?? [];
 
 $sceneImage = $scene !== null
     ? wp_get_attachment_image_url(
@@ -120,6 +121,46 @@ $sceneImage = $scene !== null
             ($encounter['status'] ?? '') === 'active'
             && ! empty($encounter['current_token_id'])
         ) : ?>
+            <?php
+            $currentTokenId = (string) (
+                $encounter['current_token_id']
+                ?? ''
+            );
+            $currentVitality = $vitality[$currentTokenId] ?? null;
+            $currentDeathSaves = $deathSaves[$currentTokenId] ?? null;
+            ?>
+            <?php if (
+                is_array($currentVitality)
+                && (int) $currentVitality['current_hp'] === 0
+            ) : ?>
+                <div class="gmrt-death-saves" data-death-saves>
+                    <strong>DOWN</strong>
+                    <?php if (
+                        is_array($currentDeathSaves)
+                        && ! empty($currentDeathSaves['dead'])
+                    ) : ?>
+                        <span>Fallen</span>
+                    <?php elseif (
+                        is_array($currentDeathSaves)
+                        && ! empty($currentDeathSaves['stable'])
+                    ) : ?>
+                        <span>Stable</span>
+                    <?php else : ?>
+                        <span>
+                            Saves <?php echo esc_html(
+                                (string) ($currentDeathSaves['successes'] ?? 0)
+                            ); ?>/3
+                            · Failures <?php echo esc_html(
+                                (string) ($currentDeathSaves['failures'] ?? 0)
+                            ); ?>/3
+                        </span>
+                        <button type="button" data-roll-death-save>
+                            Roll Death Save
+                        </button>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
+
             <div
                 class="gmrt-deeds"
                 aria-label="Battle deeds"

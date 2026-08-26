@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace GreatMarketrealmTabletop\Tabletop\Battle\Services;
 
 use GreatMarketrealmTabletop\Tabletop\Battle\Contracts\BattleEventRepository;
+use GreatMarketrealmTabletop\Tabletop\Battle\Contracts\VitalityRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Exceptions\BattleDeedDenied;
 use GreatMarketrealmTabletop\Tabletop\Battle\Models\BattleDeed;
 use GreatMarketrealmTabletop\Tabletop\Battle\Models\BattleEvent;
@@ -24,7 +25,8 @@ final class BattleDeedManager
         private TableMembershipRepository $members,
         private TableTokenRepository $tokens,
         private BattleEventRepository $events,
-        private TableClock $clock
+        private TableClock $clock,
+        private ?VitalityRepository $vitality = null
     ) {}
 
     public function perform(
@@ -94,6 +96,19 @@ final class BattleDeedManager
             throw new BattleDeedDenied(
                 'This Table member does not control the current combatant.'
             );
+        }
+
+        if ($this->vitality !== null) {
+            $vitality = $this->vitality->forToken(
+                $tableId,
+                $token->id()
+            );
+
+            if ($vitality->currentHp() === 0) {
+                throw new BattleDeedDenied(
+                    'A downed combatant cannot perform ordinary battle deeds.'
+                );
+            }
         }
 
         $resource = BattleDeed::resource($deed);

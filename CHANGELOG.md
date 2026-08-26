@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.13.0-alpha.1] - 2026-08-26
+
+### Added
+
+- Phase IV.13 — When Heroes Fall.
+- Persistent per-token death-save state.
+- Secure server-side death-save d20 resolution.
+- Natural 1 double failures and natural 20 revival to 1 HP.
+- Three-success stabilization and three-failure Fallen state.
+- Authority checks for controlled Player tokens.
+- Downed-combatant Battle Deed restrictions.
+- Structured `death-save-resolved` Battle Events.
+- Chamber death-save projection and first DOWN combat HUD.
+
+
 ## [0.12.0-alpha.1] - 2026-08-26
 
 ### Added

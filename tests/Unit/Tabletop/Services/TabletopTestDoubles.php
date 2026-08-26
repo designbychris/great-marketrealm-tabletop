@@ -202,3 +202,26 @@ final class ChamberVitality implements \GreatMarketrealmTabletop\Tabletop\Battle
         $this->items[$vitality->tokenId()] = $vitality;
     }
 }
+
+
+final class ChamberDeathSaves implements \GreatMarketrealmTabletop\Tabletop\Battle\Contracts\DeathSaveRepository
+{
+    public array $items = [];
+
+    public function forToken(
+        string $tableId,
+        string $tokenId
+    ): \GreatMarketrealmTabletop\Tabletop\Battle\Models\DeathSaveState {
+        return $this->items[$tokenId]
+            ?? new \GreatMarketrealmTabletop\Tabletop\Battle\Models\DeathSaveState(
+                $tokenId
+            );
+    }
+
+    public function save(
+        string $tableId,
+        \GreatMarketrealmTabletop\Tabletop\Battle\Models\DeathSaveState $state
+    ): void {
+        $this->items[$state->tokenId()] = $state;
+    }
+}

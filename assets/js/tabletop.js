@@ -177,6 +177,53 @@
     });
 
 
+    const deathSaveButton = document.querySelector(
+        '[data-roll-death-save]'
+    );
+
+    if (deathSaveButton) {
+        deathSaveButton.addEventListener('click', async () => {
+            const encounter = document.querySelector('[data-encounter-id]');
+
+            if (!encounter) {
+                say('No active Encounter.');
+                return;
+            }
+
+            deathSaveButton.disabled = true;
+
+            try {
+                const data = await request('gmrt_roll_death_save', {
+                    encounter_id: encounter.dataset.encounterId || '',
+                    revision: encounter.dataset.encounterRevision || '1'
+                });
+
+                const save = data.death_save;
+                let message = 'Death save: d20 ' + save.roll + '. ';
+
+                if (save.result === 'natural-twenty') {
+                    message += 'Natural 20! Back on 1 HP.';
+                } else if (save.result === 'natural-one') {
+                    message += 'Natural 1 — two failures.';
+                } else if (save.result === 'success') {
+                    message += 'Success.';
+                } else {
+                    message += 'Failure.';
+                }
+
+                say(message);
+                await refresh();
+            } catch (error) {
+                say(
+                    error.message
+                    || 'The death save could not be resolved.'
+                );
+            } finally {
+                deathSaveButton.disabled = false;
+            }
+        });
+    }
+
     document.querySelectorAll('[data-battle-deed]').forEach((button) => {
         button.addEventListener('click', async () => {
             const encounter = document.querySelector('[data-encounter-id]');

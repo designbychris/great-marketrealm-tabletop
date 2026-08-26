@@ -8,6 +8,7 @@ use GreatMarketrealmTabletop\Tabletop\Exceptions\TabletopAccessDenied;
 use GreatMarketrealmTabletop\Tabletop\Models\TabletopChamberState;
 use GreatMarketrealmTabletop\Tabletop\Encounters\Contracts\EncounterRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Contracts\VitalityRepository;
+use GreatMarketrealmTabletop\Tabletop\Battle\Contracts\DeathSaveRepository;
 use GreatMarketrealmTabletop\Tables\Contracts\TableRepository;
 use GreatMarketrealmTabletop\Tables\Memberships\Contracts\TableMembershipRepository;
 use GreatMarketrealmTabletop\Tables\Memberships\Models\TableMember;
@@ -27,7 +28,8 @@ final class TabletopChamber
         private TableSceneRepository $scenes,
         private TableTokenRepository $tokens,
         private EncounterRepository $encounters,
-        private VitalityRepository $vitality
+        private VitalityRepository $vitality,
+        private DeathSaveRepository $deathSaves
     ) {}
 
     public function state(
@@ -101,6 +103,7 @@ final class TabletopChamber
             : null;
 
         $vitality = [];
+        $deathSaves = [];
 
         foreach ($tokens as $token) {
             $tokenId = (string) ($token['id'] ?? '');
@@ -115,6 +118,13 @@ final class TabletopChamber
                     $tokenId
                 )
                 ->toArray();
+
+            $deathSaves[$tokenId] = $this->deathSaves
+                ->forToken(
+                    $tableId,
+                    $tokenId
+                )
+                ->toArray();
         }
 
         return new TabletopChamberState(
@@ -124,7 +134,8 @@ final class TabletopChamber
             $activeScene?->toArray(),
             $tokens,
             $encounter?->toArray(),
-            $vitality
+            $vitality,
+            $deathSaves
         );
     }
 }

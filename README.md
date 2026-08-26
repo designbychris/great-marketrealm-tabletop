@@ -18,6 +18,15 @@ Gameplay code must not reach directly into arbitrary Companion internals.
 
 ## Current Milestone
 
+### Phase IV.13 — When Heroes Fall
+
+Combatants at 0 HP now enter an authoritative death-save flow. Three successes
+stabilize, three failures mark the combatant Fallen, natural 1 counts as two
+failures, and natural 20 restores 1 HP.
+
+Downed combatants cannot perform ordinary Battle Deeds, and the Chamber gains
+its first death-save HUD.
+
 ### Phase IV.12 — Blood on the Board
 
 Successful attacks now roll and apply server-authoritative damage. Tokens gain
