@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.15.0-alpha.2] - 2026-08-26
+
+### Fixed
+
+- Updated the vitality presentation regression to assert IV.15 authoritative
+  resolved/raw damage output rather than the pre-IV.15 raw damage string.
+- Updated the Test Table fixture regression for the four-part typed damage
+  tuple: dice count, die size, modifier and damage type.
+
+
 ## [0.15.0-alpha.1] - 2026-08-26
 
 ### Added

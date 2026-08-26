@@ -37,7 +37,11 @@ final class TabletopVitalityViewRegressionTest extends TestCase
         );
 
         self::assertStringContainsString(
-            "' Damage ' + data.damage.total",
+            'adjusted.resolved_damage',
+            $source
+        );
+        self::assertStringContainsString(
+            'adjusted.raw_damage',
             $source
         );
         self::assertStringContainsString(
