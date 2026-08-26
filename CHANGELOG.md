@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.16.0-alpha.2] - 2026-08-26
+
+### Fixed
+
+- Corrected the IV.16 condition repository tests to call the two-argument
+  `ConditionRepository::save()` contract with a `TokenCondition`.
+- Extended the Tabletop Chamber test harness with a condition repository
+  double so the new IV.16 Chamber dependency is represented in unit tests.
+- Added Chamber projection coverage for visible token conditions.
+
+
 ## [0.16.0-alpha.1] - 2026-08-26
 
 ### Added

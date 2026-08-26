@@ -225,3 +225,37 @@ final class ChamberDeathSaves implements \GreatMarketrealmTabletop\Tabletop\Batt
         $this->items[$state->tokenId()] = $state;
     }
 }
+
+
+final class ChamberConditions implements \GreatMarketrealmTabletop\Tabletop\Conditions\Contracts\ConditionRepository
+{
+    /** @var array<string,array<string,\GreatMarketrealmTabletop\Tabletop\Conditions\Models\TokenCondition>> */
+    public array $items = [];
+
+    public function forToken(
+        string $tableId,
+        string $tokenId
+    ): array {
+        return array_values(
+            $this->items[$tokenId] ?? []
+        );
+    }
+
+    public function save(
+        string $tableId,
+        \GreatMarketrealmTabletop\Tabletop\Conditions\Models\TokenCondition $condition
+    ): void {
+        $this->items[$condition->tokenId()]
+            [$condition->condition()] = $condition;
+    }
+
+    public function remove(
+        string $tableId,
+        string $tokenId,
+        string $condition
+    ): void {
+        unset(
+            $this->items[$tokenId][$condition]
+        );
+    }
+}

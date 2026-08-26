@@ -27,6 +27,7 @@ final class TabletopChamberTest extends TestCase
     private ChamberEncounters $encounters;
     private ChamberVitality $vitality;
     private ChamberDeathSaves $deathSaves;
+    private ChamberConditions $conditions;
     private TabletopChamber $chamber;
 
     protected function setUp(): void
@@ -42,6 +43,7 @@ final class TabletopChamberTest extends TestCase
         $this->encounters = new ChamberEncounters();
         $this->vitality = new ChamberVitality();
         $this->deathSaves = new ChamberDeathSaves();
+        $this->conditions = new ChamberConditions();
 
         $table = Table::prepare(
             'table-1',
@@ -125,7 +127,8 @@ final class TabletopChamberTest extends TestCase
             $this->tokens,
             $this->encounters,
             $this->vitality,
-            $this->deathSaves
+            $this->deathSaves,
+            $this->conditions
         );
     }
 
@@ -231,6 +234,39 @@ final class TabletopChamberTest extends TestCase
         self::assertSame(
             0,
             $state->deathSaves()['token-visible']['failures']
+        );
+    }
+
+
+
+    public function testChamberProjectsConditionsForVisibleTokens(): void
+    {
+        $this->conditions->save(
+            'table-1',
+            new \GreatMarketrealmTabletop\Tabletop\Conditions\Models\TokenCondition(
+                'token-visible',
+                'poisoned',
+                2,
+                new DateTimeImmutable(
+                    '2026-08-26T10:00:00+01:00'
+                )
+            )
+        );
+
+        $state = $this->chamber->state(
+            'table-1',
+            42
+        );
+
+        self::assertSame(
+            'poisoned',
+            $state->conditions()
+                ['token-visible'][0]['condition']
+        );
+        self::assertSame(
+            2,
+            $state->conditions()
+                ['token-visible'][0]['turns_remaining']
         );
     }
 
