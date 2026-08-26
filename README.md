@@ -18,22 +18,20 @@ Gameplay code must not reach directly into arbitrary Companion internals.
 
 ## Current Milestone
 
-### Phase IV.1 — The Empty Table
+### Phase IV.2 — The First Table
 
-The first milestone establishes the independent plugin foundation:
+The foundation is certified. IV.2 introduces the first real VTT domain:
 
-- WordPress plugin bootstrap
-- self-contained PSR-4 autoloading
-- application lifecycle
-- activation/deactivation boundaries
-- Companion availability contract
-- PHPUnit scaffolding
-- architecture regression tests
-- initial server-capacity seed of **2 concurrently active tables**
+- persistent Table identity
+- Dungeon Master ownership
+- **Preparing → Active → Ended** lifecycle
+- Table repository abstraction
+- application Table Registry
+- configurable concurrent-table capacity
+- initial **2 active Table** safety limit
+- immediate capacity release when a session ends
 
-No maps, tokens, or real-time gameplay are part of IV.1 yet.
-
-First, we build the table.
+Maps, tokens, player invitations, and networking remain deliberately outside this phase.
 
 ## Technical Identity
 

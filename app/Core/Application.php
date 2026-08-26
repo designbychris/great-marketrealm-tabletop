@@ -6,6 +6,8 @@ namespace GreatMarketrealmTabletop\Core;
 
 use GreatMarketrealmTabletop\Integration\Companion\CompanionAvailability;
 use GreatMarketrealmTabletop\Integration\Companion\CompanionGateway;
+use GreatMarketrealmTabletop\Tables\Services\TableRegistry;
+use GreatMarketrealmTabletop\Tables\Services\TableRegistryFactory;
 
 defined('ABSPATH') || exit;
 
@@ -17,9 +19,12 @@ final class Application
 
     private CompanionGateway $companion;
 
+    private TableRegistry $tables;
+
     private function __construct()
     {
         $this->companion = new CompanionAvailability();
+        $this->tables = TableRegistryFactory::make();
     }
 
     public static function instance(): self
@@ -47,11 +52,16 @@ final class Application
     {
         return defined('GMRT_VERSION')
             ? (string) GMRT_VERSION
-            : '0.1.0-alpha.1';
+            : '0.2.0-alpha.1';
     }
 
     public function companion(): CompanionGateway
     {
         return $this->companion;
+    }
+
+    public function tables(): TableRegistry
+    {
+        return $this->tables;
     }
 }

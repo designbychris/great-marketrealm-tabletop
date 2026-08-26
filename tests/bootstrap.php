@@ -58,6 +58,16 @@ if (! function_exists('do_action')) {
     }
 }
 
+if (! function_exists('get_option')) {
+    function get_option(
+        string $option,
+        mixed $default = false
+    ): mixed {
+        return $GLOBALS['gmrt_test_options'][$option]['value']
+            ?? $default;
+    }
+}
+
 if (! function_exists('update_option')) {
     function update_option(
         string $option,

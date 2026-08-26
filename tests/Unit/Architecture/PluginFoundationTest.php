@@ -24,7 +24,7 @@ final class PluginFoundationTest extends TestCase
             $source
         );
         self::assertStringContainsString(
-            "define('GMRT_VERSION', '0.1.0-alpha.1')",
+            "define('GMRT_VERSION', '0.2.0-alpha.1')",
             $source
         );
         self::assertStringContainsString(
@@ -95,6 +95,34 @@ final class PluginFoundationTest extends TestCase
                 'GreatMarketrealmCompanion\\'
             )) {
                 $violations[] = $relative;
+            }
+        }
+
+        self::assertSame([], $violations);
+    }
+
+    public function testTableDomainDoesNotReachIntoCompanionInternals(): void
+    {
+        $tables = $this->root . '/app/Tables';
+        $violations = [];
+
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator(
+                $tables,
+                \FilesystemIterator::SKIP_DOTS
+            )
+        );
+
+        foreach ($iterator as $file) {
+            if (! $file->isFile() || $file->getExtension() !== 'php') {
+                continue;
+            }
+
+            if (str_contains(
+                (string) file_get_contents($file->getPathname()),
+                'GreatMarketrealmCompanion\\'
+            )) {
+                $violations[] = $file->getPathname();
             }
         }
 

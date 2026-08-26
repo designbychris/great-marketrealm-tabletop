@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.2.0-alpha.1] - 2026-08-25
+
+### Added
+
+- Phase IV.2 — The First Table.
+- Persistent Table domain identity and Dungeon Master ownership.
+- Preparing, Active and Ended Table lifecycle.
+- Table repository contract and WordPress persistence adapter.
+- Table Registry application service.
+- Configurable concurrent active-table capacity policy.
+- Initial two-active-table protection and immediate slot release on end.
+- Table-domain and capacity regression coverage.
+
+
 ## [0.1.0-alpha.1] - 2026-08-25
 
 ### Added

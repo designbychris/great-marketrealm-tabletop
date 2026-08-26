@@ -14,9 +14,19 @@
 - [x] Architecture regression tests
 - [ ] Server-side certification on the deployment environment
 
-### Phase IV.2 — The Table Registry
+### Phase IV.2 — The First Table
 
-Persistent game-table identity and lifecycle.
+- [x] Stable Table identity
+- [x] Dungeon Master ownership
+- [x] Preparing → Active → Ended lifecycle
+- [x] Persistent repository contract
+- [x] Initial WordPress persistence adapter
+- [x] Configurable active-table capacity policy
+- [x] Initial limit of 2 simultaneously active tables
+- [x] Capacity released immediately when a Table ends
+- [x] Application-level Table Registry
+- [x] Domain and regression coverage
+- [ ] Server-side certification on the deployment environment
 
 ### Phase IV.3 — The Steward's Table Rules
 
