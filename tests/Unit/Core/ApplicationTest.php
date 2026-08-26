@@ -34,4 +34,13 @@ final class ApplicationTest extends TestCase
             Application::instance()->version()
         );
     }
+
+    public function testApplicationExposesBattlemapScenes(): void
+    {
+        self::assertInstanceOf(
+            \GreatMarketrealmTabletop\Tables\Scenes\Services\TableSceneManager::class,
+            \GreatMarketrealmTabletop\Core\Application::instance()->scenes()
+        );
+    }
+
 }

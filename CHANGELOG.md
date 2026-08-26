@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.5.0-alpha.1] - 2026-08-26
+
+### Added
+
+- Phase IV.5 — The First Battlemap.
+- Persistent Table Scene records and WordPress storage adapter.
+- WordPress Media attachment references for battlemap artwork.
+- Square-grid and gridless Scene foundations.
+- One active Scene per Table with non-destructive switching.
+- Normalised token-ready coordinates independent of rendered map pixels.
+- Ended-Table Scene preservation and mutation guards.
+- Scene domain, persistence, factory and architecture regression coverage.
+
+
 ## [0.4.0-alpha.1] - 2026-08-26
 
 ### Added

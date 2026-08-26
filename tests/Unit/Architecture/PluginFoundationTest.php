@@ -185,4 +185,28 @@ final class PluginFoundationTest extends TestCase
 
         return $source;
     }
+
+    public function testBattlemapDomainDoesNotDependOnCompanionInternals(): void
+    {
+        $path = $this->root . '/app/Tables/Scenes';
+        $violations = [];
+
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS)
+        );
+
+        foreach ($iterator as $file) {
+            if ($file->isFile() && $file->getExtension() === 'php') {
+                if (str_contains(
+                    (string) file_get_contents($file->getPathname()),
+                    'GreatMarketrealmCompanion\\'
+                )) {
+                    $violations[] = $file->getPathname();
+                }
+            }
+        }
+
+        self::assertSame([], $violations);
+    }
+
 }

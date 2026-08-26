@@ -18,6 +18,19 @@ Gameplay code must not reach directly into arbitrary Companion internals.
 
 ## Current Milestone
 
+### Phase IV.5 — The First Battlemap
+
+IV.5 gives each Table persistent battlemap Scenes:
+
+- multiple preserved Scenes per Table
+- WordPress Media attachment-backed maps
+- square-grid and gridless foundations
+- one active Scene at a time
+- safe Scene switching
+- normalised token-ready coordinates
+
+Tokens, fog of war and real-time networking remain deliberately outside this phase.
+
 ### Phase IV.4 — The Gathering of Adventurers
 
 IV.4 gives Tables their first persistent adventuring party:

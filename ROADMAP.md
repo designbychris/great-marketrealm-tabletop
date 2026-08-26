@@ -57,4 +57,18 @@
 
 ### Phase IV.5 — The First Battlemap
 
-Persistent map surface and token-ready coordinates.
+- [x] Persistent Table Scene records
+- [x] WordPress Media attachment references for battlemap artwork
+- [x] Battlemap pixel dimensions
+- [x] Square-grid and gridless scene foundations
+- [x] Configurable grid size
+- [x] Exactly one active Scene per Table
+- [x] Scene switching without destructive loss
+- [x] Normalised token-ready coordinates
+- [x] Ended Tables preserve scenes but reject scene changes
+- [x] Scene persistence and regression coverage
+- [ ] Server-side certification on the deployment environment
+
+### Phase IV.6 — Tokens on the Table
+
+Persistent token identity and placement on the active Scene.
