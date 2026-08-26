@@ -5,7 +5,7 @@
     const board = document.querySelector('.gmrt-board__viewport');
     const status = document.querySelector('#gmrt-tabletop-status');
 
-    if (!root || !board || !window.gmrtTabletop) {
+    if (!root || !window.gmrtTabletop) {
         return;
     }
 
@@ -52,6 +52,33 @@
         }
 
         return data.data;
+    }
+
+    const prepareTestTableButton = document.querySelector(
+        '[data-prepare-test-table]'
+    );
+
+    if (prepareTestTableButton) {
+        prepareTestTableButton.addEventListener('click', async () => {
+            prepareTestTableButton.disabled = true;
+            prepareTestTableButton.textContent = 'Preparing…';
+            say('Sage is preparing the Training Grounds…');
+
+            try {
+                const data = await request('gmrt_prepare_test_table', {});
+                const url = new URL(window.location.href);
+                url.searchParams.set('table', data.table_id);
+                window.location.assign(url.toString());
+            } catch (error) {
+                say(error.message || 'The test Table could not be prepared.');
+                prepareTestTableButton.disabled = false;
+                prepareTestTableButton.textContent = 'Prepare Test Table';
+            }
+        });
+    }
+
+    if (!board) {
+        return;
     }
 
     function select(token) {
@@ -307,29 +334,6 @@
         });
     });
 
-
-    const prepareTestTableButton = document.querySelector(
-        '[data-prepare-test-table]'
-    );
-
-    if (prepareTestTableButton) {
-        prepareTestTableButton.addEventListener('click', async () => {
-            prepareTestTableButton.disabled = true;
-            prepareTestTableButton.textContent = 'Preparing…';
-            say('Sage is preparing the Training Grounds…');
-
-            try {
-                const data = await request('gmrt_prepare_test_table', {});
-                const url = new URL(window.location.href);
-                url.searchParams.set('table', data.table_id);
-                window.location.assign(url.toString());
-            } catch (error) {
-                say(error.message || 'The test Table could not be prepared.');
-                prepareTestTableButton.disabled = false;
-                prepareTestTableButton.textContent = 'Prepare Test Table';
-            }
-        });
-    }
 
     refreshTimer = window.setInterval(refresh, 5000);
 

@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.14.1-alpha.2] - 2026-08-26
+
+### Fixed
+
+- The empty Tabletop host now initializes `Prepare Test Table` before
+  battlemap-only JavaScript checks.
+- Prevented `tabletop.js` from exiting early when no Scene board exists yet.
+- Added regression coverage for preparing the first test Table from an empty
+  Chamber.
+
+
 ## [0.14.1-alpha.1] - 2026-08-26
 
 ### Added
