@@ -14,7 +14,8 @@ final class DamageProfile
         private string $tokenId,
         private int $diceCount = 1,
         private int $dieSides = 6,
-        private int $modifier = 0
+        private int $modifier = 0,
+        private string $damageType = DamageType::SLASHING
     ) {
         if (trim($tokenId) === '') {
             throw new InvalidArgumentException(
@@ -45,6 +46,8 @@ final class DamageProfile
                 'Damage modifier is outside the supported range.'
             );
         }
+
+        DamageType::assert($damageType);
     }
 
     public function tokenId(): string
@@ -67,6 +70,11 @@ final class DamageProfile
         return $this->modifier;
     }
 
+    public function damageType(): string
+    {
+        return $this->damageType;
+    }
+
     /** @return array<string,int|string> */
     public function toArray(): array
     {
@@ -75,6 +83,7 @@ final class DamageProfile
             'dice_count' => $this->diceCount,
             'die_sides' => $this->dieSides,
             'modifier' => $this->modifier,
+            'damage_type' => $this->damageType,
         ];
     }
 
@@ -85,7 +94,11 @@ final class DamageProfile
             (string) ($record['token_id'] ?? ''),
             (int) ($record['dice_count'] ?? 1),
             (int) ($record['die_sides'] ?? 6),
-            (int) ($record['modifier'] ?? 0)
+            (int) ($record['modifier'] ?? 0),
+            (string) (
+                $record['damage_type']
+                ?? DamageType::SLASHING
+            )
         );
     }
 }

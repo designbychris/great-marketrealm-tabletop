@@ -57,4 +57,18 @@ final class AttackAjaxRegressionTest extends TestCase
         );
     }
 
+
+    public function testAttackEndpointReturnsDamageAdjustment(): void
+    {
+        $source = (string) file_get_contents(
+            dirname(__DIR__, 4)
+                . '/app/Tabletop/Http/AttackAjaxController.php'
+        );
+
+        self::assertStringContainsString(
+            "'damage_adjustment' =>",
+            $source
+        );
+    }
+
 }

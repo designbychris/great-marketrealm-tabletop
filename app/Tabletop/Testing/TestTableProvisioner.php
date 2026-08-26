@@ -3,9 +3,11 @@ declare(strict_types=1);
 namespace GreatMarketrealmTabletop\Tabletop\Testing;
 use GreatMarketrealmTabletop\Tabletop\Battle\Models\CombatProfile;
 use GreatMarketrealmTabletop\Tabletop\Battle\Models\DamageProfile;
+use GreatMarketrealmTabletop\Tabletop\Battle\Models\DamageDefenseProfile;
 use GreatMarketrealmTabletop\Tabletop\Battle\Models\Vitality;
 use GreatMarketrealmTabletop\Tabletop\Battle\Repositories\WordPressCombatProfileRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Repositories\WordPressDamageProfileRepository;
+use GreatMarketrealmTabletop\Tabletop\Battle\Repositories\WordPressDamageDefenseRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Repositories\WordPressVitalityRepository;
 use GreatMarketrealmTabletop\Tabletop\Encounters\Services\EncounterManagerFactory;
 use GreatMarketrealmTabletop\Tables\Scenes\Models\GridType;
@@ -13,6 +15,7 @@ use GreatMarketrealmTabletop\Tables\Scenes\Services\TableSceneManagerFactory;
 use GreatMarketrealmTabletop\Tables\Services\TableRegistryFactory;
 use GreatMarketrealmTabletop\Tables\Tokens\Models\TableTokenVisibility;
 use GreatMarketrealmTabletop\Tables\Tokens\Services\TableTokenManagerFactory;
+use GreatMarketrealmTabletop\Tables\Tokens\Repositories\WordPressTableTokenRepository;
 use RuntimeException;
 defined('ABSPATH') || exit;
 
@@ -29,7 +32,13 @@ final class TestTableProvisioner
         foreach($registry->all() as $existing){
             if($existing->dungeonMasterUserId()===$userId
                 && $existing->name()===TestTableBlueprint::TABLE_NAME
-                && $existing->status()!=='ended'){return $existing->id();}
+                && $existing->status()!=='ended'){
+                $this->syncCombatProfiles(
+                    $existing->id(),
+                    $userId
+                );
+                return $existing->id();
+            }
         }
         $table=$registry->prepare($userId,TestTableBlueprint::TABLE_NAME);
         $registry->activate($table->id());
@@ -41,6 +50,7 @@ final class TestTableProvisioner
         $tokens=TableTokenManagerFactory::make();
         $combat=new WordPressCombatProfileRepository();
         $damage=new WordPressDamageProfileRepository();
+        $defenses=new WordPressDamageDefenseRepository();
         $vitality=new WordPressVitalityRepository();
         $placed=[];
         foreach($this->blueprint->tokens($userId) as $f){
@@ -49,7 +59,9 @@ final class TestTableProvisioner
             $placed[(string)$f['key']]=$token;
             $combat->save($table->id(),new CombatProfile($token->id(),(int)$f['ac'],(int)$f['attack']));
             $dice=$f['damage'];
-            $damage->save($table->id(),new DamageProfile($token->id(),(int)$dice[0],(int)$dice[1],(int)$dice[2]));
+            $damage->save($table->id(),new DamageProfile($token->id(),(int)$dice[0],(int)$dice[1],(int)$dice[2],(string)$dice[3]));
+            $defense=$f['defenses'];
+            $defenses->save($table->id(),new DamageDefenseProfile($token->id(),$defense[0],$defense[1],$defense[2]));
             $vitality->save($table->id(),new Vitality($token->id(),(int)$f['hp'],(int)$f['hp']));
         }
 
@@ -60,6 +72,66 @@ final class TestTableProvisioner
         }
         $manager->start($table->id(),$userId,$enc->id(),$enc->revision());
         return $table->id();
+    }
+
+    private function syncCombatProfiles(
+        string $tableId,
+        int $userId
+    ): void {
+        $scenes = TableSceneManagerFactory::make();
+        $scene = $scenes->active($tableId);
+
+        if ($scene === null) {
+            return;
+        }
+
+        $tokens = (new WordPressTableTokenRepository())
+            ->forScene(
+                $tableId,
+                $scene->id()
+            );
+
+        $bySource = [];
+        foreach ($tokens as $token) {
+            $bySource[$token->sourceReference()]
+                = $token;
+        }
+
+        $damage = new WordPressDamageProfileRepository();
+        $defenses = new WordPressDamageDefenseRepository();
+
+        foreach ($this->blueprint->tokens($userId) as $fixture) {
+            $token = $bySource[
+                (string) $fixture['source']
+            ] ?? null;
+
+            if ($token === null) {
+                continue;
+            }
+
+            $dice = $fixture['damage'];
+            $damage->save(
+                $tableId,
+                new DamageProfile(
+                    $token->id(),
+                    (int) $dice[0],
+                    (int) $dice[1],
+                    (int) $dice[2],
+                    (string) $dice[3]
+                )
+            );
+
+            $defense = $fixture['defenses'];
+            $defenses->save(
+                $tableId,
+                new DamageDefenseProfile(
+                    $token->id(),
+                    $defense[0],
+                    $defense[1],
+                    $defense[2]
+                )
+            );
+        }
     }
 
     private function battlemapAttachment(): int

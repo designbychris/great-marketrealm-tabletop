@@ -7,6 +7,7 @@ namespace GreatMarketrealmTabletop\Tabletop\Battle\Services;
 use GreatMarketrealmTabletop\Tabletop\Battle\Repositories\WordPressBattleEventRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Repositories\WordPressCombatProfileRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Repositories\WordPressDamageProfileRepository;
+use GreatMarketrealmTabletop\Tabletop\Battle\Repositories\WordPressDamageDefenseRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Repositories\WordPressDeathSaveRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Repositories\WordPressVitalityRepository;
 use GreatMarketrealmTabletop\Tabletop\Encounters\Repositories\WordPressEncounterRepository;
@@ -40,11 +41,13 @@ final class AttackManagerFactory
             $tokens,
             new WordPressCombatProfileRepository(),
             new WordPressDamageProfileRepository(),
+            new WordPressDamageDefenseRepository(),
             new WordPressVitalityRepository(),
             new WordPressDeathSaveRepository(),
             $events,
             new AttackResolver(new SecureD20Roller()),
             new DamageResolver(new SecureDamageDieRoller()),
+            new DamageDefenseResolver(),
             $clock
         );
     }

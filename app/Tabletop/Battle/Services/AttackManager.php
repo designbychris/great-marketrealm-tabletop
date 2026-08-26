@@ -7,6 +7,7 @@ namespace GreatMarketrealmTabletop\Tabletop\Battle\Services;
 use GreatMarketrealmTabletop\Tabletop\Battle\Contracts\BattleEventRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Contracts\CombatProfileRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Contracts\DamageProfileRepository;
+use GreatMarketrealmTabletop\Tabletop\Battle\Contracts\DamageDefenseRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Contracts\DeathSaveRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Contracts\VitalityRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Exceptions\AttackDenied;
@@ -29,11 +30,13 @@ final class AttackManager
         private TableTokenRepository $tokens,
         private CombatProfileRepository $profiles,
         private DamageProfileRepository $damageProfiles,
+        private DamageDefenseRepository $damageDefenses,
         private VitalityRepository $vitality,
         private DeathSaveRepository $deathSaves,
         private BattleEventRepository $events,
         private AttackResolver $resolver,
         private DamageResolver $damageResolver,
+        private DamageDefenseResolver $defenseResolver,
         private TableClock $clock
     ) {}
 
@@ -156,16 +159,28 @@ final class AttackManager
 
         $damageRoll = null;
         $damageEvent = null;
+        $damageAdjustment = null;
         $vitality = null;
 
         if ($outcome->isHit()) {
+            $damageProfile = $this->damageProfiles->forToken(
+                $tableId,
+                $attacker->id()
+            );
+
             $damageRoll = $this->damageResolver->resolve(
-                $this->damageProfiles->forToken(
-                    $tableId,
-                    $attacker->id()
-                ),
+                $damageProfile,
                 $outcome->result()
                     === \GreatMarketrealmTabletop\Tabletop\Battle\Models\AttackOutcome::CRITICAL_HIT
+            );
+
+            $damageAdjustment = $this->defenseResolver->resolve(
+                $damageRoll->total(),
+                $damageProfile->damageType(),
+                $this->damageDefenses->forToken(
+                    $tableId,
+                    $target->id()
+                )
             );
 
             $vitality = $this->vitality->forToken(
@@ -175,7 +190,7 @@ final class AttackManager
             $hpBefore = $vitality->currentHp();
 
             $application = $vitality->damage(
-                $damageRoll->total()
+                $damageAdjustment->resolvedDamage()
             );
 
             $deathSaveState = $this->deathSaves->forToken(
@@ -226,6 +241,7 @@ final class AttackManager
                 [
                     'target_token_id' => $target->id(),
                     'damage' => $damageRoll->toArray(),
+                    'damage_adjustment' => $damageAdjustment->toArray(),
                     'application' => $application,
                     'vitality' => $vitality->toArray(),
                     'death_consequence' => $deathConsequence,
@@ -243,6 +259,7 @@ final class AttackManager
             'damage_event' => $damageEvent,
             'outcome' => $outcome,
             'damage' => $damageRoll,
+            'damage_adjustment' => $damageAdjustment,
             'vitality' => $vitality,
             'death_saves' => isset($deathSaveState)
                 ? $deathSaveState

@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.15.0-alpha.1] - 2026-08-26
+
+### Added
+
+- Phase IV.15 — The Wounds We Bear.
+- Canonical damage types on Damage Profiles.
+- Persistent per-token resistance, vulnerability and immunity.
+- Deterministic defense resolution before Vitality damage.
+- Raw/resolved damage and defense effects in Battle Events.
+- RESIST, WEAK and IMMUNE browser combat announcements.
+- IV.15 defense fixtures for Training Slime, Frosty Cheese Thing and
+  Suspicious Training Dummy.
+- Existing open test Tables can refresh their damage/defense fixture profiles.
+
+
 ## [0.14.2-alpha.1] - 2026-08-26
 
 ### Added

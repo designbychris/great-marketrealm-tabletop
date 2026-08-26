@@ -263,3 +263,26 @@ Lower-latency shared-state synchronisation, presence and reconnection foundation
 - [x] Round wrapping remains owned by the Encounter domain model
 - [x] Current turn displays the combatant label instead of an opaque token UUID
 - [x] Target list is rebuilt for the newly active combatant after turn advance
+
+
+### Phase IV.15 — The Wounds We Bear
+
+- [x] Canonical damage-type vocabulary
+- [x] Damage Profiles carry one authoritative damage type
+- [x] Per-token resistance, vulnerability and immunity profiles
+- [x] Immunity resolves to zero damage
+- [x] Resistance halves damage and rounds down
+- [x] Vulnerability doubles damage
+- [x] Deterministic resistance-then-vulnerability ordering
+- [x] Defense resolution occurs before Vitality damage
+- [x] Battle Events record raw and resolved damage plus defense effects
+- [x] Attack endpoint exposes authoritative damage adjustment
+- [x] Browser announces RESIST / WEAK / IMMUNE
+- [x] Existing Test Tables can refresh IV.15 fixture profiles
+- [x] Training Slime resists slashing
+- [x] Frosty Cheese Thing is vulnerable to fire
+- [x] Suspicious Training Dummy is immune to poison
+- [ ] Conditions
+- [ ] Multi-type damage packets
+- [ ] GMRC trait integration
+- [ ] Server-side certification on deployment

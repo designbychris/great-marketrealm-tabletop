@@ -13,4 +13,44 @@ final class TestTableBlueprintTest extends TestCase
  public function testAubyIsControlledByDungeonMaster():void{$x=$this->b->tokens(42);self::assertSame(42,$x[0]['controller']);self::assertSame('character',$x[0]['type']);}
  public function testFixtureHasFourCombatants():void{self::assertCount(4,$this->b->tokens(42));}
  public function testEveryFixtureHasCombatNumbers():void{foreach($this->b->tokens(42) as $x){self::assertGreaterThan(0,$x['hp']);self::assertGreaterThan(0,$x['ac']);self::assertCount(3,$x['damage']);}}
+
+    public function testTrainingSlimeResistsSlashing(): void
+    {
+        $tokens = $this->b->tokens(42);
+
+        self::assertSame(
+            ['slashing'],
+            $tokens[1]['defenses'][0]
+        );
+    }
+
+    public function testFrostyCheeseThingIsVulnerableToFire(): void
+    {
+        $tokens = $this->b->tokens(42);
+
+        self::assertSame(
+            ['fire'],
+            $tokens[2]['defenses'][1]
+        );
+    }
+
+    public function testSuspiciousDummyIsImmuneToPoison(): void
+    {
+        $tokens = $this->b->tokens(42);
+
+        self::assertSame(
+            ['poison'],
+            $tokens[3]['defenses'][2]
+        );
+    }
+
+    public function testFixtureAttackTypesExerciseAllThreeDefenses(): void
+    {
+        $tokens = $this->b->tokens(42);
+
+        self::assertSame('slashing', $tokens[0]['damage'][3]);
+        self::assertSame('poison', $tokens[1]['damage'][3]);
+        self::assertSame('fire', $tokens[3]['damage'][3]);
+    }
+
 }

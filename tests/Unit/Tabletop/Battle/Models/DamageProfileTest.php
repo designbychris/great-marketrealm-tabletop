@@ -25,4 +25,34 @@ final class DamageProfileTest extends TestCase
 
         new DamageProfile('token-a', 1, 7, 0);
     }
+
+    public function testDamageProfileCarriesDamageType(): void
+    {
+        $profile = new DamageProfile(
+            'token-a',
+            1,
+            8,
+            3,
+            'fire'
+        );
+
+        self::assertSame('fire', $profile->damageType());
+        self::assertSame(
+            'fire',
+            $profile->toArray()['damage_type']
+        );
+    }
+
+    public function testLegacyDamageProfileDefaultsToSlashing(): void
+    {
+        $profile = DamageProfile::reconstitute([
+            'token_id' => 'token-a',
+            'dice_count' => 1,
+            'die_sides' => 6,
+            'modifier' => 0,
+        ]);
+
+        self::assertSame('slashing', $profile->damageType());
+    }
+
 }

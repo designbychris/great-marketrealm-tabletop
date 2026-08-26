@@ -18,6 +18,14 @@ Gameplay code must not reach directly into arbitrary Companion internals.
 
 ## Current Milestone
 
+### Phase IV.15 — The Wounds We Bear
+
+Damage now carries an authoritative type and targets can persist resistance,
+vulnerability and immunity. The server resolves those defenses before Vitality
+changes and records both raw and final damage in Battle Events.
+
+The Training Grounds now provides browser fixtures for RESIST, WEAK and IMMUNE.
+
 ### Phase IV.14.2 — Pass the Turn
 
 Dungeon Masters can now advance the active Encounter directly from the Chamber.

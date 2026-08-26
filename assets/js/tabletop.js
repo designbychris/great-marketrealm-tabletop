@@ -343,10 +343,45 @@
                         + ' = ' + attack.total
                         + ' vs AC ' + attack.armor_class + '.';
 
-                    if (data.damage && data.vitality) {
+                    if (
+                        data.damage
+                        && data.damage_adjustment
+                        && data.vitality
+                    ) {
+                        const adjusted = data.damage_adjustment;
+                        const effects = adjusted.effects || [];
+                        let defenseText = '';
+
+                        if (effects.includes('immune')) {
+                            defenseText = ' IMMUNE!';
+                        } else {
+                            if (effects.includes('resistant')) {
+                                defenseText += ' RESIST!';
+                            }
+                            if (effects.includes('vulnerable')) {
+                                defenseText += ' WEAK!';
+                            }
+                        }
+
                         message +=
-                            ' Damage ' + data.damage.total
-                            + '. HP '
+                            ' '
+                            + adjusted.damage_type.toUpperCase()
+                            + defenseText
+                            + ' Damage '
+                            + adjusted.resolved_damage;
+
+                        if (
+                            adjusted.resolved_damage
+                            !== adjusted.raw_damage
+                        ) {
+                            message +=
+                                ' (rolled '
+                                + adjusted.raw_damage
+                                + ')';
+                        }
+
+                        message +=
+                            '. HP '
                             + data.vitality.current_hp
                             + '/' + data.vitality.maximum_hp
                             + '.';
