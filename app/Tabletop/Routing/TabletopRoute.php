@@ -41,6 +41,19 @@ final class TabletopRoute
         );
     }
 
+
+    /** @param array<int,string> $classes */
+    public function bodyClasses(array $classes): array
+    {
+        if ($this->matches()) {
+            $classes[] = 'gmrt-tabletop-page';
+        }
+
+        return array_values(
+            array_unique($classes)
+        );
+    }
+
     public function matches(): bool
     {
         return (string) get_query_var(

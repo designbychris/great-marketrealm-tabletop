@@ -58,6 +58,11 @@ final class TabletopServiceProvider
             [$this->route, 'queryVars']
         );
 
+        add_filter(
+            'body_class',
+            [$this->route, 'bodyClasses']
+        );
+
         add_action(
             'template_redirect',
             [$this->controller, 'dispatch']

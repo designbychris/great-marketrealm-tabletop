@@ -114,4 +114,23 @@ final class TabletopRouteTest extends TestCase
         );
     }
 
+
+    public function testRouteProvidesTabletopBodyClassForThemeIntegration(): void
+    {
+        $source = file_get_contents(
+            $this->root
+                . '/app/Tabletop/Routing/TabletopRoute.php'
+        );
+
+        self::assertIsString($source);
+        self::assertStringContainsString(
+            'gmrt-tabletop-page',
+            $source
+        );
+        self::assertStringContainsString(
+            'bodyClasses',
+            $source
+        );
+    }
+
 }

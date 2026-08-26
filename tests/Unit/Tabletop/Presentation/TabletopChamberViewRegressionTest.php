@@ -63,4 +63,25 @@ final class TabletopChamberViewRegressionTest extends TestCase
             $this->source
         );
     }
+
+    public function testViewUsesWordPressThemeHeaderAndFooter(): void
+    {
+        self::assertStringContainsString(
+            'get_header();',
+            $this->source
+        );
+        self::assertStringContainsString(
+            'get_footer();',
+            $this->source
+        );
+        self::assertStringNotContainsString(
+            '<!doctype html>',
+            $this->source
+        );
+        self::assertStringNotContainsString(
+            '<body class="gmrt-tabletop-page">',
+            $this->source
+        );
+    }
+
 }
