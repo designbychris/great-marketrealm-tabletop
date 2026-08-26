@@ -17,6 +17,16 @@ $encounter = $state?->encounter();
 $vitality = $state?->vitality() ?? [];
 $deathSaves = $state?->deathSaves() ?? [];
 
+$tokenLabels = [];
+foreach ($tokens as $token) {
+    $tokenId = (string) ($token['id'] ?? '');
+    if ($tokenId !== '') {
+        $tokenLabels[$tokenId] = (string) (
+            $token['label'] ?? 'Unknown combatant'
+        );
+    }
+}
+
 $sceneImage = $scene !== null
     ? wp_get_attachment_image_url(
         (int) ($scene['map_attachment_id'] ?? 0),
@@ -109,12 +119,29 @@ $sceneImage = $scene !== null
                 <?php endif; ?>
 
                 <?php if (! empty($encounter['current_token_id'])) : ?>
-                    <span>
+                    <?php
+                    $turnTokenId = (string) $encounter['current_token_id'];
+                    $turnLabel = $tokenLabels[$turnTokenId]
+                        ?? 'Unknown combatant';
+                    ?>
+                    <span class="gmrt-current-turn" data-current-turn-label>
                         Turn:
-                        <?php echo esc_html(
-                            (string) $encounter['current_token_id']
-                        ); ?>
+                        <strong><?php echo esc_html($turnLabel); ?></strong>
                     </span>
+                <?php endif; ?>
+
+                <?php if (
+                    $state !== null
+                    && $state->isDungeonMaster()
+                    && ($encounter['status'] ?? '') === 'active'
+                ) : ?>
+                    <button
+                        type="button"
+                        class="gmrt-end-turn"
+                        data-end-turn
+                    >
+                        End Turn ▶
+                    </button>
                 <?php endif; ?>
             </div>
 

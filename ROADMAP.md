@@ -253,3 +253,13 @@ Lower-latency shared-state synchronisation, presence and reconnection foundation
 - [x] Idempotent reuse of an existing open test Table
 - [x] Redirect directly into the prepared Table
 - [ ] IV.15 damage-type defenses added to fixture creatures
+
+### Phase IV.14.2 — Pass the Turn
+
+- [x] DM-only End Turn control in the active Encounter HUD
+- [x] Existing authoritative Encounter advance service reused
+- [x] Optimistic Encounter revision sent with the request
+- [x] Automatic full HUD refresh after a successful turn advance
+- [x] Round wrapping remains owned by the Encounter domain model
+- [x] Current turn displays the combatant label instead of an opaque token UUID
+- [x] Target list is rebuilt for the newly active combatant after turn advance

@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.14.2-alpha.1] - 2026-08-26
+
+### Added
+
+- Phase IV.14.2 — Pass the Turn.
+- DM-only `End Turn` control in the live Encounter HUD.
+- Automatic Chamber refresh after authoritative turn advancement.
+- Human-readable current combatant labels in place of token UUIDs.
+
+
 ## [0.14.1-alpha.2] - 2026-08-26
 
 ### Fixed

@@ -407,3 +407,30 @@
 }
 .gmrt-test-table-button:disabled { opacity:.65; cursor:wait; }
 .gmrt-test-table-note { display:block; margin-top:.65rem; opacity:.78; }
+
+.gmrt-end-turn {
+    border: 2px solid currentColor;
+    border-radius: 6px;
+    padding: .45rem .7rem;
+    background: rgba(0, 0, 0, .2);
+    color: inherit;
+    font: inherit;
+    font-weight: 800;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.gmrt-end-turn:hover,
+.gmrt-end-turn:focus-visible {
+    transform: translateY(-1px);
+}
+
+.gmrt-end-turn:disabled {
+    opacity: .65;
+    cursor: wait;
+    transform: none;
+}
+
+.gmrt-current-turn strong {
+    font-weight: 800;
+}

@@ -204,6 +204,43 @@
     });
 
 
+    const endTurnButton = document.querySelector('[data-end-turn]');
+
+    if (endTurnButton) {
+        endTurnButton.addEventListener('click', async () => {
+            const encounter = document.querySelector('[data-encounter-id]');
+
+            if (!encounter) {
+                say('No active Encounter.');
+                return;
+            }
+
+            endTurnButton.disabled = true;
+            endTurnButton.textContent = 'Passing…';
+            say('Passing the turn…');
+
+            try {
+                const data = await request('gmrt_advance_encounter', {
+                    encounter_id: encounter.dataset.encounterId || '',
+                    revision: encounter.dataset.encounterRevision || '1'
+                });
+
+                if (data.encounter) {
+                    encounter.dataset.encounterRevision =
+                        String(data.encounter.revision || 1);
+                }
+
+                say('Turn passed.');
+                window.location.reload();
+            } catch (error) {
+                say(error.message || 'The turn could not be passed.');
+                endTurnButton.disabled = false;
+                endTurnButton.textContent = 'End Turn ▶';
+                await refresh();
+            }
+        });
+    }
+
     const deathSaveButton = document.querySelector(
         '[data-roll-death-save]'
     );

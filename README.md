@@ -18,6 +18,12 @@ Gameplay code must not reach directly into arbitrary Companion internals.
 
 ## Current Milestone
 
+### Phase IV.14.2 — Pass the Turn
+
+Dungeon Masters can now advance the active Encounter directly from the Chamber.
+The HUD shows the current combatant by name and refreshes automatically after
+each turn so targeting and deed controls follow the initiative order.
+
 ### Phase IV.14.1 — The Steward's Test Table
 
 The empty Tabletop host can now prepare `Sage's Combat Testing Grounds` with a
