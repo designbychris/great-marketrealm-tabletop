@@ -40,9 +40,17 @@ final class TabletopChamberViewRegressionTest extends TestCase
         );
     }
 
-    public function testViewMakesInitialReadOnlyNatureExplicit(): void
+    public function testViewMakesServerValidatedMovementExplicit(): void
     {
         self::assertStringContainsString(
+            'Movement is validated and persisted by',
+            $this->source
+        );
+        self::assertStringContainsString(
+            'the Tabletop server.',
+            $this->source
+        );
+        self::assertStringNotContainsString(
             'This first chamber is read-only.',
             $this->source
         );

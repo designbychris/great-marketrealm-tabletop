@@ -87,7 +87,7 @@ final class TableToken
     /** @param array<string,mixed> $record */
     public static function reconstitute(array $record): self
     {
-        return self::create(
+        $token = self::create(
             (string) ($record['id'] ?? ''),
             (string) ($record['table_id'] ?? ''),
             (string) ($record['scene_id'] ?? ''),
@@ -111,12 +111,15 @@ final class TableToken
                     $record['created_at']
                     ?? 'now'
                 )
-            ),
-            max(
-                1,
-                (int) ($record['revision'] ?? 1)
             )
         );
+
+        $token->revision = max(
+            1,
+            (int) ($record['revision'] ?? 1)
+        );
+
+        return $token;
     }
 
     public function move(float $x, float $y): void
