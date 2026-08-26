@@ -14,6 +14,8 @@ use GreatMarketrealmTabletop\Tabletop\Battle\Exceptions\AttackDenied;
 use GreatMarketrealmTabletop\Tabletop\Battle\Models\BattleDeed;
 use GreatMarketrealmTabletop\Tabletop\Battle\Models\BattleEvent;
 use GreatMarketrealmTabletop\Tabletop\Encounters\Contracts\EncounterRepository;
+use GreatMarketrealmTabletop\Tabletop\Conditions\Contracts\ConditionRepository;
+use GreatMarketrealmTabletop\Tabletop\Conditions\Services\ConditionCombatRules;
 use GreatMarketrealmTabletop\Tables\Contracts\TableClock;
 use GreatMarketrealmTabletop\Tables\Memberships\Contracts\TableMembershipRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Contracts\TableTokenRepository;
@@ -37,7 +39,9 @@ final class AttackManager
         private AttackResolver $resolver,
         private DamageResolver $damageResolver,
         private DamageDefenseResolver $defenseResolver,
-        private TableClock $clock
+        private TableClock $clock,
+        private ?ConditionRepository $conditions = null,
+        private ?ConditionCombatRules $conditionRules = null
     ) {}
 
     /** @return array<string,mixed> */
@@ -134,9 +138,29 @@ final class AttackManager
             $expectedRevision
         );
 
+        $rollMode = 'normal';
+
+        if (
+            $this->conditions !== null
+            && $this->conditionRules !== null
+        ) {
+            $rollMode = $this->conditionRules
+                ->attackRollMode(
+                    $this->conditions->forToken(
+                        $tableId,
+                        $attacker->id()
+                    ),
+                    $this->conditions->forToken(
+                        $tableId,
+                        $target->id()
+                    )
+                );
+        }
+
         $outcome = $this->resolver->resolve(
             $attackerProfile,
-            $targetProfile
+            $targetProfile,
+            $rollMode
         );
 
         $updatedEncounter = $deed['encounter'];

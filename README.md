@@ -196,3 +196,14 @@ php vendor/bin/phpunit --display-warnings
 See `ROADMAP.md` and the `docs/` directory for the architecture plan.
 
 **First we build the table. Then we roll initiative.** 🎲
+
+### Phase IV.17 — Afflictions Take Hold
+
+Conditions now influence authoritative combat. Poisoned, Blinded, Prone and
+Restrained can impose attack disadvantage; Blinded, Restrained and Stunned
+targets can grant advantage; Stunned blocks Battle Deeds; and Grappled,
+Restrained or Stunned combatants cannot move.
+
+Advantage and disadvantage are resolved server-side with two d20s and cancel
+each other when both apply.
+

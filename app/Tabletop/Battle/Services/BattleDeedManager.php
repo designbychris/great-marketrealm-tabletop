@@ -10,6 +10,8 @@ use GreatMarketrealmTabletop\Tabletop\Battle\Exceptions\BattleDeedDenied;
 use GreatMarketrealmTabletop\Tabletop\Battle\Models\BattleDeed;
 use GreatMarketrealmTabletop\Tabletop\Battle\Models\BattleEvent;
 use GreatMarketrealmTabletop\Tabletop\Encounters\Contracts\EncounterRepository;
+use GreatMarketrealmTabletop\Tabletop\Conditions\Contracts\ConditionRepository;
+use GreatMarketrealmTabletop\Tabletop\Conditions\Services\ConditionCombatRules;
 use GreatMarketrealmTabletop\Tabletop\Encounters\Exceptions\StaleEncounterRevision;
 use GreatMarketrealmTabletop\Tables\Contracts\TableClock;
 use GreatMarketrealmTabletop\Tables\Memberships\Contracts\TableMembershipRepository;
@@ -26,7 +28,9 @@ final class BattleDeedManager
         private TableTokenRepository $tokens,
         private BattleEventRepository $events,
         private TableClock $clock,
-        private ?VitalityRepository $vitality = null
+        private ?VitalityRepository $vitality = null,
+        private ?ConditionRepository $conditions = null,
+        private ?ConditionCombatRules $conditionRules = null
     ) {}
 
     public function perform(
@@ -109,6 +113,21 @@ final class BattleDeedManager
                     'A downed combatant cannot perform ordinary battle deeds.'
                 );
             }
+        }
+
+        if (
+            $this->conditions !== null
+            && $this->conditionRules !== null
+            && $this->conditionRules->blocksBattleDeeds(
+                $this->conditions->forToken(
+                    $tableId,
+                    $token->id()
+                )
+            )
+        ) {
+            throw new BattleDeedDenied(
+                'A stunned combatant cannot perform battle deeds.'
+            );
         }
 
         $resource = BattleDeed::resource($deed);

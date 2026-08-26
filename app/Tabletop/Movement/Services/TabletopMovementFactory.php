@@ -8,6 +8,8 @@ use GreatMarketrealmTabletop\Tables\Memberships\Repositories\WordPressTableMembe
 use GreatMarketrealmTabletop\Tables\Repositories\WordPressTableRepository;
 use GreatMarketrealmTabletop\Tables\Scenes\Repositories\WordPressTableSceneRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Repositories\WordPressTableTokenRepository;
+use GreatMarketrealmTabletop\Tabletop\Conditions\Repositories\WordPressConditionRepository;
+use GreatMarketrealmTabletop\Tabletop\Conditions\Services\ConditionCombatRules;
 
 defined('ABSPATH') || exit;
 
@@ -20,7 +22,9 @@ final class TabletopMovementFactory
             new WordPressTableMembershipRepository(),
             new WordPressTableSceneRepository(),
             new WordPressTableTokenRepository(),
-            new TabletopMovementPolicy()
+            new TabletopMovementPolicy(),
+            new WordPressConditionRepository(),
+            new ConditionCombatRules()
         );
     }
 }

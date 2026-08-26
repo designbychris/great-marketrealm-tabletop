@@ -12,6 +12,8 @@ use GreatMarketrealmTabletop\Tables\Models\TableStatus;
 use GreatMarketrealmTabletop\Tables\Scenes\Contracts\TableSceneRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Contracts\TableTokenRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Models\TableToken;
+use GreatMarketrealmTabletop\Tabletop\Conditions\Contracts\ConditionRepository;
+use GreatMarketrealmTabletop\Tabletop\Conditions\Services\ConditionCombatRules;
 use RuntimeException;
 
 defined('ABSPATH') || exit;
@@ -23,7 +25,9 @@ final class TabletopMovement
         private TableMembershipRepository $members,
         private TableSceneRepository $scenes,
         private TableTokenRepository $tokens,
-        private TabletopMovementPolicy $policy
+        private TabletopMovementPolicy $policy,
+        private ?ConditionRepository $conditions = null,
+        private ?ConditionCombatRules $conditionRules = null
     ) {}
 
     public function move(
@@ -93,6 +97,21 @@ final class TabletopMovement
         )) {
             throw new TabletopMovementDenied(
                 'This Table member does not control that token.'
+            );
+        }
+
+        if (
+            $this->conditions !== null
+            && $this->conditionRules !== null
+            && $this->conditionRules->blocksMovement(
+                $this->conditions->forToken(
+                    $tableId,
+                    $token->id()
+                )
+            )
+        ) {
+            throw new TabletopMovementDenied(
+                'This combatant cannot move while grappled, restrained, or stunned.'
             );
         }
 

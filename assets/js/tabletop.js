@@ -389,8 +389,22 @@
                             ? 'Critical miss.'
                             : attack.hit ? 'Hit!' : 'Miss!';
 
+                    let rollContext = '';
+
+                    if (
+                        attack.roll_mode
+                        && attack.roll_mode !== 'normal'
+                        && Array.isArray(attack.rolls)
+                    ) {
+                        rollContext =
+                            ' '
+                            + attack.roll_mode.toUpperCase()
+                            + ' [' + attack.rolls.join(' / ') + ']';
+                    }
+
                     let message =
                         prefix
+                        + rollContext
                         + ' d20 ' + attack.roll
                         + ' + ' + attack.modifier
                         + ' = ' + attack.total

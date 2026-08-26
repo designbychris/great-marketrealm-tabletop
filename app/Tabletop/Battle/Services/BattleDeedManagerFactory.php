@@ -6,6 +6,8 @@ namespace GreatMarketrealmTabletop\Tabletop\Battle\Services;
 
 use GreatMarketrealmTabletop\Tabletop\Battle\Repositories\WordPressBattleEventRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Repositories\WordPressVitalityRepository;
+use GreatMarketrealmTabletop\Tabletop\Conditions\Repositories\WordPressConditionRepository;
+use GreatMarketrealmTabletop\Tabletop\Conditions\Services\ConditionCombatRules;
 use GreatMarketrealmTabletop\Tabletop\Encounters\Repositories\WordPressEncounterRepository;
 use GreatMarketrealmTabletop\Tables\Memberships\Repositories\WordPressTableMembershipRepository;
 use GreatMarketrealmTabletop\Tables\Services\SystemTableClock;
@@ -23,7 +25,9 @@ final class BattleDeedManagerFactory
             new WordPressTableTokenRepository(),
             new WordPressBattleEventRepository(),
             new SystemTableClock(),
-            new WordPressVitalityRepository()
+            new WordPressVitalityRepository(),
+            new WordPressConditionRepository(),
+            new ConditionCombatRules()
         );
     }
 }

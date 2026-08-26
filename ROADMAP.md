@@ -303,3 +303,27 @@ Lower-latency shared-state synchronisation, presence and reconnection foundation
 - [x] Reduced-motion compatibility
 - [ ] Mechanical modifiers imposed by individual conditions
 - [ ] GMRC trait/spell automatic condition application
+
+
+### Phase IV.17 — Afflictions Take Hold
+
+- [x] Server-authoritative attack advantage/disadvantage modes
+- [x] Two-d20 advantage and disadvantage resolution
+- [x] Poisoned attacker has disadvantage
+- [x] Blinded attacker has disadvantage
+- [x] Prone attacker has disadvantage
+- [x] Restrained attacker has disadvantage
+- [x] Attacks against Blinded targets have advantage
+- [x] Attacks against Restrained targets have advantage
+- [x] Attacks against Stunned targets have advantage
+- [x] Advantage and disadvantage cancel to a normal roll
+- [x] Stunned blocks ordinary Battle Deeds
+- [x] Grappled blocks token movement
+- [x] Restrained blocks token movement
+- [x] Stunned blocks token movement
+- [x] Browser reports roll mode and both d20 rolls
+- [ ] Prone target melee/ranged distinction (requires certified distance)
+- [ ] Frightened attack penalty (requires source/line-of-sight context)
+- [ ] Charmed source-target attack restriction
+- [ ] Saving throw consequences
+- [ ] Server-side certification on deployment

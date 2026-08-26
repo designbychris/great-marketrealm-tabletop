@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.17.0-alpha.1] - 2026-08-26
+
+### Added
+
+- Phase IV.17 — Afflictions Take Hold.
+- Server-authoritative attack advantage/disadvantage.
+- Poisoned, Blinded, Prone and Restrained attacker penalties.
+- Advantage against Blinded, Restrained and Stunned targets.
+- Advantage/disadvantage cancellation.
+- Stunned Battle Deed restriction.
+- Grappled, Restrained and Stunned movement restrictions.
+- Browser reporting of both d20s for condition-modified attacks.
+
+
 ## [0.16.0-alpha.2] - 2026-08-26
 
 ### Fixed

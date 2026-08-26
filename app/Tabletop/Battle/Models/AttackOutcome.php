@@ -13,11 +13,20 @@ final class AttackOutcome
     public const MISS = 'miss';
     public const CRITICAL_MISS = 'critical-miss';
 
+    /**
+     * @param array<int,int>|null $rolls
+     */
     public function __construct(
         private int $roll,
         private int $modifier,
-        private int $armorClass
-    ) {}
+        private int $armorClass,
+        private string $rollMode = AttackRollMode::NORMAL,
+        private ?array $rolls = null
+    ) {
+        AttackRollMode::assert($this->rollMode);
+
+        $this->rolls ??= [$this->roll];
+    }
 
     public function total(): int
     {
@@ -53,6 +62,8 @@ final class AttackOutcome
     {
         return [
             'roll' => $this->roll,
+            'rolls' => $this->rolls,
+            'roll_mode' => $this->rollMode,
             'modifier' => $this->modifier,
             'total' => $this->total(),
             'armor_class' => $this->armorClass,

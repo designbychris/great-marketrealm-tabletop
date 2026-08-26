@@ -6,6 +6,7 @@ namespace GreatMarketrealmTabletop\Tabletop\Battle\Services;
 
 use GreatMarketrealmTabletop\Tabletop\Battle\Contracts\D20Roller;
 use GreatMarketrealmTabletop\Tabletop\Battle\Models\AttackOutcome;
+use GreatMarketrealmTabletop\Tabletop\Battle\Models\AttackRollMode;
 use GreatMarketrealmTabletop\Tabletop\Battle\Models\CombatProfile;
 
 defined('ABSPATH') || exit;
@@ -18,12 +19,31 @@ final class AttackResolver
 
     public function resolve(
         CombatProfile $attacker,
-        CombatProfile $target
+        CombatProfile $target,
+        string $rollMode = AttackRollMode::NORMAL
     ): AttackOutcome {
+        $rollMode = AttackRollMode::assert(
+            $rollMode
+        );
+
+        $rolls = [$this->roller->roll()];
+
+        if ($rollMode !== AttackRollMode::NORMAL) {
+            $rolls[] = $this->roller->roll();
+        }
+
+        $roll = match ($rollMode) {
+            AttackRollMode::ADVANTAGE => max($rolls),
+            AttackRollMode::DISADVANTAGE => min($rolls),
+            default => $rolls[0],
+        };
+
         return new AttackOutcome(
-            $this->roller->roll(),
+            $roll,
             $attacker->attackModifier(),
-            $target->armorClass()
+            $target->armorClass(),
+            $rollMode,
+            $rolls
         );
     }
 }

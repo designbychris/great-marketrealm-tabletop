@@ -10,6 +10,8 @@ use GreatMarketrealmTabletop\Tabletop\Battle\Repositories\WordPressDamageProfile
 use GreatMarketrealmTabletop\Tabletop\Battle\Repositories\WordPressDamageDefenseRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Repositories\WordPressDeathSaveRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Repositories\WordPressVitalityRepository;
+use GreatMarketrealmTabletop\Tabletop\Conditions\Repositories\WordPressConditionRepository;
+use GreatMarketrealmTabletop\Tabletop\Conditions\Services\ConditionCombatRules;
 use GreatMarketrealmTabletop\Tabletop\Encounters\Repositories\WordPressEncounterRepository;
 use GreatMarketrealmTabletop\Tables\Memberships\Repositories\WordPressTableMembershipRepository;
 use GreatMarketrealmTabletop\Tables\Services\SystemTableClock;
@@ -34,7 +36,9 @@ final class AttackManagerFactory
                 $tokens,
                 $events,
                 $clock,
-                new WordPressVitalityRepository()
+                new WordPressVitalityRepository(),
+                new WordPressConditionRepository(),
+                new ConditionCombatRules()
             ),
             $encounters,
             $members,
@@ -48,7 +52,9 @@ final class AttackManagerFactory
             new AttackResolver(new SecureD20Roller()),
             new DamageResolver(new SecureDamageDieRoller()),
             new DamageDefenseResolver(),
-            $clock
+            $clock,
+            new WordPressConditionRepository(),
+            new ConditionCombatRules()
         );
     }
 }
