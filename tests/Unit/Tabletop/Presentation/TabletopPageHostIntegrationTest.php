@@ -120,4 +120,22 @@ final class TabletopPageHostIntegrationTest extends TestCase
         );
     }
 
+
+    public function testProviderRegistersAttackResolutionEndpoint(): void
+    {
+        $source = (string) file_get_contents(
+            $this->root
+                . '/app/Tabletop/TabletopServiceProvider.php'
+        );
+
+        self::assertStringContainsString(
+            "'wp_ajax_gmrt_resolve_attack'",
+            $source
+        );
+        self::assertStringNotContainsString(
+            "'wp_ajax_nopriv_gmrt_resolve_attack'",
+            $source
+        );
+    }
+
 }

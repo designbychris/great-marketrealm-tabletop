@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.11.0-alpha.1] - 2026-08-26
+
+### Added
+
+- Phase IV.11 — The Clash of Arms.
+- Server-side d20 attack resolution.
+- Token Combat Profiles with Armor Class and attack modifier.
+- Natural 20 critical hits and natural 1 critical misses.
+- Target selection and same-Scene validation.
+- Player protection against hidden attack targets.
+- Structured `attack-resolved` Battle Events.
+- Visible target selector and authoritative attack result announcement.
+
+
 ## [0.10.0-alpha.2] - 2026-08-26
 
 ### Added

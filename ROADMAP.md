@@ -160,3 +160,22 @@ Lower-latency shared-state synchronisation, presence and reconnection foundation
 - [x] Authenticated nonce-protected Deed endpoint
 - [x] First visible Chamber Deed controls
 - [ ] Server-side certification on the deployment environment
+
+
+### Phase IV.11 — The Clash of Arms
+
+- [x] Server-side d20 attack roller
+- [x] Per-token combat profiles with AC and attack modifier
+- [x] Safe default profile: AC 10 / attack +0
+- [x] Attack target selection
+- [x] Natural 20 critical-hit rule
+- [x] Natural 1 critical-miss rule
+- [x] Modified attack total versus Armor Class
+- [x] Attack spends the existing Action resource
+- [x] Structured attack-resolved Battle Event
+- [x] Hidden-target protection for Players
+- [x] Encounter revision conflict protection
+- [x] First visible target selector and attack result announcement
+- [ ] Damage and HP application (future phase)
+- [ ] Pixel critical animations (presentation phase)
+- [ ] Server-side certification on deployment

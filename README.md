@@ -18,6 +18,14 @@ Gameplay code must not reach directly into arbitrary Companion internals.
 
 ## Current Milestone
 
+### Phase IV.11 — The Clash of Arms
+
+Attack Deeds can now target another token and resolve a server-side d20 attack
+against Armor Class. Natural 20s are critical hits, natural 1s are critical
+misses, and every result is recorded as a structured Battle Event.
+
+Damage and HP are intentionally not applied yet.
+
 ### Phase IV.10 — Deeds in Battle
 
 Active Encounters now have a server-authoritative turn economy and first

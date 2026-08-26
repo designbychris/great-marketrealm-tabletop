@@ -324,3 +324,20 @@
 .gmrt-deed:focus-visible {
     background: rgba(244, 234, 214, .14);
 }
+
+
+.gmrt-deeds__target {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    font: 700 .75rem system-ui, sans-serif;
+}
+
+.gmrt-deeds__target select {
+    max-width: 12rem;
+    border: 1px solid rgba(244, 234, 214, .35);
+    border-radius: 8px;
+    padding: .4rem .55rem;
+    background: rgba(0, 0, 0, .32);
+    color: inherit;
+}

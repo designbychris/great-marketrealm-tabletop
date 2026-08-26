@@ -126,6 +126,30 @@ $sceneImage = $scene !== null
                     (string) $encounter['current_token_id']
                 ); ?>"
             >
+                <label class="gmrt-deeds__target">
+                    <span>Target</span>
+                    <select data-attack-target>
+                        <option value="">Choose target…</option>
+                        <?php foreach ($tokens as $targetToken) :
+                            if (
+                                ($targetToken['id'] ?? '')
+                                === ($encounter['current_token_id'] ?? '')
+                            ) {
+                                continue;
+                            }
+                            ?>
+                            <option
+                                value="<?php echo esc_attr(
+                                    (string) ($targetToken['id'] ?? '')
+                                ); ?>"
+                            >
+                                <?php echo esc_html(
+                                    (string) ($targetToken['label'] ?? 'Token')
+                                ); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </label>
                 <?php foreach (
                     ['attack' => 'Attack', 'dash' => 'Dash',
                      'disengage' => 'Disengage', 'dodge' => 'Dodge',

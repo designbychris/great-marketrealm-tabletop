@@ -186,15 +186,53 @@
             }
 
             try {
-                const data = await request('gmrt_perform_battle_deed', {
-                    encounter_id: encounter.dataset.encounterId || '',
-                    deed: button.dataset.battleDeed || '',
-                    revision: encounter.dataset.encounterRevision || '1'
-                });
+                const deedKey = button.dataset.battleDeed || '';
+                let data;
+
+                if (deedKey === 'attack') {
+                    const target = document.querySelector(
+                        '[data-attack-target]'
+                    );
+
+                    if (!target || !target.value) {
+                        say('Choose a target before attacking.');
+                        return;
+                    }
+
+                    data = await request('gmrt_resolve_attack', {
+                        encounter_id: encounter.dataset.encounterId || '',
+                        target_token_id: target.value,
+                        revision: encounter.dataset.encounterRevision || '1'
+                    });
+                } else {
+                    data = await request('gmrt_perform_battle_deed', {
+                        encounter_id: encounter.dataset.encounterId || '',
+                        deed: deedKey,
+                        revision: encounter.dataset.encounterRevision || '1'
+                    });
+                }
 
                 if (data.encounter) {
                     encounter.dataset.encounterRevision =
                         String(data.encounter.revision || 1);
+                }
+
+                if (data.attack) {
+                    const attack = data.attack;
+                    const prefix = attack.result === 'critical-hit'
+                        ? 'CRITICAL HIT!'
+                        : attack.result === 'critical-miss'
+                            ? 'Critical miss.'
+                            : attack.hit ? 'Hit!' : 'Miss!';
+
+                    say(
+                        prefix
+                        + ' d20 ' + attack.roll
+                        + ' + ' + attack.modifier
+                        + ' = ' + attack.total
+                        + ' vs AC ' + attack.armor_class + '.'
+                    );
+                    return;
                 }
 
                 const deed = data.event
