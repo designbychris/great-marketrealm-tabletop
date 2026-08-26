@@ -6,6 +6,8 @@ namespace GreatMarketrealmTabletop\Tabletop\Battle\Services;
 
 use GreatMarketrealmTabletop\Tabletop\Battle\Contracts\BattleEventRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Contracts\CombatProfileRepository;
+use GreatMarketrealmTabletop\Tabletop\Battle\Contracts\DamageProfileRepository;
+use GreatMarketrealmTabletop\Tabletop\Battle\Contracts\VitalityRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Exceptions\AttackDenied;
 use GreatMarketrealmTabletop\Tabletop\Battle\Models\BattleDeed;
 use GreatMarketrealmTabletop\Tabletop\Battle\Models\BattleEvent;
@@ -25,8 +27,11 @@ final class AttackManager
         private TableMembershipRepository $members,
         private TableTokenRepository $tokens,
         private CombatProfileRepository $profiles,
+        private DamageProfileRepository $damageProfiles,
+        private VitalityRepository $vitality,
         private BattleEventRepository $events,
         private AttackResolver $resolver,
+        private DamageResolver $damageResolver,
         private TableClock $clock
     ) {}
 
@@ -147,11 +152,62 @@ final class AttackManager
 
         $this->events->append($event);
 
+        $damageRoll = null;
+        $damageEvent = null;
+        $vitality = null;
+
+        if ($outcome->isHit()) {
+            $damageRoll = $this->damageResolver->resolve(
+                $this->damageProfiles->forToken(
+                    $tableId,
+                    $attacker->id()
+                ),
+                $outcome->result()
+                    === \GreatMarketrealmTabletop\Tabletop\Battle\Models\AttackOutcome::CRITICAL_HIT
+            );
+
+            $vitality = $this->vitality->forToken(
+                $tableId,
+                $target->id()
+            );
+
+            $application = $vitality->damage(
+                $damageRoll->total()
+            );
+
+            $this->vitality->save(
+                $tableId,
+                $vitality
+            );
+
+            $damageEvent = new BattleEvent(
+                bin2hex(random_bytes(12)),
+                $tableId,
+                $encounterId,
+                'damage-applied',
+                $attacker->id(),
+                $updatedEncounter->round(),
+                $updatedEncounter->turnIndex(),
+                $this->clock->now(),
+                [
+                    'target_token_id' => $target->id(),
+                    'damage' => $damageRoll->toArray(),
+                    'application' => $application,
+                    'vitality' => $vitality->toArray(),
+                ]
+            );
+
+            $this->events->append($damageEvent);
+        }
+
         return [
             'encounter' => $updatedEncounter,
             'deed_event' => $deed['event'],
             'attack_event' => $event,
+            'damage_event' => $damageEvent,
             'outcome' => $outcome,
+            'damage' => $damageRoll,
+            'vitality' => $vitality,
         ];
     }
 }

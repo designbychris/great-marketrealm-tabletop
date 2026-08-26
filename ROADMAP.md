@@ -179,3 +179,22 @@ Lower-latency shared-state synchronisation, presence and reconnection foundation
 - [ ] Damage and HP application (future phase)
 - [ ] Pixel critical animations (presentation phase)
 - [ ] Server-side certification on deployment
+
+
+### Phase IV.12 — Blood on the Board
+
+- [x] Server-owned Maximum / Current / Temporary HP
+- [x] Temporary HP absorbs damage before Current HP
+- [x] Healing capped at Maximum HP
+- [x] Healthy / Wounded / Down vitality states
+- [x] Per-token persistent vitality
+- [x] Per-token damage profiles
+- [x] Secure damage dice rolling
+- [x] Critical hits double damage dice, not modifiers
+- [x] Successful attacks apply authoritative damage
+- [x] Structured `damage-applied` Battle Events
+- [x] Chamber vitality projection
+- [x] First party HP bars
+- [ ] Death saves and unconsciousness rules
+- [ ] GMRC HP synchronisation
+- [ ] Server-side certification on deployment

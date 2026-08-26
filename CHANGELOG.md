@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.12.0-alpha.1] - 2026-08-26
+
+### Added
+
+- Phase IV.12 — Blood on the Board.
+- Persistent per-token Maximum, Current and Temporary HP.
+- Temporary-HP-first damage application.
+- Healing caps and non-stacking Temporary HP grants.
+- Healthy, Wounded and Down vitality projection.
+- Persistent damage profiles and secure damage dice.
+- Critical hits double damage dice only.
+- Successful attack damage application.
+- Structured `damage-applied` Battle Events.
+- First Tabletop party HP bars.
+
+
 ## [0.11.0-alpha.1] - 2026-08-26
 
 ### Added

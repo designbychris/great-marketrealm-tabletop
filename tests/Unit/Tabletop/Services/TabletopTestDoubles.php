@@ -176,3 +176,29 @@ final class ChamberEncounters implements \GreatMarketrealmTabletop\Tabletop\Enco
         $this->items[$encounter->id()] = $encounter;
     }
 }
+
+
+final class ChamberVitality implements \GreatMarketrealmTabletop\Tabletop\Battle\Contracts\VitalityRepository
+{
+    /** @var array<string,\GreatMarketrealmTabletop\Tabletop\Battle\Models\Vitality> */
+    public array $items = [];
+
+    public function forToken(
+        string $tableId,
+        string $tokenId
+    ): \GreatMarketrealmTabletop\Tabletop\Battle\Models\Vitality {
+        return $this->items[$tokenId]
+            ?? new \GreatMarketrealmTabletop\Tabletop\Battle\Models\Vitality(
+                $tokenId,
+                10,
+                10
+            );
+    }
+
+    public function save(
+        string $tableId,
+        \GreatMarketrealmTabletop\Tabletop\Battle\Models\Vitality $vitality
+    ): void {
+        $this->items[$vitality->tokenId()] = $vitality;
+    }
+}

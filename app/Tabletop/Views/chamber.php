@@ -13,6 +13,7 @@ $scene = $state?->scene();
 $tokens = $state?->tokens() ?? [];
 $members = $state?->members() ?? [];
 $encounter = $state?->encounter();
+$vitality = $state?->vitality() ?? [];
 
 $sceneImage = $scene !== null
     ? wp_get_attachment_image_url(
@@ -417,6 +418,66 @@ $sceneImage = $scene !== null
                                     )
                                 ); ?>
                             </small>
+                            <?php
+                            $memberCharacter = (string) (
+                                $member['companion_character_id']
+                                ?? ''
+                            );
+                            $memberVitality = null;
+
+                            foreach ($tokens as $partyToken) {
+                                if (
+                                    $memberCharacter !== ''
+                                    && (string) (
+                                        $partyToken['source_reference']
+                                        ?? ''
+                                    ) === $memberCharacter
+                                ) {
+                                    $partyTokenId = (string) (
+                                        $partyToken['id']
+                                        ?? ''
+                                    );
+                                    $memberVitality = $vitality[
+                                        $partyTokenId
+                                    ] ?? null;
+                                    break;
+                                }
+                            }
+                            ?>
+                            <?php if (is_array($memberVitality)) : ?>
+                                <div
+                                    class="gmrt-hp"
+                                    aria-label="<?php echo esc_attr(
+                                        'Hit Points '
+                                        . (string) $memberVitality['current_hp']
+                                        . ' of '
+                                        . (string) $memberVitality['maximum_hp']
+                                    ); ?>"
+                                >
+                                    <div class="gmrt-hp__track">
+                                        <span
+                                            class="gmrt-hp__fill"
+                                            style="--gmrt-hp: <?php echo esc_attr(
+                                                (string) $memberVitality['percentage']
+                                            ); ?>%;"
+                                        ></span>
+                                    </div>
+                                    <small>
+                                        HP <?php echo esc_html(
+                                            (string) $memberVitality['current_hp']
+                                        ); ?>/<?php echo esc_html(
+                                            (string) $memberVitality['maximum_hp']
+                                        ); ?>
+                                        <?php if (
+                                            (int) $memberVitality['temporary_hp'] > 0
+                                        ) : ?>
+                                            +<?php echo esc_html(
+                                                (string) $memberVitality['temporary_hp']
+                                            ); ?> temp
+                                        <?php endif; ?>
+                                    </small>
+                                </div>
+                            <?php endif; ?>
                         </li>
                     <?php endforeach; ?>
                 </ul>

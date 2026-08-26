@@ -341,3 +341,33 @@
     background: rgba(0, 0, 0, .32);
     color: inherit;
 }
+
+
+.gmrt-hp {
+    grid-column: 2;
+    display: grid;
+    gap: .2rem;
+    margin-top: .25rem;
+}
+
+.gmrt-hp__track {
+    height: .5rem;
+    overflow: hidden;
+    border: 1px solid rgba(244, 234, 214, .28);
+    border-radius: 999px;
+    background: rgba(0, 0, 0, .28);
+}
+
+.gmrt-hp__fill {
+    display: block;
+    width: var(--gmrt-hp);
+    height: 100%;
+    background: currentColor;
+    opacity: .82;
+}
+
+.gmrt-hp small {
+    font-family: system-ui, sans-serif;
+    font-size: .7rem;
+    opacity: .72;
+}

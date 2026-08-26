@@ -225,13 +225,24 @@
                             ? 'Critical miss.'
                             : attack.hit ? 'Hit!' : 'Miss!';
 
-                    say(
+                    let message =
                         prefix
                         + ' d20 ' + attack.roll
                         + ' + ' + attack.modifier
                         + ' = ' + attack.total
-                        + ' vs AC ' + attack.armor_class + '.'
-                    );
+                        + ' vs AC ' + attack.armor_class + '.';
+
+                    if (data.damage && data.vitality) {
+                        message +=
+                            ' Damage ' + data.damage.total
+                            + '. HP '
+                            + data.vitality.current_hp
+                            + '/' + data.vitality.maximum_hp
+                            + '.';
+                    }
+
+                    say(message);
+                    await refresh();
                     return;
                 }
 

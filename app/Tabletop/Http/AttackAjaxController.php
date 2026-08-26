@@ -51,7 +51,10 @@ final class AttackAjaxController
             wp_send_json_success([
                 'encounter' => $result['encounter']->toArray(),
                 'attack' => $result['outcome']->toArray(),
+                'damage' => $result['damage']?->toArray(),
+                'vitality' => $result['vitality']?->toArray(),
                 'event' => $result['attack_event']->toArray(),
+                'damage_event' => $result['damage_event']?->toArray(),
             ]);
         } catch (StaleEncounterRevision $exception) {
             wp_send_json_error(

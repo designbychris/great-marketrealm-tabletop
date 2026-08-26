@@ -18,6 +18,15 @@ Gameplay code must not reach directly into arbitrary Companion internals.
 
 ## Current Milestone
 
+### Phase IV.12 — Blood on the Board
+
+Successful attacks now roll and apply server-authoritative damage. Tokens gain
+persistent Maximum HP, Current HP and Temporary HP, with Healthy / Wounded /
+Down presentation states and the Tabletop's first real HP bars.
+
+Critical hits double damage dice rather than flat modifiers. Death saves and
+Companion HP synchronisation remain future work.
+
 ### Phase IV.11 — The Clash of Arms
 
 Attack Deeds can now target another token and resolve a server-side d20 attack

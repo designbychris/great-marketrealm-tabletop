@@ -21,4 +21,26 @@ final class AttackAjaxRegressionTest extends TestCase
         self::assertStringContainsString("'target_token_id'", $source);
         self::assertStringContainsString('409', $source);
     }
+
+    public function testAttackEndpointReturnsDamageAndVitalityProjection(): void
+    {
+        $source = (string) file_get_contents(
+            dirname(__DIR__, 4)
+                . '/app/Tabletop/Http/AttackAjaxController.php'
+        );
+
+        self::assertStringContainsString(
+            "'damage' =>",
+            $source
+        );
+        self::assertStringContainsString(
+            "'vitality' =>",
+            $source
+        );
+        self::assertStringContainsString(
+            "'damage_event' =>",
+            $source
+        );
+    }
+
 }
