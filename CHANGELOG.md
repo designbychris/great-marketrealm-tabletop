@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.4.0-alpha.1] - 2026-08-26
+
+### Added
+
+- Phase IV.4 — The Gathering of Adventurers.
+- Persistent Table membership records.
+- Dungeon Master and Player Table roles.
+- Invited, Active and Left player membership lifecycle.
+- Automatic Dungeon Master seating for newly prepared Tables.
+- Invitation, join, leave and re-invite application service.
+- Table-level management and participation permissions.
+- Optional opaque Companion Character references without duplicating Companion data.
+- WordPress membership persistence adapter and regression coverage.
+
+
 ## [0.3.0-alpha.1] - 2026-08-26
 
 ### Added

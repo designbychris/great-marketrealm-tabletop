@@ -8,6 +8,8 @@ use GreatMarketrealmTabletop\Integration\Companion\CompanionAvailability;
 use GreatMarketrealmTabletop\Integration\Companion\CompanionGateway;
 use GreatMarketrealmTabletop\Tables\Services\TableRegistry;
 use GreatMarketrealmTabletop\Tables\Services\TableRegistryFactory;
+use GreatMarketrealmTabletop\Tables\Memberships\Services\TableGathering;
+use GreatMarketrealmTabletop\Tables\Memberships\Services\TableGatheringFactory;
 
 defined('ABSPATH') || exit;
 
@@ -21,10 +23,13 @@ final class Application
 
     private TableRegistry $tables;
 
+    private TableGathering $gathering;
+
     private function __construct()
     {
         $this->companion = new CompanionAvailability();
         $this->tables = TableRegistryFactory::make();
+        $this->gathering = TableGatheringFactory::make();
     }
 
     public static function instance(): self
@@ -52,7 +57,7 @@ final class Application
     {
         return defined('GMRT_VERSION')
             ? (string) GMRT_VERSION
-            : '0.3.0-alpha.1';
+            : '0.4.0-alpha.1';
     }
 
     public function companion(): CompanionGateway
@@ -63,5 +68,10 @@ final class Application
     public function tables(): TableRegistry
     {
         return $this->tables;
+    }
+
+    public function gathering(): TableGathering
+    {
+        return $this->gathering;
     }
 }

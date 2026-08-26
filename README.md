@@ -18,20 +18,21 @@ Gameplay code must not reach directly into arbitrary Companion internals.
 
 ## Current Milestone
 
-### Phase IV.3 — The Steward's Table Rules
+### Phase IV.4 — The Gathering of Adventurers
 
-The foundation is certified. IV.2 introduces the first real VTT domain:
+IV.4 gives Tables their first persistent adventuring party:
 
-- persistent Table identity
-- Dungeon Master ownership
-- **Preparing → Active → Ended** lifecycle
-- Table repository abstraction
-- application Table Registry
-- configurable concurrent-table capacity
-- initial **2 active Table** safety limit
-- immediate capacity release when a session ends
+- Dungeon Master and Player Table roles
+- invitation-required player joining
+- reconnectable Table membership records
+- safe player leaving and re-invitation
+- Table-level management and participation permissions
+- optional opaque references to Companion-owned Characters
+- automatic Dungeon Master seating when a Table is prepared
 
-Maps, tokens, player invitations, and networking remain deliberately outside this phase.
+Character data itself remains owned by Great Marketrealm Companion. GMRT stores only the Character reference selected for that Table membership.
+
+Maps, tokens, and real-time networking remain deliberately outside this phase.
 
 ## Technical Identity
 

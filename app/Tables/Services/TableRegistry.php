@@ -11,6 +11,7 @@ use GreatMarketrealmTabletop\Tables\Contracts\TableRepository;
 use GreatMarketrealmTabletop\Tables\Contracts\TableStewardOverride;
 use GreatMarketrealmTabletop\Tables\Exceptions\TableCapacityExceeded;
 use GreatMarketrealmTabletop\Tables\Models\Table;
+use GreatMarketrealmTabletop\Tables\Memberships\Services\TableGathering;
 use GreatMarketrealmTabletop\Tables\Policies\WordPressTableLeasePolicy;
 use GreatMarketrealmTabletop\Tables\Policies\WordPressTableStewardOverride;
 use RuntimeException;
@@ -22,13 +23,16 @@ final class TableRegistry
     private TableLeaseManager $leases;
     private TableStewardOverride $override;
 
+    private ?TableGathering $gathering;
+
     public function __construct(
         private TableRepository $tables,
         private TableCapacityPolicy $capacity,
         private TableClock $clock,
         private TableIdGenerator $ids,
         ?TableLeaseManager $leases = null,
-        ?TableStewardOverride $override = null
+        ?TableStewardOverride $override = null,
+        ?TableGathering $gathering = null
     ) {
         $this->leases = $leases ?? new TableLeaseManager(
             $tables,
@@ -36,6 +40,7 @@ final class TableRegistry
             $clock
         );
         $this->override = $override ?? new WordPressTableStewardOverride();
+        $this->gathering = $gathering;
     }
 
     public function prepare(int $dungeonMasterUserId, string $name): Table
@@ -47,6 +52,11 @@ final class TableRegistry
             $this->clock->now()
         );
         $this->tables->save($table);
+
+        if ($this->gathering !== null) {
+            $this->gathering->seatDungeonMaster($table);
+        }
+
         return $table;
     }
 

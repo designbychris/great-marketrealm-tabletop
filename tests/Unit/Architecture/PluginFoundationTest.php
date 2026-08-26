@@ -24,7 +24,7 @@ final class PluginFoundationTest extends TestCase
             $source
         );
         self::assertStringContainsString(
-            "define('GMRT_VERSION', '0.3.0-alpha.1')",
+            "define('GMRT_VERSION', '0.4.0-alpha.1')",
             $source
         );
         self::assertStringContainsString(
@@ -134,6 +134,40 @@ final class PluginFoundationTest extends TestCase
         self::assertFileExists($this->root . '/app/Tables/Services/TableLeaseManager.php');
         self::assertFileExists($this->root . '/app/Tables/Policies/WordPressTableLeasePolicy.php');
         self::assertFileExists($this->root . '/app/Tables/Policies/WordPressTableStewardOverride.php');
+    }
+
+    public function testMembershipDomainKeepsCompanionAsOpaqueReference(): void
+    {
+        $memberships = $this->root
+            . '/app/Tables/Memberships';
+        $violations = [];
+
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator(
+                $memberships,
+                \FilesystemIterator::SKIP_DOTS
+            )
+        );
+
+        foreach ($iterator as $file) {
+            if (
+                ! $file->isFile()
+                || $file->getExtension() !== 'php'
+            ) {
+                continue;
+            }
+
+            if (str_contains(
+                (string) file_get_contents(
+                    $file->getPathname()
+                ),
+                'GreatMarketrealmCompanion\\'
+            )) {
+                $violations[] = $file->getPathname();
+            }
+        }
+
+        self::assertSame([], $violations);
     }
 
     public function testInitialRoadmapNamesTheEmptyTable(): void

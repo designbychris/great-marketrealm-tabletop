@@ -43,7 +43,17 @@
 
 ### Phase IV.4 — The Gathering of Adventurers
 
-Players and Companion Characters join tables.
+- [x] Persistent Table membership records
+- [x] Dungeon Master and Player Table roles
+- [x] Invited → Active → Left player lifecycle
+- [x] Dungeon Master automatically seated for prepared Tables
+- [x] Invitation-required player joining
+- [x] Safe leave/re-invite behaviour
+- [x] Table-level management/participation permissions
+- [x] Opaque Companion Character references without duplicated Character data
+- [x] Ended Tables reject new gathering changes
+- [x] Membership persistence and regression coverage
+- [ ] Server-side certification on the deployment environment
 
 ### Phase IV.5 — The First Battlemap
 

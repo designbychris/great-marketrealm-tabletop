@@ -7,6 +7,8 @@ namespace GreatMarketrealmTabletop\Tables\Services;
 use GreatMarketrealmTabletop\Tables\Policies\WordPressTableLeasePolicy;
 use GreatMarketrealmTabletop\Tables\Policies\WordPressTableStewardOverride;
 use GreatMarketrealmTabletop\Tables\Repositories\WordPressTableRepository;
+use GreatMarketrealmTabletop\Tables\Memberships\Repositories\WordPressTableMembershipRepository;
+use GreatMarketrealmTabletop\Tables\Memberships\Services\TableGathering;
 
 defined('ABSPATH') || exit;
 
@@ -22,13 +24,20 @@ final class TableRegistryFactory
             $clock
         );
 
+        $gathering = new TableGathering(
+            $tables,
+            new WordPressTableMembershipRepository(),
+            $clock
+        );
+
         return new TableRegistry(
             $tables,
             new WordPressTableCapacityPolicy(),
             $clock,
             new UuidTableIdGenerator(),
             $leases,
-            new WordPressTableStewardOverride()
+            new WordPressTableStewardOverride(),
+            $gathering
         );
     }
 }
