@@ -41,5 +41,9 @@ final class Activation
             [],
             false
         );
+
+        if (function_exists('flush_rewrite_rules')) {
+            flush_rewrite_rules();
+        }
     }
 }

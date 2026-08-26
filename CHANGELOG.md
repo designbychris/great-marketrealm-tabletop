@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.7.0-alpha.1] - 2026-08-26
+
+### Added
+
+- Phase IV.7 — The Tabletop Chamber.
+- GMRT-owned `/tabletop/` and `/tabletop/{table-id}/` front-end routes.
+- Logged-in and active-Table-membership access boundary.
+- Server-assembled Tabletop Chamber view state.
+- Active battlemap Scene and square-grid rendering.
+- Persistent token rendering using normalised Scene coordinates.
+- Dungeon Master visibility of Hidden preparation tokens.
+- Player filtering of Hidden tokens.
+- Table gathering sidebar, empty states and unavailable-map handling.
+- Responsive Tabletop styling with reduced-motion support.
+- Read-only initial chamber ahead of interactive movement.
+
+
 ## [0.6.0-alpha.1] - 2026-08-26
 
 ### Added

@@ -18,6 +18,17 @@ Gameplay code must not reach directly into arbitrary Companion internals.
 
 ## Current Milestone
 
+### Phase IV.7 — The Tabletop Chamber
+
+The VTT now owns its first visible front-end at **`/tabletop/`**.
+
+The chamber renders the active Table Scene, square grid, persisted tokens and
+the gathering of Table members. Dungeon Masters can see Hidden preparation
+tokens while Players receive Visible tokens only.
+
+The first chamber is deliberately read-only. Interactive movement arrives in
+the next certified phase.
+
 ### Phase IV.6 — Tokens on the Table
 
 IV.6 places persistent game pieces onto Table Scenes:

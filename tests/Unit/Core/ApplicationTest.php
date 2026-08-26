@@ -30,7 +30,7 @@ final class ApplicationTest extends TestCase
     public function testApplicationExposesInitialVersion(): void
     {
         self::assertSame(
-            '0.6.0-alpha.1',
+            '0.7.0-alpha.1',
             Application::instance()->version()
         );
     }
@@ -49,6 +49,24 @@ final class ApplicationTest extends TestCase
         self::assertInstanceOf(
             \GreatMarketrealmTabletop\Tables\Tokens\Services\TableTokenManager::class,
             \GreatMarketrealmTabletop\Core\Application::instance()->tokens()
+        );
+    }
+
+
+    public function testApplicationRegistersTabletopChamberProvider(): void
+    {
+        $source = (string) file_get_contents(
+            dirname(__DIR__, 3)
+                . '/app/Core/Application.php'
+        );
+
+        self::assertStringContainsString(
+            'new TabletopServiceProvider()',
+            $source
+        );
+        self::assertStringContainsString(
+            '$this->tabletop->register();',
+            $source
         );
     }
 

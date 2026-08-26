@@ -24,7 +24,7 @@ final class PluginFoundationTest extends TestCase
             $source
         );
         self::assertStringContainsString(
-            "define('GMRT_VERSION', '0.6.0-alpha.1')",
+            "define('GMRT_VERSION', '0.7.0-alpha.1')",
             $source
         );
         self::assertStringContainsString(
@@ -255,6 +255,55 @@ final class PluginFoundationTest extends TestCase
         self::assertStringContainsString(
             'Phase IV.7 — The Tabletop Chamber',
             $roadmap
+        );
+    }
+
+
+    public function testTabletopPresentationDoesNotReachIntoCompanionInternals(): void
+    {
+        $path = $this->root
+            . '/app/Tabletop';
+        $violations = [];
+
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator(
+                $path,
+                \FilesystemIterator::SKIP_DOTS
+            )
+        );
+
+        foreach ($iterator as $file) {
+            if (
+                $file->isFile()
+                && $file->getExtension() === 'php'
+                && str_contains(
+                    (string) file_get_contents(
+                        $file->getPathname()
+                    ),
+                    'GreatMarketrealmCompanion\\'
+                )
+            ) {
+                $violations[] =
+                    $file->getPathname();
+            }
+        }
+
+        self::assertSame([], $violations);
+    }
+
+    public function testTabletopChamberOwnsItsFrontEndPath(): void
+    {
+        $route = $this->source(
+            'app/Tabletop/Routing/TabletopRoute.php'
+        );
+
+        self::assertStringContainsString(
+            '^tabletop/',
+            $route
+        );
+        self::assertStringNotContainsString(
+            'gmrc_route',
+            $route
         );
     }
 

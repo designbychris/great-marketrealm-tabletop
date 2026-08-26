@@ -1,0 +1,198 @@
+<?php
+
+declare(strict_types=1);
+
+namespace GreatMarketrealmTabletop\Tests\Unit\Tabletop\Services;
+
+require_once __DIR__ . '/TabletopTestDoubles.php';
+
+use DateTimeImmutable;
+use GreatMarketrealmTabletop\Tabletop\Exceptions\TabletopAccessDenied;
+use GreatMarketrealmTabletop\Tabletop\Services\TabletopChamber;
+use GreatMarketrealmTabletop\Tables\Memberships\Models\TableMember;
+use GreatMarketrealmTabletop\Tables\Models\Table;
+use GreatMarketrealmTabletop\Tables\Scenes\Models\GridType;
+use GreatMarketrealmTabletop\Tables\Scenes\Models\TableScene;
+use GreatMarketrealmTabletop\Tables\Tokens\Models\TableToken;
+use GreatMarketrealmTabletop\Tables\Tokens\Models\TableTokenType;
+use GreatMarketrealmTabletop\Tables\Tokens\Models\TableTokenVisibility;
+use PHPUnit\Framework\TestCase;
+
+final class TabletopChamberTest extends TestCase
+{
+    private ChamberTables $tables;
+    private ChamberMembers $members;
+    private ChamberScenes $scenes;
+    private ChamberTokens $tokens;
+    private TabletopChamber $chamber;
+
+    protected function setUp(): void
+    {
+        $now = new DateTimeImmutable(
+            '2026-08-26T10:00:00+01:00'
+        );
+
+        $this->tables = new ChamberTables();
+        $this->members = new ChamberMembers();
+        $this->scenes = new ChamberScenes();
+        $this->tokens = new ChamberTokens();
+
+        $table = Table::prepare(
+            'table-1',
+            42,
+            'The Giggling Gourd',
+            $now
+        );
+
+        $this->tables->save($table);
+
+        $this->members->save(
+            TableMember::dungeonMaster(
+                'table-1',
+                42,
+                $now
+            )
+        );
+
+        $player = TableMember::invitePlayer(
+            'table-1',
+            84,
+            $now
+        );
+        $player->join($now);
+        $this->members->save($player);
+
+        $scene = TableScene::create(
+            'scene-1',
+            'table-1',
+            'Cold Vault',
+            17,
+            1600,
+            900,
+            GridType::SQUARE,
+            50,
+            $now
+        );
+        $scene->activate();
+        $this->scenes->save($scene);
+
+        $this->tokens->save(
+            TableToken::create(
+                'token-visible',
+                'table-1',
+                'scene-1',
+                'Sir Pie',
+                TableTokenType::CHARACTER,
+                'gmrc-character-27',
+                84,
+                .25,
+                .75,
+                1,
+                1,
+                TableTokenVisibility::VISIBLE,
+                $now
+            )
+        );
+
+        $this->tokens->save(
+            TableToken::create(
+                'token-hidden',
+                'table-1',
+                'scene-1',
+                'Gravy Golem',
+                TableTokenType::CREATURE,
+                'gmrc-creature-gravy-golem',
+                null,
+                .6,
+                .4,
+                2,
+                2,
+                TableTokenVisibility::HIDDEN,
+                $now
+            )
+        );
+
+        $this->chamber = new TabletopChamber(
+            $this->tables,
+            $this->members,
+            $this->scenes,
+            $this->tokens
+        );
+    }
+
+    public function testDungeonMasterReceivesActiveSceneAndAllTokens(): void
+    {
+        $state = $this->chamber->state(
+            'table-1',
+            42
+        );
+
+        self::assertTrue($state->isDungeonMaster());
+        self::assertSame(
+            'Cold Vault',
+            $state->scene()['name'] ?? null
+        );
+        self::assertCount(2, $state->tokens());
+        self::assertCount(2, $state->members());
+    }
+
+    public function testPlayerCannotSeeHiddenDungeonMasterTokens(): void
+    {
+        $state = $this->chamber->state(
+            'table-1',
+            84
+        );
+
+        self::assertFalse($state->isDungeonMaster());
+        self::assertCount(1, $state->tokens());
+        self::assertSame(
+            'Sir Pie',
+            $state->tokens()[0]['label']
+        );
+    }
+
+    public function testNonMemberCannotEnterChamber(): void
+    {
+        $this->expectException(
+            TabletopAccessDenied::class
+        );
+
+        $this->chamber->state(
+            'table-1',
+            999
+        );
+    }
+
+    public function testInvitedButInactivePlayerCannotEnterChamber(): void
+    {
+        $invited = TableMember::invitePlayer(
+            'table-1',
+            126,
+            new DateTimeImmutable()
+        );
+        $this->members->save($invited);
+
+        $this->expectException(
+            TabletopAccessDenied::class
+        );
+
+        $this->chamber->state(
+            'table-1',
+            126
+        );
+    }
+
+    public function testChamberSupportsTableWithoutActiveScene(): void
+    {
+        $this->scenes->items['table-1']
+            ['scene-1']->deactivate();
+
+        $state = $this->chamber->state(
+            'table-1',
+            42
+        );
+
+        self::assertNull($state->scene());
+        self::assertSame([], $state->tokens());
+    }
+}

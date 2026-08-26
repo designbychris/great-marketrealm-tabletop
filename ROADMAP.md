@@ -86,14 +86,29 @@
 
 ### Phase IV.7 — The Tabletop Chamber
 
-The first visible VTT application shell will live at **`/tabletop/`**.
+- [x] GMRT-owned `/tabletop/` front-end route
+- [x] Optional `/tabletop/{table-id}/` direct Table route
+- [x] Logged-in Table membership gate
+- [x] Active Scene battlemap rendering
+- [x] Square-grid visual overlay
+- [x] Persistent token rendering from IV.6 records
+- [x] Hidden tokens visible to Dungeon Masters only
+- [x] Table gathering/member sidebar
+- [x] Empty, unavailable-map and access-denied states
+- [x] Responsive shell and reduced-motion treatment
+- [x] Read-only first chamber with no premature drag transport
+- [ ] Server-side certification on the deployment environment
+
+### Phase IV.8 — The Living Table
+
+Interactive client-side movement and state refresh foundations.
 
 Planned foundations:
 
-- Front-end Tabletop route and application shell
-- Active Scene battlemap rendering
-- Token rendering from IV.6 records
-- Dungeon Master and Player view boundaries
-- Table/member context
-- Accessible loading and empty states
-- No real-time drag transport yet
+- Token selection
+- Dungeon Master token movement
+- Player-controlled Character token movement
+- Server-authoritative movement endpoints
+- Incremental Table state refresh
+- Optimistic UI with authoritative reconciliation
+- No WebSocket requirement yet

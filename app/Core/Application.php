@@ -14,6 +14,7 @@ use GreatMarketrealmTabletop\Tables\Scenes\Services\TableSceneManager;
 use GreatMarketrealmTabletop\Tables\Scenes\Services\TableSceneManagerFactory;
 use GreatMarketrealmTabletop\Tables\Tokens\Services\TableTokenManager;
 use GreatMarketrealmTabletop\Tables\Tokens\Services\TableTokenManagerFactory;
+use GreatMarketrealmTabletop\Tabletop\TabletopServiceProvider;
 
 defined('ABSPATH') || exit;
 
@@ -33,6 +34,8 @@ final class Application
 
     private TableTokenManager $tokens;
 
+    private TabletopServiceProvider $tabletop;
+
     private function __construct()
     {
         $this->companion = new CompanionAvailability();
@@ -40,6 +43,7 @@ final class Application
         $this->gathering = TableGatheringFactory::make();
         $this->scenes = TableSceneManagerFactory::make();
         $this->tokens = TableTokenManagerFactory::make();
+        $this->tabletop = new TabletopServiceProvider();
     }
 
     public static function instance(): self
@@ -53,6 +57,7 @@ final class Application
             return;
         }
 
+        $this->tabletop->register();
         $this->booted = true;
 
         do_action('gmrt_booted', $this);
@@ -67,7 +72,7 @@ final class Application
     {
         return defined('GMRT_VERSION')
             ? (string) GMRT_VERSION
-            : '0.6.0-alpha.1';
+            : '0.7.0-alpha.1';
     }
 
     public function companion(): CompanionGateway
