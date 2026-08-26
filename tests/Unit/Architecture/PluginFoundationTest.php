@@ -24,7 +24,7 @@ final class PluginFoundationTest extends TestCase
             $source
         );
         self::assertStringContainsString(
-            "define('GMRT_VERSION', '0.8.0-alpha.1')",
+            "define('GMRT_VERSION', '0.9.0-alpha.1')",
             $source
         );
         self::assertStringContainsString(
@@ -332,6 +332,47 @@ final class PluginFoundationTest extends TestCase
         self::assertStringNotContainsString(
             'update_option(',
             $client
+        );
+    }
+
+
+    public function testEncounterEngineReferencesTokensRatherThanCompanionCharacters(): void
+    {
+        $source = $this->source(
+            'app/Tabletop/Encounters/Models/EncounterCombatant.php'
+        );
+
+        self::assertStringContainsString(
+            'tokenId',
+            $source
+        );
+        self::assertStringNotContainsString(
+            'GreatMarketrealmCompanion\\',
+            $source
+        );
+        self::assertStringNotContainsString(
+            'characterId',
+            $source
+        );
+    }
+
+    public function testEncounterInitiativeOrderingIsServerDeterministic(): void
+    {
+        $source = $this->source(
+            'app/Tabletop/Encounters/Models/Encounter.php'
+        );
+
+        self::assertStringContainsString(
+            'initiativeModifier()',
+            $source
+        );
+        self::assertStringContainsString(
+            'strcmp(',
+            $source
+        );
+        self::assertStringContainsString(
+            'tokenId()',
+            $source
         );
     }
 

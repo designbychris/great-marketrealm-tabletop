@@ -135,3 +135,44 @@ final class ChamberTokens implements TableTokenRepository
         $this->items[$token->id()] = $token;
     }
 }
+
+
+final class ChamberEncounters implements \GreatMarketrealmTabletop\Tabletop\Encounters\Contracts\EncounterRepository
+{
+    /** @var array<string,\GreatMarketrealmTabletop\Tabletop\Encounters\Models\Encounter> */
+    public array $items = [];
+
+    public function forScene(string $tableId, string $sceneId): array
+    {
+        return array_values(array_filter(
+            $this->items,
+            static fn ($encounter): bool =>
+                $encounter->tableId() === $tableId
+                && $encounter->sceneId() === $sceneId
+        ));
+    }
+
+    public function find(string $tableId, string $encounterId): ?\GreatMarketrealmTabletop\Tabletop\Encounters\Models\Encounter
+    {
+        $encounter = $this->items[$encounterId] ?? null;
+        return $encounter !== null && $encounter->tableId() === $tableId
+            ? $encounter
+            : null;
+    }
+
+    public function currentForScene(string $tableId, string $sceneId): ?\GreatMarketrealmTabletop\Tabletop\Encounters\Models\Encounter
+    {
+        foreach (array_reverse($this->forScene($tableId, $sceneId)) as $encounter) {
+            if (! $encounter->isEnded()) {
+                return $encounter;
+            }
+        }
+
+        return null;
+    }
+
+    public function save(\GreatMarketrealmTabletop\Tabletop\Encounters\Models\Encounter $encounter): void
+    {
+        $this->items[$encounter->id()] = $encounter;
+    }
+}

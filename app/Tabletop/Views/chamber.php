@@ -12,6 +12,7 @@ $viewer = $state?->viewer() ?? [];
 $scene = $state?->scene();
 $tokens = $state?->tokens() ?? [];
 $members = $state?->members() ?? [];
+$encounter = $state?->encounter();
 
 $sceneImage = $scene !== null
     ? wp_get_attachment_image_url(
@@ -76,6 +77,56 @@ $sceneImage = $scene !== null
             </div>
         <?php endif; ?>
     </header>
+
+
+    <?php if ($encounter !== null) : ?>
+        <section
+            class="gmrt-encounter-strip"
+            aria-labelledby="gmrt-encounter-title"
+            data-encounter-id="<?php echo esc_attr(
+                (string) $encounter['id']
+            ); ?>"
+            data-encounter-revision="<?php echo esc_attr(
+                (string) ($encounter['revision'] ?? 1)
+            ); ?>"
+        >
+            <div>
+                <p class="gmrt-chamber__eyebrow">
+                    The Turn of Battle
+                </p>
+                <h2 id="gmrt-encounter-title">
+                    <?php echo esc_html(
+                        (string) $encounter['name']
+                    ); ?>
+                </h2>
+            </div>
+
+            <div class="gmrt-encounter-strip__state">
+                <strong>
+                    <?php echo esc_html(
+                        strtoupper((string) $encounter['status'])
+                    ); ?>
+                </strong>
+
+                <?php if ((int) ($encounter['round'] ?? 0) > 0) : ?>
+                    <span>
+                        Round <?php echo esc_html(
+                            (string) $encounter['round']
+                        ); ?>
+                    </span>
+                <?php endif; ?>
+
+                <?php if (! empty($encounter['current_token_id'])) : ?>
+                    <span>
+                        Turn:
+                        <?php echo esc_html(
+                            (string) $encounter['current_token_id']
+                        ); ?>
+                    </span>
+                <?php endif; ?>
+            </div>
+        </section>
+    <?php endif; ?>
 
     <?php if ($message !== null) : ?>
         <section

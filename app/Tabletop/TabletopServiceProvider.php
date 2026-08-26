@@ -6,6 +6,8 @@ namespace GreatMarketrealmTabletop\Tabletop;
 
 use GreatMarketrealmTabletop\Tabletop\Http\TabletopController;
 use GreatMarketrealmTabletop\Tabletop\Http\TabletopAjaxController;
+use GreatMarketrealmTabletop\Tabletop\Http\EncounterAjaxController;
+use GreatMarketrealmTabletop\Tabletop\Encounters\Services\EncounterManagerFactory;
 use GreatMarketrealmTabletop\Tabletop\Movement\Services\TabletopMovementFactory;
 use GreatMarketrealmTabletop\Tabletop\Presentation\TabletopChamberRenderer;
 use GreatMarketrealmTabletop\Tabletop\Routing\TabletopRoute;
@@ -21,6 +23,8 @@ final class TabletopServiceProvider
 
     private TabletopAjaxController $ajax;
 
+    private EncounterAjaxController $encounterAjax;
+
     public function __construct()
     {
         $this->route = new TabletopRoute();
@@ -35,6 +39,10 @@ final class TabletopServiceProvider
         $this->ajax = new TabletopAjaxController(
             $chamber,
             TabletopMovementFactory::make()
+        );
+
+        $this->encounterAjax = new EncounterAjaxController(
+            EncounterManagerFactory::make()
         );
     }
 
@@ -63,6 +71,41 @@ final class TabletopServiceProvider
         add_action(
             'wp_ajax_gmrt_move_token',
             [$this->ajax, 'moveToken']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_prepare_encounter',
+            [$this->encounterAjax, 'prepare']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_add_combatant',
+            [$this->encounterAjax, 'addCombatant']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_start_encounter',
+            [$this->encounterAjax, 'start']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_pause_encounter',
+            [$this->encounterAjax, 'pause']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_resume_encounter',
+            [$this->encounterAjax, 'resume']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_advance_encounter',
+            [$this->encounterAjax, 'advance']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_end_encounter',
+            [$this->encounterAjax, 'end']
         );
     }
 }

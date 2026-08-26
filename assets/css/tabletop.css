@@ -274,3 +274,31 @@ body.gmrt-tabletop-page {
     font-size: .875rem;
     color: rgba(244, 234, 214, .82);
 }
+
+
+.gmrt-encounter-strip {
+    max-width: 1500px;
+    margin: 0 auto 1rem;
+    padding: .85rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    border: 1px solid rgba(244, 234, 214, .2);
+    border-radius: 12px;
+    background: rgba(111, 45, 32, .28);
+}
+
+.gmrt-encounter-strip h2 {
+    margin: .15rem 0 0;
+    font-size: 1.15rem;
+}
+
+.gmrt-encounter-strip__state {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: .5rem 1rem;
+    font-family: system-ui, sans-serif;
+    font-size: .82rem;
+}

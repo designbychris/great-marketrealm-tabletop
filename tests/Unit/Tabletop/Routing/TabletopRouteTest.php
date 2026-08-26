@@ -87,4 +87,31 @@ final class TabletopRouteTest extends TestCase
         );
     }
 
+
+    public function testProviderRegistersEncounterControlActions(): void
+    {
+        $source = file_get_contents(
+            $this->root
+                . '/app/Tabletop/TabletopServiceProvider.php'
+        );
+
+        self::assertIsString($source);
+        self::assertStringContainsString(
+            "'wp_ajax_gmrt_prepare_encounter'",
+            $source
+        );
+        self::assertStringContainsString(
+            "'wp_ajax_gmrt_advance_encounter'",
+            $source
+        );
+        self::assertStringContainsString(
+            "'wp_ajax_gmrt_end_encounter'",
+            $source
+        );
+        self::assertStringNotContainsString(
+            "'wp_ajax_nopriv_gmrt_prepare_encounter'",
+            $source
+        );
+    }
+
 }

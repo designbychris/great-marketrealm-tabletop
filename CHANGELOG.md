@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.9.0-alpha.1] - 2026-08-26
+
+### Added
+
+- Phase IV.9 — The Turn of Battle.
+- Persistent Scene-bound Encounter records.
+- Preparing, Active, Paused and Ended Encounter lifecycle.
+- Token-based combatants with deterministic initiative ordering.
+- Round and current-turn progression.
+- Dungeon Master-only Encounter control policy.
+- Encounter revision conflict protection.
+- Authenticated nonce-protected Encounter AJAX endpoints.
+- Current Encounter projection into Tabletop Chamber state.
+- Minimal battle strip ready for the future combat HUD.
+
+
 ## [0.8.0-alpha.1] - 2026-08-26
 
 ### Added

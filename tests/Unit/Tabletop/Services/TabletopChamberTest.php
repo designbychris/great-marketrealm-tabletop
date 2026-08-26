@@ -24,6 +24,7 @@ final class TabletopChamberTest extends TestCase
     private ChamberMembers $members;
     private ChamberScenes $scenes;
     private ChamberTokens $tokens;
+    private ChamberEncounters $encounters;
     private TabletopChamber $chamber;
 
     protected function setUp(): void
@@ -36,6 +37,7 @@ final class TabletopChamberTest extends TestCase
         $this->members = new ChamberMembers();
         $this->scenes = new ChamberScenes();
         $this->tokens = new ChamberTokens();
+        $this->encounters = new ChamberEncounters();
 
         $table = Table::prepare(
             'table-1',
@@ -116,7 +118,8 @@ final class TabletopChamberTest extends TestCase
             $this->tables,
             $this->members,
             $this->scenes,
-            $this->tokens
+            $this->tokens,
+            $this->encounters
         );
     }
 

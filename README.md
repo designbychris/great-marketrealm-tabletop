@@ -18,6 +18,22 @@ Gameplay code must not reach directly into arbitrary Companion internals.
 
 ## Current Milestone
 
+### Phase IV.9 — The Turn of Battle
+
+The Tabletop now has a persistent server-authoritative Encounter engine:
+
+- Scene-bound Encounters
+- Preparing, Active, Paused and Ended lifecycle
+- token-based initiative rosters
+- deterministic initiative tie breaking
+- round and turn progression
+- Dungeon Master-only controls
+- revision conflict protection
+- Chamber battle-state projection
+
+The full SNES-era combat HUD and Pixel Auby/Sage reactions remain future
+presentation work on top of this engine.
+
 ### Phase IV.8 — The Living Table
 
 The Chamber is now interactive while PHP remains authoritative:

@@ -114,6 +114,22 @@
 - [x] No WebSocket dependency
 - [ ] Server-side certification on the deployment environment
 
-### Phase IV.9 — The Shared Table
+### Phase IV.9 — The Turn of Battle
+
+- [x] Scene-bound persistent Encounter records
+- [x] Preparing → Active → Paused → Ended lifecycle
+- [x] Token-based combatant roster
+- [x] Deterministic initiative ordering
+- [x] Initiative modifier and token-ID tie breakers
+- [x] Round and current-turn progression
+- [x] Dungeon Master-only Encounter control
+- [x] Encounter revision conflict protection
+- [x] Authenticated nonce-protected Encounter endpoints
+- [x] Active-Scene lifecycle protection
+- [x] Ended Tables retire current Encounter state
+- [x] Chamber battle-state projection for future combat HUD
+- [ ] Server-side certification on the deployment environment
+
+### Phase IV.10 — The Shared Table
 
 Lower-latency shared-state synchronisation, presence and reconnection foundations.

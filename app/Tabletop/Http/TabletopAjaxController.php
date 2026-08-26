@@ -38,6 +38,7 @@ final class TabletopAjaxController
                 'members' => $state->members(),
                 'scene' => $state->scene(),
                 'tokens' => $state->tokens(),
+                'encounter' => $state->encounter(),
             ]);
         } catch (TabletopAccessDenied $exception) {
             wp_send_json_error(
