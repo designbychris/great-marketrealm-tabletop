@@ -45,7 +45,8 @@ final class TabletopShortcode
         if ($tableId === '') {
             return $this->renderer->render(
                 null,
-                'Choose an active Table to enter the Tabletop Chamber.'
+                'No Table is selected. Prepare a test Table to begin screen testing.',
+                true
             );
         }
 

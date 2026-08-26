@@ -18,6 +18,12 @@ Gameplay code must not reach directly into arbitrary Companion internals.
 
 ## Current Milestone
 
+### Phase IV.14.1 — The Steward's Test Table
+
+The empty Tabletop host can now prepare `Sage's Combat Testing Grounds` with a
+real Scene, Auby, Training Slime, Frosty Cheese Thing, Suspicious Training
+Dummy, combat profiles and an active Encounter for front-end screen testing.
+
 ### Phase IV.14 — Death at the Door
 
 Damage now has authoritative consequences after a combatant reaches 0 HP.

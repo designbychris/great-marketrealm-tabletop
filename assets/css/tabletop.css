@@ -400,3 +400,10 @@
     font-weight: 700;
     cursor: pointer;
 }
+
+.gmrt-test-table-button {
+    display:inline-block;margin-top:.8rem;border:2px solid currentColor;border-radius:7px;
+    padding:.6rem .85rem;background:rgba(0,0,0,.18);color:inherit;font:inherit;font-weight:800;cursor:pointer;
+}
+.gmrt-test-table-button:disabled { opacity:.65; cursor:wait; }
+.gmrt-test-table-note { display:block; margin-top:.65rem; opacity:.78; }

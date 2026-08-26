@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.14.1-alpha.1] - 2026-08-26
+
+### Added
+
+- Phase IV.14.1 — The Steward's Test Table.
+- One-click authenticated test Table bootstrap.
+- Sage's Combat Testing Grounds and bundled battlemap fixture.
+- Auby, Training Slime, Frosty Cheese Thing and Suspicious Training Dummy.
+- Persisted combat profiles and automatically started test Encounter.
+
+
 ## [0.14.0-alpha.1] - 2026-08-26
 
 ### Added

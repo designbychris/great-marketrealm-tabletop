@@ -6,6 +6,7 @@ defined('ABSPATH') || exit;
 
 /** @var TabletopChamberState|null $state */
 /** @var string|null $message */
+/** @var bool $canPrepareTestTable */
 
 $table = $state?->table() ?? [];
 $viewer = $state?->viewer() ?? [];
@@ -220,6 +221,15 @@ $sceneImage = $scene !== null
         >
             <h2>The chamber awaits</h2>
             <p><?php echo esc_html($message); ?></p>
+            <?php if (! empty($canPrepareTestTable)) : ?>
+                <button type="button" class="gmrt-test-table-button" data-prepare-test-table>
+                    Prepare Test Table
+                </button>
+                <small class="gmrt-test-table-note">
+                    Creates Sage's Combat Testing Grounds with Auby,
+                    a Training Slime and other test combatants.
+                </small>
+            <?php endif; ?>
         </section>
     <?php elseif ($scene === null) : ?>
         <section

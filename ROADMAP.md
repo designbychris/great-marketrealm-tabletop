@@ -237,3 +237,19 @@ Lower-latency shared-state synchronisation, presence and reconnection foundation
 - [ ] Resurrection policy
 - [ ] GMRC character-state synchronisation
 - [ ] Server-side certification on deployment
+
+### Phase IV.14.1 — The Steward's Test Table
+
+- [x] One-click authenticated test Table bootstrap
+- [x] Sage's Combat Testing Grounds
+- [x] Real Table, Scene, Token and Encounter services
+- [x] Bundled neutral battlemap imported into WordPress Media
+- [x] Auby controlled by the preparing user
+- [x] Training Slime
+- [x] Frosty Cheese Thing
+- [x] Suspicious Training Dummy
+- [x] Persisted HP, AC, attack and damage profiles
+- [x] Active test Encounter
+- [x] Idempotent reuse of an existing open test Table
+- [x] Redirect directly into the prepared Table
+- [ ] IV.15 damage-type defenses added to fixture creatures

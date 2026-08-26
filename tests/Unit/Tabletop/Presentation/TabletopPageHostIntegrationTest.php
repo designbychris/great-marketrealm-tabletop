@@ -155,4 +155,14 @@ final class TabletopPageHostIntegrationTest extends TestCase
         );
     }
 
+
+    public function testProviderRegistersAuthenticatedTestTableEndpoint(): void
+    {
+        $source = (string) file_get_contents(
+            $this->root . '/app/Tabletop/TabletopServiceProvider.php'
+        );
+        self::assertStringContainsString("'wp_ajax_gmrt_prepare_test_table'", $source);
+        self::assertStringNotContainsString("'wp_ajax_nopriv_gmrt_prepare_test_table'", $source);
+    }
+
 }

@@ -13,6 +13,8 @@ use GreatMarketrealmTabletop\Tabletop\Battle\Services\BattleDeedManagerFactory;
 use GreatMarketrealmTabletop\Tabletop\Battle\Services\AttackManagerFactory;
 use GreatMarketrealmTabletop\Tabletop\Battle\Services\DeathSaveManagerFactory;
 use GreatMarketrealmTabletop\Tabletop\Http\TabletopAjaxController;
+use GreatMarketrealmTabletop\Tabletop\Http\TestTableAjaxController;
+use GreatMarketrealmTabletop\Tabletop\Testing\TestTableProvisioner;
 use GreatMarketrealmTabletop\Tabletop\Movement\Services\TabletopMovementFactory;
 use GreatMarketrealmTabletop\Tabletop\Presentation\TabletopChamberRenderer;
 use GreatMarketrealmTabletop\Tabletop\Presentation\TabletopShortcode;
@@ -33,6 +35,8 @@ final class TabletopServiceProvider
     private AttackAjaxController $attackAjax;
 
     private DeathSaveAjaxController $deathSaveAjax;
+
+    private TestTableAjaxController $testTableAjax;
 
     public function __construct()
     {
@@ -62,6 +66,10 @@ final class TabletopServiceProvider
 
         $this->deathSaveAjax = new DeathSaveAjaxController(
             DeathSaveManagerFactory::make()
+        );
+
+        $this->testTableAjax = new TestTableAjaxController(
+            new TestTableProvisioner()
         );
     }
 
@@ -130,6 +138,11 @@ final class TabletopServiceProvider
         add_action(
             'wp_ajax_gmrt_roll_death_save',
             [$this->deathSaveAjax, 'roll']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_prepare_test_table',
+            [$this->testTableAjax, 'prepare']
         );
     }
 }
