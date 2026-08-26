@@ -16,6 +16,7 @@ $members = $state?->members() ?? [];
 $encounter = $state?->encounter();
 $vitality = $state?->vitality() ?? [];
 $deathSaves = $state?->deathSaves() ?? [];
+$conditions = $state?->conditions() ?? [];
 
 $tokenLabels = [];
 foreach ($tokens as $token) {
@@ -237,6 +238,52 @@ $sceneImage = $scene !== null
                     </button>
                 <?php endforeach; ?>
             </div>
+
+            <?php if ($state !== null && $state->isDungeonMaster()) : ?>
+                <div class="gmrt-afflictions" data-affliction-controls>
+                    <strong>Afflictions</strong>
+                    <select data-condition-target aria-label="Condition target">
+                        <option value="">Choose combatant…</option>
+                        <?php foreach ($tokens as $conditionToken) : ?>
+                            <option value="<?php echo esc_attr(
+                                (string) ($conditionToken['id'] ?? '')
+                            ); ?>">
+                                <?php echo esc_html(
+                                    (string) ($conditionToken['label'] ?? 'Token')
+                                ); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <select data-condition-type aria-label="Condition">
+                        <?php foreach (
+                            ['blinded','charmed','frightened','grappled',
+                             'poisoned','prone','restrained','stunned']
+                            as $conditionType
+                        ) : ?>
+                            <option value="<?php echo esc_attr($conditionType); ?>">
+                                <?php echo esc_html(ucfirst($conditionType)); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <label>
+                        <span class="screen-reader-text">Duration in turns</span>
+                        <input
+                            type="number"
+                            min="0"
+                            max="99"
+                            value="0"
+                            data-condition-duration
+                            title="0 means until removed"
+                        >
+                    </label>
+                    <button type="button" data-apply-condition>
+                        Apply
+                    </button>
+                    <button type="button" data-remove-condition>
+                        Remove
+                    </button>
+                </div>
+            <?php endif; ?>
         <?php endif; ?>
         </section>
     <?php endif; ?>
@@ -441,6 +488,28 @@ $sceneImage = $scene !== null
                                         )
                                     ); ?>
                                 </span>
+                                <?php
+                                $tokenConditions = $conditions[
+                                    (string) ($token['id'] ?? '')
+                                ] ?? [];
+                                ?>
+                                <?php if ($tokenConditions !== []) : ?>
+                                    <span
+                                        class="gmrt-token__conditions"
+                                        aria-hidden="true"
+                                    >
+                                        <?php foreach ($tokenConditions as $tokenCondition) : ?>
+                                            <i
+                                                class="gmrt-condition gmrt-condition--<?php echo esc_attr(
+                                                    (string) ($tokenCondition['condition'] ?? '')
+                                                ); ?>"
+                                                title="<?php echo esc_attr(
+                                                    ucfirst((string) ($tokenCondition['condition'] ?? ''))
+                                                ); ?>"
+                                            ></i>
+                                        <?php endforeach; ?>
+                                    </span>
+                                <?php endif; ?>
                                 <span class="screen-reader-text">
                                     <?php echo esc_html(
                                         (string) $token['label']

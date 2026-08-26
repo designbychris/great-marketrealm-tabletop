@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.16.0-alpha.1] - 2026-08-26
+
+### Added
+
+- Phase IV.16 — Under Strange Afflictions.
+- Persistent blinded, charmed, frightened, grappled, poisoned, prone,
+  restrained and stunned conditions.
+- Optional turn-based condition duration and authoritative expiry.
+- DM-only condition application and removal.
+- Battle Events for condition application, removal and expiry.
+- Condition state in Chamber refresh payloads.
+- Token condition markers and DM Afflictions controls.
+- SNES-style pixel bubbles for Poisoned with reduced-motion support.
+
+
 ## [0.15.0-alpha.2] - 2026-08-26
 
 ### Fixed

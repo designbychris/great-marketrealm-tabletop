@@ -41,6 +41,7 @@ final class TabletopAjaxController
                 'encounter' => $state->encounter(),
                 'vitality' => $state->vitality(),
                 'death_saves' => $state->deathSaves(),
+                'conditions' => $state->conditions(),
             ]);
         } catch (TabletopAccessDenied $exception) {
             wp_send_json_error(

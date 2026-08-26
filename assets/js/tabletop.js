@@ -241,6 +241,59 @@
         });
     }
 
+    const applyConditionButton = document.querySelector(
+        '[data-apply-condition]'
+    );
+    const removeConditionButton = document.querySelector(
+        '[data-remove-condition]'
+    );
+
+    async function changeCondition(action) {
+        const encounter = document.querySelector('[data-encounter-id]');
+        const target = document.querySelector('[data-condition-target]');
+        const type = document.querySelector('[data-condition-type]');
+        const duration = document.querySelector('[data-condition-duration]');
+
+        if (!encounter || !target || !target.value || !type) {
+            say('Choose a combatant and condition first.');
+            return;
+        }
+
+        try {
+            await request(action, {
+                encounter_id: encounter.dataset.encounterId || '',
+                token_id: target.value,
+                condition: type.value,
+                turns_remaining: duration ? duration.value : '0'
+            });
+
+            say(
+                type.value.toUpperCase()
+                + (
+                    action === 'gmrt_apply_condition'
+                        ? ' applied.'
+                        : ' removed.'
+                )
+            );
+            window.location.reload();
+        } catch (error) {
+            say(error.message || 'The affliction could not be changed.');
+        }
+    }
+
+    if (applyConditionButton) {
+        applyConditionButton.addEventListener('click', () => {
+            changeCondition('gmrt_apply_condition');
+        });
+    }
+
+    if (removeConditionButton) {
+        removeConditionButton.addEventListener('click', () => {
+            changeCondition('gmrt_remove_condition');
+        });
+    }
+
+
     const deathSaveButton = document.querySelector(
         '[data-roll-death-save]'
     );

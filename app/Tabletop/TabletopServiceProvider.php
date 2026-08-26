@@ -9,9 +9,11 @@ use GreatMarketrealmTabletop\Tabletop\Http\EncounterAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\BattleDeedAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\AttackAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\DeathSaveAjaxController;
+use GreatMarketrealmTabletop\Tabletop\Http\ConditionAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Battle\Services\BattleDeedManagerFactory;
 use GreatMarketrealmTabletop\Tabletop\Battle\Services\AttackManagerFactory;
 use GreatMarketrealmTabletop\Tabletop\Battle\Services\DeathSaveManagerFactory;
+use GreatMarketrealmTabletop\Tabletop\Conditions\Services\ConditionManagerFactory;
 use GreatMarketrealmTabletop\Tabletop\Http\TabletopAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\TestTableAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Testing\TestTableProvisioner;
@@ -35,6 +37,8 @@ final class TabletopServiceProvider
     private AttackAjaxController $attackAjax;
 
     private DeathSaveAjaxController $deathSaveAjax;
+
+    private ConditionAjaxController $conditionAjax;
 
     private TestTableAjaxController $testTableAjax;
 
@@ -66,6 +70,10 @@ final class TabletopServiceProvider
 
         $this->deathSaveAjax = new DeathSaveAjaxController(
             DeathSaveManagerFactory::make()
+        );
+
+        $this->conditionAjax = new ConditionAjaxController(
+            ConditionManagerFactory::make()
         );
 
         $this->testTableAjax = new TestTableAjaxController(
@@ -138,6 +146,16 @@ final class TabletopServiceProvider
         add_action(
             'wp_ajax_gmrt_roll_death_save',
             [$this->deathSaveAjax, 'roll']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_apply_condition',
+            [$this->conditionAjax, 'apply']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_remove_condition',
+            [$this->conditionAjax, 'remove']
         );
 
         add_action(

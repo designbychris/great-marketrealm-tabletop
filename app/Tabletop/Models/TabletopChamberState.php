@@ -20,7 +20,8 @@ final class TabletopChamberState
         private array $tokens,
         private ?array $encounter = null,
         private array $vitality = [],
-        private array $deathSaves = []
+        private array $deathSaves = [],
+        private array $conditions = []
     ) {}
 
     /** @return array<string,mixed> */
@@ -69,6 +70,12 @@ final class TabletopChamberState
     public function deathSaves(): array
     {
         return $this->deathSaves;
+    }
+
+    /** @return array<string,array<int,array<string,mixed>>> */
+    public function conditions(): array
+    {
+        return $this->conditions;
     }
 
     public function isDungeonMaster(): bool

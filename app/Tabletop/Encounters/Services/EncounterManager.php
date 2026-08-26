@@ -11,6 +11,7 @@ use GreatMarketrealmTabletop\Tabletop\Encounters\Exceptions\EncounterStateExcept
 use GreatMarketrealmTabletop\Tabletop\Encounters\Exceptions\StaleEncounterRevision;
 use GreatMarketrealmTabletop\Tabletop\Encounters\Models\Encounter;
 use GreatMarketrealmTabletop\Tabletop\Encounters\Models\EncounterCombatant;
+use GreatMarketrealmTabletop\Tabletop\Conditions\Services\ConditionLifecycle;
 use GreatMarketrealmTabletop\Tables\Contracts\TableClock;
 use GreatMarketrealmTabletop\Tables\Contracts\TableRepository;
 use GreatMarketrealmTabletop\Tables\Memberships\Contracts\TableMembershipRepository;
@@ -31,7 +32,8 @@ final class EncounterManager
         private EncounterRepository $encounters,
         private EncounterIdGenerator $ids,
         private TableClock $clock,
-        private EncounterControlPolicy $policy
+        private EncounterControlPolicy $policy,
+        private ?ConditionLifecycle $conditionLifecycle = null
     ) {}
 
     public function prepare(
@@ -164,13 +166,40 @@ final class EncounterManager
         string $encounterId,
         int $expectedRevision
     ): Encounter {
-        return $this->mutate(
+        $encounter = $this->controlledEncounter(
             $tableId,
             $viewerUserId,
             $encounterId,
-            $expectedRevision,
-            static fn (Encounter $encounter) => $encounter->advanceTurn()
+            $expectedRevision
         );
+
+        $scene = $this->requireScene(
+            $tableId,
+            $encounter->sceneId()
+        );
+
+        if (! $scene->isActive()) {
+            throw new EncounterStateException(
+                'The Encounter Scene is no longer active.'
+            );
+        }
+
+        $outgoing = $encounter->currentCombatant();
+        $encounter->advanceTurn();
+        $this->encounters->save($encounter);
+
+        if (
+            $outgoing !== null
+            && $this->conditionLifecycle !== null
+        ) {
+            $this->conditionLifecycle->turnEnded(
+                $tableId,
+                $encounter,
+                $outgoing->tokenId()
+            );
+        }
+
+        return $encounter;
     }
 
     public function end(

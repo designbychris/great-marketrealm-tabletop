@@ -286,3 +286,20 @@ Lower-latency shared-state synchronisation, presence and reconnection foundation
 - [ ] Multi-type damage packets
 - [ ] GMRC trait integration
 - [ ] Server-side certification on deployment
+
+
+### Phase IV.16 — Under Strange Afflictions
+
+- [x] Canonical combat condition vocabulary
+- [x] Persistent per-token conditions
+- [x] Optional turn-based duration
+- [x] Condition expiry at the end of the affected combatant's turn
+- [x] DM-only apply/remove authority
+- [x] Battle Events for application, removal and expiry
+- [x] Chamber state exposes conditions
+- [x] Token condition markers
+- [x] DM Afflictions controls
+- [x] Poisoned pixel-bubble presentation
+- [x] Reduced-motion compatibility
+- [ ] Mechanical modifiers imposed by individual conditions
+- [ ] GMRC trait/spell automatic condition application

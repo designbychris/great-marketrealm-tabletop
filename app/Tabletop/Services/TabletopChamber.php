@@ -9,6 +9,7 @@ use GreatMarketrealmTabletop\Tabletop\Models\TabletopChamberState;
 use GreatMarketrealmTabletop\Tabletop\Encounters\Contracts\EncounterRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Contracts\VitalityRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Contracts\DeathSaveRepository;
+use GreatMarketrealmTabletop\Tabletop\Conditions\Contracts\ConditionRepository;
 use GreatMarketrealmTabletop\Tables\Contracts\TableRepository;
 use GreatMarketrealmTabletop\Tables\Memberships\Contracts\TableMembershipRepository;
 use GreatMarketrealmTabletop\Tables\Memberships\Models\TableMember;
@@ -29,7 +30,8 @@ final class TabletopChamber
         private TableTokenRepository $tokens,
         private EncounterRepository $encounters,
         private VitalityRepository $vitality,
-        private DeathSaveRepository $deathSaves
+        private DeathSaveRepository $deathSaves,
+        private ConditionRepository $conditions
     ) {}
 
     public function state(
@@ -104,6 +106,7 @@ final class TabletopChamber
 
         $vitality = [];
         $deathSaves = [];
+        $conditions = [];
 
         foreach ($tokens as $token) {
             $tokenId = (string) ($token['id'] ?? '');
@@ -125,6 +128,15 @@ final class TabletopChamber
                     $tokenId
                 )
                 ->toArray();
+
+            $conditions[$tokenId] = array_map(
+                static fn ($condition): array =>
+                    $condition->toArray(),
+                $this->conditions->forToken(
+                    $tableId,
+                    $tokenId
+                )
+            );
         }
 
         return new TabletopChamberState(
@@ -135,7 +147,8 @@ final class TabletopChamber
             $tokens,
             $encounter?->toArray(),
             $vitality,
-            $deathSaves
+            $deathSaves,
+            $conditions
         );
     }
 }

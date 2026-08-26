@@ -11,6 +11,7 @@ use GreatMarketrealmTabletop\Tables\Tokens\Repositories\WordPressTableTokenRepos
 use GreatMarketrealmTabletop\Tabletop\Encounters\Repositories\WordPressEncounterRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Repositories\WordPressVitalityRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Repositories\WordPressDeathSaveRepository;
+use GreatMarketrealmTabletop\Tabletop\Conditions\Repositories\WordPressConditionRepository;
 
 defined('ABSPATH') || exit;
 
@@ -25,7 +26,8 @@ final class TabletopChamberFactory
             new WordPressTableTokenRepository(),
             new WordPressEncounterRepository(),
             new WordPressVitalityRepository(),
-            new WordPressDeathSaveRepository()
+            new WordPressDeathSaveRepository(),
+            new WordPressConditionRepository()
         );
     }
 }

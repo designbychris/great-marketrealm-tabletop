@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace GreatMarketrealmTabletop\Tabletop\Encounters\Services;
 
 use GreatMarketrealmTabletop\Tabletop\Encounters\Repositories\WordPressEncounterRepository;
+use GreatMarketrealmTabletop\Tabletop\Conditions\Services\ConditionManagerFactory;
 use GreatMarketrealmTabletop\Tables\Memberships\Repositories\WordPressTableMembershipRepository;
 use GreatMarketrealmTabletop\Tables\Repositories\WordPressTableRepository;
 use GreatMarketrealmTabletop\Tables\Scenes\Repositories\WordPressTableSceneRepository;
@@ -25,7 +26,8 @@ final class EncounterManagerFactory
             new WordPressEncounterRepository(),
             new UuidEncounterIdGenerator(),
             new SystemTableClock(),
-            new EncounterControlPolicy()
+            new EncounterControlPolicy(),
+            ConditionManagerFactory::lifecycle()
         );
     }
 }
