@@ -8,6 +8,7 @@ require_once __DIR__ . '/TableTestDoubles.php';
 
 use DateTimeImmutable;
 use GreatMarketrealmTabletop\Tables\Models\TableStatus;
+use GreatMarketrealmTabletop\Tables\Services\TableLeaseManager;
 use PHPUnit\Framework\TestCase;
 
 final class TableRegistryCapacityRulesTest extends TestCase

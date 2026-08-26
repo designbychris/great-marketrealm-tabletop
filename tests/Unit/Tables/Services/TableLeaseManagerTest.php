@@ -10,6 +10,7 @@ use DateTimeImmutable;
 use GreatMarketrealmTabletop\Tables\Exceptions\TableLeaseExpired;
 use GreatMarketrealmTabletop\Tables\Models\Table;
 use GreatMarketrealmTabletop\Tables\Models\TableStatus;
+use GreatMarketrealmTabletop\Tables\Services\TableLeaseManager;
 use PHPUnit\Framework\TestCase;
 
 final class TableLeaseManagerTest extends TestCase
