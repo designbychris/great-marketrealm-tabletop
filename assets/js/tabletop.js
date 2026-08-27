@@ -344,6 +344,47 @@
         }
     }
 
+    const battleLog = document.querySelector(
+        '[data-battle-log]'
+    );
+    const battleLogEmpty = document.querySelector(
+        '[data-battle-log-empty]'
+    );
+
+    function renderBattleLog(entries) {
+        if (!battleLog) {
+            return;
+        }
+
+        battleLog.replaceChildren();
+
+        const safeEntries = Array.isArray(entries)
+            ? entries
+            : [];
+
+        safeEntries.forEach((entry) => {
+            const item = document.createElement('li');
+            item.dataset.battleLogEntry = '';
+
+            const round = document.createElement('small');
+            round.textContent =
+                'Round ' + String(entry.round || 0);
+
+            const summary = document.createElement('span');
+            summary.textContent = String(
+                entry.summary || ''
+            );
+
+            item.append(round, summary);
+            battleLog.append(item);
+        });
+
+        if (battleLogEmpty) {
+            battleLogEmpty.hidden =
+                safeEntries.length > 0;
+        }
+    }
+
     async function refresh() {
         if (!tableId) {
             return;
@@ -352,6 +393,8 @@
         try {
             const state = await request('gmrt_tabletop_state', {});
             const tokens = Array.isArray(state.tokens) ? state.tokens : [];
+
+            renderBattleLog(state.battle_log);
 
             tokens.forEach((token) => {
                 const node = document.querySelector(
@@ -515,6 +558,15 @@
     const diceworksResult = document.querySelector(
         '[data-diceworks-result]'
     );
+    const diceworksOutcome = document.querySelector(
+        '[data-diceworks-outcome]'
+    );
+    const diceworksOutcomeTitle = document.querySelector(
+        '[data-diceworks-outcome-title]'
+    );
+    const diceworksOutcomeDetail = document.querySelector(
+        '[data-diceworks-outcome-detail]'
+    );
     const combatDice = Array.from(
         document.querySelectorAll('[data-combat-die]')
     );
@@ -556,6 +608,10 @@
                     : 'The certified d20 is rolling…';
         }
 
+        if (diceworksOutcome) {
+            diceworksOutcome.hidden = true;
+        }
+
         combatDice.forEach((die, index) => {
             die.hidden = index >= count;
             die.classList.remove(
@@ -573,6 +629,84 @@
         if (lonelyConfetti) {
             lonelyConfetti.hidden = true;
         }
+    }
+
+    function renderImmediateCombatOutcome(data) {
+        if (
+            !data
+            || !data.attack
+            || !diceworksOutcome
+        ) {
+            return;
+        }
+
+        const attack = data.attack;
+        const title = attack.result === 'critical-hit'
+            ? 'CRITICAL HIT!'
+            : attack.result === 'critical-miss'
+                ? 'CRITICAL MISS'
+                : attack.hit
+                    ? 'HIT!'
+                    : 'MISS!';
+
+        let detail =
+            String(attack.roll)
+            + ' + ' + String(attack.modifier)
+            + ' = ' + String(attack.total)
+            + ' vs AC '
+            + String(attack.armor_class);
+
+        if (
+            data.targeting
+            && data.targeting.distance_feet !== undefined
+        ) {
+            detail +=
+                ' · '
+                + String(data.targeting.distance_feet)
+                + ' ft';
+        }
+
+        if (
+            data.damage_adjustment
+            && data.vitality
+        ) {
+            const adjusted = data.damage_adjustment;
+            const effects = Array.isArray(adjusted.effects)
+                ? adjusted.effects
+                : [];
+
+            let effect = '';
+
+            if (effects.includes('immune')) {
+                effect = ' · IMMUNE!';
+            } else if (effects.includes('vulnerable')) {
+                effect = ' · WEAK!';
+            } else if (effects.includes('resistant')) {
+                effect = ' · RESIST!';
+            }
+
+            detail +=
+                ' · '
+                + String(adjusted.resolved_damage)
+                + ' '
+                + String(adjusted.damage_type).toUpperCase()
+                + ' DAMAGE'
+                + effect
+                + ' · HP '
+                + String(data.vitality.current_hp)
+                + '/'
+                + String(data.vitality.maximum_hp);
+        }
+
+        if (diceworksOutcomeTitle) {
+            diceworksOutcomeTitle.textContent = title;
+        }
+
+        if (diceworksOutcomeDetail) {
+            diceworksOutcomeDetail.textContent = detail;
+        }
+
+        diceworksOutcome.hidden = false;
     }
 
     function revealCombatRoll(attack) {
@@ -743,6 +877,7 @@
                 if (data.attack) {
                     const attack = data.attack;
                     revealCombatRoll(attack);
+                    renderImmediateCombatOutcome(data);
                     const prefix = attack.result === 'critical-hit'
                         ? 'CRITICAL HIT!'
                         : attack.result === 'critical-miss'
@@ -814,7 +949,7 @@
                             + '.';
                     }
 
-                    say(message);
+                    say('Attack resolved — see Guild Diceworks.');
                     await refresh();
                     return;
                 }

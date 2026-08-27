@@ -10,6 +10,8 @@ use GreatMarketrealmTabletop\Tabletop\Encounters\Contracts\EncounterRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Contracts\VitalityRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Contracts\DeathSaveRepository;
 use GreatMarketrealmTabletop\Tabletop\Conditions\Contracts\ConditionRepository;
+use GreatMarketrealmTabletop\Tabletop\Battle\Contracts\BattleEventRepository;
+use GreatMarketrealmTabletop\Tabletop\Battle\Presentation\BattleLogProjector;
 use GreatMarketrealmTabletop\Tables\Contracts\TableRepository;
 use GreatMarketrealmTabletop\Tables\Memberships\Contracts\TableMembershipRepository;
 use GreatMarketrealmTabletop\Tables\Memberships\Models\TableMember;
@@ -31,7 +33,9 @@ final class TabletopChamber
         private EncounterRepository $encounters,
         private VitalityRepository $vitality,
         private DeathSaveRepository $deathSaves,
-        private ConditionRepository $conditions
+        private ConditionRepository $conditions,
+        private ?BattleEventRepository $battleEvents = null,
+        private ?BattleLogProjector $battleLogProjector = null
     ) {}
 
     public function state(
@@ -139,6 +143,38 @@ final class TabletopChamber
             );
         }
 
+        $battleLog = [];
+
+        if (
+            $encounter !== null
+            && $this->battleEvents !== null
+            && $this->battleLogProjector !== null
+        ) {
+            $labels = [];
+
+            foreach ($tokens as $token) {
+                $tokenId = (string) (
+                    $token['id'] ?? ''
+                );
+
+                if ($tokenId !== '') {
+                    $labels[$tokenId] = (string) (
+                        $token['label']
+                        ?? 'Combatant'
+                    );
+                }
+            }
+
+            $battleLog = $this->battleLogProjector
+                ->project(
+                    $this->battleEvents->forEncounter(
+                        $tableId,
+                        $encounter->id()
+                    ),
+                    $labels
+                );
+        }
+
         return new TabletopChamberState(
             $table->toArray(),
             $viewer->toArray(),
@@ -148,7 +184,8 @@ final class TabletopChamber
             $encounter?->toArray(),
             $vitality,
             $deathSaves,
-            $conditions
+            $conditions,
+            $battleLog
         );
     }
 }

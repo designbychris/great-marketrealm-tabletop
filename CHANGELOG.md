@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.19.0-alpha.1] - 2026-08-27
+
+### Added
+
+- Phase IV.19 — The Chronicle of Battle.
+- Immediate Diceworks combat result card beside certified dice.
+- Hit/miss arithmetic, damage defense effects and target HP in the HUD.
+- Persistent Battle Event projection into a readable Battle Chronicle.
+- Attack + Damage event merging and redundant Attack-deed suppression.
+- Chronicle entries for deeds, death saves and condition lifecycle events.
+- Viewer-safe Chronicle projection using visible token labels only.
+- Live Chronicle refresh from Tabletop state.
+
+
 ## [0.18.0-alpha.2] - 2026-08-27
 
 ### Fixed

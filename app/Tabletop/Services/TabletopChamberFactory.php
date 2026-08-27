@@ -12,6 +12,8 @@ use GreatMarketrealmTabletop\Tabletop\Encounters\Repositories\WordPressEncounter
 use GreatMarketrealmTabletop\Tabletop\Battle\Repositories\WordPressVitalityRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Repositories\WordPressDeathSaveRepository;
 use GreatMarketrealmTabletop\Tabletop\Conditions\Repositories\WordPressConditionRepository;
+use GreatMarketrealmTabletop\Tabletop\Battle\Repositories\WordPressBattleEventRepository;
+use GreatMarketrealmTabletop\Tabletop\Battle\Presentation\BattleLogProjector;
 
 defined('ABSPATH') || exit;
 
@@ -27,7 +29,9 @@ final class TabletopChamberFactory
             new WordPressEncounterRepository(),
             new WordPressVitalityRepository(),
             new WordPressDeathSaveRepository(),
-            new WordPressConditionRepository()
+            new WordPressConditionRepository(),
+            new WordPressBattleEventRepository(),
+            new BattleLogProjector()
         );
     }
 }

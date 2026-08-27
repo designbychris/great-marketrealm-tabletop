@@ -197,6 +197,13 @@ See `ROADMAP.md` and the `docs/` directory for the architecture plan.
 
 **First we build the table. Then we roll initiative.** 🎲
 
+### Phase IV.19 — The Chronicle of Battle
+
+Immediate attack results now remain beside the Guild Diceworks, including roll
+maths, damage defenses and target HP. Persisted Battle Events are projected into
+a compact Battle Chronicle showing the latest encounter deeds without
+duplicating Attack and Damage events.
+
 ### Phase IV.18 — The Measure of the Battlefield
 
 The Tabletop now measures authoritative square-grid distance between token

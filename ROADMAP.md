@@ -356,3 +356,26 @@ Lower-latency shared-state synchronisation, presence and reconnection foundation
 - [ ] Movement budgets
 - [ ] Hex-grid measurement
 - [ ] Server-side certification on deployment
+
+
+### Phase IV.19 — The Chronicle of Battle
+
+- [x] Guild Diceworks owns immediate attack result presentation
+- [x] Hit / miss / critical result displayed beside the dice
+- [x] Attack arithmetic displayed beside the dice
+- [x] Damage type, RESIST / WEAK / IMMUNE and HP displayed beside the dice
+- [x] Lower live status becomes concise operational feedback
+- [x] Persisted Battle Events projected into readable Chronicle entries
+- [x] Attack + damage event pairs merge into one Chronicle entry
+- [x] Attack deed duplicate suppressed from Chronicle
+- [x] Non-attack deeds chronicled
+- [x] Death saves chronicled
+- [x] Condition application / removal / expiry chronicled
+- [x] Chronicle limited to latest 12 entries
+- [x] Newest Chronicle entry appears first
+- [x] Hidden-token events do not leak through Player Chronicle
+- [x] Chronicle refreshes with Tabletop state
+- [ ] Full encounter export
+- [ ] Search/filter Chronicle
+- [ ] DM annotations
+- [ ] Server-side certification on deployment

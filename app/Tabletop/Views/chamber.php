@@ -17,6 +17,7 @@ $encounter = $state?->encounter();
 $vitality = $state?->vitality() ?? [];
 $deathSaves = $state?->deathSaves() ?? [];
 $conditions = $state?->conditions() ?? [];
+$battleLog = $state?->battleLog() ?? [];
 
 $tokenLabels = [];
 foreach ($tokens as $token) {
@@ -310,6 +311,16 @@ $sceneImage = $scene !== null
                     <span class="gmrt-pixel-d20" data-combat-die="1" hidden>
                         <b data-die-value>?</b>
                     </span>
+                </div>
+                <div
+                    class="gmrt-diceworks__outcome"
+                    data-diceworks-outcome
+                    hidden
+                >
+                    <strong data-diceworks-outcome-title>
+                        Awaiting result
+                    </strong>
+                    <span data-diceworks-outcome-detail></span>
                 </div>
                 <small data-diceworks-result>
                     Awaiting the roll…
@@ -692,6 +703,55 @@ $sceneImage = $scene !== null
                         the Tabletop server.
                     </p>
                 </div>
+
+
+                <section
+                    class="gmrt-battle-log"
+                    aria-labelledby="gmrt-battle-log-title"
+                >
+                    <div class="gmrt-battle-log__heading">
+                        <div>
+                            <p class="gmrt-chamber__eyebrow">
+                                Battle Chronicle
+                            </p>
+                            <h3 id="gmrt-battle-log-title">
+                                Deeds at the Table
+                            </h3>
+                        </div>
+                        <span>Latest 12</span>
+                    </div>
+
+                    <ol data-battle-log>
+                        <?php foreach ($battleLog as $entry) : ?>
+                            <li data-battle-log-entry>
+                                <small>
+                                    Round <?php echo esc_html(
+                                        (string) (
+                                            $entry['round'] ?? 0
+                                        )
+                                    ); ?>
+                                </small>
+                                <span>
+                                    <?php echo esc_html(
+                                        (string) (
+                                            $entry['summary'] ?? ''
+                                        )
+                                    ); ?>
+                                </span>
+                            </li>
+                        <?php endforeach; ?>
+                    </ol>
+
+                    <p
+                        class="gmrt-battle-log__empty"
+                        data-battle-log-empty
+                        <?php echo $battleLog !== []
+                            ? 'hidden'
+                            : ''; ?>
+                    >
+                        No deeds have been chronicled yet.
+                    </p>
+                </section>
             </aside>
         </div>
     <?php endif; ?>
