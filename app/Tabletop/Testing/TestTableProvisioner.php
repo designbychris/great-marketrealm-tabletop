@@ -57,7 +57,14 @@ final class TestTableProvisioner
             $token=$tokens->place($table->id(),$scene->id(),(string)$f['label'],(string)$f['type'],(string)$f['source'],
                 is_int($f['controller'])?$f['controller']:null,(float)$f['x'],(float)$f['y'],1,1,TableTokenVisibility::VISIBLE);
             $placed[(string)$f['key']]=$token;
-            $combat->save($table->id(),new CombatProfile($token->id(),(int)$f['ac'],(int)$f['attack']));
+            $range=$f['range'];
+            $combat->save($table->id(),new CombatProfile(
+                $token->id(),
+                (int)$f['ac'],
+                (int)$f['attack'],
+                (int)$range[0],
+                (int)$range[1]
+            ));
             $dice=$f['damage'];
             $damage->save($table->id(),new DamageProfile($token->id(),(int)$dice[0],(int)$dice[1],(int)$dice[2],(string)$dice[3]));
             $defense=$f['defenses'];
@@ -97,6 +104,7 @@ final class TestTableProvisioner
                 = $token;
         }
 
+        $combat = new WordPressCombatProfileRepository();
         $damage = new WordPressDamageProfileRepository();
         $defenses = new WordPressDamageDefenseRepository();
 
@@ -108,6 +116,18 @@ final class TestTableProvisioner
             if ($token === null) {
                 continue;
             }
+
+            $range = $fixture['range'];
+            $combat->save(
+                $tableId,
+                new CombatProfile(
+                    $token->id(),
+                    (int) $fixture['ac'],
+                    (int) $fixture['attack'],
+                    (int) $range[0],
+                    (int) $range[1]
+                )
+            );
 
             $dice = $fixture['damage'];
             $damage->save(

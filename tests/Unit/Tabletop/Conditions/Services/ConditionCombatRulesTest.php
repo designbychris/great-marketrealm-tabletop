@@ -136,6 +136,31 @@ final class ConditionCombatRulesTest extends TestCase
         );
     }
 
+
+    public function testProneTargetGrantsAdvantageWithinFiveFeet(): void
+    {
+        self::assertSame(
+            AttackRollMode::ADVANTAGE,
+            $this->rules->attackRollMode(
+                [],
+                [$this->condition('prone')],
+                5
+            )
+        );
+    }
+
+    public function testProneTargetImposesDisadvantageBeyondFiveFeet(): void
+    {
+        self::assertSame(
+            AttackRollMode::DISADVANTAGE,
+            $this->rules->attackRollMode(
+                [],
+                [$this->condition('prone')],
+                10
+            )
+        );
+    }
+
     private function condition(string $type): TokenCondition
     {
         return new TokenCondition(

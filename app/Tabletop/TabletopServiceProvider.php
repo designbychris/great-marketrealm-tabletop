@@ -16,6 +16,8 @@ use GreatMarketrealmTabletop\Tabletop\Battle\Services\DeathSaveManagerFactory;
 use GreatMarketrealmTabletop\Tabletop\Conditions\Services\ConditionManagerFactory;
 use GreatMarketrealmTabletop\Tabletop\Http\TabletopAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\TestTableAjaxController;
+use GreatMarketrealmTabletop\Tabletop\Http\TargetingAjaxController;
+use GreatMarketrealmTabletop\Tabletop\Battlefield\Services\TargetingServiceFactory;
 use GreatMarketrealmTabletop\Tabletop\Testing\TestTableProvisioner;
 use GreatMarketrealmTabletop\Tabletop\Movement\Services\TabletopMovementFactory;
 use GreatMarketrealmTabletop\Tabletop\Presentation\TabletopChamberRenderer;
@@ -41,6 +43,8 @@ final class TabletopServiceProvider
     private ConditionAjaxController $conditionAjax;
 
     private TestTableAjaxController $testTableAjax;
+
+    private TargetingAjaxController $targetingAjax;
 
     public function __construct()
     {
@@ -78,6 +82,10 @@ final class TabletopServiceProvider
 
         $this->testTableAjax = new TestTableAjaxController(
             new TestTableProvisioner()
+        );
+
+        $this->targetingAjax = new TargetingAjaxController(
+            TargetingServiceFactory::make()
         );
     }
 
@@ -161,6 +169,11 @@ final class TabletopServiceProvider
         add_action(
             'wp_ajax_gmrt_prepare_test_table',
             [$this->testTableAjax, 'prepare']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_measure_target',
+            [$this->targetingAjax, 'measure']
         );
     }
 }

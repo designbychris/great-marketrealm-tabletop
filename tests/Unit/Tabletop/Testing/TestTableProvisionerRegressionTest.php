@@ -21,4 +21,17 @@ final class TestTableProvisionerRegressionTest extends TestCase
      );
  }
 
+
+ public function testExistingFixtureReceivesLatestRangeProfiles():void
+ {
+     self::assertStringContainsString(
+         "\$range = \$fixture['range'];",
+         $this->s
+     );
+     self::assertStringContainsString(
+         'new CombatProfile(',
+         $this->s
+     );
+ }
+
 }

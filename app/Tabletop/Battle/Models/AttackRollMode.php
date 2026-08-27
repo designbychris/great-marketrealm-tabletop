@@ -14,6 +14,25 @@ final class AttackRollMode
     public const ADVANTAGE = 'advantage';
     public const DISADVANTAGE = 'disadvantage';
 
+    public static function fromFactors(
+        bool $advantage,
+        bool $disadvantage
+    ): string {
+        if ($advantage && $disadvantage) {
+            return self::NORMAL;
+        }
+
+        if ($advantage) {
+            return self::ADVANTAGE;
+        }
+
+        if ($disadvantage) {
+            return self::DISADVANTAGE;
+        }
+
+        return self::NORMAL;
+    }
+
     public static function assert(string $mode): string
     {
         if (! in_array(

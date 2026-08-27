@@ -12,10 +12,10 @@ final class TestTableBlueprint
     public function tokens(int $dm): array
     {
         return [
-            ['key'=>'auby','label'=>'Auby','type'=>'character','source'=>'gmrt-test:auby','controller'=>$dm,'x'=>0.25,'y'=>0.50,'hp'=>24,'ac'=>14,'attack'=>5,'damage'=>[1,8,3,'slashing'],'defenses'=>[[],[],[]],'initiative'=>16],
-            ['key'=>'slime','label'=>'Training Slime','type'=>'creature','source'=>'gmrt-test:training-slime','controller'=>null,'x'=>0.62,'y'=>0.43,'hp'=>18,'ac'=>11,'attack'=>3,'damage'=>[1,6,1,'poison'],'defenses'=>[['slashing'],[],[]],'initiative'=>12],
-            ['key'=>'cheese','label'=>'Frosty Cheese Thing','type'=>'creature','source'=>'gmrt-test:frosty-cheese','controller'=>null,'x'=>0.72,'y'=>0.62,'hp'=>22,'ac'=>12,'attack'=>4,'damage'=>[1,6,2,'cold'],'defenses'=>[[],['fire'],[]],'initiative'=>10],
-            ['key'=>'dummy','label'=>'Suspicious Training Dummy','type'=>'creature','source'=>'gmrt-test:suspicious-dummy','controller'=>null,'x'=>0.55,'y'=>0.72,'hp'=>30,'ac'=>13,'attack'=>2,'damage'=>[1,4,0,'fire'],'defenses'=>[[],[],['poison']],'initiative'=>8],
+            ['key'=>'auby','label'=>'Auby','type'=>'character','source'=>'gmrt-test:auby','controller'=>$dm,'x'=>0.25,'y'=>0.50,'hp'=>24,'ac'=>14,'attack'=>5,'range'=>[5,5],'damage'=>[1,8,3,'slashing'],'defenses'=>[[],[],[]],'initiative'=>16],
+            ['key'=>'slime','label'=>'Training Slime','type'=>'creature','source'=>'gmrt-test:training-slime','controller'=>null,'x'=>0.62,'y'=>0.43,'hp'=>18,'ac'=>11,'attack'=>3,'range'=>[5,5],'damage'=>[1,6,1,'poison'],'defenses'=>[['slashing'],[],[]],'initiative'=>12],
+            ['key'=>'cheese','label'=>'Frosty Cheese Thing','type'=>'creature','source'=>'gmrt-test:frosty-cheese','controller'=>null,'x'=>0.72,'y'=>0.62,'hp'=>22,'ac'=>12,'attack'=>4,'range'=>[30,60],'damage'=>[1,6,2,'cold'],'defenses'=>[[],['fire'],[]],'initiative'=>10],
+            ['key'=>'dummy','label'=>'Suspicious Training Dummy','type'=>'creature','source'=>'gmrt-test:suspicious-dummy','controller'=>null,'x'=>0.55,'y'=>0.72,'hp'=>30,'ac'=>13,'attack'=>2,'range'=>[30,60],'damage'=>[1,4,0,'fire'],'defenses'=>[[],[],['poison']],'initiative'=>8],
         ];
     }
 }

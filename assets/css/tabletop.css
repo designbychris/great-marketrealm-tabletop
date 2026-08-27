@@ -512,3 +512,235 @@
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-4px); }
 }
+
+
+/* Phase IV.18 — The Measure of the Battlefield */
+
+.gmrt-targeting-layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 3;
+    pointer-events: none;
+    overflow: visible;
+}
+
+.gmrt-board__tokens {
+    z-index: 4;
+}
+
+.gmrt-target-line {
+    stroke: rgba(244, 234, 214, .9);
+    stroke-width: 3;
+    stroke-linecap: square;
+    stroke-dasharray: none;
+    opacity: 0;
+    filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, .7));
+}
+
+.gmrt-target-line.is-visible {
+    opacity: 1;
+}
+
+.gmrt-target-line.is-long-range {
+    stroke-dasharray: 9 5;
+}
+
+.gmrt-target-line.is-out-of-range {
+    stroke-dasharray: 3 7;
+    stroke-width: 2;
+}
+
+.gmrt-target-range {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2rem;
+    padding: .25rem .55rem;
+    border: 1px solid rgba(244, 234, 214, .24);
+    border-radius: 6px;
+    font: 800 .68rem/1.1 system-ui, sans-serif;
+    letter-spacing: .035em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.gmrt-target-range.is-out-of-range {
+    border-style: dashed;
+}
+
+.gmrt-target-range.is-long-range::before {
+    content: "↗";
+    margin-right: .3rem;
+}
+
+.gmrt-target-range.is-out-of-range::before {
+    content: "×";
+    margin-right: .3rem;
+}
+
+.gmrt-diceworks {
+    flex-basis: 100%;
+    position: relative;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: .7rem;
+    min-height: 4.5rem;
+    margin-top: .7rem;
+    padding: .55rem .75rem;
+    border: 2px solid rgba(244, 234, 214, .28);
+    box-shadow:
+        inset 0 0 0 2px rgba(0, 0, 0, .25),
+        3px 3px 0 rgba(0, 0, 0, .35);
+    background:
+        linear-gradient(
+            180deg,
+            rgba(50, 30, 24, .96),
+            rgba(22, 17, 15, .96)
+        );
+    font-family: ui-monospace, "Courier New", monospace;
+}
+
+.gmrt-diceworks[hidden] {
+    display: none;
+}
+
+.gmrt-diceworks__heading {
+    display: grid;
+    gap: .15rem;
+    min-width: 8rem;
+    text-transform: uppercase;
+}
+
+.gmrt-diceworks__heading span {
+    font-size: .58rem;
+    opacity: .72;
+    letter-spacing: .12em;
+}
+
+.gmrt-diceworks__heading strong {
+    font-size: .75rem;
+}
+
+.gmrt-diceworks__tray {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: .65rem;
+    min-width: 7rem;
+}
+
+.gmrt-pixel-d20 {
+    position: relative;
+    width: 2.85rem;
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    clip-path: polygon(
+        50% 0,
+        92% 24%,
+        100% 66%,
+        72% 100%,
+        28% 100%,
+        0 66%,
+        8% 24%
+    );
+    background: #d6b968;
+    color: #17120d;
+    box-shadow: inset 0 0 0 4px #f5e7b7;
+    font-size: .92rem;
+    font-weight: 900;
+    image-rendering: pixelated;
+}
+
+.gmrt-pixel-d20[hidden] {
+    display: none;
+}
+
+.gmrt-diceworks.is-rolling .gmrt-pixel-d20 {
+    animation:
+        gmrt-d20-tumble .42s steps(5, end) infinite;
+}
+
+.gmrt-pixel-d20.is-chosen {
+    transform: scale(1.14);
+    outline: 3px solid currentColor;
+    outline-offset: 3px;
+}
+
+.gmrt-pixel-d20.is-rejected {
+    opacity: .36;
+    transform: translateY(.3rem) scale(.88);
+}
+
+.gmrt-diceworks.is-critical-hit .gmrt-pixel-d20.is-chosen {
+    animation: gmrt-d20-victory .55s steps(4, end) 2;
+}
+
+.gmrt-diceworks.is-critical-miss .gmrt-pixel-d20.is-chosen {
+    transform: rotate(-9deg) translateY(.25rem);
+}
+
+.gmrt-diceworks > small {
+    max-width: 12rem;
+    font-size: .62rem;
+    line-height: 1.25;
+    opacity: .8;
+}
+
+.gmrt-lonely-confetti {
+    position: absolute;
+    top: -.2rem;
+    left: 50%;
+    width: 4px;
+    height: 7px;
+    background: #f4ead6;
+    box-shadow: 1px 1px 0 rgba(0, 0, 0, .7);
+    animation:
+        gmrt-lonely-confetti-fall 1.6s steps(8, end) forwards;
+}
+
+.gmrt-lonely-confetti[hidden] {
+    display: none;
+}
+
+@keyframes gmrt-d20-tumble {
+    0% { transform: translate(0, 0) rotate(0); }
+    25% { transform: translate(-4px, -3px) rotate(-12deg); }
+    50% { transform: translate(3px, 2px) rotate(9deg); }
+    75% { transform: translate(-2px, 3px) rotate(-6deg); }
+    100% { transform: translate(0, 0) rotate(0); }
+}
+
+@keyframes gmrt-d20-victory {
+    0%, 100% { transform: scale(1.14); }
+    50% { transform: scale(1.28) translateY(-3px); }
+}
+
+@keyframes gmrt-lonely-confetti-fall {
+    0% {
+        transform: translate(0, 0) rotate(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(17px, 72px) rotate(110deg);
+        opacity: .2;
+    }
+}
+
+@media (max-width: 760px) {
+    .gmrt-diceworks {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .gmrt-diceworks > small {
+        max-width: none;
+    }
+
+    .gmrt-target-range {
+        flex-basis: 100%;
+        justify-content: center;
+    }
+}

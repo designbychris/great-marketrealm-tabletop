@@ -16,6 +16,9 @@ use GreatMarketrealmTabletop\Tabletop\Battle\Models\BattleEvent;
 use GreatMarketrealmTabletop\Tabletop\Encounters\Contracts\EncounterRepository;
 use GreatMarketrealmTabletop\Tabletop\Conditions\Contracts\ConditionRepository;
 use GreatMarketrealmTabletop\Tabletop\Conditions\Services\ConditionCombatRules;
+use GreatMarketrealmTabletop\Tabletop\Battlefield\Services\BattlefieldMeasure;
+use GreatMarketrealmTabletop\Tabletop\Battle\Models\AttackRollMode;
+use GreatMarketrealmTabletop\Tables\Scenes\Contracts\TableSceneRepository;
 use GreatMarketrealmTabletop\Tables\Contracts\TableClock;
 use GreatMarketrealmTabletop\Tables\Memberships\Contracts\TableMembershipRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Contracts\TableTokenRepository;
@@ -41,7 +44,10 @@ final class AttackManager
         private DamageDefenseResolver $defenseResolver,
         private TableClock $clock,
         private ?ConditionRepository $conditions = null,
-        private ?ConditionCombatRules $conditionRules = null
+        private ?ConditionCombatRules $conditionRules = null,
+        private ?TableSceneRepository $scenes = null,
+        private ?BattlefieldMeasure $battlefield = null,
+        private ?AttackRangeResolver $rangeResolver = null
     ) {}
 
     /** @return array<string,mixed> */
@@ -130,6 +136,47 @@ final class AttackManager
             $target->id()
         );
 
+        $distance = null;
+        $range = null;
+
+        if (
+            $this->scenes !== null
+            && $this->battlefield !== null
+            && $this->rangeResolver !== null
+        ) {
+            $scene = $this->scenes->find(
+                $tableId,
+                $attacker->sceneId()
+            );
+
+            if ($scene === null) {
+                throw new AttackDenied(
+                    'The active battlefield could not be measured.'
+                );
+            }
+
+            $distance = $this->battlefield->between(
+                $scene,
+                $attacker,
+                $target
+            );
+
+            $range = $this->rangeResolver->assess(
+                $distance->feet(),
+                $attackerProfile
+            );
+
+            if (! $range->inRange()) {
+                throw new AttackDenied(
+                    sprintf(
+                        'Out of range: target is %d ft away; this attack reaches %d ft.',
+                        $distance->feet(),
+                        $attackerProfile->longRangeFeet()
+                    )
+                );
+            }
+        }
+
         $deed = $this->deeds->perform(
             $tableId,
             $viewerUserId,
@@ -138,14 +185,16 @@ final class AttackManager
             $expectedRevision
         );
 
-        $rollMode = 'normal';
+        $advantage = false;
+        $disadvantage = $range !== null
+            && $range->longRange();
 
         if (
             $this->conditions !== null
             && $this->conditionRules !== null
         ) {
-            $rollMode = $this->conditionRules
-                ->attackRollMode(
+            $factors = $this->conditionRules
+                ->attackRollFactors(
                     $this->conditions->forToken(
                         $tableId,
                         $attacker->id()
@@ -153,9 +202,19 @@ final class AttackManager
                     $this->conditions->forToken(
                         $tableId,
                         $target->id()
-                    )
+                    ),
+                    $distance?->feet()
                 );
+
+            $advantage = $factors['advantage'];
+            $disadvantage = $disadvantage
+                || $factors['disadvantage'];
         }
+
+        $rollMode = AttackRollMode::fromFactors(
+            $advantage,
+            $disadvantage
+        );
 
         $outcome = $this->resolver->resolve(
             $attackerProfile,
@@ -176,6 +235,7 @@ final class AttackManager
             [
                 'deed' => BattleDeed::ATTACK,
                 'target_token_id' => $target->id(),
+                'targeting' => $range?->toArray(),
             ] + $outcome->toArray()
         );
 
@@ -282,6 +342,7 @@ final class AttackManager
             'attack_event' => $event,
             'damage_event' => $damageEvent,
             'outcome' => $outcome,
+            'targeting' => $range,
             'damage' => $damageRoll,
             'damage_adjustment' => $damageAdjustment,
             'vitality' => $vitality,

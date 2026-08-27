@@ -12,6 +12,7 @@
     const tableId = root.dataset.tableId || '';
     let selected = null;
     let refreshTimer = null;
+    let targetingPreview = null;
 
     function say(message) {
         if (status) {
@@ -81,6 +82,216 @@
         return;
     }
 
+    const attackTarget = document.querySelector(
+        '[data-attack-target]'
+    );
+    const rangeStatus = document.querySelector(
+        '[data-target-range-status]'
+    );
+    const targetLine = document.querySelector(
+        '[data-target-line]'
+    );
+    const deedsPanel = document.querySelector(
+        '.gmrt-deeds[data-current-token]'
+    );
+
+    function attackButton() {
+        return document.querySelector(
+            '[data-battle-deed="attack"]'
+        );
+    }
+
+    function clearTargeting() {
+        targetingPreview = null;
+
+        if (targetLine) {
+            targetLine.classList.remove(
+                'is-visible',
+                'is-long-range',
+                'is-out-of-range'
+            );
+        }
+
+        if (rangeStatus) {
+            rangeStatus.textContent = 'Choose target';
+            rangeStatus.className = 'gmrt-target-range';
+            delete rangeStatus.dataset.rollMode;
+        }
+
+        const button = attackButton();
+        if (button) {
+            button.disabled = false;
+            button.removeAttribute('aria-disabled');
+        }
+    }
+
+    function drawTargetLine(targetId, rangeState) {
+        if (!targetLine || !deedsPanel || !targetId) {
+            return;
+        }
+
+        const attackerId = deedsPanel.dataset.currentToken || '';
+        const attacker = document.querySelector(
+            '[data-token-id="' + CSS.escape(attackerId) + '"]'
+        );
+        const target = document.querySelector(
+            '[data-token-id="' + CSS.escape(targetId) + '"]'
+        );
+
+        if (!attacker || !target) {
+            return;
+        }
+
+        const boardRect = board.getBoundingClientRect();
+        const attackerRect = attacker.getBoundingClientRect();
+        const targetRect = target.getBoundingClientRect();
+
+        targetLine.setAttribute(
+            'x1',
+            String(
+                attackerRect.left
+                + attackerRect.width / 2
+                - boardRect.left
+            )
+        );
+        targetLine.setAttribute(
+            'y1',
+            String(
+                attackerRect.top
+                + attackerRect.height / 2
+                - boardRect.top
+            )
+        );
+        targetLine.setAttribute(
+            'x2',
+            String(
+                targetRect.left
+                + targetRect.width / 2
+                - boardRect.left
+            )
+        );
+        targetLine.setAttribute(
+            'y2',
+            String(
+                targetRect.top
+                + targetRect.height / 2
+                - boardRect.top
+            )
+        );
+
+        targetLine.classList.add('is-visible');
+        targetLine.classList.toggle(
+            'is-long-range',
+            rangeState === 'long-range'
+        );
+        targetLine.classList.toggle(
+            'is-out-of-range',
+            rangeState === 'out-of-range'
+        );
+    }
+
+    async function updateTargeting() {
+        if (
+            !attackTarget
+            || !attackTarget.value
+        ) {
+            clearTargeting();
+            return;
+        }
+
+        const encounter = document.querySelector(
+            '[data-encounter-id]'
+        );
+
+        if (!encounter) {
+            clearTargeting();
+            return;
+        }
+
+        try {
+            const data = await request(
+                'gmrt_measure_target',
+                {
+                    encounter_id:
+                        encounter.dataset.encounterId || '',
+                    target_token_id: attackTarget.value
+                }
+            );
+
+            targetingPreview = data;
+            const range = data.range || {};
+            const distance = data.distance || {};
+            const rollMode = data.roll_mode || 'normal';
+
+            let label =
+                String(distance.feet || 0)
+                + ' ft · ';
+
+            if (range.range_status === 'out-of-range') {
+                label += 'OUT OF RANGE';
+            } else if (range.range_status === 'long-range') {
+                label += 'LONG RANGE';
+            } else {
+                label += 'IN RANGE';
+            }
+
+            if (rollMode !== 'normal') {
+                label += ' · ' + rollMode.toUpperCase();
+            }
+
+            if (rangeStatus) {
+                rangeStatus.textContent = label;
+                rangeStatus.className =
+                    'gmrt-target-range is-'
+                    + String(range.range_status || 'unknown');
+                rangeStatus.dataset.rollMode = rollMode;
+            }
+
+            drawTargetLine(
+                attackTarget.value,
+                range.range_status || ''
+            );
+
+            const button = attackButton();
+            if (button) {
+                const out = range.in_range === false;
+                button.disabled = out;
+                button.setAttribute(
+                    'aria-disabled',
+                    out ? 'true' : 'false'
+                );
+                button.title = out
+                    ? 'Out of range'
+                    : '';
+            }
+        } catch (error) {
+            clearTargeting();
+            say(error.message);
+        }
+    }
+
+    if (attackTarget) {
+        attackTarget.addEventListener(
+            'change',
+            updateTargeting
+        );
+    }
+
+    window.addEventListener('resize', () => {
+        if (
+            targetingPreview
+            && attackTarget
+            && attackTarget.value
+        ) {
+            drawTargetLine(
+                attackTarget.value,
+                targetingPreview.range
+                    ? targetingPreview.range.range_status
+                    : ''
+            );
+        }
+    });
+
     function select(token) {
         if (selected) {
             selected.classList.remove('is-selected');
@@ -126,6 +337,7 @@
             selected.style.setProperty('--gmrt-token-y', (token.y * 100) + '%');
             selected.dataset.tokenRevision = String(token.revision);
             say((token.label || 'Token') + ' moved.');
+            await updateTargeting();
         } catch (error) {
             say(error.message);
             await refresh();
@@ -294,6 +506,151 @@
     }
 
 
+    const diceworks = document.querySelector(
+        '[data-combat-diceworks]'
+    );
+    const diceworksMode = document.querySelector(
+        '[data-diceworks-mode]'
+    );
+    const diceworksResult = document.querySelector(
+        '[data-diceworks-result]'
+    );
+    const combatDice = Array.from(
+        document.querySelectorAll('[data-combat-die]')
+    );
+    const lonelyConfetti = document.querySelector(
+        '[data-lonely-confetti]'
+    );
+
+    function beginCombatRoll() {
+        if (!diceworks) {
+            return;
+        }
+
+        const expectedMode = rangeStatus
+            && rangeStatus.dataset.rollMode
+            ? rangeStatus.dataset.rollMode
+            : 'normal';
+        const count = expectedMode === 'normal'
+            ? 1
+            : 2;
+
+        diceworks.hidden = false;
+        diceworks.classList.add('is-rolling');
+        diceworks.classList.remove(
+            'is-critical-hit',
+            'is-critical-miss'
+        );
+
+        if (diceworksMode) {
+            diceworksMode.textContent =
+                expectedMode === 'normal'
+                    ? 'D20'
+                    : expectedMode.toUpperCase();
+        }
+
+        if (diceworksResult) {
+            diceworksResult.textContent =
+                count === 2
+                    ? 'Two certified d20s are rolling…'
+                    : 'The certified d20 is rolling…';
+        }
+
+        combatDice.forEach((die, index) => {
+            die.hidden = index >= count;
+            die.classList.remove(
+                'is-chosen',
+                'is-rejected'
+            );
+            const value = die.querySelector(
+                '[data-die-value]'
+            );
+            if (value) {
+                value.textContent = '?';
+            }
+        });
+
+        if (lonelyConfetti) {
+            lonelyConfetti.hidden = true;
+        }
+    }
+
+    function revealCombatRoll(attack) {
+        if (!diceworks || !attack) {
+            return;
+        }
+
+        const rolls = Array.isArray(attack.rolls)
+            ? attack.rolls
+            : [attack.roll];
+        const chosenIndex = Math.max(
+            0,
+            rolls.indexOf(attack.roll)
+        );
+
+        diceworks.hidden = false;
+        diceworks.classList.remove('is-rolling');
+        diceworks.classList.toggle(
+            'is-critical-hit',
+            attack.result === 'critical-hit'
+        );
+        diceworks.classList.toggle(
+            'is-critical-miss',
+            attack.result === 'critical-miss'
+        );
+
+        if (diceworksMode) {
+            diceworksMode.textContent =
+                attack.roll_mode === 'normal'
+                    ? 'D20'
+                    : String(attack.roll_mode).toUpperCase();
+        }
+
+        combatDice.forEach((die, index) => {
+            const visible = index < rolls.length;
+            die.hidden = !visible;
+
+            if (!visible) {
+                return;
+            }
+
+            const value = die.querySelector(
+                '[data-die-value]'
+            );
+            if (value) {
+                value.textContent = String(rolls[index]);
+            }
+
+            die.classList.toggle(
+                'is-chosen',
+                index === chosenIndex
+            );
+            die.classList.toggle(
+                'is-rejected',
+                rolls.length > 1
+                && index !== chosenIndex
+            );
+        });
+
+        if (diceworksResult) {
+            diceworksResult.textContent =
+                attack.roll_mode === 'normal'
+                    ? 'Result: ' + attack.roll
+                    : 'Chosen d20: ' + attack.roll;
+        }
+
+        if (lonelyConfetti) {
+            lonelyConfetti.hidden =
+                attack.result !== 'critical-miss';
+        }
+    }
+
+    function cancelCombatRoll() {
+        if (diceworks) {
+            diceworks.classList.remove('is-rolling');
+        }
+    }
+
     const deathSaveButton = document.querySelector(
         '[data-roll-death-save]'
     );
@@ -363,6 +720,8 @@
                         return;
                     }
 
+                    beginCombatRoll();
+
                     data = await request('gmrt_resolve_attack', {
                         encounter_id: encounter.dataset.encounterId || '',
                         target_token_id: target.value,
@@ -383,6 +742,7 @@
 
                 if (data.attack) {
                     const attack = data.attack;
+                    revealCombatRoll(attack);
                     const prefix = attack.result === 'critical-hit'
                         ? 'CRITICAL HIT!'
                         : attack.result === 'critical-miss'
@@ -467,6 +827,7 @@
 
                 say('Battle deed recorded: ' + deed + '.');
             } catch (error) {
+                cancelCombatRoll();
                 say(error.message);
                 await refresh();
             }

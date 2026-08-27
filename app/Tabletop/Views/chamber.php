@@ -221,6 +221,14 @@ $sceneImage = $scene !== null
                         <?php endforeach; ?>
                     </select>
                 </label>
+                <span
+                    class="gmrt-target-range"
+                    data-target-range-status
+                    role="status"
+                    aria-live="polite"
+                >
+                    Choose target
+                </span>
                 <?php foreach (
                     ['attack' => 'Attack', 'dash' => 'Dash',
                      'disengage' => 'Disengage', 'dodge' => 'Dodge',
@@ -284,6 +292,35 @@ $sceneImage = $scene !== null
                     </button>
                 </div>
             <?php endif; ?>
+
+            <div
+                class="gmrt-diceworks"
+                data-combat-diceworks
+                aria-live="polite"
+                hidden
+            >
+                <div class="gmrt-diceworks__heading">
+                    <span>Guild Diceworks</span>
+                    <strong data-diceworks-mode>D20</strong>
+                </div>
+                <div class="gmrt-diceworks__tray" aria-hidden="true">
+                    <span class="gmrt-pixel-d20" data-combat-die="0">
+                        <b data-die-value>?</b>
+                    </span>
+                    <span class="gmrt-pixel-d20" data-combat-die="1" hidden>
+                        <b data-die-value>?</b>
+                    </span>
+                </div>
+                <small data-diceworks-result>
+                    Awaiting the roll…
+                </small>
+                <i
+                    class="gmrt-lonely-confetti"
+                    data-lonely-confetti
+                    aria-hidden="true"
+                    hidden
+                ></i>
+            </div>
         <?php endif; ?>
         </section>
     <?php endif; ?>
@@ -396,6 +433,21 @@ $sceneImage = $scene !== null
                             aria-hidden="true"
                         ></div>
                     <?php endif; ?>
+
+                    <svg
+                        class="gmrt-targeting-layer"
+                        data-targeting-layer
+                        aria-hidden="true"
+                    >
+                        <line
+                            class="gmrt-target-line"
+                            data-target-line
+                            x1="0"
+                            y1="0"
+                            x2="0"
+                            y2="0"
+                        ></line>
+                    </svg>
 
                     <div
                         class="gmrt-board__tokens"

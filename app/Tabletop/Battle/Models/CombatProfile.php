@@ -13,7 +13,9 @@ final class CombatProfile
     public function __construct(
         private string $tokenId,
         private int $armorClass = 10,
-        private int $attackModifier = 0
+        private int $attackModifier = 0,
+        private int $attackRangeFeet = 5,
+        private int $longRangeFeet = 5
     ) {
         if (trim($tokenId) === '') {
             throw new InvalidArgumentException(
@@ -30,6 +32,26 @@ final class CombatProfile
         if ($attackModifier < -20 || $attackModifier > 30) {
             throw new InvalidArgumentException(
                 'Attack modifier is outside the supported range.'
+            );
+        }
+
+        if (
+            $attackRangeFeet < 5
+            || $attackRangeFeet > 1000
+            || $attackRangeFeet % 5 !== 0
+        ) {
+            throw new InvalidArgumentException(
+                'Attack range must be a 5-foot increment between 5 and 1000.'
+            );
+        }
+
+        if (
+            $longRangeFeet < $attackRangeFeet
+            || $longRangeFeet > 2000
+            || $longRangeFeet % 5 !== 0
+        ) {
+            throw new InvalidArgumentException(
+                'Long range must be a 5-foot increment at least as large as normal range.'
             );
         }
     }
@@ -49,6 +71,22 @@ final class CombatProfile
         return $this->attackModifier;
     }
 
+    public function attackRangeFeet(): int
+    {
+        return $this->attackRangeFeet;
+    }
+
+    public function longRangeFeet(): int
+    {
+        return $this->longRangeFeet;
+    }
+
+    public function isRangedAttack(): bool
+    {
+        return $this->attackRangeFeet > 5
+            || $this->longRangeFeet > 5;
+    }
+
     /** @return array<string,int|string> */
     public function toArray(): array
     {
@@ -56,6 +94,8 @@ final class CombatProfile
             'token_id' => $this->tokenId,
             'armor_class' => $this->armorClass,
             'attack_modifier' => $this->attackModifier,
+            'attack_range_feet' => $this->attackRangeFeet,
+            'long_range_feet' => $this->longRangeFeet,
         ];
     }
 
@@ -65,7 +105,9 @@ final class CombatProfile
         return new self(
             (string) ($record['token_id'] ?? ''),
             (int) ($record['armor_class'] ?? 10),
-            (int) ($record['attack_modifier'] ?? 0)
+            (int) ($record['attack_modifier'] ?? 0),
+            (int) ($record['attack_range_feet'] ?? 5),
+            (int) ($record['long_range_feet'] ?? 5)
         );
     }
 }

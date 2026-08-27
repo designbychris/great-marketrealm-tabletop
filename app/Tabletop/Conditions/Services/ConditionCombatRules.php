@@ -18,8 +18,31 @@ final class ConditionCombatRules
      */
     public function attackRollMode(
         array $attacker,
-        array $target
+        array $target,
+        ?int $distanceFeet = null
     ): string {
+        $factors = $this->attackRollFactors(
+            $attacker,
+            $target,
+            $distanceFeet
+        );
+
+        return AttackRollMode::fromFactors(
+            $factors['advantage'],
+            $factors['disadvantage']
+        );
+    }
+
+    /**
+     * @param array<int,TokenCondition> $attacker
+     * @param array<int,TokenCondition> $target
+     * @return array{advantage:bool,disadvantage:bool}
+     */
+    public function attackRollFactors(
+        array $attacker,
+        array $target,
+        ?int $distanceFeet = null
+    ): array {
         $attackerTypes = $this->types($attacker);
         $targetTypes = $this->types($target);
 
@@ -42,19 +65,25 @@ final class ConditionCombatRules
             ]
         );
 
-        if ($advantage && $disadvantage) {
-            return AttackRollMode::NORMAL;
+        if (
+            in_array(
+                ConditionType::PRONE,
+                $targetTypes,
+                true
+            )
+            && $distanceFeet !== null
+        ) {
+            if ($distanceFeet <= 5) {
+                $advantage = true;
+            } else {
+                $disadvantage = true;
+            }
         }
 
-        if ($advantage) {
-            return AttackRollMode::ADVANTAGE;
-        }
-
-        if ($disadvantage) {
-            return AttackRollMode::DISADVANTAGE;
-        }
-
-        return AttackRollMode::NORMAL;
+        return [
+            'advantage' => $advantage,
+            'disadvantage' => $disadvantage,
+        ];
     }
 
     /**

@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.18.0-alpha.1] - 2026-08-27
+
+### Added
+
+- Phase IV.18 — The Measure of the Battlefield.
+- Server-authoritative square-grid distance measured from token footprints.
+- Persisted normal/long attack range on Combat Profiles.
+- Server-side Out of Range rejection before the Attack deed is spent.
+- Long-range attack disadvantage.
+- Distance-sensitive Prone target rules.
+- Authenticated read-only targeting preview.
+- Live battlefield targeting line and range feedback.
+- Tabletop Guild Diceworks tray with visible one/two-d20 rolls.
+- Chosen/rejected Advantage and Disadvantage dice presentation.
+- Natural 1 lonely pixel confetti and natural 20 victory feedback.
+- Melee/ranged Training Grounds fixtures.
+
+
 ## [0.17.0-alpha.1] - 2026-08-26
 
 ### Added

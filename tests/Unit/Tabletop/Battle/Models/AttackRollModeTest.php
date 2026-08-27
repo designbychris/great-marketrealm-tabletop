@@ -28,4 +28,21 @@ final class AttackRollModeTest extends TestCase
 
         AttackRollMode::assert('extra-lucky');
     }
+
+    public function testFactorsCancelAdvantageAndDisadvantage(): void
+    {
+        self::assertSame(
+            AttackRollMode::NORMAL,
+            AttackRollMode::fromFactors(true, true)
+        );
+        self::assertSame(
+            AttackRollMode::ADVANTAGE,
+            AttackRollMode::fromFactors(true, false)
+        );
+        self::assertSame(
+            AttackRollMode::DISADVANTAGE,
+            AttackRollMode::fromFactors(false, true)
+        );
+    }
+
 }

@@ -53,4 +53,15 @@ final class TestTableBlueprintTest extends TestCase
         self::assertSame('fire', $tokens[3]['damage'][3]);
     }
 
+
+ public function testFixtureContainsMeleeAndRangedAttackProfiles():void
+ {
+     $tokens=$this->b->tokens(42);
+
+     self::assertSame([5,5],$tokens[0]['range']);
+     self::assertSame([5,5],$tokens[1]['range']);
+     self::assertSame([30,60],$tokens[2]['range']);
+     self::assertSame([30,60],$tokens[3]['range']);
+ }
+
 }

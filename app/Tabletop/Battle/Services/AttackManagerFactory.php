@@ -16,6 +16,8 @@ use GreatMarketrealmTabletop\Tabletop\Encounters\Repositories\WordPressEncounter
 use GreatMarketrealmTabletop\Tables\Memberships\Repositories\WordPressTableMembershipRepository;
 use GreatMarketrealmTabletop\Tables\Services\SystemTableClock;
 use GreatMarketrealmTabletop\Tables\Tokens\Repositories\WordPressTableTokenRepository;
+use GreatMarketrealmTabletop\Tables\Scenes\Repositories\WordPressTableSceneRepository;
+use GreatMarketrealmTabletop\Tabletop\Battlefield\Services\BattlefieldMeasure;
 
 defined('ABSPATH') || exit;
 
@@ -54,7 +56,10 @@ final class AttackManagerFactory
             new DamageDefenseResolver(),
             $clock,
             new WordPressConditionRepository(),
-            new ConditionCombatRules()
+            new ConditionCombatRules(),
+            new WordPressTableSceneRepository(),
+            new BattlefieldMeasure(),
+            new AttackRangeResolver()
         );
     }
 }

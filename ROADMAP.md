@@ -327,3 +327,32 @@ Lower-latency shared-state synchronisation, presence and reconnection foundation
 - [ ] Charmed source-target attack restriction
 - [ ] Saving throw consequences
 - [ ] Server-side certification on deployment
+
+
+### Phase IV.18 — The Measure of the Battlefield
+
+- [x] Server-authoritative square-grid token distance
+- [x] Five-foot adjacency
+- [x] Distance measured from token footprints
+- [x] Combat Profiles persist normal and long attack range
+- [x] Melee defaults to 5-foot reach
+- [x] Out-of-range attacks rejected before spending the Attack deed
+- [x] Long-range attacks impose disadvantage
+- [x] Prone-target advantage within 5 feet
+- [x] Prone-target disadvantage beyond 5 feet
+- [x] Read-only target measurement endpoint
+- [x] Live target line from current attacker to selected target
+- [x] Live IN RANGE / LONG RANGE / OUT OF RANGE feedback
+- [x] Range preview exposes expected roll mode
+- [x] Guild Diceworks combat tray
+- [x] Two visible d20s for Advantage / Disadvantage
+- [x] Chosen and rejected dice presentation
+- [x] Natural 1 lonely pixel confetti
+- [x] Reduced-motion support
+- [x] Test Table includes melee and ranged fixture profiles
+- [ ] Cover and line of sight
+- [ ] Opportunity attacks
+- [ ] Area templates
+- [ ] Movement budgets
+- [ ] Hex-grid measurement
+- [ ] Server-side certification on deployment

@@ -51,6 +51,7 @@ final class AttackAjaxController
             wp_send_json_success([
                 'encounter' => $result['encounter']->toArray(),
                 'attack' => $result['outcome']->toArray(),
+                'targeting' => $result['targeting']?->toArray(),
                 'damage' => $result['damage']?->toArray(),
                 'damage_adjustment' => $result['damage_adjustment']?->toArray(),
                 'vitality' => $result['vitality']?->toArray(),

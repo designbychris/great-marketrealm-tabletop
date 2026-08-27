@@ -197,6 +197,17 @@ See `ROADMAP.md` and the `docs/` directory for the architecture plan.
 
 **First we build the table. Then we roll initiative.** 🎲
 
+### Phase IV.18 — The Measure of the Battlefield
+
+The Tabletop now measures authoritative square-grid distance between token
+footprints, validates melee/ranged attack ranges before spending an Action,
+handles long-range disadvantage and completes the distance-sensitive Prone
+rule.
+
+Target selection draws a visible battlefield line with server-certified range
+feedback, while the first Tabletop Guild Diceworks tray visibly rolls one or
+two d20s and reveals the already-certified server result.
+
 ### Phase IV.17 — Afflictions Take Hold
 
 Conditions now influence authoritative combat. Poisoned, Blinded, Prone and
