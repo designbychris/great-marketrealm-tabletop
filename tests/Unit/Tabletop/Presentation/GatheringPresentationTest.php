@@ -32,7 +32,7 @@ final class GatheringPresentationTest extends TestCase
             $this->root . '/app/Tabletop/Views/chamber.php'
         );
 
-        self::assertStringContainsString('Invite an Adventurer', $view);
+        self::assertStringContainsString('The Summons to the Table', $view);
         self::assertStringContainsString('data-gathering-invite-form', $view);
     }
 
