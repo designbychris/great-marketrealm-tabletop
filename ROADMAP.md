@@ -476,7 +476,7 @@ Lower-latency shared-state synchronisation, presence and reconnection foundation
 - [x] Fog aligns with calibrated grid
 - [x] Non-character tokens outside current Player vision are withheld from Player state
 - [x] Lens remains presentation-only over the same fog coordinate space
-- [ ] Walls and doors block line of sight
+- [x] Walls and doors block line of sight
 - [ ] Per-character vision distances / darkvision
 - [ ] Light-source rules
 - [ ] Manual polygon reveal/hide
@@ -505,3 +505,19 @@ Lower-latency shared-state synchronisation, presence and reconnection foundation
 - [x] Synchronize stable/deceased death-save HUD states
 
 - **Phase IV.22A.1 — The Veil Remembers (browser corrective pass)** — corrective browser pass for true token dragging and resilient rendered vision anchoring.
+
+### Phase IV.22B — Sight Beyond the Door
+
+- [x] Persist a per-Scene Dungeon Master vision layer
+- [x] Draw wall segments snapped to calibrated grid intersections
+- [x] Place door segments on the same grid geometry
+- [x] Closed doors block current sight
+- [x] Open doors permit current sight
+- [x] Walls block server-projected Fog visibility
+- [x] Player token filtering uses the same blocker-aware server projection
+- [x] Keep DM vision-layer geometry out of Player chamber state
+- [x] Preserve blocker-aware explored cells as the party's remembered route
+- [x] Provide DM door toggle and barrier removal controls
+- [ ] Browser-certify wall drawing against a real calibrated dungeon map
+- [ ] Browser-certify closed/open door transitions and remembered-room behaviour
+

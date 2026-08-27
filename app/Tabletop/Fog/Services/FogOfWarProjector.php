@@ -20,7 +20,8 @@ final class FogOfWarProjector
         TableScene $scene,
         FogOfWarState $fog,
         array $tokens,
-        bool $dungeonMaster
+        bool $dungeonMaster,
+        array $barriers = []
     ): array {
         $visible = [];
         $visionOrigins = [];
@@ -42,7 +43,8 @@ final class FogOfWarProjector
                 $visible,
                 (new FogCellMapper())->visibleAround(
                     $scene,
-                    $token
+                    $token,
+                    $barriers
                 )
             );
         }
@@ -64,6 +66,7 @@ final class FogOfWarProjector
                 $visible
             )),
             'vision_origins' => $visionOrigins,
+            'has_blockers' => $barriers !== [],
         ];
     }
 

@@ -16,6 +16,7 @@ use GreatMarketrealmTabletop\Tabletop\Presentation\CombatantStateProjector;
 use GreatMarketrealmTabletop\Tabletop\Arsenal\Contracts\CombatArsenalRepository;
 use GreatMarketrealmTabletop\Tabletop\Fog\Contracts\FogOfWarRepository;
 use GreatMarketrealmTabletop\Tabletop\Fog\Services\FogOfWarProjector;
+use GreatMarketrealmTabletop\Tabletop\Vision\Contracts\VisionBarrierRepository;
 use GreatMarketrealmTabletop\Tables\Contracts\TableRepository;
 use GreatMarketrealmTabletop\Tables\Memberships\Contracts\TableMembershipRepository;
 use GreatMarketrealmTabletop\Tables\Memberships\Models\TableMember;
@@ -44,7 +45,8 @@ final class TabletopChamber
         private ?CombatantStateProjector $combatantStateProjector = null,
         private ?CombatArsenalRepository $arsenals = null,
         private ?FogOfWarRepository $fogRepository = null,
-        private ?FogOfWarProjector $fogProjector = null
+        private ?FogOfWarProjector $fogProjector = null,
+        private ?VisionBarrierRepository $visionBarriers = null
     ) {}
 
     public function state(
@@ -117,6 +119,22 @@ final class TabletopChamber
         }
 
         $fog = [];
+        $barrierModels = [];
+        $visionLayer = [];
+
+        if ($activeScene !== null && $this->visionBarriers !== null) {
+            $barrierModels = $this->visionBarriers->forScene(
+                $tableId,
+                $activeScene->id()
+            );
+
+            if ($viewer->isDungeonMaster()) {
+                $visionLayer = array_map(
+                    static fn ($barrier): array => $barrier->toArray(),
+                    $barrierModels
+                );
+            }
+        }
 
         if (
             $activeScene !== null
@@ -130,7 +148,8 @@ final class TabletopChamber
                     $activeScene->id()
                 ),
                 $visionTokenModels,
-                $viewer->isDungeonMaster()
+                $viewer->isDungeonMaster(),
+                $barrierModels
             );
         }
 
@@ -256,7 +275,8 @@ final class TabletopChamber
             $battleLog,
             $combatantStates,
             $arsenals,
-            $fog
+            $fog,
+            $visionLayer
         );
     }
 }

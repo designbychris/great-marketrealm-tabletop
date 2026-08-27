@@ -7,6 +7,7 @@ use GreatMarketrealmTabletop\Tabletop\Fog\Repositories\WordPressFogOfWarReposito
 use GreatMarketrealmTabletop\Tables\Memberships\Repositories\WordPressTableMembershipRepository;
 use GreatMarketrealmTabletop\Tables\Scenes\Repositories\WordPressTableSceneRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Repositories\WordPressTableTokenRepository;
+use GreatMarketrealmTabletop\Tabletop\Vision\Repositories\WordPressVisionBarrierRepository;
 
 defined('ABSPATH') || exit;
 
@@ -19,7 +20,8 @@ final class FogOfWarFactory
             new WordPressTableMembershipRepository(),
             new WordPressTableSceneRepository(),
             new WordPressTableTokenRepository(),
-            new FogCellMapper()
+            new FogCellMapper(),
+            new WordPressVisionBarrierRepository()
         );
     }
 }

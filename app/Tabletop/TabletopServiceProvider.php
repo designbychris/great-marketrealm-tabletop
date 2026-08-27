@@ -19,7 +19,9 @@ use GreatMarketrealmTabletop\Tabletop\Http\TestTableAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\TargetingAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\CartographyAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\FogOfWarAjaxController;
+use GreatMarketrealmTabletop\Tabletop\Http\VisionBarrierAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Fog\Services\FogOfWarFactory;
+use GreatMarketrealmTabletop\Tabletop\Vision\Services\VisionBarrierFactory;
 use GreatMarketrealmTabletop\Tabletop\Cartography\Services\CartographersTableFactory;
 use GreatMarketrealmTabletop\Tabletop\Battlefield\Services\TargetingServiceFactory;
 use GreatMarketrealmTabletop\Tabletop\Testing\TestTableProvisioner;
@@ -53,6 +55,8 @@ final class TabletopServiceProvider
     private CartographyAjaxController $cartographyAjax;
 
     private FogOfWarAjaxController $fogAjax;
+
+    private VisionBarrierAjaxController $visionAjax;
 
     public function __construct()
     {
@@ -102,6 +106,10 @@ final class TabletopServiceProvider
 
         $this->fogAjax = new FogOfWarAjaxController(
             FogOfWarFactory::make()
+        );
+
+        $this->visionAjax = new VisionBarrierAjaxController(
+            VisionBarrierFactory::make()
         );
     }
 
@@ -205,6 +213,21 @@ final class TabletopServiceProvider
         add_action(
             'wp_ajax_gmrt_configure_fog',
             [$this->fogAjax, 'configure']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_add_vision_barrier',
+            [$this->visionAjax, 'add']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_toggle_vision_door',
+            [$this->visionAjax, 'toggle']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_remove_vision_barrier',
+            [$this->visionAjax, 'remove']
         );
     }
 }

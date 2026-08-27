@@ -11,6 +11,7 @@ use GreatMarketrealmTabletop\Tables\Scenes\Contracts\TableSceneRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Contracts\TableTokenRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Models\TableToken;
 use GreatMarketrealmTabletop\Tables\Tokens\Models\TableTokenType;
+use GreatMarketrealmTabletop\Tabletop\Vision\Contracts\VisionBarrierRepository;
 use RuntimeException;
 
 defined('ABSPATH') || exit;
@@ -22,7 +23,8 @@ final class FogOfWarManager
         private TableMembershipRepository $members,
         private TableSceneRepository $scenes,
         private TableTokenRepository $tokens,
-        private FogCellMapper $mapper
+        private FogCellMapper $mapper,
+        private ?VisionBarrierRepository $barriers = null
     ) {}
 
     /** @return array<string,mixed> */
@@ -71,7 +73,11 @@ final class FogOfWarManager
                     $state->reveal(
                         $this->mapper->visibleAround(
                             $scene,
-                            $token
+                            $token,
+                            $this->barriers?->forScene(
+                                $tableId,
+                                $scene->id()
+                            ) ?? []
                         )
                     );
                 }
@@ -114,7 +120,11 @@ final class FogOfWarManager
         $state->reveal(
             $this->mapper->visibleAround(
                 $scene,
-                $token
+                $token,
+                $this->barriers?->forScene(
+                    $tableId,
+                    $scene->id()
+                ) ?? []
             )
         );
 

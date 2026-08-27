@@ -5,6 +5,8 @@ namespace GreatMarketrealmTabletop\Tabletop\Fog\Services;
 
 use GreatMarketrealmTabletop\Tables\Scenes\Models\TableScene;
 use GreatMarketrealmTabletop\Tables\Tokens\Models\TableToken;
+use GreatMarketrealmTabletop\Tabletop\Vision\Models\VisionBarrier;
+use GreatMarketrealmTabletop\Tabletop\Vision\Services\SightLineResolver;
 
 defined('ABSPATH') || exit;
 
@@ -15,7 +17,8 @@ final class FogCellMapper
     /** @return array<int,string> */
     public function visibleAround(
         TableScene $scene,
-        TableToken $token
+        TableToken $token,
+        array $barriers = []
     ): array {
         if ($scene->gridSize() < 1) {
             return [];
@@ -45,6 +48,16 @@ final class FogCellMapper
                         abs($row - $center['row'])
                     ) > self::VISION_RADIUS
                 ) {
+                    continue;
+                }
+
+                if (! (new SightLineResolver())->canSee(
+                    $center['column'],
+                    $center['row'],
+                    $column,
+                    $row,
+                    $barriers
+                )) {
                     continue;
                 }
 

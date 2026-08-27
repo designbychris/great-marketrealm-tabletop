@@ -13,6 +13,7 @@
     let selected = null;
     let refreshTimer = null;
     let targetingPreview = null;
+    let visionDrafting = false;
 
     function say(message) {
         if (status) {
@@ -175,7 +176,11 @@
     });
 
     lensStage?.addEventListener('pointerdown', (event) => {
-        if (event.button !== 0 || isLensInteractiveTarget(event.target)) {
+        if (
+            event.button !== 0
+            || visionDrafting
+            || isLensInteractiveTarget(event.target)
+        ) {
             return;
         }
 
@@ -357,7 +362,7 @@
         // server projector, supplied so the visual veil can anchor itself to
         // the actually rendered battlefield even when responsive scaling
         // differs slightly from the saved calibration width.
-        visionOrigins.forEach((origin) => {
+        if (!Boolean(fogProjection.has_blockers)) visionOrigins.forEach((origin) => {
             const x = Math.max(0, Math.min(1, Number(origin.x || 0)));
             const y = Math.max(0, Math.min(1, Number(origin.y || 0)));
             const centerColumn = Math.floor(
@@ -495,6 +500,201 @@
     fogClear?.addEventListener('click', () => {
         configureFog(Boolean(fogEnabled?.checked), true);
     });
+
+    const visionLayer = document.querySelector('[data-vision-layer]');
+    const visionStatus = document.querySelector('[data-vision-status]');
+    const visionRoster = document.querySelector('[data-vision-roster]');
+    const visionCancel = document.querySelector('[data-vision-cancel]');
+    const visionTools = Array.from(document.querySelectorAll('[data-vision-tool]'));
+    let visionBarriers = [];
+    let visionTool = null;
+    let visionStart = null;
+
+    if (visionLayer) {
+        try {
+            visionBarriers = JSON.parse(visionLayer.dataset.vision || '[]');
+        } catch (error) {
+            visionBarriers = [];
+        }
+    }
+
+    const visionGrid = () => {
+        const referenceWidth = Math.max(
+            1,
+            Number(fogProjection.reference_width || board.clientWidth || 1)
+        );
+        const displayWidth = Math.max(1, board.clientWidth || referenceWidth);
+        const scale = displayWidth / referenceWidth;
+        return {
+            size: Math.max(1, Number(fogProjection.grid_size || 1) * scale),
+            offsetX: Number(fogProjection.offset_x || 0) * scale,
+            offsetY: Number(fogProjection.offset_y || 0) * scale
+        };
+    };
+
+    const barrierPoint = (column, row) => {
+        const grid = visionGrid();
+        return {
+            x: grid.offsetX + (Number(column) * grid.size),
+            y: grid.offsetY + (Number(row) * grid.size)
+        };
+    };
+
+    const renderVisionLayer = (barriers = visionBarriers) => {
+        if (!visionLayer) return;
+        visionBarriers = Array.isArray(barriers) ? barriers : [];
+        visionLayer.replaceChildren();
+        const fragment = document.createDocumentFragment();
+
+        visionBarriers.forEach((barrier) => {
+            const start = barrierPoint(barrier.x1, barrier.y1);
+            const end = barrierPoint(barrier.x2, barrier.y2);
+            const line = document.createElementNS(
+                'http://www.w3.org/2000/svg',
+                'line'
+            );
+            line.setAttribute('x1', String(start.x));
+            line.setAttribute('y1', String(start.y));
+            line.setAttribute('x2', String(end.x));
+            line.setAttribute('y2', String(end.y));
+            line.classList.add('gmrt-vision-barrier', `is-${barrier.type}`);
+            if (barrier.type === 'door' && barrier.open) {
+                line.classList.add('is-open');
+            }
+            fragment.append(line);
+        });
+
+        visionLayer.append(fragment);
+
+        if (visionRoster) {
+            visionRoster.replaceChildren();
+            visionBarriers.forEach((barrier, index) => {
+                const item = document.createElement('span');
+                item.className = 'gmrt-vision-roster__item';
+                const label = document.createElement('span');
+                label.textContent = barrier.type === 'door'
+                    ? `Door ${index + 1} · ${barrier.open ? 'OPEN' : 'CLOSED'}`
+                    : `Wall ${index + 1}`;
+                item.append(label);
+
+                if (barrier.type === 'door') {
+                    const toggle = document.createElement('button');
+                    toggle.type = 'button';
+                    toggle.dataset.visionToggle = String(barrier.id);
+                    toggle.textContent = barrier.open ? 'Close' : 'Open';
+                    item.append(toggle);
+                }
+
+                const remove = document.createElement('button');
+                remove.type = 'button';
+                remove.dataset.visionRemove = String(barrier.id);
+                remove.textContent = 'Remove';
+                item.append(remove);
+                visionRoster.append(item);
+            });
+        }
+    };
+
+    const resetVisionDraft = (message = '') => {
+        visionDrafting = false;
+        visionTool = null;
+        visionStart = null;
+        visionTools.forEach((button) => button.classList.remove('is-active'));
+        if (visionCancel) visionCancel.disabled = true;
+        if (message && visionStatus) visionStatus.textContent = message;
+    };
+
+    visionTools.forEach((button) => {
+        button.addEventListener('click', () => {
+            visionDrafting = true;
+            visionTool = button.dataset.visionTool || 'wall';
+            visionStart = null;
+            visionTools.forEach((candidate) => {
+                candidate.classList.toggle('is-active', candidate === button);
+            });
+            if (visionCancel) visionCancel.disabled = false;
+            if (visionStatus) {
+                visionStatus.textContent = `Drawing ${visionTool}. Click the first grid intersection.`;
+            }
+        });
+    });
+
+    visionCancel?.addEventListener('click', () => {
+        resetVisionDraft('Vision drawing cancelled.');
+    });
+
+    board.addEventListener('click', async (event) => {
+        if (!visionDrafting || !visionTool) return;
+        event.preventDefault();
+        event.stopPropagation();
+
+        const rect = board.getBoundingClientRect();
+        const localX = ((event.clientX - rect.left) / rect.width) * board.clientWidth;
+        const localY = ((event.clientY - rect.top) / rect.height) * board.clientHeight;
+        const grid = visionGrid();
+        const point = {
+            x: Math.round((localX - grid.offsetX) / grid.size),
+            y: Math.round((localY - grid.offsetY) / grid.size)
+        };
+
+        if (!visionStart) {
+            visionStart = point;
+            if (visionStatus) {
+                visionStatus.textContent = 'First point set. Click the second grid intersection.';
+            }
+            return;
+        }
+
+        try {
+            await request('gmrt_add_vision_barrier', {
+                type: visionTool,
+                x1: visionStart.x,
+                y1: visionStart.y,
+                x2: point.x,
+                y2: point.y
+            });
+            const state = await request('gmrt_tabletop_state', {});
+            renderVisionLayer(state.vision_layer || []);
+            renderFog(state.fog || {});
+            resetVisionDraft(
+                visionTool === 'door'
+                    ? 'Door placed. Closed doors now block sight.'
+                    : 'Wall drawn. The Veil now respects it.'
+            );
+        } catch (error) {
+            if (visionStatus) visionStatus.textContent = error.message;
+            visionStart = null;
+        }
+    }, true);
+
+    visionRoster?.addEventListener('click', async (event) => {
+        const button = event.target instanceof Element
+            ? event.target.closest('button')
+            : null;
+        if (!button) return;
+        try {
+            if (button.dataset.visionToggle) {
+                await request('gmrt_toggle_vision_door', {
+                    barrier_id: button.dataset.visionToggle
+                });
+            } else if (button.dataset.visionRemove) {
+                await request('gmrt_remove_vision_barrier', {
+                    barrier_id: button.dataset.visionRemove
+                });
+            } else {
+                return;
+            }
+            const state = await request('gmrt_tabletop_state', {});
+            renderVisionLayer(state.vision_layer || []);
+            renderFog(state.fog || {});
+            if (visionStatus) visionStatus.textContent = 'Vision layer updated.';
+        } catch (error) {
+            if (visionStatus) visionStatus.textContent = error.message;
+        }
+    });
+
+    window.addEventListener('resize', () => renderVisionLayer());
+    renderVisionLayer();
 
     const gridViewport = document.querySelector('.gmrt-board__viewport');
     const gridSize = document.querySelector('[data-grid-size]');
@@ -1074,6 +1274,7 @@
 
             renderBattleLog(state.battle_log);
             renderFog(state.fog || {});
+            renderVisionLayer(state.vision_layer || []);
 
             const combatantStates =
                 state.combatant_states || {};

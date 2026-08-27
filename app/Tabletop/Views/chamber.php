@@ -21,6 +21,7 @@ $battleLog = $state?->battleLog() ?? [];
 $combatantStates = $state?->combatantStates() ?? [];
 $arsenals = $state?->arsenals() ?? [];
 $fog = $state?->fog() ?? [];
+$visionLayer = $state?->visionLayer() ?? [];
 
 $tokenLabels = [];
 foreach ($tokens as $token) {
@@ -486,6 +487,16 @@ $sceneImage = $scene !== null
                         </button>
                         <span data-fog-status role="status" aria-live="polite"></span>
                     </div>
+
+                    <div class="gmrt-vision-controls" data-vision-controls>
+                        <strong>Sight Beyond the Door</strong>
+                        <span>Teach the Veil where sight must stop.</span>
+                        <button type="button" data-vision-tool="wall">Draw Wall</button>
+                        <button type="button" data-vision-tool="door">Place Door</button>
+                        <button type="button" data-vision-cancel disabled>Cancel</button>
+                        <span data-vision-status role="status" aria-live="polite">Choose a wall or door, then click two grid intersections.</span>
+                        <div class="gmrt-vision-roster" data-vision-roster></div>
+                    </div>
                 <?php endif; ?>
 
 
@@ -604,6 +615,15 @@ $sceneImage = $scene !== null
                             class="gmrt-board__grid"
                             aria-hidden="true"
                         ></div>
+                    <?php endif; ?>
+
+                    <?php if ($state->isDungeonMaster()) : ?>
+                        <svg
+                            class="gmrt-vision-layer"
+                            data-vision-layer
+                            data-vision='<?php echo esc_attr(wp_json_encode($visionLayer)); ?>'
+                            aria-label="Dungeon Master vision barriers"
+                        ></svg>
                     <?php endif; ?>
 
                     <div

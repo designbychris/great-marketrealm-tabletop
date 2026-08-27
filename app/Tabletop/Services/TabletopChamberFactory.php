@@ -18,6 +18,7 @@ use GreatMarketrealmTabletop\Tabletop\Presentation\CombatantStateProjector;
 use GreatMarketrealmTabletop\Tabletop\Arsenal\Repositories\WordPressCombatArsenalRepository;
 use GreatMarketrealmTabletop\Tabletop\Fog\Repositories\WordPressFogOfWarRepository;
 use GreatMarketrealmTabletop\Tabletop\Fog\Services\FogOfWarProjector;
+use GreatMarketrealmTabletop\Tabletop\Vision\Repositories\WordPressVisionBarrierRepository;
 
 defined('ABSPATH') || exit;
 
@@ -39,7 +40,8 @@ final class TabletopChamberFactory
             new CombatantStateProjector(),
             new WordPressCombatArsenalRepository(),
             new WordPressFogOfWarRepository(),
-            new FogOfWarProjector()
+            new FogOfWarProjector(),
+            new WordPressVisionBarrierRepository()
         );
     }
 }

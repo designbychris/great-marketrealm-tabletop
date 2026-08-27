@@ -25,7 +25,8 @@ final class TabletopChamberState
         private array $battleLog = [],
         private array $combatantStates = [],
         private array $arsenals = [],
-        private array $fog = []
+        private array $fog = [],
+        private array $visionLayer = []
     ) {}
 
     /** @return array<string,mixed> */
@@ -104,6 +105,12 @@ final class TabletopChamberState
     public function fog(): array
     {
         return $this->fog;
+    }
+
+    /** @return array<int,array<string,mixed>> */
+    public function visionLayer(): array
+    {
+        return $this->visionLayer;
     }
 
     public function isDungeonMaster(): bool

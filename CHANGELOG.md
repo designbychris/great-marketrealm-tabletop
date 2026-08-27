@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.22.2-alpha.1 — Phase IV.22B: Sight Beyond the Door
+
+- Added a persisted Dungeon Master vision layer with grid-snapped wall and door segments.
+- Walls and closed doors now block server-projected Fog of War sight; open doors permit sight through their segment.
+- Kept vision blockers server-authoritative for current visibility and player token filtering; players do not receive DM vision-layer geometry.
+- Added DM controls to draw walls, place doors, toggle doors open/closed, and remove vision barriers.
+- Exploration memory now accumulates from blocker-aware visibility, allowing travelled corridors and visited rooms to remain as the party's dim remembered route.
+- Disabled the browser's circular vision reconstruction whenever persisted blockers exist so client presentation cannot see through server-authored walls.
+- Added regression coverage for barrier models, persistence, line intersection, Fog integration, DM-only geometry exposure, and AJAX/UI wiring.
+
 ## 0.22.1-alpha.4 — Phase IV.22A.2: The Veil Takes Hold
 
 - Added true pointer-captured token dragging with live grab feedback while preserving server-validated movement on release.
