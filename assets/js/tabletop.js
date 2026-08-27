@@ -304,9 +304,36 @@
                 }
 
                 const cell = document.createElement('span');
-                cell.className = explored.has(key)
+                const remembered = explored.has(key);
+
+                cell.className = remembered
                     ? 'gmrt-fog-cell is-memory'
                     : 'gmrt-fog-cell is-unexplored';
+
+                const neighbours = [
+                    `${column - 1}:${row}`,
+                    `${column + 1}:${row}`,
+                    `${column}:${row - 1}`,
+                    `${column}:${row + 1}`
+                ];
+
+                if (
+                    neighbours.some(
+                        (neighbour) => visible.has(neighbour)
+                    )
+                ) {
+                    cell.classList.add('is-vision-edge');
+                }
+
+                if (
+                    !remembered
+                    && neighbours.some(
+                        (neighbour) => explored.has(neighbour)
+                    )
+                ) {
+                    cell.classList.add('is-memory-edge');
+                }
+
                 cell.style.left = `${offsetX + (column * size)}px`;
                 cell.style.top = `${offsetY + (row * size)}px`;
                 cell.style.width = `${size + 1}px`;

@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.22.1-alpha.1] - 2026-08-27
+
+### Added
+
+- Phase IV.22A — The Living Veil.
+- Cohesive unexplored darkness instead of individually glowing fog tiles.
+- Remembered terrain treatment that leaves previously explored map artwork dimly readable.
+- Pixel-dithered vision and memory boundaries for a more SNES-like reveal edge.
+- Reduced-motion support for Fog of War presentation transitions.
+
+
 ## [0.22.0-alpha.1] - 2026-08-27
 
 ### Added

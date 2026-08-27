@@ -480,3 +480,12 @@ Lower-latency shared-state synchronisation, presence and reconnection foundation
 - [ ] Per-character vision distances / darkvision
 - [ ] Light-source rules
 - [ ] Manual polygon reveal/hide
+
+### Phase IV.22A — The Living Veil
+
+- [x] Replace harsh per-cell fog gradients with cohesive darkness
+- [x] Keep explored territory visible as dim memory
+- [x] Add pixel-dithered reveal boundary
+- [x] Add separate unexplored-to-memory boundary treatment
+- [x] Preserve Fog mechanics and persistence unchanged
+- [x] Respect reduced-motion preference
