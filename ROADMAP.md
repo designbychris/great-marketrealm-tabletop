@@ -490,8 +490,12 @@ Lower-latency shared-state synchronisation, presence and reconnection foundation
 - [x] Preserve Fog mechanics and persistence unchanged
 - [x] Respect reduced-motion preference
 
-### Phase IV.22A.1 — The Anchored Veil
+### Phase IV.22A.1 — The Anchored Veil / The Veil Remembers
 
+- [x] Project current vision from canonical Scene character tokens before viewer payload filtering
+- [x] Keep player token filtering independent from vision-source calculation
+- [x] Regression-test exploration memory across encounter persistence and repository reload
+- [x] Preserve explicit Reset Exploration as the clearing path
 - [x] Persist rendered grid calibration reference width
 - [x] Translate visual grid pixels into intrinsic server map coordinates
 - [x] Scale Fog cells to each viewer's rendered battlefield

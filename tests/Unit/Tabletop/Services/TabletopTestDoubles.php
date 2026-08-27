@@ -259,3 +259,24 @@ final class ChamberConditions implements \GreatMarketrealmTabletop\Tabletop\Cond
         );
     }
 }
+
+final class ChamberFog implements \GreatMarketrealmTabletop\Tabletop\Fog\Contracts\FogOfWarRepository
+{
+    /** @var array<string,\GreatMarketrealmTabletop\Tabletop\Fog\Models\FogOfWarState> */
+    public array $items = [];
+
+    public function forScene(
+        string $tableId,
+        string $sceneId
+    ): \GreatMarketrealmTabletop\Tabletop\Fog\Models\FogOfWarState {
+        return $this->items[$tableId . ':' . $sceneId]
+            ?? new \GreatMarketrealmTabletop\Tabletop\Fog\Models\FogOfWarState($sceneId);
+    }
+
+    public function save(
+        string $tableId,
+        \GreatMarketrealmTabletop\Tabletop\Fog\Models\FogOfWarState $state
+    ): void {
+        $this->items[$tableId . ':' . $state->sceneId()] = $state;
+    }
+}

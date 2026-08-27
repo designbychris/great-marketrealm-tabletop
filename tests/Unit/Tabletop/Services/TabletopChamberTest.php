@@ -28,6 +28,7 @@ final class TabletopChamberTest extends TestCase
     private ChamberVitality $vitality;
     private ChamberDeathSaves $deathSaves;
     private ChamberConditions $conditions;
+    private ChamberFog $fog;
     private TabletopChamber $chamber;
 
     protected function setUp(): void
@@ -44,6 +45,7 @@ final class TabletopChamberTest extends TestCase
         $this->vitality = new ChamberVitality();
         $this->deathSaves = new ChamberDeathSaves();
         $this->conditions = new ChamberConditions();
+        $this->fog = new ChamberFog();
 
         $table = Table::prepare(
             'table-1',
@@ -128,7 +130,13 @@ final class TabletopChamberTest extends TestCase
             $this->encounters,
             $this->vitality,
             $this->deathSaves,
-            $this->conditions
+            $this->conditions,
+            null,
+            null,
+            null,
+            null,
+            $this->fog,
+            new \GreatMarketrealmTabletop\Tabletop\Fog\Services\FogOfWarProjector()
         );
     }
 
@@ -267,6 +275,45 @@ final class TabletopChamberTest extends TestCase
             2,
             $state->conditions()
                 ['token-visible'][0]['turns_remaining']
+        );
+    }
+
+    public function testPlayerFogUsesCanonicalCharacterTokensAsVisionSources(): void
+    {
+        $now = new DateTimeImmutable('2026-08-27T12:00:00+01:00');
+        $hiddenCharacter = TableToken::create(
+            'token-hidden-character',
+            'table-1',
+            'scene-1',
+            'Auby',
+            TableTokenType::CHARACTER,
+            'gmrt-test:auby',
+            42,
+            .50,
+            .50,
+            1,
+            1,
+            TableTokenVisibility::HIDDEN,
+            $now
+        );
+        $this->tokens->save($hiddenCharacter);
+
+        $fog = new \GreatMarketrealmTabletop\Tabletop\Fog\Models\FogOfWarState(
+            'scene-1',
+            true,
+            []
+        );
+        $this->fog->save('table-1', $fog);
+
+        $state = $this->chamber->state('table-1', 84);
+
+        self::assertContains(
+            '16:9',
+            $state->fog()['visible'] ?? []
+        );
+        self::assertNotContains(
+            'token-hidden-character',
+            array_column($state->tokens(), 'id')
         );
     }
 

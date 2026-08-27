@@ -23,6 +23,7 @@ use GreatMarketrealmTabletop\Tables\Memberships\Models\TableMemberStatus;
 use GreatMarketrealmTabletop\Tables\Scenes\Contracts\TableSceneRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Contracts\TableTokenRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Models\TableToken;
+use GreatMarketrealmTabletop\Tables\Tokens\Models\TableTokenType;
 use RuntimeException;
 
 defined('ABSPATH') || exit;
@@ -90,6 +91,7 @@ final class TabletopChamber
 
         $tokens = [];
         $tokenModels = [];
+        $visionTokenModels = [];
 
         if ($activeScene !== null) {
             foreach (
@@ -99,6 +101,10 @@ final class TabletopChamber
                 )
                 as $token
             ) {
+                if ($token->type() === TableTokenType::CHARACTER) {
+                    $visionTokenModels[] = $token;
+                }
+
                 if (
                     ! $viewer->isDungeonMaster()
                     && ! $token->isVisible()
@@ -123,7 +129,7 @@ final class TabletopChamber
                     $tableId,
                     $activeScene->id()
                 ),
-                $tokenModels,
+                $visionTokenModels,
                 $viewer->isDungeonMaster()
             );
         }

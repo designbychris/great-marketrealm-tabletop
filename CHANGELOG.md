@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.22.1-alpha.3] - 2026-08-27
+
+### Fixed
+
+- Phase IV.22A.1 — The Veil Remembers.
+- Build current Fog of War visibility from the active Scene's canonical character tokens before viewer token-payload filtering, so DM Player Fog preview and player vision always receive the same authoritative sight sources.
+- Keep hidden/non-player token payload filtering intact; sight projection no longer depends on which token records may be sent to the viewer.
+- Added regression coverage proving Fog exploration survives unrelated encounter persistence and a fresh repository load, while explicit Reset Exploration remains the operation that clears memory.
+
 ## [0.22.1-alpha.2] - 2026-08-27
 
 ### Fixed
