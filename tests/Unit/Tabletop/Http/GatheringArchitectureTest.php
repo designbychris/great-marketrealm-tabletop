@@ -56,4 +56,13 @@ final class GatheringArchitectureTest extends TestCase
         self::assertStringNotContainsString('GreatMarketrealmCompanion\\', $source);
         self::assertStringContainsString('CompanionGateway', $source);
     }
+    public function testPlayerRemovalIsAuthenticatedAndDungeonMasterControlled(): void
+    {
+        $provider = (string) file_get_contents($this->root . '/app/Tabletop/TabletopServiceProvider.php');
+        $controller = (string) file_get_contents($this->root . '/app/Tabletop/Http/GatheringAjaxController.php');
+        self::assertStringContainsString('wp_ajax_gmrt_remove_table_player', $provider);
+        self::assertStringNotContainsString('wp_ajax_nopriv_gmrt_remove_table_player', $provider);
+        self::assertStringContainsString('assertDungeonMaster($tableId)', $controller);
+    }
+
 }

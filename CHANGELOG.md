@@ -1,3 +1,10 @@
+## 0.23.1-alpha.2 — Phase IV.23A corrective: Reliable Summons & Seat Removal
+
+- Generate invitation links with the canonical Tabletop query route so they work without relying on rewrite rules being flushed.
+- Use player-facing “Sign in to the Marketrealm Companion” wording in invitation email.
+- Allow the active Dungeon Master to remove invited or active players from a Table so they can be reinvited cleanly later.
+- Removed/left members are omitted from the live Gathering roster while their canonical membership history remains persisted.
+
 
 ## 0.23.0-alpha.1 — Phase IV.23: The Gathering at the Table
 

@@ -115,6 +115,16 @@ final class TableGathering
         return $member;
     }
 
+    public function removePlayer(string $tableId, int $userId): TableMember
+    {
+        $this->openTable($tableId);
+        $member = $this->requiredMember($tableId, $userId);
+        $member->removeByDungeonMaster($this->clock->now());
+        $this->members->save($member);
+
+        return $member;
+    }
+
     public function selectCompanionCharacter(
         string $tableId,
         int $userId,

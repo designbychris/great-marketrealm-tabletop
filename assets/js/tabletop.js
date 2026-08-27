@@ -127,6 +127,23 @@
         }
     });
 
+    document.querySelectorAll('[data-remove-table-player]').forEach((button) => {
+        button.addEventListener('click', async () => {
+            const userId = button.dataset.userId || '';
+            if (!userId) return;
+            button.disabled = true;
+            gatheringSay('Removing the player from the Table…');
+            try {
+                const data = await request('gmrt_remove_table_player', { user_id: userId });
+                gatheringSay(data.message || 'Player removed.');
+                window.setTimeout(() => window.location.reload(), 350);
+            } catch (error) {
+                gatheringSay(error.message || 'The player could not be removed.');
+                button.disabled = false;
+            }
+        });
+    });
+
     if (!board) {
         return;
     }

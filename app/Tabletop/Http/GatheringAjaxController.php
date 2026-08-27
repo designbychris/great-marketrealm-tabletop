@@ -65,6 +65,27 @@ final class GatheringAjaxController
         }
     }
 
+    public function remove(): void
+    {
+        $this->guard();
+
+        try {
+            $tableId = $this->tableId();
+            $this->assertDungeonMaster($tableId);
+            $userId = absint($_POST['user_id'] ?? 0);
+            if ($userId < 1) {
+                throw new \RuntimeException('A player user ID is required.');
+            }
+            $member = $this->gathering->removePlayer($tableId, $userId);
+            wp_send_json_success([
+                'message' => 'The player has been removed from the Table.',
+                'member' => $member->toArray(),
+            ]);
+        } catch (Throwable $exception) {
+            wp_send_json_error(['message' => $exception->getMessage()], 400);
+        }
+    }
+
     public function accept(): void
     {
         $this->guard();

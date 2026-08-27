@@ -145,4 +145,11 @@ final class TableMemberTest extends TestCase
             $restored->toArray()
         );
     }
+    public function testDungeonMasterMayRemoveInvitedPlayer(): void
+    {
+        $member = TableMember::invitePlayer('table-1', 84, new DateTimeImmutable());
+        $member->removeByDungeonMaster(new DateTimeImmutable());
+        self::assertSame(TableMemberStatus::LEFT, $member->status());
+    }
+
 }

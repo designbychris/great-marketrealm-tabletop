@@ -537,6 +537,8 @@ Real WordPress identities, avatars, Table invitations and explicit seat acceptan
 
 
 ### Phase IV.23A — The Summons to the Table
+
+**Corrective alpha.2:** reliable query-route summons links, Companion sign-in wording, and DM player removal/reinvite support.
 - [x] Persist the Tabletop invitation before attempting delivery.
 - [x] Send a WordPress email summons containing the direct Table URL.
 - [x] Use the configured WordPress admin email as the explicit summons sender when valid.

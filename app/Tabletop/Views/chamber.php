@@ -905,6 +905,19 @@ $sceneImage = $scene !== null
                                 }
                             }
                             ?>
+                            <?php if (
+                                $state->isDungeonMaster()
+                                && ($member['role'] ?? '') === 'player'
+                                && ($member['status'] ?? '') !== 'left'
+                            ) : ?>
+                                <button
+                                    type="button"
+                                    class="gmrt-party__remove"
+                                    data-remove-table-player
+                                    data-user-id="<?php echo esc_attr((string) ($member['user_id'] ?? '')); ?>"
+                                >Remove from Table</button>
+                            <?php endif; ?>
+
                             <?php if (is_array($memberVitality)) : ?>
                                 <div
                                     class="gmrt-hp"

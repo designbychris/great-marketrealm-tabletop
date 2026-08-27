@@ -30,7 +30,7 @@ final class ApplicationTest extends TestCase
     public function testApplicationExposesInitialVersion(): void
     {
         self::assertSame(
-            '0.23.1-alpha.1',
+            '0.23.1-alpha.2',
             Application::instance()->version()
         );
     }

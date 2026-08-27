@@ -259,5 +259,10 @@ final class TabletopServiceProvider
             'wp_ajax_gmrt_accept_table_invitation',
             [$this->gatheringAjax, 'accept']
         );
+
+        add_action(
+            'wp_ajax_gmrt_remove_table_player',
+            [$this->gatheringAjax, 'remove']
+        );
     }
 }

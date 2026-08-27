@@ -59,11 +59,11 @@ final class WordPressTableInvitationDelivery
 
     private function inviteUrl(string $tableId): string
     {
-        $path = '/tabletop/' . rawurlencode($tableId) . '/';
+        $query = '?gmrt_tabletop=1&gmrt_table=' . rawurlencode($tableId);
 
         return function_exists('home_url')
-            ? (string) home_url($path)
-            : $path;
+            ? (string) home_url('/' . $query)
+            : '/' . $query;
     }
 
     private function sendEmail(
@@ -94,7 +94,7 @@ final class WordPressTableInvitationDelivery
             ),
             'Take My Seat:',
             $inviteUrl,
-            'Sign in with the WordPress account that received this invitation. Your seat remains reserved until you accept it.',
+            'Sign in to the Marketrealm Companion with the account that received this invitation. Your seat remains reserved until you accept it.',
         ]);
 
         $headers = [];

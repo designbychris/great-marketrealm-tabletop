@@ -114,6 +114,19 @@ final class TableMember
         $this->companionCharacterId = null;
     }
 
+    public function removeByDungeonMaster(DateTimeImmutable $when): void
+    {
+        if ($this->role === TableMemberRole::DUNGEON_MASTER) {
+            throw new TableMembershipException(
+                'The Dungeon Master cannot remove their own seat.'
+            );
+        }
+
+        $this->status = TableMemberStatus::LEFT;
+        $this->leftAt = $when;
+        $this->companionCharacterId = null;
+    }
+
     public function selectCompanionCharacter(
         string $characterId
     ): void {

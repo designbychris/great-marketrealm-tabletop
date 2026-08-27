@@ -81,7 +81,11 @@ final class TabletopChamber
             );
         }
 
-        $memberModels = $this->members->forTable($tableId);
+        $memberModels = array_values(array_filter(
+            $this->members->forTable($tableId),
+            static fn (TableMember $member): bool =>
+                $member->status() !== TableMemberStatus::LEFT
+        ));
         $projector = $this->identities !== null
             ? new TableMemberProjector($this->identities)
             : null;
