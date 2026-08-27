@@ -489,3 +489,13 @@ Lower-latency shared-state synchronisation, presence and reconnection foundation
 - [x] Add separate unexplored-to-memory boundary treatment
 - [x] Preserve Fog mechanics and persistence unchanged
 - [x] Respect reduced-motion preference
+
+### Phase IV.22A.1 — The Anchored Veil
+
+- [x] Persist rendered grid calibration reference width
+- [x] Translate visual grid pixels into intrinsic server map coordinates
+- [x] Scale Fog cells to each viewer's rendered battlefield
+- [x] Preserve Player Fog preview across End Turn reloads
+- [x] Prompt older Scenes for one Grid Save to establish their Fog anchor
+- [x] Remove stale DOWN HUD immediately after natural-20 death-save revival
+- [x] Synchronize stable/deceased death-save HUD states

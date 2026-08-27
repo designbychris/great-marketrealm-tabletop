@@ -263,6 +263,17 @@
         }
     }
 
+    const fogPreviewStorageKey = tableId
+        ? `gmrt-fog-preview:${tableId}`
+        : 'gmrt-fog-preview';
+
+    if (fogPreview) {
+        fogPreview.checked =
+            window.sessionStorage.getItem(
+                fogPreviewStorageKey
+            ) === '1';
+    }
+
     const renderFog = (projection = fogProjection) => {
         if (!fogLayer) return;
 
@@ -273,6 +284,15 @@
         const dmBypass = Boolean(fogProjection.bypass);
         const preview = Boolean(fogPreview && fogPreview.checked);
 
+        if (
+            enabled
+            && Number(fogProjection.reference_width || 0) < 1
+            && fogStatus
+        ) {
+            fogStatus.textContent =
+                'Save Grid once to anchor Fog of War to this battlemat.';
+        }
+
         if (!enabled || (dmBypass && !preview)) {
             fogLayer.hidden = true;
             return;
@@ -280,11 +300,48 @@
 
         fogLayer.hidden = false;
 
-        const size = Math.max(1, Number(fogProjection.grid_size || 1));
-        const offsetX = Number(fogProjection.offset_x || 0);
-        const offsetY = Number(fogProjection.offset_y || 0);
-        const width = Math.max(1, Number(fogProjection.width || 1));
-        const height = Math.max(1, Number(fogProjection.height || 1));
+        const referenceWidth = Math.max(
+            1,
+            Number(
+                fogProjection.reference_width
+                || fogLayer.parentElement?.clientWidth
+                || 1
+            )
+        );
+        const displayWidth = Math.max(
+            1,
+            Number(
+                fogLayer.parentElement?.clientWidth
+                || referenceWidth
+            )
+        );
+        const displayScale =
+            displayWidth / referenceWidth;
+
+        const size = Math.max(
+            1,
+            Number(fogProjection.grid_size || 1)
+            * displayScale
+        );
+        const offsetX =
+            Number(fogProjection.offset_x || 0)
+            * displayScale;
+        const offsetY =
+            Number(fogProjection.offset_y || 0)
+            * displayScale;
+
+        const nativeWidth = Math.max(
+            1,
+            Number(fogProjection.width || 1)
+        );
+        const nativeHeight = Math.max(
+            1,
+            Number(fogProjection.height || 1)
+        );
+        const width = displayWidth;
+        const height =
+            nativeHeight
+            * (displayWidth / nativeWidth);
         const explored = new Set(fogProjection.explored || []);
         const visible = new Set(fogProjection.visible || []);
 
@@ -348,6 +405,10 @@
     renderFog();
 
     fogPreview?.addEventListener('change', () => {
+        window.sessionStorage.setItem(
+            fogPreviewStorageKey,
+            fogPreview.checked ? '1' : '0'
+        );
         renderFog();
     });
 
@@ -462,7 +523,16 @@
                     grid_offset_x: gridOffsetX.value,
                     grid_offset_y: gridOffsetY.value,
                     grid_opacity: gridOpacity.value,
-                    grid_visible: gridVisible.checked ? '1' : '0'
+                    grid_visible: gridVisible.checked ? '1' : '0',
+                    grid_reference_width: String(
+                        Math.max(
+                            1,
+                            Math.round(
+                                gridViewport?.clientWidth
+                                || 1
+                            )
+                        )
+                    )
                 });
 
                 const saved = data.grid || {};
@@ -472,6 +542,14 @@
                 gridOffsetY.value = String(saved.offset_y ?? gridOffsetY.value);
                 gridOpacity.value = String(saved.opacity ?? gridOpacity.value);
                 gridVisible.checked = Boolean(saved.visible);
+
+                if (
+                    gridViewport
+                    && saved.reference_width
+                ) {
+                    gridViewport.dataset.gridReferenceWidth =
+                        String(saved.reference_width);
+                }
 
                 if (originalGrid) {
                     originalGrid.size = gridSize.value;
@@ -1357,6 +1435,51 @@
         }
     }
 
+    const syncDeathSaveHud = (data) => {
+        const panel = document.querySelector(
+            '[data-death-saves]'
+        );
+
+        if (!panel || !data) {
+            return;
+        }
+
+        const vitality = data.vitality || {};
+        const saves = data.death_saves || {};
+
+        if (Number(vitality.current_hp || 0) > 0) {
+            panel.remove();
+            return;
+        }
+
+        const heading = panel.querySelector('strong');
+        const details = panel.querySelector('span');
+        const rollButton = panel.querySelector(
+            '[data-roll-death-save]'
+        );
+
+        if (saves.dead) {
+            if (heading) heading.textContent = 'DECEASED';
+            if (details) details.textContent = 'Death confirmed';
+            if (rollButton) rollButton.remove();
+            return;
+        }
+
+        if (saves.stable) {
+            if (heading) heading.textContent = 'DOWN';
+            if (details) details.textContent = 'Stable';
+            if (rollButton) rollButton.remove();
+            return;
+        }
+
+        if (heading) heading.textContent = 'DOWN';
+        if (details) {
+            details.textContent =
+                `Saves ${Number(saves.successes || 0)}/3`
+                + ` · Failures ${Number(saves.failures || 0)}/3`;
+        }
+    };
+
     const deathSaveButton = document.querySelector(
         '[data-roll-death-save]'
     );
@@ -1392,6 +1515,7 @@
                 }
 
                 say(message);
+                syncDeathSaveHud(data);
                 await refresh();
             } catch (error) {
                 say(

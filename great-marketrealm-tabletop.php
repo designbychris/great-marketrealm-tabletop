@@ -3,7 +3,7 @@
  * Plugin Name: Great Marketrealm Tabletop
  * Plugin URI:  https://greatmarketrealm.co.uk/
  * Description: The live virtual tabletop for adventures across The Great Marketrealm.
- * Version:     0.22.1-alpha.1
+ * Version:     0.22.1-alpha.2
  * Author:      Great Marketrealm
  * Text Domain: great-marketrealm-tabletop
  * Requires PHP: 8.1
@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 defined('ABSPATH') || exit;
 
-define('GMRT_VERSION', '0.22.1-alpha.1');
+define('GMRT_VERSION', '0.22.1-alpha.2');
 define('GMRT_FILE', __FILE__);
 define('GMRT_PATH', plugin_dir_path(__FILE__));
 define('GMRT_URL', plugin_dir_url(__FILE__));

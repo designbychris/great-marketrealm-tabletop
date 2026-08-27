@@ -66,15 +66,26 @@ final class FogCellMapper
     ): array {
         $pixelX = $x * $scene->width();
         $pixelY = $y * $scene->height();
-        $size = max(1, $scene->gridSize());
+
+        $referenceWidth = $scene->gridReferenceWidth();
+        $scale = $referenceWidth > 0
+            ? $scene->width() / $referenceWidth
+            : 1.0;
+
+        $size = max(
+            1.0,
+            $scene->gridSize() * $scale
+        );
+        $offsetX = $scene->gridOffsetX() * $scale;
+        $offsetY = $scene->gridOffsetY() * $scale;
 
         return [
             'column' => (int) floor(
-                ($pixelX - $scene->gridOffsetX())
+                ($pixelX - $offsetX)
                 / $size
             ),
             'row' => (int) floor(
-                ($pixelY - $scene->gridOffsetY())
+                ($pixelY - $offsetY)
                 / $size
             ),
         ];

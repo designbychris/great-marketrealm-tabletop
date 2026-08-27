@@ -555,6 +555,12 @@ $sceneImage = $scene !== null
                     data-grid-type="<?php echo esc_attr(
                         (string) $scene['grid_type']
                     ); ?>"
+                    data-grid-reference-width="<?php echo esc_attr(
+                        (string) ((int) (
+                            $scene['grid_reference_width']
+                            ?? 0
+                        ))
+                    ); ?>"
                     style="--gmrt-grid-size: <?php echo esc_attr(
                         (string) max(
                             1,

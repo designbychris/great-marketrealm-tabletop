@@ -74,7 +74,8 @@ final class CartographersTable
         int $offsetX,
         int $offsetY,
         int $opacity,
-        bool $visible
+        bool $visible,
+        int $referenceWidth
     ): array {
         $member = $this->members->find($tableId, $viewerUserId);
 
@@ -107,7 +108,8 @@ final class CartographersTable
             $offsetX,
             $offsetY,
             $opacity,
-            $visible
+            $visible,
+            $referenceWidth
         );
         $this->scenes->save($scene);
 
@@ -117,6 +119,7 @@ final class CartographersTable
             'offset_y' => $scene->gridOffsetY(),
             'opacity' => $scene->gridOpacity(),
             'visible' => $scene->gridVisible(),
+            'reference_width' => $scene->gridReferenceWidth(),
         ];
     }
 

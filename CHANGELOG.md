@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.22.1-alpha.2] - 2026-08-27
+
+### Fixed
+
+- Phase IV.22A.1 — The Anchored Veil.
+- Anchored Fog of War calculations to the rendered browser width used when the DM saved grid calibration, fixing fully-black Player Fog caused by mixing display pixels with the battlemat's intrinsic image dimensions.
+- Scaled Fog presentation to each viewer's rendered battlefield while preserving server-side native-map visibility calculations.
+- Preserved Dungeon Master Player Fog preview across End Turn/page reloads using session-scoped presentation state.
+- Added a visible one-time prompt to Save Grid when an older Scene has no Fog calibration anchor.
+- Synchronized the death-save HUD from authoritative results so a natural 20 recovery to 1 HP immediately removes the stale DOWN panel; stable/deceased results also update in place.
+
+
 ## [0.22.1-alpha.1] - 2026-08-27
 
 ### Added

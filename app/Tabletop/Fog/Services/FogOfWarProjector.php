@@ -48,6 +48,7 @@ final class FogOfWarProjector
             'grid_size' => $scene->gridSize(),
             'offset_x' => $scene->gridOffsetX(),
             'offset_y' => $scene->gridOffsetY(),
+            'reference_width' => $scene->gridReferenceWidth(),
             'width' => $scene->width(),
             'height' => $scene->height(),
             'explored' => array_values(array_unique(

@@ -24,6 +24,7 @@ final class TableScene
         private int $gridOffsetY,
         private int $gridOpacity,
         private bool $gridVisible,
+        private int $gridReferenceWidth,
         private bool $active,
         private DateTimeImmutable $createdAt
     ) {}
@@ -57,6 +58,7 @@ final class TableScene
             0,
             13,
             true,
+            0,
             false,
             $createdAt
         );
@@ -84,7 +86,11 @@ final class TableScene
             (int) ($record['grid_opacity'] ?? 13),
             array_key_exists('grid_visible', $record)
                 ? (bool) $record['grid_visible']
-                : true
+                : true,
+            max(
+                0,
+                (int) ($record['grid_reference_width'] ?? 0)
+            )
         );
 
         if (! empty($record['active'])) {
@@ -118,7 +124,8 @@ final class TableScene
         int $offsetX,
         int $offsetY,
         int $opacity,
-        bool $visible
+        bool $visible,
+        int $referenceWidth = 0
     ): void {
         self::assertGrid($this->gridType, $size);
 
@@ -133,6 +140,10 @@ final class TableScene
         $this->gridOffsetY = $offsetY;
         $this->gridOpacity = $opacity;
         $this->gridVisible = $visible;
+        $this->gridReferenceWidth = max(
+            0,
+            $referenceWidth
+        );
     }
 
     public function id(): string { return $this->id; }
@@ -147,6 +158,7 @@ final class TableScene
     public function gridOffsetY(): int { return $this->gridOffsetY; }
     public function gridOpacity(): int { return $this->gridOpacity; }
     public function gridVisible(): bool { return $this->gridVisible; }
+    public function gridReferenceWidth(): int { return $this->gridReferenceWidth; }
     public function isActive(): bool { return $this->active; }
     public function createdAt(): DateTimeImmutable { return $this->createdAt; }
 
@@ -182,6 +194,7 @@ final class TableScene
             'grid_offset_y' => $this->gridOffsetY,
             'grid_opacity' => $this->gridOpacity,
             'grid_visible' => $this->gridVisible,
+            'grid_reference_width' => $this->gridReferenceWidth,
             'active' => $this->active,
             'created_at' => $this->createdAt->format(DATE_ATOM),
         ];

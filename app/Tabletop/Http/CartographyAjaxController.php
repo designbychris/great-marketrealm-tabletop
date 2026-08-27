@@ -72,6 +72,13 @@ final class CartographyAjaxController
                 filter_var(
                     $_POST['grid_visible'] ?? false,
                     FILTER_VALIDATE_BOOLEAN
+                ),
+                max(
+                    1,
+                    absint(
+                        $_POST['grid_reference_width']
+                        ?? 1
+                    )
                 )
             );
 
