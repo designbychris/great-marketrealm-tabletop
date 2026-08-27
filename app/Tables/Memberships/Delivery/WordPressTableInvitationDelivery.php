@@ -62,8 +62,8 @@ final class WordPressTableInvitationDelivery
         $query = '?gmrt_tabletop=1&gmrt_table=' . rawurlencode($tableId);
 
         return function_exists('home_url')
-            ? (string) home_url('/' . $query)
-            : '/' . $query;
+            ? (string) home_url('/tabletop/' . $query)
+            : '/tabletop/' . $query;
     }
 
     private function sendEmail(

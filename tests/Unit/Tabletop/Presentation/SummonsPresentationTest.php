@@ -46,6 +46,8 @@ final class SummonsPresentationTest extends TestCase
     {
         $delivery = (string) file_get_contents($this->root . '/app/Tables/Memberships/Delivery/WordPressTableInvitationDelivery.php');
         self::assertStringContainsString('Sign in to the Marketrealm Companion', $delivery);
+        self::assertStringContainsString("home_url('/tabletop/' . \$query)", $delivery);
+        self::assertStringContainsString("'/tabletop/' . \$query", $delivery);
         self::assertStringContainsString('?gmrt_tabletop=1&gmrt_table=', $delivery);
     }
 
