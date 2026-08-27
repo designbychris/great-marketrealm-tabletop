@@ -85,6 +85,106 @@
     const arsenalAttack = document.querySelector(
         '[data-arsenal-attack]'
     );
+    const lensStage = document.querySelector('[data-lens-stage]');
+    const lensViewport = document.querySelector('.gmrt-board__viewport');
+    const lensZoomOut = document.querySelector('[data-lens-zoom-out]');
+    const lensZoomIn = document.querySelector('[data-lens-zoom-in]');
+    const lensFit = document.querySelector('[data-lens-fit]');
+    const lensReset = document.querySelector('[data-lens-reset]');
+    const lensZoomLabel = document.querySelector('[data-lens-zoom]');
+
+    const lens = {
+        scale: 1, x: 0, y: 0,
+        min: .25, max: 3, step: .1,
+        dragging: false, pointerX: 0, pointerY: 0
+    };
+
+    const clampLensScale = (scale) =>
+        Math.max(lens.min, Math.min(lens.max, scale));
+
+    const renderLens = () => {
+        if (!lensViewport) return;
+        lensViewport.style.transform =
+            `translate(${lens.x}px, ${lens.y}px) scale(${lens.scale})`;
+        if (lensZoomLabel) {
+            const label = `${Math.round(lens.scale * 100)}%`;
+            lensZoomLabel.value = label;
+            lensZoomLabel.textContent = label;
+        }
+    };
+
+    const zoomLens = (delta) => {
+        if (!lensStage || !lensViewport) return;
+        const oldScale = lens.scale;
+        const nextScale = clampLensScale(oldScale + delta);
+        if (nextScale === oldScale) return;
+
+        const anchorX = lensStage.clientWidth / 2;
+        const anchorY = lensStage.clientHeight / 2;
+        const mapX = (anchorX - lens.x) / oldScale;
+        const mapY = (anchorY - lens.y) / oldScale;
+        lens.scale = nextScale;
+        lens.x = anchorX - (mapX * nextScale);
+        lens.y = anchorY - (mapY * nextScale);
+        renderLens();
+    };
+
+    const fitLens = () => {
+        if (!lensStage || !lensViewport) return;
+        const mapWidth = lensViewport.offsetWidth;
+        const mapHeight = lensViewport.offsetHeight;
+        if (!mapWidth || !mapHeight) return;
+        lens.scale = clampLensScale(Math.min(
+            lensStage.clientWidth / mapWidth,
+            lensStage.clientHeight / mapHeight
+        ));
+        lens.x = (lensStage.clientWidth - (mapWidth * lens.scale)) / 2;
+        lens.y = (lensStage.clientHeight - (mapHeight * lens.scale)) / 2;
+        renderLens();
+    };
+
+    const resetLens = () => {
+        lens.scale = 1;
+        lens.x = 0;
+        lens.y = 0;
+        renderLens();
+    };
+
+    lensZoomOut?.addEventListener('click', () => zoomLens(-lens.step));
+    lensZoomIn?.addEventListener('click', () => zoomLens(lens.step));
+    lensFit?.addEventListener('click', fitLens);
+    lensReset?.addEventListener('click', resetLens);
+
+    lensStage?.addEventListener('pointerdown', (event) => {
+        if (event.button !== 0 || lens.scale <= 1) return;
+        if (event.target.closest('button, input, select, a, [data-token-id]')) return;
+        lens.dragging = true;
+        lens.pointerX = event.clientX;
+        lens.pointerY = event.clientY;
+        lensStage.classList.add('is-panning');
+        lensStage.setPointerCapture(event.pointerId);
+    });
+
+    lensStage?.addEventListener('pointermove', (event) => {
+        if (!lens.dragging) return;
+        lens.x += event.clientX - lens.pointerX;
+        lens.y += event.clientY - lens.pointerY;
+        lens.pointerX = event.clientX;
+        lens.pointerY = event.clientY;
+        renderLens();
+    });
+
+    const stopLensPan = (event) => {
+        if (!lens.dragging) return;
+        lens.dragging = false;
+        lensStage?.classList.remove('is-panning');
+        if (lensStage?.hasPointerCapture(event.pointerId)) {
+            lensStage.releasePointerCapture(event.pointerId);
+        }
+    };
+    lensStage?.addEventListener('pointerup', stopLensPan);
+    lensStage?.addEventListener('pointercancel', stopLensPan);
+
     const gridViewport = document.querySelector('.gmrt-board__viewport');
     const gridSize = document.querySelector('[data-grid-size]');
     const gridOffsetX = document.querySelector('[data-grid-offset-x]');

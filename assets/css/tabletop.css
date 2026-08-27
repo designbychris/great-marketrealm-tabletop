@@ -1061,3 +1061,14 @@
 .gmrt-grid-calibrator button, .gmrt-grid-calibrator input[type=number] { border: 1px solid rgba(244,234,214,.35); border-radius: 7px; background: rgba(0,0,0,.3); color: inherit; padding: .38rem .5rem; }
 .gmrt-grid-calibrator__nudges { display: flex; gap: .25rem; }
 .gmrt-grid-calibrator__nudges button { min-width: 2rem; cursor: pointer; }
+
+
+/* Phase IV.21B — The Cartographer's Lens */
+.gmrt-cartographers-lens { display:flex; align-items:center; gap:.45rem; flex-wrap:wrap; margin:.45rem 0 .75rem; padding:.55rem .7rem; border:1px solid rgba(244,234,214,.2); border-radius:9px; }
+.gmrt-cartographers-lens__title { margin-right:.2rem; }
+.gmrt-cartographers-lens button { border:1px solid rgba(244,234,214,.35); border-radius:7px; background:rgba(0,0,0,.3); color:inherit; padding:.38rem .55rem; cursor:pointer; }
+.gmrt-cartographers-lens output { min-width:3.8rem; text-align:center; font:800 .75rem system-ui,sans-serif; }
+.gmrt-cartographers-lens__hint { opacity:.7; font-size:.72rem; }
+.gmrt-board__lens-stage { position:relative; overflow:hidden; width:100%; min-height:22rem; border-radius:inherit; touch-action:none; cursor:grab; }
+.gmrt-board__lens-stage.is-panning { cursor:grabbing; }
+.gmrt-board__lens-stage .gmrt-board__viewport { transform-origin:0 0; will-change:transform; }

@@ -444,3 +444,12 @@ Lower-latency shared-state synchronisation, presence and reconnection foundation
 - [x] Resettable preview before save
 - [x] Persistent DM-authoritative Scene calibration
 - [x] Backwards-compatible defaults for existing Scenes
+
+### Phase IV.21B — The Cartographer's Lens
+
+- [x] Zoom battlefield in/out
+- [x] Fit battlemat to chamber viewport
+- [x] Reset to 100% view
+- [x] Drag-to-pan while zoomed
+- [x] Transform map, grid and tokens together
+- [x] Keep lens state independent from combat persistence

@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.21.2-alpha.1] - 2026-08-27
+
+### Added
+
+- Phase IV.21B — The Cartographer's Lens.
+- Battlefield zoom from 25% to 300%, Fit Map, Reset View and drag-to-pan.
+- A single transformed battlefield coordinate-space so artwork, calibrated grid and tokens remain locked together.
+- Presentation-only lens state that never mutates Scene, token, movement or grid calibration data.
+
+
 ## [0.21.1-alpha.1] - 2026-08-27
 
 ### Added

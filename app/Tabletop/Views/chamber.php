@@ -455,6 +455,16 @@ $sceneImage = $scene !== null
                     </div>
                 </div>
 
+                <div class="gmrt-cartographers-lens" data-cartographers-lens>
+                    <strong class="gmrt-cartographers-lens__title">Cartographer's Lens</strong>
+                    <button type="button" data-lens-zoom-out aria-label="Zoom battlefield out">−</button>
+                    <output data-lens-zoom aria-live="polite">100%</output>
+                    <button type="button" data-lens-zoom-in aria-label="Zoom battlefield in">+</button>
+                    <button type="button" data-lens-fit>Fit Map</button>
+                    <button type="button" data-lens-reset>Reset View</button>
+                    <span class="gmrt-cartographers-lens__hint">Drag the map to pan while zoomed.</span>
+                </div>
+
                 <?php if (
                     $state->isDungeonMaster()
                     && ($scene['grid_type'] ?? '') === 'square'
@@ -515,6 +525,7 @@ $sceneImage = $scene !== null
                     </p>
                 <?php endif; ?>
 
+                <div class="gmrt-board__lens-stage" data-lens-stage>
                 <div
                     class="gmrt-board__viewport"
                     data-grid-type="<?php echo esc_attr(
@@ -737,6 +748,7 @@ $sceneImage = $scene !== null
                             </div>
                         <?php endforeach; ?>
                     </div>
+                </div>
                 </div>
             </section>
 
