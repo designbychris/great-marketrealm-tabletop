@@ -432,4 +432,15 @@ Lower-latency shared-state synchronisation, presence and reconnection foundation
 - [x] Live battlemap refresh after successful save
 - [x] Active Dungeon Master authorization and nonce protection
 - [x] Existing bundled Training Yard remains a valid fallback/current map
-- [ ] Grid scale/offset calibration — Phase IV.21A
+- [x] Grid scale/offset calibration — Phase IV.21A
+
+
+### Phase IV.21A — The Cartographer's Grid
+
+- [x] Live square-size calibration
+- [x] X/Y visual grid offsets
+- [x] Grid opacity and visibility
+- [x] One-pixel nudge controls
+- [x] Resettable preview before save
+- [x] Persistent DM-authoritative Scene calibration
+- [x] Backwards-compatible defaults for existing Scenes

@@ -455,6 +455,54 @@ $sceneImage = $scene !== null
                     </div>
                 </div>
 
+                <?php if (
+                    $state->isDungeonMaster()
+                    && ($scene['grid_type'] ?? '') === 'square'
+                ) : ?>
+                    <details class="gmrt-grid-calibrator" data-grid-calibrator>
+                        <summary>Calibrate Grid</summary>
+                        <div class="gmrt-grid-calibrator__controls">
+                            <label>
+                                Square
+                                <input type="number" min="8" max="512" step="1"
+                                    value="<?php echo esc_attr((string) ($scene['grid_size'] ?? 64)); ?>"
+                                    data-grid-size> px
+                            </label>
+                            <label>
+                                X offset
+                                <input type="number" step="1"
+                                    value="<?php echo esc_attr((string) ($scene['grid_offset_x'] ?? 0)); ?>"
+                                    data-grid-offset-x> px
+                            </label>
+                            <label>
+                                Y offset
+                                <input type="number" step="1"
+                                    value="<?php echo esc_attr((string) ($scene['grid_offset_y'] ?? 0)); ?>"
+                                    data-grid-offset-y> px
+                            </label>
+                            <label>
+                                Opacity
+                                <input type="range" min="0" max="100" step="1"
+                                    value="<?php echo esc_attr((string) ($scene['grid_opacity'] ?? 13)); ?>"
+                                    data-grid-opacity>
+                            </label>
+                            <label class="gmrt-grid-calibrator__visible">
+                                <input type="checkbox" data-grid-visible
+                                    <?php checked((bool) ($scene['grid_visible'] ?? true)); ?>>
+                                Show grid
+                            </label>
+                            <div class="gmrt-grid-calibrator__nudges" aria-label="Grid nudge controls">
+                                <button type="button" data-grid-nudge="0,-1" aria-label="Nudge grid up">↑</button>
+                                <button type="button" data-grid-nudge="-1,0" aria-label="Nudge grid left">←</button>
+                                <button type="button" data-grid-nudge="1,0" aria-label="Nudge grid right">→</button>
+                                <button type="button" data-grid-nudge="0,1" aria-label="Nudge grid down">↓</button>
+                            </div>
+                            <button type="button" data-save-grid>Save Grid</button>
+                            <button type="button" data-reset-grid>Reset Preview</button>
+                        </div>
+                    </details>
+                <?php endif; ?>
+
                 <?php if ($state->isDungeonMaster()) : ?>
                     <p
                         class="gmrt-cartographer-status"
@@ -480,7 +528,7 @@ $sceneImage = $scene !== null
                                 ?? 1
                             )
                         )
-                    ); ?>px;"
+                    ); ?>px; --gmrt-grid-offset-x: <?php echo esc_attr((string) ((int) ($scene['grid_offset_x'] ?? 0))); ?>px; --gmrt-grid-offset-y: <?php echo esc_attr((string) ((int) ($scene['grid_offset_y'] ?? 0))); ?>px; --gmrt-grid-opacity: <?php echo esc_attr((string) ((int) ($scene['grid_opacity'] ?? 13) / 100)); ?>; --gmrt-grid-display: <?php echo ! array_key_exists('grid_visible', $scene) || ! empty($scene['grid_visible']) ? 'block' : 'none'; ?>;"
                 >
                     <?php if ($sceneImage !== false) : ?>
                         <img

@@ -85,6 +85,73 @@
     const arsenalAttack = document.querySelector(
         '[data-arsenal-attack]'
     );
+    const gridViewport = document.querySelector('.gmrt-board__viewport');
+    const gridSize = document.querySelector('[data-grid-size]');
+    const gridOffsetX = document.querySelector('[data-grid-offset-x]');
+    const gridOffsetY = document.querySelector('[data-grid-offset-y]');
+    const gridOpacity = document.querySelector('[data-grid-opacity]');
+    const gridVisible = document.querySelector('[data-grid-visible]');
+    const saveGrid = document.querySelector('[data-save-grid]');
+    const resetGrid = document.querySelector('[data-reset-grid]');
+
+    const originalGrid = gridSize ? {
+        size: gridSize.value,
+        x: gridOffsetX.value,
+        y: gridOffsetY.value,
+        opacity: gridOpacity.value,
+        visible: gridVisible.checked
+    } : null;
+
+    const previewGrid = () => {
+        if (!gridViewport || !gridSize) return;
+        gridViewport.style.setProperty('--gmrt-grid-size', `${Math.max(1, Number(gridSize.value || 1))}px`);
+        gridViewport.style.setProperty('--gmrt-grid-offset-x', `${Number(gridOffsetX.value || 0)}px`);
+        gridViewport.style.setProperty('--gmrt-grid-offset-y', `${Number(gridOffsetY.value || 0)}px`);
+        gridViewport.style.setProperty('--gmrt-grid-opacity', String(Math.max(0, Math.min(100, Number(gridOpacity.value || 0))) / 100));
+        gridViewport.style.setProperty('--gmrt-grid-display', gridVisible.checked ? 'block' : 'none');
+    };
+
+    [gridSize, gridOffsetX, gridOffsetY, gridOpacity, gridVisible]
+        .filter(Boolean)
+        .forEach((control) => control.addEventListener('input', previewGrid));
+
+    document.querySelectorAll('[data-grid-nudge]').forEach((button) => {
+        button.addEventListener('click', () => {
+            const parts = String(button.dataset.gridNudge || '0,0').split(',').map(Number);
+            gridOffsetX.value = String(Number(gridOffsetX.value || 0) + parts[0]);
+            gridOffsetY.value = String(Number(gridOffsetY.value || 0) + parts[1]);
+            previewGrid();
+        });
+    });
+
+    if (resetGrid && originalGrid) {
+        resetGrid.addEventListener('click', () => {
+            gridSize.value = originalGrid.size;
+            gridOffsetX.value = originalGrid.x;
+            gridOffsetY.value = originalGrid.y;
+            gridOpacity.value = originalGrid.opacity;
+            gridVisible.checked = originalGrid.visible;
+            previewGrid();
+        });
+    }
+
+    if (saveGrid) {
+        saveGrid.addEventListener('click', async () => {
+            try {
+                await request('gmrt_calibrate_grid', {
+                    grid_size: gridSize.value,
+                    grid_offset_x: gridOffsetX.value,
+                    grid_offset_y: gridOffsetY.value,
+                    grid_opacity: gridOpacity.value,
+                    grid_visible: gridVisible.checked ? '1' : ''
+                });
+                say('Grid calibration saved.');
+            } catch (error) {
+                say(error.message || 'Grid calibration could not be saved.');
+            }
+        });
+    }
+
     const chooseBattlemap = document.querySelector(
         '[data-choose-battlemap]'
     );

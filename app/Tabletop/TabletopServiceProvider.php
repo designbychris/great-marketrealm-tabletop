@@ -188,5 +188,10 @@ final class TabletopServiceProvider
             'wp_ajax_gmrt_replace_battlemap',
             [$this->cartographyAjax, 'replaceBattlemap']
         );
+
+        add_action(
+            'wp_ajax_gmrt_calibrate_grid',
+            [$this->cartographyAjax, 'calibrateGrid']
+        );
     }
 }

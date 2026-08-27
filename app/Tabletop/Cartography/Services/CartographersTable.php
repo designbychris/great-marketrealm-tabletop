@@ -66,4 +66,58 @@ final class CartographersTable
 
         return $image;
     }
+    /** @return array<string,mixed> */
+    public function calibrateActiveGrid(
+        string $tableId,
+        int $viewerUserId,
+        int $size,
+        int $offsetX,
+        int $offsetY,
+        int $opacity,
+        bool $visible
+    ): array {
+        $member = $this->members->find($tableId, $viewerUserId);
+
+        if (
+            $member === null
+            || $member->status() !== TableMemberStatus::ACTIVE
+            || $member->role() !== TableMemberRole::DUNGEON_MASTER
+        ) {
+            throw new CartographyDenied(
+                'Only the Dungeon Master may calibrate the active grid.'
+            );
+        }
+
+        $scene = null;
+        foreach ($this->scenes->forTable($tableId) as $candidate) {
+            if ($candidate->isActive()) {
+                $scene = $candidate;
+                break;
+            }
+        }
+
+        if ($scene === null) {
+            throw new CartographyDenied(
+                'Open a Scene before calibrating its grid.'
+            );
+        }
+
+        $scene->calibrateGrid(
+            $size,
+            $offsetX,
+            $offsetY,
+            $opacity,
+            $visible
+        );
+        $this->scenes->save($scene);
+
+        return [
+            'size' => $scene->gridSize(),
+            'offset_x' => $scene->gridOffsetX(),
+            'offset_y' => $scene->gridOffsetY(),
+            'opacity' => $scene->gridOpacity(),
+            'visible' => $scene->gridVisible(),
+        ];
+    }
+
 }

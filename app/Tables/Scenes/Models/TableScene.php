@@ -20,6 +20,10 @@ final class TableScene
         private int $height,
         private string $gridType,
         private int $gridSize,
+        private int $gridOffsetX,
+        private int $gridOffsetY,
+        private int $gridOpacity,
+        private bool $gridVisible,
         private bool $active,
         private DateTimeImmutable $createdAt
     ) {}
@@ -49,6 +53,10 @@ final class TableScene
             $height,
             $gridType,
             $gridSize,
+            0,
+            0,
+            13,
+            true,
             false,
             $createdAt
         );
@@ -67,6 +75,16 @@ final class TableScene
             (string) ($record['grid_type'] ?? ''),
             (int) ($record['grid_size'] ?? 0),
             new DateTimeImmutable((string) ($record['created_at'] ?? 'now'))
+        );
+
+        $scene->calibrateGrid(
+            (int) ($record['grid_size'] ?? $scene->gridSize()),
+            (int) ($record['grid_offset_x'] ?? 0),
+            (int) ($record['grid_offset_y'] ?? 0),
+            (int) ($record['grid_opacity'] ?? 13),
+            array_key_exists('grid_visible', $record)
+                ? (bool) $record['grid_visible']
+                : true
         );
 
         if (! empty($record['active'])) {
@@ -95,6 +113,28 @@ final class TableScene
         $this->height = $height;
     }
 
+    public function calibrateGrid(
+        int $size,
+        int $offsetX,
+        int $offsetY,
+        int $opacity,
+        bool $visible
+    ): void {
+        self::assertGrid($this->gridType, $size);
+
+        if ($opacity < 0 || $opacity > 100) {
+            throw new InvalidArgumentException(
+                'Grid opacity must be between 0 and 100.'
+            );
+        }
+
+        $this->gridSize = $size;
+        $this->gridOffsetX = $offsetX;
+        $this->gridOffsetY = $offsetY;
+        $this->gridOpacity = $opacity;
+        $this->gridVisible = $visible;
+    }
+
     public function id(): string { return $this->id; }
     public function tableId(): string { return $this->tableId; }
     public function name(): string { return $this->name; }
@@ -103,6 +143,10 @@ final class TableScene
     public function height(): int { return $this->height; }
     public function gridType(): string { return $this->gridType; }
     public function gridSize(): int { return $this->gridSize; }
+    public function gridOffsetX(): int { return $this->gridOffsetX; }
+    public function gridOffsetY(): int { return $this->gridOffsetY; }
+    public function gridOpacity(): int { return $this->gridOpacity; }
+    public function gridVisible(): bool { return $this->gridVisible; }
     public function isActive(): bool { return $this->active; }
     public function createdAt(): DateTimeImmutable { return $this->createdAt; }
 
@@ -134,6 +178,10 @@ final class TableScene
             'height' => $this->height,
             'grid_type' => $this->gridType,
             'grid_size' => $this->gridSize,
+            'grid_offset_x' => $this->gridOffsetX,
+            'grid_offset_y' => $this->gridOffsetY,
+            'grid_opacity' => $this->gridOpacity,
+            'grid_visible' => $this->gridVisible,
             'active' => $this->active,
             'created_at' => $this->createdAt->format(DATE_ATOM),
         ];

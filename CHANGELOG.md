@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.21.1-alpha.1] - 2026-08-27
+
+### Added
+
+- Phase IV.21A — The Cartographer's Grid.
+- Live DM grid scale, X/Y offset, opacity and visibility calibration.
+- One-pixel directional grid nudging and resettable live preview.
+- Persistent Scene grid calibration with backwards-compatible defaults.
+- Server-authoritative active-DM grid saving with the Tabletop nonce.
+
+
 ## [0.21.0-alpha.1] - 2026-08-27
 
 ### Added
