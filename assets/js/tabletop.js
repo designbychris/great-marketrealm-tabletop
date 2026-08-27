@@ -344,6 +344,50 @@
             * (displayWidth / nativeWidth);
         const explored = new Set(fogProjection.explored || []);
         const visible = new Set(fogProjection.visible || []);
+        const visionOrigins = Array.isArray(fogProjection.vision_origins)
+            ? fogProjection.vision_origins
+            : [];
+        const visionRadius = Math.max(
+            0,
+            Number(fogProjection.vision_radius || 0)
+        );
+
+        // The server remains authoritative for which tokens may be exposed.
+        // Vision origins are the same CHARACTER sight sources used by the
+        // server projector, supplied so the visual veil can anchor itself to
+        // the actually rendered battlefield even when responsive scaling
+        // differs slightly from the saved calibration width.
+        visionOrigins.forEach((origin) => {
+            const x = Math.max(0, Math.min(1, Number(origin.x || 0)));
+            const y = Math.max(0, Math.min(1, Number(origin.y || 0)));
+            const centerColumn = Math.floor(
+                ((x * width) - offsetX) / size
+            );
+            const centerRow = Math.floor(
+                ((y * height) - offsetY) / size
+            );
+
+            for (
+                let row = centerRow - visionRadius;
+                row <= centerRow + visionRadius;
+                row += 1
+            ) {
+                for (
+                    let column = centerColumn - visionRadius;
+                    column <= centerColumn + visionRadius;
+                    column += 1
+                ) {
+                    if (
+                        Math.max(
+                            Math.abs(column - centerColumn),
+                            Math.abs(row - centerRow)
+                        ) <= visionRadius
+                    ) {
+                        visible.add(`${column}:${row}`);
+                    }
+                }
+            }
+        });
 
         const minColumn = Math.floor((0 - offsetX) / size);
         const maxColumn = Math.ceil((width - offsetX) / size);
@@ -1063,6 +1107,95 @@
 
     document.querySelectorAll('.gmrt-token').forEach((token) => {
         token.setAttribute('aria-pressed', 'false');
+
+        const tokenDrag = {
+            active: false,
+            moved: false,
+            pointerId: null,
+            startX: 0,
+            startY: 0,
+            threshold: 3
+        };
+
+        token.addEventListener('pointerdown', (event) => {
+            if (event.button !== 0) return;
+
+            event.stopPropagation();
+            select(token);
+            tokenDrag.active = true;
+            tokenDrag.moved = false;
+            tokenDrag.pointerId = event.pointerId;
+            tokenDrag.startX = event.clientX;
+            tokenDrag.startY = event.clientY;
+            token.setPointerCapture(event.pointerId);
+        });
+
+        token.addEventListener('pointermove', (event) => {
+            if (
+                !tokenDrag.active
+                || event.pointerId !== tokenDrag.pointerId
+            ) {
+                return;
+            }
+
+            const dx = event.clientX - tokenDrag.startX;
+            const dy = event.clientY - tokenDrag.startY;
+
+            if (
+                !tokenDrag.moved
+                && Math.hypot(dx, dy) < tokenDrag.threshold
+            ) {
+                return;
+            }
+
+            tokenDrag.moved = true;
+            token.classList.add('is-dragging');
+            event.preventDefault();
+            event.stopPropagation();
+
+            const point = coordinatesFromPointer(event);
+            token.style.setProperty(
+                '--gmrt-token-x',
+                (point.x * 100) + '%'
+            );
+            token.style.setProperty(
+                '--gmrt-token-y',
+                (point.y * 100) + '%'
+            );
+        });
+
+        const finishTokenDrag = (event) => {
+            if (
+                !tokenDrag.active
+                || event.pointerId !== tokenDrag.pointerId
+            ) {
+                return;
+            }
+
+            const moved = tokenDrag.moved;
+            tokenDrag.active = false;
+            tokenDrag.moved = false;
+            token.classList.remove('is-dragging');
+
+            if (
+                tokenDrag.pointerId !== null
+                && token.hasPointerCapture(tokenDrag.pointerId)
+            ) {
+                token.releasePointerCapture(tokenDrag.pointerId);
+            }
+
+            tokenDrag.pointerId = null;
+
+            if (moved) {
+                event.preventDefault();
+                event.stopPropagation();
+                const point = coordinatesFromPointer(event);
+                moveSelected(point.x, point.y);
+            }
+        };
+
+        token.addEventListener('pointerup', finishTokenDrag);
+        token.addEventListener('pointercancel', finishTokenDrag);
 
         token.addEventListener('click', (event) => {
             event.stopPropagation();

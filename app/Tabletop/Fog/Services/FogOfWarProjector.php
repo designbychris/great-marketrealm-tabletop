@@ -23,6 +23,7 @@ final class FogOfWarProjector
         bool $dungeonMaster
     ): array {
         $visible = [];
+        $visionOrigins = [];
 
         foreach ($tokens as $token) {
             if (
@@ -31,6 +32,11 @@ final class FogOfWarProjector
             ) {
                 continue;
             }
+
+            $visionOrigins[] = [
+                'x' => $token->x(),
+                'y' => $token->y(),
+            ];
 
             $visible = array_merge(
                 $visible,
@@ -57,6 +63,7 @@ final class FogOfWarProjector
             'visible' => array_values(array_unique(
                 $visible
             )),
+            'vision_origins' => $visionOrigins,
         ];
     }
 

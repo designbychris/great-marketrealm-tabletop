@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.22.1-alpha.4 — Phase IV.22A.2: The Veil Takes Hold
+
+- Added true pointer-captured token dragging with live grab feedback while preserving server-validated movement on release.
+- Kept token presentation above the visual fog layer; player token exposure remains server-filtered.
+- Added server-projected character vision origins so the Living Veil stays anchored to the rendered battlefield under responsive/grid scaling.
+- Added regression coverage for drag ownership, fog stacking, and rendered vision anchoring.
+
 ## [0.22.1-alpha.3] - 2026-08-27
 
 ### Fixed

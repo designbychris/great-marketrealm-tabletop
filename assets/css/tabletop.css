@@ -260,7 +260,15 @@
 
 .gmrt-token[role="button"] {
     pointer-events: auto;
-    cursor: pointer;
+    cursor: grab;
+    touch-action: none;
+}
+
+.gmrt-token.is-dragging {
+    cursor: grabbing;
+    z-index: 2;
+    transform: translate(-50%, -50%) scale(1.08);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, .65);
 }
 
 .gmrt-token:focus-visible,
@@ -531,7 +539,7 @@
 }
 
 .gmrt-board__tokens {
-    z-index: 4;
+    z-index: 9;
 }
 
 .gmrt-target-line {

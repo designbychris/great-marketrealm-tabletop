@@ -503,3 +503,5 @@ Lower-latency shared-state synchronisation, presence and reconnection foundation
 - [x] Prompt older Scenes for one Grid Save to establish their Fog anchor
 - [x] Remove stale DOWN HUD immediately after natural-20 death-save revival
 - [x] Synchronize stable/deceased death-save HUD states
+
+- **Phase IV.22A.1 — The Veil Remembers (browser corrective pass)** — corrective browser pass for true token dragging and resilient rendered vision anchoring.
