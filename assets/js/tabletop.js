@@ -505,10 +505,13 @@
     const visionStatus = document.querySelector('[data-vision-status]');
     const visionRoster = document.querySelector('[data-vision-roster]');
     const visionCancel = document.querySelector('[data-vision-cancel]');
+    const visionUndo = document.querySelector('[data-vision-undo]');
     const visionTools = Array.from(document.querySelectorAll('[data-vision-tool]'));
     let visionBarriers = [];
     let visionTool = null;
     let visionStart = null;
+    let selectedVisionBarrier = null;
+    let visionPreview = null;
 
     if (visionLayer) {
         try {
@@ -558,11 +561,27 @@
             line.setAttribute('x2', String(end.x));
             line.setAttribute('y2', String(end.y));
             line.classList.add('gmrt-vision-barrier', `is-${barrier.type}`);
+            line.dataset.visionBarrier = String(barrier.id);
+            if (String(barrier.id) === String(selectedVisionBarrier)) {
+                line.classList.add('is-selected');
+            }
             if (barrier.type === 'door' && barrier.open) {
                 line.classList.add('is-open');
             }
             fragment.append(line);
         });
+
+        if (visionPreview) {
+            const start = barrierPoint(visionPreview.x1, visionPreview.y1);
+            const end = barrierPoint(visionPreview.x2, visionPreview.y2);
+            const preview = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            preview.setAttribute('x1', String(start.x));
+            preview.setAttribute('y1', String(start.y));
+            preview.setAttribute('x2', String(end.x));
+            preview.setAttribute('y2', String(end.y));
+            preview.classList.add('gmrt-vision-barrier', 'is-preview', `is-${visionTool || 'wall'}`);
+            fragment.append(preview);
+        }
 
         visionLayer.append(fragment);
 
@@ -571,6 +590,8 @@
             visionBarriers.forEach((barrier, index) => {
                 const item = document.createElement('span');
                 item.className = 'gmrt-vision-roster__item';
+                item.dataset.visionSelect = String(barrier.id);
+                item.classList.toggle('is-selected', String(barrier.id) === String(selectedVisionBarrier));
                 const label = document.createElement('span');
                 label.textContent = barrier.type === 'door'
                     ? `Door ${index + 1} · ${barrier.open ? 'OPEN' : 'CLOSED'}`
@@ -593,12 +614,14 @@
                 visionRoster.append(item);
             });
         }
+        if (visionUndo) visionUndo.disabled = visionBarriers.length === 0;
     };
 
     const resetVisionDraft = (message = '') => {
         visionDrafting = false;
         visionTool = null;
         visionStart = null;
+        visionPreview = null;
         visionTools.forEach((button) => button.classList.remove('is-active'));
         if (visionCancel) visionCancel.disabled = true;
         if (message && visionStatus) visionStatus.textContent = message;
@@ -614,13 +637,30 @@
             });
             if (visionCancel) visionCancel.disabled = false;
             if (visionStatus) {
-                visionStatus.textContent = `Drawing ${visionTool}. Click the first grid intersection.`;
+                visionStatus.textContent = visionTool === 'wall'
+                    ? 'Wall tracing active. Click a grid intersection to begin.'
+                    : 'Door placement active. Click the first grid intersection; frame the doorway with walls for a sealed room.';
             }
         });
     });
 
     visionCancel?.addEventListener('click', () => {
         resetVisionDraft('Vision drawing cancelled.');
+    });
+
+    board.addEventListener('pointermove', (event) => {
+        if (!visionDrafting || !visionTool || !visionStart) return;
+        const rect = board.getBoundingClientRect();
+        const localX = ((event.clientX - rect.left) / rect.width) * board.clientWidth;
+        const localY = ((event.clientY - rect.top) / rect.height) * board.clientHeight;
+        const grid = visionGrid();
+        visionPreview = {
+            x1: visionStart.x,
+            y1: visionStart.y,
+            x2: Math.round((localX - grid.offsetX) / grid.size),
+            y2: Math.round((localY - grid.offsetY) / grid.size)
+        };
+        renderVisionLayer();
     });
 
     board.addEventListener('click', async (event) => {
@@ -640,7 +680,10 @@
         if (!visionStart) {
             visionStart = point;
             if (visionStatus) {
-                visionStatus.textContent = 'First point set. Click the second grid intersection.';
+                visionStatus.textContent = visionTool === 'wall'
+                    ? 'Anchor set. Click the next intersection; keep clicking to trace connected walls.'
+                    : 'First door edge set. Click the second intersection.';
+                renderVisionLayer();
             }
             return;
         }
@@ -656,22 +699,52 @@
             const state = await request('gmrt_tabletop_state', {});
             renderVisionLayer(state.vision_layer || []);
             renderFog(state.fog || {});
-            resetVisionDraft(
-                visionTool === 'door'
-                    ? 'Door placed. Closed doors now block sight.'
-                    : 'Wall drawn. The Veil now respects it.'
-            );
+            if (visionTool === 'wall') {
+                visionStart = point;
+                visionPreview = null;
+                if (visionStatus) {
+                    visionStatus.textContent = 'Wall added. Continue from this anchor, or Finish / Cancel.';
+                }
+                renderVisionLayer();
+            } else {
+                resetVisionDraft('Door placed CLOSED. Frame both sides with walls so sight cannot travel around it.');
+            }
         } catch (error) {
             if (visionStatus) visionStatus.textContent = error.message;
             visionStart = null;
+            visionPreview = null;
+            renderVisionLayer();
         }
     }, true);
+
+    visionUndo?.addEventListener('click', async () => {
+        const last = visionBarriers[visionBarriers.length - 1];
+        if (!last) return;
+        try {
+            await request('gmrt_remove_vision_barrier', { barrier_id: String(last.id) });
+            const state = await request('gmrt_tabletop_state', {});
+            selectedVisionBarrier = null;
+            renderVisionLayer(state.vision_layer || []);
+            renderFog(state.fog || {});
+            if (visionStatus) visionStatus.textContent = 'Last cartography segment undone.';
+        } catch (error) {
+            if (visionStatus) visionStatus.textContent = error.message;
+        }
+    });
 
     visionRoster?.addEventListener('click', async (event) => {
         const button = event.target instanceof Element
             ? event.target.closest('button')
             : null;
-        if (!button) return;
+        if (!button) {
+            const item = event.target instanceof Element ? event.target.closest('[data-vision-select]') : null;
+            if (item) {
+                selectedVisionBarrier = item.dataset.visionSelect || null;
+                renderVisionLayer();
+                if (visionStatus) visionStatus.textContent = 'Segment selected. Use its controls to edit the vision layer.';
+            }
+            return;
+        }
         try {
             if (button.dataset.visionToggle) {
                 await request('gmrt_toggle_vision_door', {

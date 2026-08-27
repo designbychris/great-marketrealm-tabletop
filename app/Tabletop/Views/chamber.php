@@ -493,7 +493,8 @@ $sceneImage = $scene !== null
                         <span>Teach the Veil where sight must stop.</span>
                         <button type="button" data-vision-tool="wall">Draw Wall</button>
                         <button type="button" data-vision-tool="door">Place Door</button>
-                        <button type="button" data-vision-cancel disabled>Cancel</button>
+                        <button type="button" data-vision-undo disabled>Undo Last</button>
+                        <button type="button" data-vision-cancel disabled>Finish / Cancel</button>
                         <span data-vision-status role="status" aria-live="polite">Choose a wall or door, then click two grid intersections.</span>
                         <div class="gmrt-vision-roster" data-vision-roster></div>
                     </div>

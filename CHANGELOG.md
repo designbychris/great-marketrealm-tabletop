@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.22.2-alpha.2 — Phase IV.22B.1: The Keeper's Cartography
+
+- Added continuous grid-snapped wall tracing for faster room and corridor authoring.
+- Added a live snapped barrier preview while choosing the next wall/door endpoint.
+- Added vision-segment selection/highlighting and one-click Undo Last.
+- Improved closed-door guidance so DMs know to frame doorway edges with walls.
+- Kept vision persistence, LOS resolution, exploration memory, and player filtering server-authoritative.
+
 ## 0.22.2-alpha.1 — Phase IV.22B: Sight Beyond the Door
 
 - Added a persisted Dungeon Master vision layer with grid-snapped wall and door segments.

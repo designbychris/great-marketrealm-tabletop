@@ -1,5 +1,14 @@
 # Great Marketrealm Tabletop Roadmap
 
+## Phase IV.22B.1 — The Keeper's Cartography
+
+- [x] Continuous wall tracing from the previous endpoint.
+- [x] Live grid-snapped placement preview.
+- [x] Select/highlight authored wall and door segments.
+- [x] Undo the most recently authored segment.
+- [x] Clarify doorway framing and open/closed authoring feedback.
+- [ ] Browser-certify full-room tracing and door editing.
+
 ## Phase IV — The Great Marketrealm Tabletop
 
 ### Phase IV.1 — The Empty Table

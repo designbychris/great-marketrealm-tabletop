@@ -1297,3 +1297,25 @@
     background: rgba(0, 0, 0, .2);
     font-size: .8rem;
 }
+
+/* Phase IV.22B.1 — The Keeper's Cartography */
+.gmrt-vision-barrier.is-preview {
+    opacity: .7;
+    stroke-dasharray: 5 5;
+    stroke-width: 3;
+}
+.gmrt-vision-barrier.is-selected {
+    stroke-width: 7;
+    filter: drop-shadow(0 0 4px rgba(255, 244, 190, .9));
+}
+.gmrt-vision-roster__item { cursor: pointer; }
+.gmrt-vision-roster__item.is-selected {
+    outline: 2px solid rgba(244, 214, 136, .9);
+    outline-offset: 1px;
+    background: rgba(244, 214, 136, .1);
+}
+.gmrt-vision-controls [data-vision-undo]:disabled,
+.gmrt-vision-controls [data-vision-cancel]:disabled {
+    opacity: .42;
+    cursor: default;
+}
