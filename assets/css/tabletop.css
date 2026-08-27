@@ -90,7 +90,7 @@
 
 .gmrt-board__viewport {
     position: relative;
-    overflow: auto;
+    overflow: hidden;
     min-height: 460px;
     border-radius: 10px;
     background: #080706;
@@ -980,4 +980,33 @@
     .gmrt-token.is-state-defeated {
         transition: none;
     }
+}
+
+
+/* Phase IV.20 — The Arsenal of the Adventurer */
+.gmrt-deeds__attack {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    font: 700 .75rem system-ui, sans-serif;
+}
+.gmrt-deeds__attack select {
+    max-width: 18rem;
+    border: 1px solid rgba(244, 234, 214, .35);
+    border-radius: 8px;
+    padding: .4rem .55rem;
+    background: rgba(0, 0, 0, .32);
+    color: inherit;
+}
+.gmrt-board__viewport,
+.gmrt-board__map,
+.gmrt-board__grid,
+.gmrt-board__tokens,
+.gmrt-targeting-layer {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+@media (max-width: 760px) {
+    .gmrt-deeds__attack { flex-basis: 100%; }
+    .gmrt-deeds__attack select { max-width: min(100%, 24rem); }
 }

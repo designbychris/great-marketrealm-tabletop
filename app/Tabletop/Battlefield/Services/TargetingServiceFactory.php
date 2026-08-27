@@ -12,6 +12,7 @@ use GreatMarketrealmTabletop\Tabletop\Encounters\Repositories\WordPressEncounter
 use GreatMarketrealmTabletop\Tables\Memberships\Repositories\WordPressTableMembershipRepository;
 use GreatMarketrealmTabletop\Tables\Scenes\Repositories\WordPressTableSceneRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Repositories\WordPressTableTokenRepository;
+use GreatMarketrealmTabletop\Tabletop\Arsenal\Repositories\WordPressCombatArsenalRepository;
 
 defined('ABSPATH') || exit;
 
@@ -28,7 +29,8 @@ final class TargetingServiceFactory
             new BattlefieldMeasure(),
             new AttackRangeResolver(),
             new WordPressConditionRepository(),
-            new ConditionCombatRules()
+            new ConditionCombatRules(),
+            new WordPressCombatArsenalRepository()
         );
     }
 }

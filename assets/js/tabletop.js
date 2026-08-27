@@ -82,6 +82,9 @@
         return;
     }
 
+    const arsenalAttack = document.querySelector(
+        '[data-arsenal-attack]'
+    );
     const attackTarget = document.querySelector(
         '[data-attack-target]'
     );
@@ -214,7 +217,8 @@
                 {
                     encounter_id:
                         encounter.dataset.encounterId || '',
-                    target_token_id: attackTarget.value
+                    target_token_id: attackTarget.value,
+                    attack_id: arsenalAttack ? arsenalAttack.value : ''
                 }
             );
 
@@ -272,6 +276,13 @@
 
     if (attackTarget) {
         attackTarget.addEventListener(
+            'change',
+            updateTargeting
+        );
+    }
+
+    if (arsenalAttack) {
+        arsenalAttack.addEventListener(
             'change',
             updateTargeting
         );
@@ -699,8 +710,11 @@
                     ? 'HIT!'
                     : 'MISS!';
 
+        const selectedAttack = data.selected_attack || null;
+
         let detail =
-            String(attack.roll)
+            (selectedAttack ? String(selectedAttack.name) + ' · ' : '')
+            + String(attack.roll)
             + ' + ' + String(attack.modifier)
             + ' = ' + String(attack.total)
             + ' vs AC '

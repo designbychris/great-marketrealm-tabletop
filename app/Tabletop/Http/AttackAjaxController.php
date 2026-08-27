@@ -45,12 +45,16 @@ final class AttackAjaxController
                 sanitize_text_field(
                     (string) ($_POST['target_token_id'] ?? '')
                 ),
-                max(1, (int) ($_POST['revision'] ?? 1))
+                max(1, (int) ($_POST['revision'] ?? 1)),
+                sanitize_text_field(
+                    (string) ($_POST['attack_id'] ?? '')
+                ) ?: null
             );
 
             wp_send_json_success([
                 'encounter' => $result['encounter']->toArray(),
                 'attack' => $result['outcome']->toArray(),
+                'selected_attack' => $result['selected_attack']?->toArray(),
                 'targeting' => $result['targeting']?->toArray(),
                 'damage' => $result['damage']?->toArray(),
                 'damage_adjustment' => $result['damage_adjustment']?->toArray(),

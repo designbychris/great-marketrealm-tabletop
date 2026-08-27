@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.20.0-alpha.1] - 2026-08-27
+
+### Added
+
+- Phase IV.20 — The Arsenal of the Adventurer.
+- Persistent multi-attack Combat Arsenals.
+- Named melee, ranged, natural, spell and improvised attacks.
+- Per-attack range, modifier and damage resolution.
+- Arsenal selector in the Turn of Battle HUD.
+- Arsenal-aware targeting preview and Battle Event metadata.
+- Future GMRC `CompanionArsenalSource` boundary using opaque character references.
+- Two Training Grounds attacks for each test combatant.
+
+### Fixed
+
+- Removed the unintended horizontal battlemap scrollbar.
+
+
 ## [0.19.1-alpha.2] - 2026-08-27
 
 ### Fixed

@@ -19,6 +19,7 @@ $deathSaves = $state?->deathSaves() ?? [];
 $conditions = $state?->conditions() ?? [];
 $battleLog = $state?->battleLog() ?? [];
 $combatantStates = $state?->combatantStates() ?? [];
+$arsenals = $state?->arsenals() ?? [];
 
 $tokenLabels = [];
 foreach ($tokens as $token) {
@@ -159,6 +160,7 @@ $sceneImage = $scene !== null
             );
             $currentVitality = $vitality[$currentTokenId] ?? null;
             $currentDeathSaves = $deathSaves[$currentTokenId] ?? null;
+            $currentArsenal = $arsenals[$currentTokenId]['attacks'] ?? [];
             ?>
             <?php if (
                 is_array($currentVitality)
@@ -204,6 +206,44 @@ $sceneImage = $scene !== null
                     (string) $encounter['current_token_id']
                 ); ?>"
             >
+                <?php if ($currentArsenal !== []) : ?>
+                    <label class="gmrt-deeds__attack">
+                        <span>Attack</span>
+                        <select data-arsenal-attack>
+                            <?php foreach ($currentArsenal as $arsenalAttack) :
+                                $combat = $arsenalAttack['combat'] ?? [];
+                                $damage = $arsenalAttack['damage'] ?? [];
+                                $normal = (int) ($combat['attack_range_feet'] ?? 5);
+                                $long = (int) ($combat['long_range_feet'] ?? $normal);
+                                $rangeLabel = $long > $normal
+                                    ? $normal . '/' . $long . ' ft'
+                                    : $normal . ' ft';
+                                $diceLabel = (int) ($damage['dice_count'] ?? 1)
+                                    . 'd'
+                                    . (int) ($damage['die_sides'] ?? 6);
+                                $damageModifier = (int) ($damage['modifier'] ?? 0);
+                                if ($damageModifier > 0) {
+                                    $diceLabel .= '+' . $damageModifier;
+                                } elseif ($damageModifier < 0) {
+                                    $diceLabel .= (string) $damageModifier;
+                                }
+                                ?>
+                                <option value="<?php echo esc_attr(
+                                    (string) ($arsenalAttack['id'] ?? '')
+                                ); ?>">
+                                    <?php echo esc_html(
+                                        (string) ($arsenalAttack['name'] ?? 'Attack')
+                                        . ' · ' . $diceLabel
+                                        . ' ' . strtoupper(
+                                            (string) ($damage['damage_type'] ?? '')
+                                        )
+                                        . ' · ' . $rangeLabel
+                                    ); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </label>
+                <?php endif; ?>
                 <label class="gmrt-deeds__target">
                     <span>Target</span>
                     <select data-attack-target>

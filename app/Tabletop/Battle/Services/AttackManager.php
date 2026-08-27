@@ -19,6 +19,7 @@ use GreatMarketrealmTabletop\Tabletop\Conditions\Services\ConditionCombatRules;
 use GreatMarketrealmTabletop\Tabletop\Battlefield\Services\BattlefieldMeasure;
 use GreatMarketrealmTabletop\Tabletop\Battle\Models\AttackRollMode;
 use GreatMarketrealmTabletop\Tables\Scenes\Contracts\TableSceneRepository;
+use GreatMarketrealmTabletop\Tabletop\Arsenal\Contracts\CombatArsenalRepository;
 use GreatMarketrealmTabletop\Tables\Contracts\TableClock;
 use GreatMarketrealmTabletop\Tables\Memberships\Contracts\TableMembershipRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Contracts\TableTokenRepository;
@@ -47,7 +48,8 @@ final class AttackManager
         private ?ConditionCombatRules $conditionRules = null,
         private ?TableSceneRepository $scenes = null,
         private ?BattlefieldMeasure $battlefield = null,
-        private ?AttackRangeResolver $rangeResolver = null
+        private ?AttackRangeResolver $rangeResolver = null,
+        private ?CombatArsenalRepository $arsenals = null
     ) {}
 
     /** @return array<string,mixed> */
@@ -56,7 +58,8 @@ final class AttackManager
         int $viewerUserId,
         string $encounterId,
         string $targetTokenId,
-        int $expectedRevision
+        int $expectedRevision,
+        ?string $attackId = null
     ): array {
         $encounter = $this->encounters->find(
             $tableId,
@@ -127,10 +130,24 @@ final class AttackManager
             );
         }
 
-        $attackerProfile = $this->profiles->forToken(
-            $tableId,
-            $attacker->id()
-        );
+        $selectedAttack = null;
+
+        if ($attackId !== null && $attackId !== '' && $this->arsenals !== null) {
+            $selectedAttack = $this->arsenals
+                ->forToken($tableId, $attacker->id())
+                ->find($attackId);
+
+            if ($selectedAttack === null) {
+                throw new AttackDenied(
+                    'The selected attack is not in this combatant Arsenal.'
+                );
+            }
+        }
+
+        $attackerProfile = $selectedAttack?->combat()
+            ?? $this->profiles->forToken($tableId, $attacker->id());
+        $damageProfile = $selectedAttack?->damage()
+            ?? $this->damageProfiles->forToken($tableId, $attacker->id());
         $targetProfile = $this->profiles->forToken(
             $tableId,
             $target->id()
@@ -235,6 +252,9 @@ final class AttackManager
             [
                 'deed' => BattleDeed::ATTACK,
                 'target_token_id' => $target->id(),
+                'attack_id' => $selectedAttack?->id(),
+                'attack_name' => $selectedAttack?->name(),
+                'attack_kind' => $selectedAttack?->kind(),
                 'targeting' => $range?->toArray(),
             ] + $outcome->toArray()
         );
@@ -247,11 +267,6 @@ final class AttackManager
         $vitality = null;
 
         if ($outcome->isHit()) {
-            $damageProfile = $this->damageProfiles->forToken(
-                $tableId,
-                $attacker->id()
-            );
-
             $damageRoll = $this->damageResolver->resolve(
                 $damageProfile,
                 $outcome->result()
@@ -342,6 +357,7 @@ final class AttackManager
             'attack_event' => $event,
             'damage_event' => $damageEvent,
             'outcome' => $outcome,
+            'selected_attack' => $selectedAttack,
             'targeting' => $range,
             'damage' => $damageRoll,
             'damage_adjustment' => $damageAdjustment,

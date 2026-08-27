@@ -398,3 +398,23 @@ Lower-latency shared-state synchronisation, presence and reconnection foundation
 - [ ] Pixel-art fallen poses/icons
 - [ ] Creature-specific death-save policy
 - [ ] Server-side certification on deployment
+
+
+### Phase IV.20 — The Arsenal of the Adventurer
+
+- [x] Persistent multi-attack Combat Arsenal
+- [x] Melee weapon / ranged weapon / natural / spell / improvised kinds
+- [x] Per-attack modifier, range and damage profile
+- [x] Attack selection HUD
+- [x] Selected attack drives authoritative targeting and resolution
+- [x] Legacy single attack remains a compatibility fallback
+- [x] Attack identity written to Battle Events
+- [x] Tabletop-native monster/NPC arsenals
+- [x] Explicit future GMRC `CompanionArsenalSource` boundary
+- [x] Opaque Companion character references; no hard plugin namespace dependency
+- [x] Two Training Grounds attacks per combatant
+- [x] Battlefield horizontal scrollbar removed
+- [ ] Live GMRC adapter implementation
+- [ ] Ammunition/equipment consumption
+- [ ] Spell-resource consumption
+- [ ] Server-side certification on deployment

@@ -41,7 +41,10 @@ final class TargetingAjaxController
                     ),
                     sanitize_text_field(
                         (string) ($_POST['target_token_id'] ?? '')
-                    )
+                    ),
+                    sanitize_text_field(
+                        (string) ($_POST['attack_id'] ?? '')
+                    ) ?: null
                 )
             );
         } catch (Throwable $exception) {

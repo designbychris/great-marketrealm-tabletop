@@ -6,6 +6,7 @@ namespace GreatMarketrealmTabletop\Tabletop\Battlefield\Services;
 
 use GreatMarketrealmTabletop\Tabletop\Battle\Contracts\CombatProfileRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Models\AttackRollMode;
+use GreatMarketrealmTabletop\Tabletop\Arsenal\Contracts\CombatArsenalRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Services\AttackRangeResolver;
 use GreatMarketrealmTabletop\Tabletop\Conditions\Contracts\ConditionRepository;
 use GreatMarketrealmTabletop\Tabletop\Conditions\Services\ConditionCombatRules;
@@ -28,7 +29,8 @@ final class TargetingService
         private BattlefieldMeasure $battlefield,
         private AttackRangeResolver $ranges,
         private ConditionRepository $conditions,
-        private ConditionCombatRules $conditionRules
+        private ConditionCombatRules $conditionRules,
+        private ?CombatArsenalRepository $arsenals = null
     ) {}
 
     /** @return array<string,mixed> */
@@ -36,7 +38,8 @@ final class TargetingService
         string $tableId,
         int $viewerUserId,
         string $encounterId,
-        string $targetTokenId
+        string $targetTokenId,
+        ?string $attackId = null
     ): array {
         $member = $this->members->find(
             $tableId,
@@ -119,10 +122,19 @@ final class TargetingService
             $target
         );
 
-        $profile = $this->profiles->forToken(
-            $tableId,
-            $attacker->id()
-        );
+        $selectedAttack = null;
+
+        if ($attackId !== null && $attackId !== '' && $this->arsenals !== null) {
+            $selectedAttack = $this->arsenals
+                ->forToken($tableId, $attacker->id())
+                ->find($attackId);
+        }
+
+        $profile = $selectedAttack?->combat()
+            ?? $this->profiles->forToken(
+                $tableId,
+                $attacker->id()
+            );
 
         $range = $this->ranges->assess(
             $distance->feet(),
@@ -151,6 +163,8 @@ final class TargetingService
         return [
             'attacker_token_id' => $attacker->id(),
             'target_token_id' => $target->id(),
+            'attack_id' => $selectedAttack?->id(),
+            'attack_name' => $selectedAttack?->name(),
             'distance' => $distance->toArray(),
             'range' => $range->toArray(),
             'roll_mode' => $rollMode,

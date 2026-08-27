@@ -23,7 +23,8 @@ final class TabletopChamberState
         private array $deathSaves = [],
         private array $conditions = [],
         private array $battleLog = [],
-        private array $combatantStates = []
+        private array $combatantStates = [],
+        private array $arsenals = []
     ) {}
 
     /** @return array<string,mixed> */
@@ -90,6 +91,12 @@ final class TabletopChamberState
     public function combatantStates(): array
     {
         return $this->combatantStates;
+    }
+
+    /** @return array<string,array<string,mixed>> */
+    public function arsenals(): array
+    {
+        return $this->arsenals;
     }
 
     public function isDungeonMaster(): bool

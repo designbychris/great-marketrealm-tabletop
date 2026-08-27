@@ -5,6 +5,9 @@ use GreatMarketrealmTabletop\Tabletop\Battle\Models\CombatProfile;
 use GreatMarketrealmTabletop\Tabletop\Battle\Models\DamageProfile;
 use GreatMarketrealmTabletop\Tabletop\Battle\Models\DamageDefenseProfile;
 use GreatMarketrealmTabletop\Tabletop\Battle\Models\Vitality;
+use GreatMarketrealmTabletop\Tabletop\Arsenal\Models\ArsenalAttack;
+use GreatMarketrealmTabletop\Tabletop\Arsenal\Models\CombatArsenal;
+use GreatMarketrealmTabletop\Tabletop\Arsenal\Repositories\WordPressCombatArsenalRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Repositories\WordPressCombatProfileRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Repositories\WordPressDamageProfileRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Repositories\WordPressDamageDefenseRepository;
@@ -50,6 +53,7 @@ final class TestTableProvisioner
         $tokens=TableTokenManagerFactory::make();
         $combat=new WordPressCombatProfileRepository();
         $damage=new WordPressDamageProfileRepository();
+        $arsenals=new WordPressCombatArsenalRepository();
         $defenses=new WordPressDamageDefenseRepository();
         $vitality=new WordPressVitalityRepository();
         $placed=[];
@@ -67,6 +71,7 @@ final class TestTableProvisioner
             ));
             $dice=$f['damage'];
             $damage->save($table->id(),new DamageProfile($token->id(),(int)$dice[0],(int)$dice[1],(int)$dice[2],(string)$dice[3]));
+            $arsenals->save($table->id(),$this->buildArsenal($token->id(),$f['arsenal']??[]));
             $defense=$f['defenses'];
             $defenses->save($table->id(),new DamageDefenseProfile($token->id(),$defense[0],$defense[1],$defense[2]));
             $vitality->save($table->id(),new Vitality($token->id(),(int)$f['hp'],(int)$f['hp']));
@@ -106,6 +111,7 @@ final class TestTableProvisioner
 
         $combat = new WordPressCombatProfileRepository();
         $damage = new WordPressDamageProfileRepository();
+        $arsenals = new WordPressCombatArsenalRepository();
         $defenses = new WordPressDamageDefenseRepository();
 
         foreach ($this->blueprint->tokens($userId) as $fixture) {
@@ -141,6 +147,14 @@ final class TestTableProvisioner
                 )
             );
 
+            $arsenals->save(
+                $tableId,
+                $this->buildArsenal(
+                    $token->id(),
+                    $fixture['arsenal'] ?? []
+                )
+            );
+
             $defense = $fixture['defenses'];
             $defenses->save(
                 $tableId,
@@ -152,6 +166,22 @@ final class TestTableProvisioner
                 )
             );
         }
+    }
+
+    private function buildArsenal(string $tokenId,array $records): CombatArsenal
+    {
+        $attacks=[];
+        foreach($records as $record){
+            $range=$record['range'];$damage=$record['damage'];
+            $attacks[]=new ArsenalAttack(
+                (string)$record['id'],$tokenId,(string)$record['name'],(string)$record['kind'],
+                new CombatProfile($tokenId,10,(int)$record['attack'],(int)$range[0],(int)$range[1]),
+                new DamageProfile($tokenId,(int)$damage[0],(int)$damage[1],(int)$damage[2],(string)$damage[3]),
+                is_array($record['properties']??null)?$record['properties']:[],
+                'tabletop','gmrt-test:'.(string)$record['id']
+            );
+        }
+        return new CombatArsenal($tokenId,$attacks);
     }
 
     private function battlemapAttachment(): int
