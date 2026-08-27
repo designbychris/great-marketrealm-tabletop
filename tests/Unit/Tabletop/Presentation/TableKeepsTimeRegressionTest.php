@@ -46,10 +46,11 @@ final class TableKeepsTimeRegressionTest extends TestCase
         self::assertStringContainsString('currentEncounterId !== incomingEncounterId', $this->script);
     }
 
-    public function testRemoteEncounterChangeAutomaticallyRerendersChamber(): void
+    public function testRemoteEncounterChangeUpdatesLivingTableInPlace(): void
     {
-        self::assertStringContainsString("say('The Table has moved on. Keeping time…')", $this->script);
-        self::assertStringContainsString('window.location.reload();', $this->script);
+        self::assertStringContainsString('patchEncounterState(incomingEncounter);', $this->script);
+        self::assertStringContainsString("say('The Table stirred — the turn has changed.')", $this->script);
+        self::assertStringContainsString('if (encounterLifecycleChanged)', $this->script);
     }
 
     public function testExistingHeartbeatRemainsFiveSeconds(): void
