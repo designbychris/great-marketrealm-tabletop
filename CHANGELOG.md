@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.22.0-alpha.1] - 2026-08-27
+
+### Added
+
+- Phase IV.22 — The Veil of the Unknown.
+- Persisted per-Scene Fog of War with unexplored and remembered territory.
+- Three-square party vision around character tokens.
+- Exploration automatically expands when character tokens move.
+- Dungeon Master full-map bypass plus Player Fog preview mode.
+- Player state suppresses non-character tokens outside current vision.
+- Fog cells align to calibrated grid size and offsets.
+- Dungeon Master reset-exploration control.
+
+### Fixed
+
+- Grid Save now reports progress/result beside the Cartographer controls, consumes the server-certified saved values, updates Reset Preview's baseline, and explicitly persists hidden-grid state.
+
+
 ## [0.21.2-alpha.2] - 2026-08-27
 
 ### Fixed

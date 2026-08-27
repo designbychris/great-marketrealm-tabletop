@@ -1088,3 +1088,52 @@
 .gmrt-board__lens-stage {
     overscroll-behavior: contain;
 }
+
+
+/* Phase IV.22 — The Veil of the Unknown */
+.gmrt-fog-controls {
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    flex-wrap: wrap;
+    margin: .45rem 0 .75rem;
+    padding: .55rem .7rem;
+    border: 1px solid rgba(244,234,214,.2);
+    border-radius: 9px;
+}
+.gmrt-fog-controls label {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    font: 700 .72rem system-ui,sans-serif;
+}
+.gmrt-fog-controls button {
+    border: 1px solid rgba(244,234,214,.35);
+    border-radius: 7px;
+    background: rgba(0,0,0,.3);
+    color: inherit;
+    padding: .38rem .55rem;
+    cursor: pointer;
+}
+.gmrt-fog-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 8;
+    pointer-events: none;
+    overflow: hidden;
+}
+.gmrt-fog-layer[hidden] {
+    display: none;
+}
+.gmrt-fog-cell {
+    position: absolute;
+    box-sizing: border-box;
+}
+.gmrt-fog-cell.is-unexplored {
+    background:
+        radial-gradient(circle at 35% 30%, rgba(32,28,25,.98), rgba(6,5,5,1) 72%);
+}
+.gmrt-fog-cell.is-memory {
+    background: rgba(8,7,7,.58);
+    box-shadow: inset 0 0 12px rgba(0,0,0,.28);
+}

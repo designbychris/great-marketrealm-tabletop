@@ -16,6 +16,8 @@ use GreatMarketrealmTabletop\Tabletop\Battle\Repositories\WordPressBattleEventRe
 use GreatMarketrealmTabletop\Tabletop\Battle\Presentation\BattleLogProjector;
 use GreatMarketrealmTabletop\Tabletop\Presentation\CombatantStateProjector;
 use GreatMarketrealmTabletop\Tabletop\Arsenal\Repositories\WordPressCombatArsenalRepository;
+use GreatMarketrealmTabletop\Tabletop\Fog\Repositories\WordPressFogOfWarRepository;
+use GreatMarketrealmTabletop\Tabletop\Fog\Services\FogOfWarProjector;
 
 defined('ABSPATH') || exit;
 
@@ -35,7 +37,9 @@ final class TabletopChamberFactory
             new WordPressBattleEventRepository(),
             new BattleLogProjector(),
             new CombatantStateProjector(),
-            new WordPressCombatArsenalRepository()
+            new WordPressCombatArsenalRepository(),
+            new WordPressFogOfWarRepository(),
+            new FogOfWarProjector()
         );
     }
 }

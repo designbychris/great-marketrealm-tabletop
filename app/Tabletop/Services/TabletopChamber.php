@@ -14,6 +14,8 @@ use GreatMarketrealmTabletop\Tabletop\Battle\Contracts\BattleEventRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Presentation\BattleLogProjector;
 use GreatMarketrealmTabletop\Tabletop\Presentation\CombatantStateProjector;
 use GreatMarketrealmTabletop\Tabletop\Arsenal\Contracts\CombatArsenalRepository;
+use GreatMarketrealmTabletop\Tabletop\Fog\Contracts\FogOfWarRepository;
+use GreatMarketrealmTabletop\Tabletop\Fog\Services\FogOfWarProjector;
 use GreatMarketrealmTabletop\Tables\Contracts\TableRepository;
 use GreatMarketrealmTabletop\Tables\Memberships\Contracts\TableMembershipRepository;
 use GreatMarketrealmTabletop\Tables\Memberships\Models\TableMember;
@@ -39,7 +41,9 @@ final class TabletopChamber
         private ?BattleEventRepository $battleEvents = null,
         private ?BattleLogProjector $battleLogProjector = null,
         private ?CombatantStateProjector $combatantStateProjector = null,
-        private ?CombatArsenalRepository $arsenals = null
+        private ?CombatArsenalRepository $arsenals = null,
+        private ?FogOfWarRepository $fogRepository = null,
+        private ?FogOfWarProjector $fogProjector = null
     ) {}
 
     public function state(
@@ -85,6 +89,7 @@ final class TabletopChamber
         }
 
         $tokens = [];
+        $tokenModels = [];
 
         if ($activeScene !== null) {
             foreach (
@@ -101,8 +106,44 @@ final class TabletopChamber
                     continue;
                 }
 
-                $tokens[] = $token->toArray();
+                $tokenModels[] = $token;
             }
+        }
+
+        $fog = [];
+
+        if (
+            $activeScene !== null
+            && $this->fogRepository !== null
+            && $this->fogProjector !== null
+        ) {
+            $fog = $this->fogProjector->project(
+                $activeScene,
+                $this->fogRepository->forScene(
+                    $tableId,
+                    $activeScene->id()
+                ),
+                $tokenModels,
+                $viewer->isDungeonMaster()
+            );
+        }
+
+        foreach ($tokenModels as $token) {
+            if (
+                ! $viewer->isDungeonMaster()
+                && $activeScene !== null
+                && $this->fogProjector !== null
+                && ! $this->fogProjector
+                    ->tokenIsCurrentlyVisible(
+                        $activeScene,
+                        $token,
+                        $fog
+                    )
+            ) {
+                continue;
+            }
+
+            $tokens[] = $token->toArray();
         }
 
         $encounter = $activeScene !== null
@@ -208,7 +249,8 @@ final class TabletopChamber
             $conditions,
             $battleLog,
             $combatantStates,
-            $arsenals
+            $arsenals,
+            $fog
         );
     }
 }

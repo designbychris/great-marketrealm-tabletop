@@ -10,6 +10,7 @@ use GreatMarketrealmTabletop\Tables\Scenes\Repositories\WordPressTableSceneRepos
 use GreatMarketrealmTabletop\Tables\Tokens\Repositories\WordPressTableTokenRepository;
 use GreatMarketrealmTabletop\Tabletop\Conditions\Repositories\WordPressConditionRepository;
 use GreatMarketrealmTabletop\Tabletop\Conditions\Services\ConditionCombatRules;
+use GreatMarketrealmTabletop\Tabletop\Fog\Services\FogOfWarFactory;
 
 defined('ABSPATH') || exit;
 
@@ -24,7 +25,8 @@ final class TabletopMovementFactory
             new WordPressTableTokenRepository(),
             new TabletopMovementPolicy(),
             new WordPressConditionRepository(),
-            new ConditionCombatRules()
+            new ConditionCombatRules(),
+            FogOfWarFactory::make()
         );
     }
 }

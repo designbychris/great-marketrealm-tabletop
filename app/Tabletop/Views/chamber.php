@@ -20,6 +20,7 @@ $conditions = $state?->conditions() ?? [];
 $battleLog = $state?->battleLog() ?? [];
 $combatantStates = $state?->combatantStates() ?? [];
 $arsenals = $state?->arsenals() ?? [];
+$fog = $state?->fog() ?? [];
 
 $tokenLabels = [];
 foreach ($tokens as $token) {
@@ -465,6 +466,29 @@ $sceneImage = $scene !== null
                     <span class="gmrt-cartographers-lens__hint">Drag the map to pan while zoomed.</span>
                 </div>
 
+                <?php if ($state->isDungeonMaster()) : ?>
+                    <div class="gmrt-fog-controls">
+                        <strong>The Veil of the Unknown</strong>
+                        <label>
+                            <input
+                                type="checkbox"
+                                data-fog-enabled
+                                <?php checked(! empty($fog['enabled'])); ?>
+                            >
+                            Enable Fog of War
+                        </label>
+                        <label>
+                            <input type="checkbox" data-fog-preview>
+                            Preview Player Fog
+                        </label>
+                        <button type="button" data-fog-clear>
+                            Reset Exploration
+                        </button>
+                        <span data-fog-status role="status" aria-live="polite"></span>
+                    </div>
+                <?php endif; ?>
+
+
                 <?php if (
                     $state->isDungeonMaster()
                     && ($scene['grid_type'] ?? '') === 'square'
@@ -575,6 +599,15 @@ $sceneImage = $scene !== null
                             aria-hidden="true"
                         ></div>
                     <?php endif; ?>
+
+                    <div
+                        class="gmrt-fog-layer"
+                        data-fog-layer
+                        data-fog="<?php echo esc_attr(
+                            wp_json_encode($fog)
+                        ); ?>"
+                        aria-hidden="true"
+                    ></div>
 
                     <svg
                         class="gmrt-targeting-layer"

@@ -18,6 +18,8 @@ use GreatMarketrealmTabletop\Tabletop\Http\TabletopAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\TestTableAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\TargetingAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\CartographyAjaxController;
+use GreatMarketrealmTabletop\Tabletop\Http\FogOfWarAjaxController;
+use GreatMarketrealmTabletop\Tabletop\Fog\Services\FogOfWarFactory;
 use GreatMarketrealmTabletop\Tabletop\Cartography\Services\CartographersTableFactory;
 use GreatMarketrealmTabletop\Tabletop\Battlefield\Services\TargetingServiceFactory;
 use GreatMarketrealmTabletop\Tabletop\Testing\TestTableProvisioner;
@@ -49,6 +51,8 @@ final class TabletopServiceProvider
     private TargetingAjaxController $targetingAjax;
 
     private CartographyAjaxController $cartographyAjax;
+
+    private FogOfWarAjaxController $fogAjax;
 
     public function __construct()
     {
@@ -94,6 +98,10 @@ final class TabletopServiceProvider
 
         $this->cartographyAjax = new CartographyAjaxController(
             CartographersTableFactory::make()
+        );
+
+        $this->fogAjax = new FogOfWarAjaxController(
+            FogOfWarFactory::make()
         );
     }
 
@@ -192,6 +200,11 @@ final class TabletopServiceProvider
         add_action(
             'wp_ajax_gmrt_calibrate_grid',
             [$this->cartographyAjax, 'calibrateGrid']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_configure_fog',
+            [$this->fogAjax, 'configure']
         );
     }
 }

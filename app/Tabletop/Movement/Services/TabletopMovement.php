@@ -14,6 +14,7 @@ use GreatMarketrealmTabletop\Tables\Tokens\Contracts\TableTokenRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Models\TableToken;
 use GreatMarketrealmTabletop\Tabletop\Conditions\Contracts\ConditionRepository;
 use GreatMarketrealmTabletop\Tabletop\Conditions\Services\ConditionCombatRules;
+use GreatMarketrealmTabletop\Tabletop\Fog\Services\FogOfWarManager;
 use RuntimeException;
 
 defined('ABSPATH') || exit;
@@ -27,7 +28,8 @@ final class TabletopMovement
         private TableTokenRepository $tokens,
         private TabletopMovementPolicy $policy,
         private ?ConditionRepository $conditions = null,
-        private ?ConditionCombatRules $conditionRules = null
+        private ?ConditionCombatRules $conditionRules = null,
+        private ?FogOfWarManager $fog = null
     ) {}
 
     public function move(
@@ -124,6 +126,13 @@ final class TabletopMovement
         $scene->coordinates($x, $y);
         $token->move($x, $y);
         $this->tokens->save($token);
+
+        if ($this->fog !== null) {
+            $this->fog->revealForMovement(
+                $tableId,
+                $token
+            );
+        }
 
         return $token;
     }

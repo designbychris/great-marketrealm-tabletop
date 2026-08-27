@@ -69,7 +69,10 @@ final class CartographyAjaxController
                 (int) ($_POST['grid_offset_x'] ?? 0),
                 (int) ($_POST['grid_offset_y'] ?? 0),
                 min(100, max(0, absint($_POST['grid_opacity'] ?? 13))),
-                ! empty($_POST['grid_visible'])
+                filter_var(
+                    $_POST['grid_visible'] ?? false,
+                    FILTER_VALIDATE_BOOLEAN
+                )
             );
 
             wp_send_json_success(['grid' => $grid]);

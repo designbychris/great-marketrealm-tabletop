@@ -248,6 +248,122 @@
         if (lens.dragging) stopLensPan(event);
     });
 
+    const fogLayer = document.querySelector('[data-fog-layer]');
+    const fogEnabled = document.querySelector('[data-fog-enabled]');
+    const fogPreview = document.querySelector('[data-fog-preview]');
+    const fogClear = document.querySelector('[data-fog-clear]');
+    const fogStatus = document.querySelector('[data-fog-status]');
+    let fogProjection = {};
+
+    if (fogLayer) {
+        try {
+            fogProjection = JSON.parse(fogLayer.dataset.fog || '{}');
+        } catch (error) {
+            fogProjection = {};
+        }
+    }
+
+    const renderFog = (projection = fogProjection) => {
+        if (!fogLayer) return;
+
+        fogProjection = projection || {};
+        fogLayer.replaceChildren();
+
+        const enabled = Boolean(fogProjection.enabled);
+        const dmBypass = Boolean(fogProjection.bypass);
+        const preview = Boolean(fogPreview && fogPreview.checked);
+
+        if (!enabled || (dmBypass && !preview)) {
+            fogLayer.hidden = true;
+            return;
+        }
+
+        fogLayer.hidden = false;
+
+        const size = Math.max(1, Number(fogProjection.grid_size || 1));
+        const offsetX = Number(fogProjection.offset_x || 0);
+        const offsetY = Number(fogProjection.offset_y || 0);
+        const width = Math.max(1, Number(fogProjection.width || 1));
+        const height = Math.max(1, Number(fogProjection.height || 1));
+        const explored = new Set(fogProjection.explored || []);
+        const visible = new Set(fogProjection.visible || []);
+
+        const minColumn = Math.floor((0 - offsetX) / size);
+        const maxColumn = Math.ceil((width - offsetX) / size);
+        const minRow = Math.floor((0 - offsetY) / size);
+        const maxRow = Math.ceil((height - offsetY) / size);
+
+        const fragment = document.createDocumentFragment();
+
+        for (let row = minRow; row < maxRow; row += 1) {
+            for (let column = minColumn; column < maxColumn; column += 1) {
+                const key = `${column}:${row}`;
+
+                if (visible.has(key)) {
+                    continue;
+                }
+
+                const cell = document.createElement('span');
+                cell.className = explored.has(key)
+                    ? 'gmrt-fog-cell is-memory'
+                    : 'gmrt-fog-cell is-unexplored';
+                cell.style.left = `${offsetX + (column * size)}px`;
+                cell.style.top = `${offsetY + (row * size)}px`;
+                cell.style.width = `${size + 1}px`;
+                cell.style.height = `${size + 1}px`;
+                fragment.append(cell);
+            }
+        }
+
+        fogLayer.append(fragment);
+    };
+
+    renderFog();
+
+    fogPreview?.addEventListener('change', () => {
+        renderFog();
+    });
+
+    const configureFog = async (enabled, clear = false) => {
+        if (fogStatus) {
+            fogStatus.textContent = clear
+                ? 'Resetting exploration…'
+                : 'Changing the veil…';
+        }
+
+        try {
+            await request('gmrt_configure_fog', {
+                enabled: enabled ? '1' : '0',
+                clear: clear ? '1' : '0'
+            });
+
+            const state = await request('gmrt_tabletop_state', {});
+            fogProjection = state.fog || {};
+            renderFog(fogProjection);
+
+            if (fogStatus) {
+                fogStatus.textContent = clear
+                    ? 'Exploration reset.'
+                    : enabled
+                        ? 'Fog of War enabled.'
+                        : 'Fog of War disabled.';
+            }
+        } catch (error) {
+            if (fogStatus) {
+                fogStatus.textContent =
+                    error.message || 'Fog of War could not be changed.';
+            }
+        }
+    };
+
+    fogEnabled?.addEventListener('change', () => {
+        configureFog(fogEnabled.checked, false);
+    });
+
+    fogClear?.addEventListener('click', () => {
+        configureFog(Boolean(fogEnabled?.checked), true);
+    });
+
     const gridViewport = document.querySelector('.gmrt-board__viewport');
     const gridSize = document.querySelector('[data-grid-size]');
     const gridOffsetX = document.querySelector('[data-grid-offset-x]');
@@ -264,6 +380,10 @@
         opacity: gridOpacity.value,
         visible: gridVisible.checked
     } : null;
+
+    const cartographerStatus = document.querySelector(
+        '[data-cartographer-status]'
+    );
 
     const previewGrid = () => {
         if (!gridViewport || !gridSize) return;
@@ -300,17 +420,62 @@
 
     if (saveGrid) {
         saveGrid.addEventListener('click', async () => {
+            saveGrid.disabled = true;
+            const previousLabel = saveGrid.textContent;
+            saveGrid.textContent = 'Saving…';
+
+            if (cartographerStatus) {
+                cartographerStatus.textContent =
+                    'Saving grid calibration…';
+            }
+
             try {
-                await request('gmrt_calibrate_grid', {
+                const data = await request('gmrt_calibrate_grid', {
                     grid_size: gridSize.value,
                     grid_offset_x: gridOffsetX.value,
                     grid_offset_y: gridOffsetY.value,
                     grid_opacity: gridOpacity.value,
-                    grid_visible: gridVisible.checked ? '1' : ''
+                    grid_visible: gridVisible.checked ? '1' : '0'
                 });
-                say('Grid calibration saved.');
+
+                const saved = data.grid || {};
+
+                gridSize.value = String(saved.size ?? gridSize.value);
+                gridOffsetX.value = String(saved.offset_x ?? gridOffsetX.value);
+                gridOffsetY.value = String(saved.offset_y ?? gridOffsetY.value);
+                gridOpacity.value = String(saved.opacity ?? gridOpacity.value);
+                gridVisible.checked = Boolean(saved.visible);
+
+                if (originalGrid) {
+                    originalGrid.size = gridSize.value;
+                    originalGrid.x = gridOffsetX.value;
+                    originalGrid.y = gridOffsetY.value;
+                    originalGrid.opacity = gridOpacity.value;
+                    originalGrid.visible = gridVisible.checked;
+                }
+
+                previewGrid();
+
+                const confirmation =
+                    `Grid saved · ${gridSize.value}px · `
+                    + `X ${gridOffsetX.value} · Y ${gridOffsetY.value}`;
+
+                if (cartographerStatus) {
+                    cartographerStatus.textContent = confirmation;
+                }
+                say(confirmation);
             } catch (error) {
-                say(error.message || 'Grid calibration could not be saved.');
+                const message =
+                    error.message
+                    || 'Grid calibration could not be saved.';
+
+                if (cartographerStatus) {
+                    cartographerStatus.textContent = message;
+                }
+                say(message);
+            } finally {
+                saveGrid.disabled = false;
+                saveGrid.textContent = previousLabel;
             }
         });
     }
@@ -318,10 +483,6 @@
     const chooseBattlemap = document.querySelector(
         '[data-choose-battlemap]'
     );
-    const cartographerStatus = document.querySelector(
-        '[data-cartographer-status]'
-    );
-
     if (chooseBattlemap) {
         chooseBattlemap.addEventListener('click', () => {
             if (
@@ -667,6 +828,7 @@
             selected.dataset.tokenRevision = String(token.revision);
             say((token.label || 'Token') + ' moved.');
             await updateTargeting();
+            await refresh();
         } catch (error) {
             say(error.message);
             await refresh();
@@ -762,6 +924,7 @@
             const tokens = Array.isArray(state.tokens) ? state.tokens : [];
 
             renderBattleLog(state.battle_log);
+            renderFog(state.fog || {});
 
             const combatantStates =
                 state.combatant_states || {};

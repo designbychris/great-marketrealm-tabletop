@@ -462,3 +462,21 @@ Lower-latency shared-state synchronisation, presence and reconnection foundation
 - [x] Capture pointer for the complete gesture
 - [x] Add movement threshold before camera pan begins
 - [x] Preserve token and control interactions
+
+### Phase IV.22 — The Veil of the Unknown
+
+- [x] Per-Scene Fog of War toggle
+- [x] Unexplored areas fully veiled
+- [x] Explored areas remembered but dimmed
+- [x] Current party-visible cells fully clear
+- [x] Character movement expands exploration memory
+- [x] DM sees through the veil
+- [x] DM can preview Player Fog
+- [x] DM can reset exploration
+- [x] Fog aligns with calibrated grid
+- [x] Non-character tokens outside current Player vision are withheld from Player state
+- [x] Lens remains presentation-only over the same fog coordinate space
+- [ ] Walls and doors block line of sight
+- [ ] Per-character vision distances / darkvision
+- [ ] Light-source rules
+- [ ] Manual polygon reveal/hide
