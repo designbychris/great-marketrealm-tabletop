@@ -10,12 +10,31 @@ final class TabletopDeathAtDoorRegressionTest extends TestCase
 {
     public function testCombatHudDistinguishesFallenAndStable(): void
     {
-        $source = (string) file_get_contents(
+        $view = file_get_contents(
             dirname(__DIR__, 4)
-                . '/app/Tabletop/Views/chamber.php'
+            . '/app/Tabletop/Views/chamber.php'
         );
-
-        self::assertStringContainsString('>Fallen<', $source);
-        self::assertStringContainsString('>Stable<', $source);
+    
+        self::assertIsString($view);
+    
+        self::assertStringContainsString(
+            "'DECEASED' : 'DOWN'",
+            $view
+        );
+    
+        self::assertStringContainsString(
+            '<span>Death confirmed</span>',
+            $view
+        );
+    
+        self::assertStringContainsString(
+            '<span>Stable</span>',
+            $view
+        );
+    
+        self::assertStringNotContainsString(
+            '>Fallen<',
+            $view
+        );
     }
 }
