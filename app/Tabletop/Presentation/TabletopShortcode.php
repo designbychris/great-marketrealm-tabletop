@@ -89,6 +89,10 @@ final class TabletopShortcode
 
     private function enqueueAssets(): void
     {
+        if (is_user_logged_in()) {
+            wp_enqueue_media();
+        }
+
         wp_enqueue_style(
             'gmrt-tabletop',
             GMRT_URL . 'assets/css/tabletop.css',

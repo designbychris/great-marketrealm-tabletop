@@ -17,6 +17,8 @@ use GreatMarketrealmTabletop\Tabletop\Conditions\Services\ConditionManagerFactor
 use GreatMarketrealmTabletop\Tabletop\Http\TabletopAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\TestTableAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\TargetingAjaxController;
+use GreatMarketrealmTabletop\Tabletop\Http\CartographyAjaxController;
+use GreatMarketrealmTabletop\Tabletop\Cartography\Services\CartographersTableFactory;
 use GreatMarketrealmTabletop\Tabletop\Battlefield\Services\TargetingServiceFactory;
 use GreatMarketrealmTabletop\Tabletop\Testing\TestTableProvisioner;
 use GreatMarketrealmTabletop\Tabletop\Movement\Services\TabletopMovementFactory;
@@ -45,6 +47,8 @@ final class TabletopServiceProvider
     private TestTableAjaxController $testTableAjax;
 
     private TargetingAjaxController $targetingAjax;
+
+    private CartographyAjaxController $cartographyAjax;
 
     public function __construct()
     {
@@ -86,6 +90,10 @@ final class TabletopServiceProvider
 
         $this->targetingAjax = new TargetingAjaxController(
             TargetingServiceFactory::make()
+        );
+
+        $this->cartographyAjax = new CartographyAjaxController(
+            CartographersTableFactory::make()
         );
     }
 
@@ -174,6 +182,11 @@ final class TabletopServiceProvider
         add_action(
             'wp_ajax_gmrt_measure_target',
             [$this->targetingAjax, 'measure']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_replace_battlemap',
+            [$this->cartographyAjax, 'replaceBattlemap']
         );
     }
 }

@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.21.0-alpha.1] - 2026-08-27
+
+### Added
+
+- Phase IV.21 — The Cartographer's Table.
+- Dungeon Master battlemap selection through the WordPress Media Library.
+- Server-side image validation and active-DM authorization.
+- Persistent active Scene battlemap replacement using Media attachment IDs.
+- Live board image refresh while preserving tokens and grid configuration.
+
+
 ## [0.20.0-alpha.2] - 2026-08-27
 
 ### Fixed

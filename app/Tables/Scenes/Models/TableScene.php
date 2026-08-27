@@ -79,6 +79,22 @@ final class TableScene
     public function activate(): void { $this->active = true; }
     public function deactivate(): void { $this->active = false; }
 
+    public function replaceMap(
+        int $mapAttachmentId,
+        int $width,
+        int $height
+    ): void {
+        self::assertSurface(
+            $mapAttachmentId,
+            $width,
+            $height
+        );
+
+        $this->mapAttachmentId = $mapAttachmentId;
+        $this->width = $width;
+        $this->height = $height;
+    }
+
     public function id(): string { return $this->id; }
     public function tableId(): string { return $this->tableId; }
     public function name(): string { return $this->name; }

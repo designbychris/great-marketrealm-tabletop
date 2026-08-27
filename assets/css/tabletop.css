@@ -1010,3 +1010,38 @@
     .gmrt-deeds__attack { flex-basis: 100%; }
     .gmrt-deeds__attack select { max-width: min(100%, 24rem); }
 }
+
+
+/* Phase IV.21 — The Cartographer's Table */
+.gmrt-board__tools {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: .65rem;
+    flex-wrap: wrap;
+}
+.gmrt-cartographer-button {
+    border: 1px solid rgba(244, 234, 214, .45);
+    border-radius: 8px;
+    padding: .45rem .7rem;
+    background: rgba(0, 0, 0, .34);
+    color: inherit;
+    font: 800 .75rem system-ui, sans-serif;
+    cursor: pointer;
+}
+.gmrt-cartographer-button:hover,
+.gmrt-cartographer-button:focus-visible {
+    background: rgba(255, 255, 255, .1);
+}
+.gmrt-cartographer-status {
+    margin: .35rem 0 .75rem;
+    font: 600 .72rem/1.4 system-ui, sans-serif;
+    opacity: .78;
+}
+.gmrt-board__map {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    image-rendering: auto;
+}

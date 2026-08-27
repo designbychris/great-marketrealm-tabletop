@@ -85,6 +85,94 @@
     const arsenalAttack = document.querySelector(
         '[data-arsenal-attack]'
     );
+    const chooseBattlemap = document.querySelector(
+        '[data-choose-battlemap]'
+    );
+    const cartographerStatus = document.querySelector(
+        '[data-cartographer-status]'
+    );
+
+    if (chooseBattlemap) {
+        chooseBattlemap.addEventListener('click', () => {
+            if (
+                !window.wp
+                || !window.wp.media
+            ) {
+                say('The WordPress Media Library is unavailable.');
+                return;
+            }
+
+            const frame = window.wp.media({
+                title: 'Choose a Battlemap',
+                button: {
+                    text: 'Use this Battlemap'
+                },
+                library: {
+                    type: 'image'
+                },
+                multiple: false
+            });
+
+            frame.on('select', async () => {
+                const selected = frame.state()
+                    .get('selection')
+                    .first();
+
+                if (!selected) {
+                    return;
+                }
+
+                const attachment = selected.toJSON();
+
+                try {
+                    if (cartographerStatus) {
+                        cartographerStatus.textContent =
+                            'The Cartographer is preparing the new battlemap…';
+                    }
+
+                    const data = await request(
+                        'gmrt_replace_battlemap',
+                        {
+                            attachment_id: attachment.id
+                        }
+                    );
+
+                    const battlemap = data.battlemap || {};
+                    const map = document.querySelector(
+                        '[data-battlemap-image]'
+                    );
+
+                    if (map && battlemap.url) {
+                        map.src = String(battlemap.url);
+                        map.width = Number(battlemap.width || map.width);
+                        map.height = Number(battlemap.height || map.height);
+                    } else {
+                        window.location.reload();
+                        return;
+                    }
+
+                    if (cartographerStatus) {
+                        cartographerStatus.textContent =
+                            'Battlemap changed. Tokens and grid remain in place.';
+                    }
+
+                    say('Battlemap changed.');
+                } catch (error) {
+                    if (cartographerStatus) {
+                        cartographerStatus.textContent =
+                            error.message || 'The battlemap could not be changed.';
+                    }
+                    say(
+                        error.message
+                        || 'The battlemap could not be changed.'
+                    );
+                }
+            });
+
+            frame.open();
+        });
+    }
+
     const attackTarget = document.querySelector(
         '[data-attack-target]'
     );

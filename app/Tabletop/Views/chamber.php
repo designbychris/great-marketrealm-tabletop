@@ -428,6 +428,17 @@ $sceneImage = $scene !== null
                         </h2>
                     </div>
 
+                    <div class="gmrt-board__tools">
+                        <?php if ($state->isDungeonMaster()) : ?>
+                            <button
+                                type="button"
+                                class="gmrt-cartographer-button"
+                                data-choose-battlemap
+                            >
+                                Choose Battlemap
+                            </button>
+                        <?php endif; ?>
+
                     <span>
                         <?php echo esc_html(
                             (string) $scene['grid_type']
@@ -441,7 +452,20 @@ $sceneImage = $scene !== null
                             ); ?> px grid
                         <?php endif; ?>
                     </span>
+                    </div>
                 </div>
+
+                <?php if ($state->isDungeonMaster()) : ?>
+                    <p
+                        class="gmrt-cartographer-status"
+                        data-cartographer-status
+                        role="status"
+                        aria-live="polite"
+                    >
+                        Battlemap artwork may be changed without moving tokens
+                        or changing the rules grid.
+                    </p>
+                <?php endif; ?>
 
                 <div
                     class="gmrt-board__viewport"
@@ -461,6 +485,7 @@ $sceneImage = $scene !== null
                     <?php if ($sceneImage !== false) : ?>
                         <img
                             class="gmrt-board__map"
+                            data-battlemap-image
                             src="<?php echo esc_url(
                                 $sceneImage
                             ); ?>"

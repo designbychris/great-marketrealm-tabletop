@@ -418,3 +418,18 @@ Lower-latency shared-state synchronisation, presence and reconnection foundation
 - [ ] Ammunition/equipment consumption
 - [ ] Spell-resource consumption
 - [ ] Server-side certification on deployment
+
+
+### Phase IV.21 — The Cartographer's Table
+
+- [x] Dungeon Master battlemap chooser in the active Scene
+- [x] WordPress Media Library image upload/selection
+- [x] Image-only server validation
+- [x] Persist selected Media attachment ID on the Scene
+- [x] Adopt the selected image's native dimensions
+- [x] Preserve token normalised coordinates when artwork changes
+- [x] Preserve grid type and grid size when artwork changes
+- [x] Live battlemap refresh after successful save
+- [x] Active Dungeon Master authorization and nonce protection
+- [x] Existing bundled Training Yard remains a valid fallback/current map
+- [ ] Grid scale/offset calibration — Phase IV.21A
