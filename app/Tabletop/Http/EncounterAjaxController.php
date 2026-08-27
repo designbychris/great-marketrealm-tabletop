@@ -18,6 +18,18 @@ final class EncounterAjaxController
         private EncounterManager $encounters
     ) {}
 
+    public function begin(): void
+    {
+        $this->guard();
+
+        $this->respond(fn () => $this->encounters->begin(
+            $this->tableId(),
+            get_current_user_id(),
+            sanitize_text_field((string) ($_POST['name'] ?? 'A Sudden Encounter')),
+            $this->combatants()
+        ));
+    }
+
     public function prepare(): void
     {
         $this->guard();
@@ -95,6 +107,34 @@ final class EncounterAjaxController
             TabletopAjaxController::NONCE_ACTION,
             'nonce'
         );
+    }
+
+    /** @return array<int,array{token_id:string,initiative:int,initiative_modifier:int}> */
+    private function combatants(): array
+    {
+        $decoded = json_decode(
+            wp_unslash((string) ($_POST['combatants'] ?? '[]')),
+            true
+        );
+
+        if (! is_array($decoded)) {
+            return [];
+        }
+
+        $combatants = [];
+        foreach ($decoded as $record) {
+            if (! is_array($record)) {
+                continue;
+            }
+
+            $combatants[] = [
+                'token_id' => sanitize_text_field((string) ($record['token_id'] ?? '')),
+                'initiative' => (int) ($record['initiative'] ?? 0),
+                'initiative_modifier' => (int) ($record['initiative_modifier'] ?? 0),
+            ];
+        }
+
+        return $combatants;
     }
 
     private function tableId(): string

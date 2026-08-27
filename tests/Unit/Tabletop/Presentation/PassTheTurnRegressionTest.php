@@ -64,10 +64,10 @@ final class PassTheTurnRegressionTest extends TestCase
         );
     }
 
-    public function testSuccessfulPassRefreshesWholeCombatHud(): void
+    public function testSuccessfulPassRefreshesAuthoritativeStateInPlace(): void
     {
         self::assertStringContainsString(
-            'window.location.reload();',
+            "say('Turn passed.');\n                await refresh();",
             $this->script
         );
     }

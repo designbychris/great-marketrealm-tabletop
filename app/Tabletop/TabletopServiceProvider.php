@@ -151,6 +151,11 @@ final class TabletopServiceProvider
         );
 
         add_action(
+            'wp_ajax_gmrt_begin_encounter',
+            [$this->encounterAjax, 'begin']
+        );
+
+        add_action(
             'wp_ajax_gmrt_prepare_encounter',
             [$this->encounterAjax, 'prepare']
         );

@@ -136,4 +136,55 @@ final class EncounterManagerTest extends TestCase
         self::assertNotNull($current);
         self::assertTrue($current->isEnded());
     }
+
+    public function testDungeonMasterMayBeginFreshEncounterInOneOperation(): void
+    {
+        $encounter = $this->manager->begin(
+            'table-1',
+            42,
+            'Pantry Ambush',
+            [[
+                'token_id' => 'token-a',
+                'initiative' => 17,
+                'initiative_modifier' => 3,
+            ]]
+        );
+
+        self::assertSame(EncounterStatus::ACTIVE, $encounter->status());
+        self::assertSame(1, $encounter->round());
+        self::assertSame('token-a', $encounter->currentCombatant()?->tokenId());
+        self::assertSame($encounter->id(), $this->encounters->currentForScene('table-1', 'scene-1')?->id());
+    }
+
+    public function testPlayerCannotBeginEncounterFromExploration(): void
+    {
+        $this->expectException(EncounterControlDenied::class);
+
+        $this->manager->begin(
+            'table-1',
+            84,
+            'Absolutely Not',
+            [['token_id' => 'token-a', 'initiative' => 10]]
+        );
+    }
+
+    public function testEndedEncounterReturnsSceneToExplorationAndAllowsFreshBattle(): void
+    {
+        $first = $this->manager->begin(
+            'table-1', 42, 'First Battle',
+            [['token_id' => 'token-a', 'initiative' => 10]]
+        );
+        $this->manager->end('table-1', 42, $first->id(), $first->revision());
+
+        self::assertNull($this->encounters->currentForScene('table-1', 'scene-1'));
+
+        $second = $this->manager->begin(
+            'table-1', 42, 'Second Battle',
+            [['token_id' => 'token-a', 'initiative' => 12]]
+        );
+
+        self::assertSame(EncounterStatus::ACTIVE, $second->status());
+        self::assertSame(1, $second->round());
+    }
+
 }

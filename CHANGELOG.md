@@ -1,3 +1,13 @@
+## 0.24.0-alpha.1 — Phase IV.24: Peace and Battle
+
+- Added Exploration Mode as the natural state of an active Scene when no current Encounter exists.
+- Added a Dungeon Master Start Encounter workflow with explicit combatant selection and initiative entry.
+- Added Dungeon Master End Encounter controls that retire battle without mutating Scene tokens, Fog/exploration, grid calibration or Vision Layer state.
+- Added a single-operation server-authoritative Encounter begin service so partial preparation cannot strand the Table in battle setup.
+- Replaced encounter-lifecycle page reloads with live Chamber markup replacement and JavaScript re-binding for connected DM/Player browsers.
+- Kept movement, Living Veil, remembered exploration, walls and doors alive during Exploration Mode.
+
+
 ## 0.23.1-alpha.2 — Phase IV.23A corrective: Reliable Summons & Seat Removal
 
 - Generate invitation links with the canonical Tabletop query route so they work without relying on rewrite rules being flushed.

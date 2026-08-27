@@ -95,6 +95,68 @@ $sceneImage = $scene !== null
     </header>
 
 
+    <?php if ($state !== null && $encounter === null) : ?>
+        <section
+            class="gmrt-exploration-strip"
+            aria-labelledby="gmrt-exploration-title"
+            data-exploration-mode
+        >
+            <div>
+                <p class="gmrt-chamber__eyebrow">Peace upon the path</p>
+                <h2 id="gmrt-exploration-title">Exploration Mode</h2>
+                <p class="gmrt-exploration-strip__copy">
+                    Move through the Scene freely. The Living Veil, doors, walls
+                    and remembered route remain active without rounds or turns.
+                </p>
+            </div>
+
+            <?php if ($state->isDungeonMaster() && $scene !== null && $tokens !== []) : ?>
+                <details class="gmrt-start-encounter" data-start-encounter-panel>
+                    <summary>Start Encounter ⚔</summary>
+                    <div class="gmrt-start-encounter__body">
+                        <label>
+                            Encounter name
+                            <input
+                                type="text"
+                                value="A Sudden Encounter"
+                                data-encounter-name
+                            >
+                        </label>
+                        <fieldset>
+                            <legend>Combatants &amp; initiative</legend>
+                            <?php foreach ($tokens as $token) : ?>
+                                <?php $tokenId = (string) ($token['id'] ?? ''); ?>
+                                <?php if ($tokenId === '') { continue; } ?>
+                                <label class="gmrt-start-encounter__combatant">
+                                    <input
+                                        type="checkbox"
+                                        value="<?php echo esc_attr($tokenId); ?>"
+                                        data-encounter-combatant
+                                        checked
+                                    >
+                                    <span><?php echo esc_html((string) ($token['label'] ?? 'Combatant')); ?></span>
+                                    <span>Initiative</span>
+                                    <input
+                                        type="number"
+                                        min="-20"
+                                        max="99"
+                                        value="10"
+                                        data-encounter-initiative="<?php echo esc_attr($tokenId); ?>"
+                                        aria-label="Initiative for <?php echo esc_attr((string) ($token['label'] ?? 'combatant')); ?>"
+                                    >
+                                </label>
+                            <?php endforeach; ?>
+                        </fieldset>
+                        <button type="button" data-start-encounter>
+                            Begin Battle ⚔
+                        </button>
+                    </div>
+                </details>
+            <?php endif; ?>
+        </section>
+    <?php endif; ?>
+
+
     <?php if ($encounter !== null) : ?>
         <section
             class="gmrt-encounter-strip"
@@ -155,6 +217,13 @@ $sceneImage = $scene !== null
                         data-end-turn
                     >
                         End Turn ▶
+                    </button>
+                    <button
+                        type="button"
+                        class="gmrt-end-encounter"
+                        data-end-encounter
+                    >
+                        End Encounter ◇
                     </button>
                 <?php endif; ?>
             </div>
@@ -1022,6 +1091,7 @@ $sceneImage = $scene !== null
                 </div>
 
 
+                <?php if ($encounter !== null) : ?>
                 <section
                     class="gmrt-battle-log"
                     aria-labelledby="gmrt-battle-log-title"
@@ -1069,6 +1139,7 @@ $sceneImage = $scene !== null
                         No deeds have been chronicled yet.
                     </p>
                 </section>
+                <?php endif; ?>
             </aside>
         </div>
     <?php endif; ?>

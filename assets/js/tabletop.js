@@ -1,6 +1,48 @@
 (function () {
     'use strict';
 
+    let activeRefreshTimer = null;
+
+    async function replaceChamber(message) {
+        const current = document.querySelector('.gmrt-chamber');
+        const liveStatus = document.querySelector('#gmrt-tabletop-status');
+
+        if (!current) {
+            return;
+        }
+
+        if (message && liveStatus) {
+            liveStatus.textContent = message;
+        }
+
+        const response = await fetch(window.location.href, {
+            method: 'GET',
+            credentials: 'same-origin',
+            headers: { 'X-GMRT-Live-Chamber': '1' }
+        });
+
+        if (!response.ok) {
+            throw new Error('The live Chamber could not be refreshed.');
+        }
+
+        const html = await response.text();
+        const parsed = new DOMParser().parseFromString(html, 'text/html');
+        const incoming = parsed.querySelector('.gmrt-chamber');
+
+        if (!incoming) {
+            throw new Error('The refreshed Chamber markup was not found.');
+        }
+
+        if (activeRefreshTimer) {
+            window.clearInterval(activeRefreshTimer);
+            activeRefreshTimer = null;
+        }
+
+        current.replaceWith(incoming);
+        bootTabletop();
+    }
+
+    function bootTabletop() {
     const root = document.querySelector('.gmrt-chamber');
     const board = document.querySelector('.gmrt-board__viewport');
     const status = document.querySelector('#gmrt-tabletop-status');
@@ -11,7 +53,6 @@
 
     const tableId = root.dataset.tableId || '';
     let selected = null;
-    let refreshTimer = null;
     let targetingPreview = null;
     let visionDrafting = false;
 
@@ -1424,8 +1465,11 @@
                 currentEncounterRevision !== incomingEncounterRevision;
 
             if (encounterLifecycleChanged) {
-                say('The Table has changed its battle state. Reopening the chamber…');
-                window.location.reload();
+                await replaceChamber(
+                    incomingEncounter
+                        ? 'Battle has begun — the Table takes its places.'
+                        : 'Peace returns — exploration resumes.'
+                );
                 return;
             }
 
@@ -1685,6 +1729,78 @@
     });
 
 
+    const startEncounterButton = document.querySelector(
+        '[data-start-encounter]'
+    );
+
+    if (startEncounterButton) {
+        startEncounterButton.addEventListener('click', async () => {
+            const name = document.querySelector('[data-encounter-name]');
+            const selectedCombatants = Array.from(
+                document.querySelectorAll('[data-encounter-combatant]:checked')
+            );
+            const combatants = selectedCombatants.map((checkbox) => {
+                const tokenId = String(checkbox.value || '');
+                const initiative = document.querySelector(
+                    '[data-encounter-initiative="'
+                    + CSS.escape(tokenId)
+                    + '"]'
+                );
+
+                return {
+                    token_id: tokenId,
+                    initiative: initiative ? parseInt(initiative.value || '0', 10) : 0,
+                    initiative_modifier: 0
+                };
+            });
+
+            if (combatants.length === 0) {
+                say('Choose at least one combatant before beginning battle.');
+                return;
+            }
+
+            startEncounterButton.disabled = true;
+            say('Calling the Table to battle…');
+
+            try {
+                await request('gmrt_begin_encounter', {
+                    name: name ? name.value : 'A Sudden Encounter',
+                    combatants: JSON.stringify(combatants)
+                });
+                await replaceChamber('Battle begins.');
+            } catch (error) {
+                startEncounterButton.disabled = false;
+                say(error.message || 'The Encounter could not begin.');
+            }
+        });
+    }
+
+    const endEncounterButton = document.querySelector('[data-end-encounter]');
+
+    if (endEncounterButton) {
+        endEncounterButton.addEventListener('click', async () => {
+            const encounter = document.querySelector('[data-encounter-id]');
+            if (!encounter) {
+                say('No current Encounter.');
+                return;
+            }
+
+            endEncounterButton.disabled = true;
+            say('Ending the Encounter…');
+
+            try {
+                await request('gmrt_end_encounter', {
+                    encounter_id: encounter.dataset.encounterId || '',
+                    revision: encounter.dataset.encounterRevision || '1'
+                });
+                await replaceChamber('Peace returns to the path.');
+            } catch (error) {
+                endEncounterButton.disabled = false;
+                say(error.message || 'The Encounter could not end.');
+            }
+        });
+    }
+
     const endTurnButton = document.querySelector('[data-end-turn]');
 
     if (endTurnButton) {
@@ -1712,7 +1828,7 @@
                 }
 
                 say('Turn passed.');
-                window.location.reload();
+                await refresh();
             } catch (error) {
                 say(error.message || 'The turn could not be passed.');
                 endTurnButton.disabled = false;
@@ -2248,11 +2364,15 @@
     });
 
 
-    refreshTimer = window.setInterval(refresh, 5000);
+    activeRefreshTimer = window.setInterval(refresh, 5000);
+    }
 
     window.addEventListener('beforeunload', () => {
-        if (refreshTimer) {
-            window.clearInterval(refreshTimer);
+        if (activeRefreshTimer) {
+            window.clearInterval(activeRefreshTimer);
+            activeRefreshTimer = null;
         }
     });
+
+    bootTabletop();
 }());

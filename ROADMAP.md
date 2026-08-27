@@ -566,3 +566,16 @@ Real WordPress identities, avatars, Table invitations and explicit seat acceptan
 - [x] Continue live Chronicle, token, Fog and Vision Layer refreshes.
 - [x] Preserve a safe reload fallback for encounter lifecycle changes until IV.24.
 - [ ] Browser-certify DM → Player turn/round updates without a visible page reload.
+
+
+## Phase IV.24 — Peace and Battle
+
+- [x] Treat an active Scene with no current Encounter as Exploration Mode.
+- [x] Keep token movement, Fog, remembered exploration, walls and doors available during Exploration.
+- [x] Give the Dungeon Master an explicit Start Encounter workflow.
+- [x] Choose participating Scene tokens and initiative before battle begins.
+- [x] Give the Dungeon Master an explicit End Encounter action.
+- [x] End battle without resetting Scene/Fog/Vision state.
+- [x] Replace encounter-lifecycle full-page reloads with a live Chamber transition.
+- [ ] Browser-certify DM and Player move together from Exploration → Encounter without a page reload.
+- [ ] Browser-certify Encounter → Exploration preserves token positions, doors and remembered route.

@@ -76,6 +76,84 @@ final class EncounterManager
         return $encounter;
     }
 
+    /**
+     * Begin a fresh Encounter on the active Scene.
+     *
+     * @param array<int,array{token_id:string,initiative:int,initiative_modifier?:int}> $combatants
+     */
+    public function begin(
+        string $tableId,
+        int $viewerUserId,
+        string $name,
+        array $combatants
+    ): Encounter {
+        $this->requireDungeonMaster($tableId, $viewerUserId);
+        $this->requireOpenTable($tableId);
+
+        $scene = null;
+        foreach ($this->scenes->forTable($tableId) as $candidate) {
+            if ($candidate->isActive()) {
+                $scene = $candidate;
+                break;
+            }
+        }
+
+        if ($scene === null) {
+            throw new EncounterStateException(
+                'An active Scene is required before battle can begin.'
+            );
+        }
+
+        if ($this->encounters->currentForScene($tableId, $scene->id()) !== null) {
+            throw new EncounterStateException(
+                'That Scene already has a current Encounter.'
+            );
+        }
+
+        if ($combatants === []) {
+            throw new EncounterStateException(
+                'Choose at least one combatant before beginning battle.'
+            );
+        }
+
+        $encounter = Encounter::prepare(
+            $this->ids->generate(),
+            $tableId,
+            $scene->id(),
+            trim($name) !== '' ? trim($name) : 'A Sudden Encounter',
+            $this->clock->now()
+        );
+        $seen = [];
+
+        foreach ($combatants as $record) {
+            $tokenId = trim((string) ($record['token_id'] ?? ''));
+            if ($tokenId === '' || isset($seen[$tokenId])) {
+                throw new EncounterStateException(
+                    'Every chosen combatant must be a unique Scene token.'
+                );
+            }
+
+            $token = $this->tokens->find($tableId, $tokenId);
+            if ($token === null || $token->sceneId() !== $scene->id()) {
+                throw new EncounterStateException(
+                    'Combatants must be tokens on the active Scene.'
+                );
+            }
+
+            $seen[$tokenId] = true;
+            $encounter->addCombatant(new EncounterCombatant(
+                $tokenId,
+                (int) ($record['initiative'] ?? 0),
+                (int) ($record['initiative_modifier'] ?? 0)
+            ));
+        }
+
+        $encounter->start();
+        $this->encounters->save($encounter);
+
+        return $encounter;
+    }
+
     public function addCombatant(
         string $tableId,
         int $viewerUserId,

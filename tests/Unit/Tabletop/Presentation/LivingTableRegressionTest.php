@@ -47,10 +47,11 @@ final class LivingTableRegressionTest extends TestCase
         self::assertStringContainsString('.gmrt-token.is-active-turn', $this->css);
     }
 
-    public function testEncounterLifecycleChangeRetainsSafeReloadFallback(): void
+    public function testEncounterLifecycleChangeUsesLiveChamberTransition(): void
     {
         self::assertStringContainsString('if (encounterLifecycleChanged)', $this->script);
-        self::assertStringContainsString('window.location.reload();', $this->script);
+        self::assertStringContainsString('await replaceChamber(', $this->script);
+        self::assertStringNotContainsString("say('The Table has changed its battle state. Reopening the chamber…')", $this->script);
     }
 
     public function testRemoteTurnChangeHasAccessibleStatusAnnouncement(): void
