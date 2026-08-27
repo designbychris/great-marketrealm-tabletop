@@ -1381,3 +1381,38 @@
 }
 .gmrt-companion-link .is-connected { color: #aee7ae; font-weight: 800; }
 .gmrt-gathering-invitation { max-width: 620px; margin: 2rem auto; }
+
+/* Phase IV.23A — The Summons to the Table */
+.gmrt-party__member {
+    position: relative;
+    border: 1px solid rgba(255,255,255,.08);
+    transition: border-color .16s ease, box-shadow .16s ease;
+}
+.gmrt-party__member--dungeon-master {
+    border-color: rgba(218, 180, 92, .52);
+    box-shadow: inset 3px 0 0 rgba(218, 180, 92, .8);
+}
+.gmrt-party__member--player {
+    border-color: rgba(111, 190, 180, .42);
+    box-shadow: inset 3px 0 0 rgba(111, 190, 180, .68);
+}
+.gmrt-party__role {
+    border-radius: 3px;
+    min-width: auto;
+    width: auto;
+    height: auto;
+    padding: .2rem .38rem;
+    font-size: .68rem;
+    line-height: 1;
+}
+.gmrt-party__member--dungeon-master .gmrt-party__role {
+    background: rgba(218, 180, 92, .2);
+    border-color: rgba(218, 180, 92, .58);
+    color: #f5db9b;
+}
+.gmrt-party__member--player .gmrt-party__role {
+    background: rgba(111, 190, 180, .16);
+    border-color: rgba(111, 190, 180, .48);
+    color: #bde9e2;
+}
+

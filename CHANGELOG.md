@@ -545,3 +545,10 @@
 - Stable Companion availability contract.
 - PHPUnit configuration and first regression suite.
 - Architecture and roadmap documentation.
+
+## 0.23.1-alpha.1 — Phase IV.23A: The Summons to the Table
+- Table invitations remain canonical membership records even when mail delivery fails.
+- Added WordPress email summons with a direct Table link and explicit configured admin-email sender.
+- Added `gmrt_table_invitation_created` integration event for Companion/in-app notification consumers.
+- Added `gmrt_table_member_avatar_url` identity filter so Companion profile imagery can override the WordPress avatar without coupling domains.
+- Reworked Gathering seats to communicate DM/Player role with distinct accents and a separate presence pip instead of administrative Active text.

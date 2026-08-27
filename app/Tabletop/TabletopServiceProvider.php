@@ -24,6 +24,8 @@ use GreatMarketrealmTabletop\Tabletop\Http\GatheringAjaxController;
 use GreatMarketrealmTabletop\Tables\Memberships\Services\TableGatheringFactory;
 use GreatMarketrealmTabletop\Tables\Memberships\Repositories\WordPressTableMembershipRepository;
 use GreatMarketrealmTabletop\Tables\Memberships\Repositories\WordPressTableMemberIdentityDirectory;
+use GreatMarketrealmTabletop\Tables\Memberships\Delivery\WordPressTableInvitationDelivery;
+use GreatMarketrealmTabletop\Tables\Repositories\WordPressTableRepository;
 use GreatMarketrealmTabletop\Tabletop\Fog\Services\FogOfWarFactory;
 use GreatMarketrealmTabletop\Tabletop\Vision\Services\VisionBarrierFactory;
 use GreatMarketrealmTabletop\Tabletop\Cartography\Services\CartographersTableFactory;
@@ -119,10 +121,15 @@ final class TabletopServiceProvider
             VisionBarrierFactory::make()
         );
 
+        $identityDirectory = new WordPressTableMemberIdentityDirectory();
         $this->gatheringAjax = new GatheringAjaxController(
             TableGatheringFactory::make(),
             new WordPressTableMembershipRepository(),
-            new WordPressTableMemberIdentityDirectory()
+            $identityDirectory,
+            new WordPressTableInvitationDelivery(
+                new WordPressTableRepository(),
+                $identityDirectory
+            )
         );
     }
 

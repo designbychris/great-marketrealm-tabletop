@@ -535,3 +535,14 @@ Lower-latency shared-state synchronisation, presence and reconnection foundation
 
 Real WordPress identities, avatars, Table invitations and explicit seat acceptance establish the human membership layer before Companion character assignment and the Pixel Chamber. GMRC remains behind an integration boundary and Tabletop remains independently usable.
 
+
+### Phase IV.23A — The Summons to the Table
+- [x] Persist the Tabletop invitation before attempting delivery.
+- [x] Send a WordPress email summons containing the direct Table URL.
+- [x] Use the configured WordPress admin email as the explicit summons sender when valid.
+- [x] Preserve the invitation and report honest UI feedback if `wp_mail()` fails.
+- [x] Publish a Companion-safe invitation event without writing into GMRC internals.
+- [x] Provide an avatar integration filter for Companion profile imagery.
+- [x] Distinguish DM and Player seats with role accents while keeping presence a separate signal.
+- [ ] Browser-certify real email delivery and the received Take My Seat link.
+- [ ] Browser-certify Companion-side notification once GMRC consumes the integration event.

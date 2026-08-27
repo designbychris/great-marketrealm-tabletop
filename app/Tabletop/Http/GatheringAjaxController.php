@@ -9,6 +9,7 @@ use GreatMarketrealmTabletop\Tables\Memberships\Contracts\TableMembershipReposit
 use GreatMarketrealmTabletop\Tables\Memberships\Models\TableMemberStatus;
 use GreatMarketrealmTabletop\Tables\Memberships\Presentation\TableMemberProjector;
 use GreatMarketrealmTabletop\Tables\Memberships\Services\TableGathering;
+use GreatMarketrealmTabletop\Tables\Memberships\Delivery\WordPressTableInvitationDelivery;
 use Throwable;
 
 defined('ABSPATH') || exit;
@@ -18,7 +19,8 @@ final class GatheringAjaxController
     public function __construct(
         private TableGathering $gathering,
         private TableMembershipRepository $members,
-        private TableMemberIdentityDirectory $identities
+        private TableMemberIdentityDirectory $identities,
+        private WordPressTableInvitationDelivery $delivery
     ) {}
 
     public function invite(): void
@@ -42,10 +44,21 @@ final class GatheringAjaxController
             $member = $this->gathering->invitePlayer($tableId, $userId);
             $projection = (new TableMemberProjector($this->identities))
                 ->project($member);
+            $delivery = $this->delivery->deliver(
+                $tableId,
+                $userId,
+                get_current_user_id()
+            );
+            $message = $projection['display_name'] . ' has been summoned to the Table.';
+
+            if (! $delivery['email_sent']) {
+                $message .= ' Their seat is reserved, but WordPress could not send the email.';
+            }
 
             wp_send_json_success([
-                'message' => $projection['display_name'] . ' has been invited to the Table.',
+                'message' => $message,
                 'member' => $projection,
+                'delivery' => $delivery,
             ]);
         } catch (Throwable $exception) {
             wp_send_json_error(['message' => $exception->getMessage()], 400);

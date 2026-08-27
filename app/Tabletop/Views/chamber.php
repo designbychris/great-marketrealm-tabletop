@@ -845,7 +845,7 @@ $sceneImage = $scene !== null
 
                 <ul>
                     <?php foreach ($members as $member) : ?>
-                        <li class="gmrt-party__member">
+                        <li class="gmrt-party__member gmrt-party__member--<?php echo esc_attr((string) ($member['role'] ?? 'player')); ?> gmrt-party__member--<?php echo esc_attr((string) ($member['status'] ?? 'unknown')); ?>">
                             <?php $avatarUrl = (string) ($member['avatar_url'] ?? ''); ?>
                             <span class="gmrt-party__avatar" aria-hidden="true">
                                 <?php if ($avatarUrl !== '') : ?>
@@ -870,12 +870,9 @@ $sceneImage = $scene !== null
                                     )
                                 ); ?>
                             </strong>
-                            <small>
-                                <?php echo esc_html(
-                                    (string) (
-                                        $member['status']
-                                        ?? ''
-                                    )
+                            <small class="screen-reader-text">
+                                Membership status: <?php echo esc_html(
+                                    (string) ($member['status'] ?? '')
                                 ); ?>
                             </small>
                             <?php
@@ -968,15 +965,15 @@ $sceneImage = $scene !== null
 
                 <?php if ($state->isDungeonMaster()) : ?>
                     <div class="gmrt-gathering-controls">
-                        <strong>Invite an Adventurer</strong>
-                        <p>Invite an existing WordPress user by username, email, or user ID.</p>
+                        <strong>The Summons to the Table</strong>
+                        <p>Invite an existing WordPress user by username, email, or user ID. Their seat is reserved immediately and WordPress will also attempt to email a direct Table link.</p>
                         <form data-gathering-invite-form>
                             <label>
                                 <span>Player</span>
                                 <input type="text" name="player" autocomplete="off" required
                                     placeholder="username or email">
                             </label>
-                            <button type="submit">Send Invitation</button>
+                            <button type="submit">Send Summons</button>
                         </form>
                         <span data-gathering-status role="status" aria-live="polite"></span>
                     </div>

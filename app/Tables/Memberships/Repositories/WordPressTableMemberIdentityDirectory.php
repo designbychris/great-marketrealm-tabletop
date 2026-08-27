@@ -25,15 +25,32 @@ final class WordPressTableMemberIdentityDirectory implements TableMemberIdentity
             }
         }
 
+        $email = '';
+        if (function_exists('get_userdata')) {
+            $user = get_userdata($userId);
+            if (is_object($user)) {
+                $email = trim((string) ($user->user_email ?? ''));
+            }
+        }
+
         $avatarUrl = '';
         if (function_exists('get_avatar_url')) {
             $avatar = get_avatar_url($userId, ['size' => 64]);
             $avatarUrl = is_string($avatar) ? $avatar : '';
         }
 
+        if (function_exists('apply_filters')) {
+            $avatarUrl = (string) apply_filters(
+                'gmrt_table_member_avatar_url',
+                $avatarUrl,
+                $userId
+            );
+        }
+
         return [
             'user_id' => $userId,
             'display_name' => $displayName,
+            'email' => $email,
             'avatar_url' => $avatarUrl,
         ];
     }
