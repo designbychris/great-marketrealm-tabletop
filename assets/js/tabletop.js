@@ -1527,6 +1527,14 @@
 
                 node.style.setProperty('--gmrt-token-x', (token.x * 100) + '%');
                 node.style.setProperty('--gmrt-token-y', (token.y * 100) + '%');
+                node.style.setProperty(
+                    '--gmrt-token-width',
+                    String(Math.max(1, Number(token.width_units || 1)))
+                );
+                node.style.setProperty(
+                    '--gmrt-token-height',
+                    String(Math.max(1, Number(token.height_units || 1)))
+                );
                 node.dataset.tokenRevision = String(token.revision || 1);
 
                 const combatantState =

@@ -35,4 +35,13 @@ final class LivingTokenVisibilityRegressionTest extends TestCase
         self::assertStringContainsString('tokens.forEach((token) => {', $this->script);
         self::assertStringContainsString("token.controller_user_id || ''", $this->script);
     }
+
+
+    public function testMaterialisedTokenReceivesAuthoritativeGeometry(): void
+    {
+        self::assertStringContainsString("'--gmrt-token-width'", $this->script);
+        self::assertStringContainsString('token.width_units || 1', $this->script);
+        self::assertStringContainsString("'--gmrt-token-height'", $this->script);
+        self::assertStringContainsString('token.height_units || 1', $this->script);
+    }
 }
