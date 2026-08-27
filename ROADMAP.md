@@ -530,3 +530,8 @@ Lower-latency shared-state synchronisation, presence and reconnection foundation
 - [ ] Browser-certify wall drawing against a real calibrated dungeon map
 - [ ] Browser-certify closed/open door transitions and remembered-room behaviour
 
+
+## Phase IV.23 — The Gathering at the Table
+
+Real WordPress identities, avatars, Table invitations and explicit seat acceptance establish the human membership layer before Companion character assignment and the Pixel Chamber. GMRC remains behind an integration boundary and Tabletop remains independently usable.
+

@@ -1,3 +1,12 @@
+
+## 0.23.0-alpha.1 — Phase IV.23: The Gathering at the Table
+
+- Replaces numeric Table member placeholders with projected WordPress display names and avatars.
+- Adds Dungeon Master invitations for existing WordPress users by username, email or user ID.
+- Adds an explicit invited-player `Take My Seat` acceptance flow before Chamber access becomes active.
+- Keeps identity, persistent Table membership and Companion character assignment as separate concerns.
+- Surfaces GMRC availability/version through the existing isolated Companion integration boundary.
+- Preserves server-authoritative membership changes and opaque Companion character references.
 # Changelog
 
 ## 0.22.2-alpha.2 — Phase IV.22B.1: The Keeper's Cartography

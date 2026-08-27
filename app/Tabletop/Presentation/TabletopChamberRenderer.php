@@ -13,7 +13,8 @@ final class TabletopChamberRenderer
     public function render(
         ?TabletopChamberState $state,
         ?string $message = null,
-        bool $canPrepareTestTable = false
+        bool $canPrepareTestTable = false,
+        ?array $invitation = null
     ): string {
         $view = GMRT_PATH
             . 'app/Tabletop/Views/chamber.php';

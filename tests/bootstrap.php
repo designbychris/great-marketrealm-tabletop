@@ -103,3 +103,40 @@ if (! function_exists('update_option')) {
 }
 
 require_once dirname(__DIR__) . '/autoload.php';
+
+$GLOBALS['gmrt_test_users'] = $GLOBALS['gmrt_test_users'] ?? [];
+
+if (! function_exists('get_userdata')) {
+    function get_userdata(int $userId): object|false
+    {
+        $record = $GLOBALS['gmrt_test_users'][$userId] ?? null;
+        return is_array($record) ? (object) $record : false;
+    }
+}
+
+if (! function_exists('get_user_by')) {
+    function get_user_by(string $field, string $value): object|false
+    {
+        foreach ($GLOBALS['gmrt_test_users'] ?? [] as $record) {
+            if (! is_array($record)) {
+                continue;
+            }
+
+            $key = $field === 'login' ? 'user_login' : 'user_email';
+            if ((string) ($record[$key] ?? '') === $value) {
+                return (object) $record;
+            }
+        }
+
+        return false;
+    }
+}
+
+if (! function_exists('get_avatar_url')) {
+    function get_avatar_url(int $userId, array $args = []): string|false
+    {
+        return isset($GLOBALS['gmrt_test_users'][$userId])
+            ? 'https://example.test/avatar/' . $userId . '.png'
+            : false;
+    }
+}

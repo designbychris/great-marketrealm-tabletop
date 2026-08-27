@@ -7,6 +7,7 @@ defined('ABSPATH') || exit;
 /** @var TabletopChamberState|null $state */
 /** @var string|null $message */
 /** @var bool $canPrepareTestTable */
+/** @var array<string,mixed>|null $invitation */
 
 $table = $state?->table() ?? [];
 $viewer = $state?->viewer() ?? [];
@@ -22,6 +23,10 @@ $combatantStates = $state?->combatantStates() ?? [];
 $arsenals = $state?->arsenals() ?? [];
 $fog = $state?->fog() ?? [];
 $visionLayer = $state?->visionLayer() ?? [];
+$integrations = $state?->integrations() ?? [];
+$companion = is_array($integrations['companion'] ?? null)
+    ? $integrations['companion']
+    : [];
 
 $tokenLabels = [];
 foreach ($tokens as $token) {
@@ -44,7 +49,7 @@ $sceneImage = $scene !== null
     class="gmrt-chamber"
     id="main-content"
     data-table-id="<?php echo esc_attr(
-        (string) ($table['id'] ?? '')
+        (string) ($table['id'] ?? ($invitation['table_id'] ?? ''))
     ); ?>"
     data-viewer-role="<?php echo esc_attr(
         (string) ($viewer['role'] ?? '')
@@ -384,7 +389,21 @@ $sceneImage = $scene !== null
         </section>
     <?php endif; ?>
 
-    <?php if ($message !== null) : ?>
+    <?php if (is_array($invitation)) : ?>
+        <section class="gmrt-gathering-invitation" role="status">
+            <p class="gmrt-chamber__eyebrow">The Gathering at the Table</p>
+            <h2>Your chair is waiting</h2>
+            <p>
+                The Dungeon Master has invited you to join this Table.
+                Taking your seat creates your persistent Table membership;
+                your character remains a separate choice.
+            </p>
+            <button type="button" data-accept-table-invitation>
+                Take My Seat
+            </button>
+            <span data-gathering-status role="status" aria-live="polite"></span>
+        </section>
+    <?php elseif ($message !== null) : ?>
         <section
             class="gmrt-chamber__notice"
             role="status"
@@ -826,8 +845,16 @@ $sceneImage = $scene !== null
 
                 <ul>
                     <?php foreach ($members as $member) : ?>
-                        <li>
-                            <span>
+                        <li class="gmrt-party__member">
+                            <?php $avatarUrl = (string) ($member['avatar_url'] ?? ''); ?>
+                            <span class="gmrt-party__avatar" aria-hidden="true">
+                                <?php if ($avatarUrl !== '') : ?>
+                                    <img src="<?php echo esc_url($avatarUrl); ?>" alt="">
+                                <?php else : ?>
+                                    <?php echo esc_html(substr((string) ($member['display_name'] ?? '?'), 0, 1)); ?>
+                                <?php endif; ?>
+                            </span>
+                            <span class="gmrt-party__role">
                                 <?php echo esc_html(
                                     ($member['role'] ?? '')
                                     === 'dungeon-master'
@@ -836,10 +863,10 @@ $sceneImage = $scene !== null
                                 ); ?>
                             </span>
                             <strong>
-                                User #<?php echo esc_html(
+                                <?php echo esc_html(
                                     (string) (
-                                        $member['user_id']
-                                        ?? ''
+                                        $member['display_name']
+                                        ?? ('User #' . (string) ($member['user_id'] ?? ''))
                                     )
                                 ); ?>
                             </strong>
@@ -938,6 +965,33 @@ $sceneImage = $scene !== null
                         </li>
                     <?php endforeach; ?>
                 </ul>
+
+                <?php if ($state->isDungeonMaster()) : ?>
+                    <div class="gmrt-gathering-controls">
+                        <strong>Invite an Adventurer</strong>
+                        <p>Invite an existing WordPress user by username, email, or user ID.</p>
+                        <form data-gathering-invite-form>
+                            <label>
+                                <span>Player</span>
+                                <input type="text" name="player" autocomplete="off" required
+                                    placeholder="username or email">
+                            </label>
+                            <button type="submit">Send Invitation</button>
+                        </form>
+                        <span data-gathering-status role="status" aria-live="polite"></span>
+                    </div>
+                <?php endif; ?>
+
+                <div class="gmrt-companion-link">
+                    <strong>Great Marketrealm Companion</strong>
+                    <?php if (! empty($companion['available'])) : ?>
+                        <span class="is-connected">Connected<?php echo ! empty($companion['version']) ? ' · ' . esc_html((string) $companion['version']) : ''; ?></span>
+                        <p>Table membership is ready for Companion character assignment through the integration boundary.</p>
+                    <?php else : ?>
+                        <span>Not detected</span>
+                        <p>The Tabletop remains fully usable with manual combatants and NPCs.</p>
+                    <?php endif; ?>
+                </div>
 
                 <div class="gmrt-party__note">
                     <strong>

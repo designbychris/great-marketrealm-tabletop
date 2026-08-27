@@ -19,6 +19,8 @@ use GreatMarketrealmTabletop\Tabletop\Arsenal\Repositories\WordPressCombatArsena
 use GreatMarketrealmTabletop\Tabletop\Fog\Repositories\WordPressFogOfWarRepository;
 use GreatMarketrealmTabletop\Tabletop\Fog\Services\FogOfWarProjector;
 use GreatMarketrealmTabletop\Tabletop\Vision\Repositories\WordPressVisionBarrierRepository;
+use GreatMarketrealmTabletop\Tables\Memberships\Repositories\WordPressTableMemberIdentityDirectory;
+use GreatMarketrealmTabletop\Integration\Companion\CompanionAvailability;
 
 defined('ABSPATH') || exit;
 
@@ -41,7 +43,9 @@ final class TabletopChamberFactory
             new WordPressCombatArsenalRepository(),
             new WordPressFogOfWarRepository(),
             new FogOfWarProjector(),
-            new WordPressVisionBarrierRepository()
+            new WordPressVisionBarrierRepository(),
+            new WordPressTableMemberIdentityDirectory(),
+            new CompanionAvailability()
         );
     }
 }

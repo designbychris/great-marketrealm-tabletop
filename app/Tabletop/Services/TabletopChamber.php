@@ -21,6 +21,9 @@ use GreatMarketrealmTabletop\Tables\Contracts\TableRepository;
 use GreatMarketrealmTabletop\Tables\Memberships\Contracts\TableMembershipRepository;
 use GreatMarketrealmTabletop\Tables\Memberships\Models\TableMember;
 use GreatMarketrealmTabletop\Tables\Memberships\Models\TableMemberStatus;
+use GreatMarketrealmTabletop\Tables\Memberships\Contracts\TableMemberIdentityDirectory;
+use GreatMarketrealmTabletop\Tables\Memberships\Presentation\TableMemberProjector;
+use GreatMarketrealmTabletop\Integration\Companion\CompanionGateway;
 use GreatMarketrealmTabletop\Tables\Scenes\Contracts\TableSceneRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Contracts\TableTokenRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Models\TableToken;
@@ -46,7 +49,9 @@ final class TabletopChamber
         private ?CombatArsenalRepository $arsenals = null,
         private ?FogOfWarRepository $fogRepository = null,
         private ?FogOfWarProjector $fogProjector = null,
-        private ?VisionBarrierRepository $visionBarriers = null
+        private ?VisionBarrierRepository $visionBarriers = null,
+        private ?TableMemberIdentityDirectory $identities = null,
+        private ?CompanionGateway $companion = null
     ) {}
 
     public function state(
@@ -76,10 +81,15 @@ final class TabletopChamber
             );
         }
 
+        $memberModels = $this->members->forTable($tableId);
+        $projector = $this->identities !== null
+            ? new TableMemberProjector($this->identities)
+            : null;
         $members = array_map(
-            static fn (TableMember $member): array =>
-                $member->toArray(),
-            $this->members->forTable($tableId)
+            static fn (TableMember $member): array => $projector !== null
+                ? $projector->project($member)
+                : $member->toArray(),
+            $memberModels
         );
 
         $activeScene = null;
@@ -276,7 +286,13 @@ final class TabletopChamber
             $combatantStates,
             $arsenals,
             $fog,
-            $visionLayer
+            $visionLayer,
+            [
+                'companion' => [
+                    'available' => $this->companion?->available() ?? false,
+                    'version' => $this->companion?->version(),
+                ],
+            ]
         );
     }
 }

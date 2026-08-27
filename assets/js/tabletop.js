@@ -79,6 +79,54 @@
         });
     }
 
+    const gatheringStatus = document.querySelector('[data-gathering-status]');
+    const gatheringSay = (message) => {
+        if (gatheringStatus) gatheringStatus.textContent = message;
+    };
+
+    const acceptInvitationButton = document.querySelector(
+        '[data-accept-table-invitation]'
+    );
+
+    acceptInvitationButton?.addEventListener('click', async () => {
+        acceptInvitationButton.disabled = true;
+        gatheringSay('Taking your seat…');
+
+        try {
+            await request('gmrt_accept_table_invitation', {});
+            gatheringSay('Seat accepted. Opening the Table…');
+            window.location.reload();
+        } catch (error) {
+            gatheringSay(error.message || 'The invitation could not be accepted.');
+            acceptInvitationButton.disabled = false;
+        }
+    });
+
+    const gatheringInviteForm = document.querySelector(
+        '[data-gathering-invite-form]'
+    );
+
+    gatheringInviteForm?.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const input = gatheringInviteForm.querySelector('[name="player"]');
+        const button = gatheringInviteForm.querySelector('button[type="submit"]');
+        const player = input ? input.value.trim() : '';
+
+        if (!player) return;
+        if (button) button.disabled = true;
+        gatheringSay('Sending the invitation…');
+
+        try {
+            const data = await request('gmrt_invite_table_player', { player });
+            gatheringSay(data.message || 'Invitation sent.');
+            if (input) input.value = '';
+            window.setTimeout(() => window.location.reload(), 650);
+        } catch (error) {
+            gatheringSay(error.message || 'The player could not be invited.');
+            if (button) button.disabled = false;
+        }
+    });
+
     if (!board) {
         return;
     }

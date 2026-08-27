@@ -20,6 +20,10 @@ use GreatMarketrealmTabletop\Tabletop\Http\TargetingAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\CartographyAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\FogOfWarAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\VisionBarrierAjaxController;
+use GreatMarketrealmTabletop\Tabletop\Http\GatheringAjaxController;
+use GreatMarketrealmTabletop\Tables\Memberships\Services\TableGatheringFactory;
+use GreatMarketrealmTabletop\Tables\Memberships\Repositories\WordPressTableMembershipRepository;
+use GreatMarketrealmTabletop\Tables\Memberships\Repositories\WordPressTableMemberIdentityDirectory;
 use GreatMarketrealmTabletop\Tabletop\Fog\Services\FogOfWarFactory;
 use GreatMarketrealmTabletop\Tabletop\Vision\Services\VisionBarrierFactory;
 use GreatMarketrealmTabletop\Tabletop\Cartography\Services\CartographersTableFactory;
@@ -58,13 +62,16 @@ final class TabletopServiceProvider
 
     private VisionBarrierAjaxController $visionAjax;
 
+    private GatheringAjaxController $gatheringAjax;
+
     public function __construct()
     {
         $chamber = TabletopChamberFactory::make();
 
         $this->shortcode = new TabletopShortcode(
             $chamber,
-            new TabletopChamberRenderer()
+            new TabletopChamberRenderer(),
+            new WordPressTableMembershipRepository()
         );
 
         $this->ajax = new TabletopAjaxController(
@@ -110,6 +117,12 @@ final class TabletopServiceProvider
 
         $this->visionAjax = new VisionBarrierAjaxController(
             VisionBarrierFactory::make()
+        );
+
+        $this->gatheringAjax = new GatheringAjaxController(
+            TableGatheringFactory::make(),
+            new WordPressTableMembershipRepository(),
+            new WordPressTableMemberIdentityDirectory()
         );
     }
 
@@ -228,6 +241,16 @@ final class TabletopServiceProvider
         add_action(
             'wp_ajax_gmrt_remove_vision_barrier',
             [$this->visionAjax, 'remove']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_invite_table_player',
+            [$this->gatheringAjax, 'invite']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_accept_table_invitation',
+            [$this->gatheringAjax, 'accept']
         );
     }
 }

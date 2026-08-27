@@ -7,6 +7,8 @@ namespace GreatMarketrealmTabletop\Tabletop\Presentation;
 use GreatMarketrealmTabletop\Tabletop\Exceptions\TabletopAccessDenied;
 use GreatMarketrealmTabletop\Tabletop\Services\TabletopChamber;
 use Throwable;
+use GreatMarketrealmTabletop\Tables\Memberships\Contracts\TableMembershipRepository;
+use GreatMarketrealmTabletop\Tables\Memberships\Models\TableMemberStatus;
 
 defined('ABSPATH') || exit;
 
@@ -16,7 +18,8 @@ final class TabletopShortcode
 
     public function __construct(
         private TabletopChamber $chamber,
-        private TabletopChamberRenderer $renderer
+        private TabletopChamberRenderer $renderer,
+        private ?TableMembershipRepository $members = null
     ) {}
 
     /** @param array<string,mixed>|string $attributes */
@@ -58,6 +61,24 @@ final class TabletopShortcode
 
             return $this->renderer->render($state);
         } catch (TabletopAccessDenied $exception) {
+            $member = $this->members?->find(
+                $tableId,
+                get_current_user_id()
+            );
+
+            if ($member?->status() === TableMemberStatus::INVITED) {
+                return $this->renderer->render(
+                    null,
+                    null,
+                    false,
+                    [
+                        'table_id' => $tableId,
+                        'role' => $member->role(),
+                        'status' => $member->status(),
+                    ]
+                );
+            }
+
             return $this->renderer->render(
                 null,
                 $exception->getMessage()
