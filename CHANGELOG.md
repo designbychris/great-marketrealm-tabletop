@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.18.0-alpha.2] - 2026-08-27
+
+### Fixed
+
+- Corrected footprint-aware battlefield distance so every occupied grid unit
+  beyond a token's first square reduces the nearest-space gap by one full
+  square.
+- Updated the IV.17 affliction regression to assert IV.18's
+  `attackRollFactors()` composition and `AttackRollMode::fromFactors()`
+  resolution.
+
+
 ## [0.18.0-alpha.1] - 2026-08-27
 
 ### Added

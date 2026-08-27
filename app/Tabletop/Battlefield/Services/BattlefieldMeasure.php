@@ -55,13 +55,13 @@ final class BattlefieldMeasure
 
         $footprintX = max(
             0,
-            ($first->widthUnits() - 1) / 2
-            + ($second->widthUnits() - 1) / 2
+            ($first->widthUnits() - 1)
+            + ($second->widthUnits() - 1)
         );
         $footprintY = max(
             0,
-            ($first->heightUnits() - 1) / 2
-            + ($second->heightUnits() - 1) / 2
+            ($first->heightUnits() - 1)
+            + ($second->heightUnits() - 1)
         );
 
         $nearestX = max(

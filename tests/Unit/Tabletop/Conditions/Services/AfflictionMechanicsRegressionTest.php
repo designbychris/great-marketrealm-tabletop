@@ -16,7 +16,11 @@ final class AfflictionMechanicsRegressionTest extends TestCase
         );
 
         self::assertStringContainsString(
-            '->attackRollMode(',
+            '->attackRollFactors(',
+            $source
+        );
+        self::assertStringContainsString(
+            'AttackRollMode::fromFactors(',
             $source
         );
         self::assertStringContainsString(
