@@ -125,7 +125,7 @@ $sceneImage = $scene !== null
                 </strong>
 
                 <?php if ((int) ($encounter['round'] ?? 0) > 0) : ?>
-                    <span>
+                    <span data-live-round>
                         Round <?php echo esc_html(
                             (string) $encounter['round']
                         ); ?>
@@ -140,7 +140,7 @@ $sceneImage = $scene !== null
                     ?>
                     <span class="gmrt-current-turn" data-current-turn-label>
                         Turn:
-                        <strong><?php echo esc_html($turnLabel); ?></strong>
+                        <strong data-live-current-combatant><?php echo esc_html($turnLabel); ?></strong>
                     </span>
                 <?php endif; ?>
 
@@ -734,7 +734,10 @@ $sceneImage = $scene !== null
                                 ); ?><?php echo (
                                     ($token['visibility'] ?? '')
                                     === 'hidden'
-                                ) ? ' is-hidden-token' : ''; ?>"
+                                ) ? ' is-hidden-token' : ''; ?><?php echo (
+                                    $encounter !== null
+                                    && (string) ($encounter['current_token_id'] ?? '') === $tokenId
+                                ) ? ' is-active-turn' : ''; ?>"
                                 style="
                                     --gmrt-token-x: <?php echo esc_attr(
                                         (string) $left

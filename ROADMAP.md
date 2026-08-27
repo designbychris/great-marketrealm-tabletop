@@ -556,3 +556,13 @@ Real WordPress identities, avatars, Table invitations and explicit seat acceptan
 - [x] Preserve lightweight in-place token, Fog, Vision Layer and Chronicle refreshes.
 - [ ] Browser certify DM End Turn updates a connected Player's round/turn without manual refresh.
 - [ ] Browser certify Fog/exploration remains intact through the synchronized re-render.
+
+## Phase IV.23A.2 — The Living Table
+
+- [x] Reuse the existing authoritative chamber heartbeat.
+- [x] Patch remote round changes in place without reloading the chamber.
+- [x] Patch the active combatant label in place.
+- [x] Move the active-turn battlefield marker in place.
+- [x] Continue live Chronicle, token, Fog and Vision Layer refreshes.
+- [x] Preserve a safe reload fallback for encounter lifecycle changes until IV.24.
+- [ ] Browser-certify DM → Player turn/round updates without a visible page reload.

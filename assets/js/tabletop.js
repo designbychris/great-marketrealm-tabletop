@@ -1418,14 +1418,51 @@
                 ? String(incomingEncounter.revision || 1)
                 : '';
 
-            const encounterChanged =
-                currentEncounterId !== incomingEncounterId
-                || currentEncounterRevision !== incomingEncounterRevision;
+            const encounterLifecycleChanged =
+                currentEncounterId !== incomingEncounterId;
+            const encounterRevisionChanged =
+                currentEncounterRevision !== incomingEncounterRevision;
 
-            if (encounterChanged) {
-                say('The Table has moved on. Keeping time…');
+            if (encounterLifecycleChanged) {
+                say('The Table has changed its battle state. Reopening the chamber…');
                 window.location.reload();
                 return;
+            }
+
+            if (encounterRevisionChanged && currentEncounter && incomingEncounter) {
+                currentEncounter.dataset.encounterRevision = incomingEncounterRevision;
+
+                const liveRound = currentEncounter.querySelector('[data-live-round]');
+                if (liveRound) {
+                    liveRound.textContent = 'Round ' + String(incomingEncounter.round || 0);
+                }
+
+                const currentTokenId = String(incomingEncounter.current_token_id || '');
+                const activeToken = tokens.find((token) =>
+                    String(token.id || '') === currentTokenId
+                );
+                const liveCombatant = currentEncounter.querySelector(
+                    '[data-live-current-combatant]'
+                );
+                if (liveCombatant) {
+                    liveCombatant.textContent = activeToken
+                        ? String(activeToken.label || 'Unknown combatant')
+                        : 'Unknown combatant';
+                }
+
+                document.querySelectorAll('[data-token-id]').forEach((node) => {
+                    node.classList.toggle(
+                        'is-active-turn',
+                        node.dataset.tokenId === currentTokenId
+                    );
+                });
+
+                const deeds = document.querySelector('.gmrt-deeds[data-current-token]');
+                if (deeds) {
+                    deeds.dataset.currentToken = currentTokenId;
+                }
+
+                say('The Table stirred — the turn has changed.');
             }
 
             if (state.sync_revision) {

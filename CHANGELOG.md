@@ -564,3 +564,11 @@
 - Extended the existing five-second chamber heartbeat to detect authoritative Encounter ID/revision changes.
 - Connected players now automatically re-render their chamber when another participant advances the Encounter, keeping round and active-turn presentation current without manual refresh.
 - Added a server-derived shared-state revision covering Table membership, scene/tokens, encounter, vitality, conditions, Chronicle, Fog/exploration and the Vision Layer as a reusable synchronization seam for future Exploration/Encounter mode.
+
+### 0.23.3-alpha.1 — Phase IV.23A.2: The Living Table
+
+- Replaces full chamber reloads for ordinary remote encounter turn/round revisions with in-place DOM updates.
+- Live-patches the round label, current combatant label and active battlefield token from the authoritative heartbeat.
+- Keeps the existing five-second server-authoritative polling path for tokens, Fog, Vision Layer and Battle Chronicle.
+- Retains a safe reload fallback only when the encounter lifecycle itself changes; IV.24 will replace that with Exploration/Encounter transitions.
+- Adds an accessible live-status announcement when the remote turn changes.

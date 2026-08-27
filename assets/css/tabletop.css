@@ -1416,3 +1416,9 @@
     color: #bde9e2;
 }
 
+
+/* Phase IV.23A.2 — The Living Table */
+.gmrt-token.is-active-turn {
+    outline: 3px solid currentColor;
+    outline-offset: 3px;
+}
