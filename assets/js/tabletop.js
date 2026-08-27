@@ -1409,6 +1409,28 @@
         try {
             const state = await request('gmrt_tabletop_state', {});
             const tokens = Array.isArray(state.tokens) ? state.tokens : [];
+            const currentEncounter = document.querySelector('[data-encounter-id]');
+            const incomingEncounter = state.encounter || null;
+            const currentEncounterId = currentEncounter?.dataset.encounterId || '';
+            const incomingEncounterId = incomingEncounter?.id || '';
+            const currentEncounterRevision = currentEncounter?.dataset.encounterRevision || '';
+            const incomingEncounterRevision = incomingEncounter
+                ? String(incomingEncounter.revision || 1)
+                : '';
+
+            const encounterChanged =
+                currentEncounterId !== incomingEncounterId
+                || currentEncounterRevision !== incomingEncounterRevision;
+
+            if (encounterChanged) {
+                say('The Table has moved on. Keeping time…');
+                window.location.reload();
+                return;
+            }
+
+            if (state.sync_revision) {
+                root.dataset.syncRevision = String(state.sync_revision);
+            }
 
             renderBattleLog(state.battle_log);
             renderFog(state.fog || {});

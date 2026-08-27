@@ -559,3 +559,8 @@
 - Added `gmrt_table_invitation_created` integration event for Companion/in-app notification consumers.
 - Added `gmrt_table_member_avatar_url` identity filter so Companion profile imagery can override the WordPress avatar without coupling domains.
 - Reworked Gathering seats to communicate DM/Player role with distinct accents and a separate presence pip instead of administrative Active text.
+
+### 0.23.2-alpha.1 — Phase IV.23A.1: The Table Keeps Time
+- Extended the existing five-second chamber heartbeat to detect authoritative Encounter ID/revision changes.
+- Connected players now automatically re-render their chamber when another participant advances the Encounter, keeping round and active-turn presentation current without manual refresh.
+- Added a server-derived shared-state revision covering Table membership, scene/tokens, encounter, vitality, conditions, Chronicle, Fog/exploration and the Vision Layer as a reusable synchronization seam for future Exploration/Encounter mode.

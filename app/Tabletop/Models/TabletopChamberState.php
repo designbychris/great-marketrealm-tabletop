@@ -120,6 +120,30 @@ final class TabletopChamberState
         return $this->integrations;
     }
 
+    public function syncRevision(): string
+    {
+        $shared = [
+            'table' => $this->table,
+            'members' => $this->members,
+            'scene' => $this->scene,
+            'tokens' => $this->tokens,
+            'encounter' => $this->encounter,
+            'vitality' => $this->vitality,
+            'death_saves' => $this->deathSaves,
+            'conditions' => $this->conditions,
+            'battle_log' => $this->battleLog,
+            'combatant_states' => $this->combatantStates,
+            'arsenals' => $this->arsenals,
+            'fog' => $this->fog,
+            'vision_layer' => $this->visionLayer,
+        ];
+
+        return hash(
+            'sha256',
+            (string) json_encode($shared, JSON_UNESCAPED_SLASHES)
+        );
+    }
+
     public function isDungeonMaster(): bool
     {
         return ($this->viewer['role'] ?? '') === 'dungeon-master';

@@ -548,3 +548,11 @@ Real WordPress identities, avatars, Table invitations and explicit seat acceptan
 - [x] Distinguish DM and Player seats with role accents while keeping presence a separate signal.
 - [ ] Browser-certify real email delivery and the received Take My Seat link.
 - [ ] Browser-certify Companion-side notification once GMRC consumes the integration event.
+
+## Phase IV.23A.1 — The Table Keeps Time
+- [x] Reuse the existing chamber heartbeat rather than introduce a competing poller.
+- [x] Publish a server-derived shared-state revision with chamber state.
+- [x] Detect remote Encounter ID/revision changes and automatically re-render stale chambers.
+- [x] Preserve lightweight in-place token, Fog, Vision Layer and Chronicle refreshes.
+- [ ] Browser certify DM End Turn updates a connected Player's round/turn without manual refresh.
+- [ ] Browser certify Fog/exploration remains intact through the synchronized re-render.

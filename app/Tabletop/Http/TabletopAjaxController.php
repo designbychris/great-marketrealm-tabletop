@@ -47,6 +47,7 @@ final class TabletopAjaxController
                 'arsenals' => $state->arsenals(),
                 'fog' => $state->fog(),
                 'vision_layer' => $state->visionLayer(),
+                'sync_revision' => $state->syncRevision(),
             ]);
         } catch (TabletopAccessDenied $exception) {
             wp_send_json_error(

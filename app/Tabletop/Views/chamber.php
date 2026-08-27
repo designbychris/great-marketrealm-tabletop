@@ -54,6 +54,9 @@ $sceneImage = $scene !== null
     data-viewer-role="<?php echo esc_attr(
         (string) ($viewer['role'] ?? '')
     ); ?>"
+    data-sync-revision="<?php echo esc_attr(
+        $state?->syncRevision() ?? ''
+    ); ?>"
 >
     <header class="gmrt-chamber__masthead">
         <div>
