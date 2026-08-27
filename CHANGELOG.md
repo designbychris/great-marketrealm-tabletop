@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.19.1-alpha.2] - 2026-08-27
+
+### Fixed
+
+- Corrected `TabletopDeathAtDoorRegressionTest` to read the actual Tabletop
+  Chamber view at `app/Tabletop/Views/chamber.php`.
+
+
 ## [0.19.1-alpha.1] - 2026-08-27
 
 ### Fixed
