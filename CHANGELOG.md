@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.20.0-alpha.2] - 2026-08-27
+
+### Fixed
+
+- Ensured the selected Arsenal attack ID is sent to the authoritative
+  `gmrt_resolve_attack` request as well as the read-only targeting preview.
+  This keeps range preview, attack modifier and damage profile on the same
+  selected attack.
+- Made the Chamber Arsenal projection regression insensitive to harmless
+  fluent-call line wrapping.
+
+
 ## [0.20.0-alpha.1] - 2026-08-27
 
 ### Added

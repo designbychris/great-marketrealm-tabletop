@@ -923,6 +923,9 @@
                     data = await request('gmrt_resolve_attack', {
                         encounter_id: encounter.dataset.encounterId || '',
                         target_token_id: target.value,
+                        attack_id: arsenalAttack
+                            ? arsenalAttack.value
+                            : '',
                         revision: encounter.dataset.encounterRevision || '1'
                     });
                 } else {
