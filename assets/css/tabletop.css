@@ -172,7 +172,7 @@
     padding: 1.25rem;
 }
 
-.gmrt-party ul {
+.gmrt-party > ul {
     list-style: none;
     margin: 1rem 0;
     padding: 0;
@@ -180,7 +180,7 @@
     gap: .65rem;
 }
 
-.gmrt-party li {
+.gmrt-party > ul > li {
     display: grid;
     grid-template-columns: auto 1fr;
     gap: .15rem .65rem;
@@ -189,7 +189,7 @@
     background: rgba(255, 255, 255, .055);
 }
 
-.gmrt-party li > span {
+.gmrt-party > ul > li > span {
     grid-row: 1 / span 2;
     width: 2.25rem;
     height: 2.25rem;
@@ -200,7 +200,7 @@
     font: 700 .7rem system-ui, sans-serif;
 }
 
-.gmrt-party li small {
+.gmrt-party > ul > li > small {
     opacity: .65;
     text-transform: capitalize;
 }
@@ -861,5 +861,123 @@
 
     .gmrt-diceworks__outcome {
         grid-column: auto;
+    }
+}
+
+
+/* Phase IV.19.1 — Chronicle & Fallen Combatant Presentation */
+
+.gmrt-battle-log ol {
+    grid-auto-rows: max-content;
+    min-height: 13rem;
+    max-height: 26rem;
+    padding-right: .35rem;
+    scrollbar-gutter: stable;
+}
+
+.gmrt-battle-log li {
+    box-sizing: border-box;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+    grid-auto-flow: row;
+    min-height: 0;
+    height: auto;
+    margin: 0;
+    padding: .6rem .65rem;
+    overflow: visible;
+    border-radius: 7px;
+}
+
+.gmrt-battle-log li > small,
+.gmrt-battle-log li > span {
+    grid-column: 1;
+    grid-row: auto;
+    min-width: 0;
+    margin: 0;
+}
+
+.gmrt-battle-log li > span {
+    display: block;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: normal;
+}
+
+.gmrt-token__state-badge {
+    position: absolute;
+    left: 50%;
+    top: calc(100% + .18rem);
+    transform: translateX(-50%);
+    min-width: 1.65rem;
+    padding: 1px 3px;
+    border: 1px solid currentColor;
+    background: #17140f;
+    box-shadow: 1px 1px 0 rgba(0, 0, 0, .75);
+    font: 900 .48rem/1.1 ui-monospace, monospace;
+    letter-spacing: .05em;
+    text-align: center;
+    pointer-events: none;
+}
+
+.gmrt-token__state-badge[hidden] {
+    display: none;
+}
+
+.gmrt-token.is-state-wounded {
+    box-shadow:
+        0 4px 14px rgba(0, 0, 0, .5),
+        inset 0 -5px 0 rgba(0, 0, 0, .18);
+}
+
+.gmrt-token.is-state-downed {
+    opacity: .68;
+    transform:
+        translate(-50%, -50%)
+        rotate(18deg);
+}
+
+.gmrt-token.is-state-defeated {
+    opacity: .52;
+    filter: saturate(.4);
+    transform:
+        translate(-50%, -50%)
+        rotate(8deg);
+}
+
+.gmrt-token.is-state-deceased {
+    opacity: .38;
+    filter: grayscale(1);
+}
+
+.gmrt-token.is-state-deceased::after {
+    content: "×";
+    position: absolute;
+    inset: -.3rem;
+    display: grid;
+    place-items: center;
+    font: 900 1.55rem/1 ui-monospace, monospace;
+    text-shadow:
+        2px 0 #17140f,
+        -2px 0 #17140f,
+        0 2px #17140f,
+        0 -2px #17140f;
+    pointer-events: none;
+}
+
+.gmrt-hp__state {
+    font: 900 .58rem/1 system-ui, sans-serif;
+    letter-spacing: .08em;
+}
+
+.gmrt-hp__state--downed,
+.gmrt-hp__state--defeated,
+.gmrt-hp__state--deceased {
+    opacity: .82;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gmrt-token.is-state-downed,
+    .gmrt-token.is-state-defeated {
+        transition: none;
     }
 }

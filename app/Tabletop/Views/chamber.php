@@ -18,6 +18,7 @@ $vitality = $state?->vitality() ?? [];
 $deathSaves = $state?->deathSaves() ?? [];
 $conditions = $state?->conditions() ?? [];
 $battleLog = $state?->battleLog() ?? [];
+$combatantStates = $state?->combatantStates() ?? [];
 
 $tokenLabels = [];
 foreach ($tokens as $token) {
@@ -164,12 +165,17 @@ $sceneImage = $scene !== null
                 && (int) $currentVitality['current_hp'] === 0
             ) : ?>
                 <div class="gmrt-death-saves" data-death-saves>
-                    <strong>DOWN</strong>
+                    <strong>
+                        <?php echo (
+                            is_array($currentDeathSaves)
+                            && ! empty($currentDeathSaves['dead'])
+                        ) ? 'DECEASED' : 'DOWN'; ?>
+                    </strong>
                     <?php if (
                         is_array($currentDeathSaves)
                         && ! empty($currentDeathSaves['dead'])
                     ) : ?>
-                        <span>Fallen</span>
+                        <span>Death confirmed</span>
                     <?php elseif (
                         is_array($currentDeathSaves)
                         && ! empty($currentDeathSaves['stable'])
@@ -499,10 +505,25 @@ $sceneImage = $scene !== null
                                     ?? 1
                                 )
                             );
+                            $tokenId = (string) (
+                                $token['id'] ?? ''
+                            );
+                            $combatantState = (string) (
+                                $combatantStates[$tokenId]
+                                ?? 'healthy'
+                            );
+                            $stateBadge = match ($combatantState) {
+                                'downed' => 'DOWN',
+                                'defeated' => 'KO',
+                                'deceased' => 'DEAD',
+                                default => '',
+                            };
                             ?>
                             <div
                                 class="gmrt-token gmrt-token--<?php echo esc_attr(
                                     (string) $token['type']
+                                ); ?> is-state-<?php echo esc_attr(
+                                    $combatantState
                                 ); ?><?php echo (
                                     ($token['visibility'] ?? '')
                                     === 'hidden'
@@ -533,6 +554,9 @@ $sceneImage = $scene !== null
                                 data-token-controller="<?php echo esc_attr(
                                     (string) ($token['controller_user_id'] ?? '')
                                 ); ?>"
+                                data-combatant-state="<?php echo esc_attr(
+                                    $combatantState
+                                ); ?>"
                                 tabindex="0"
                                 role="button"
                                 aria-label="<?php echo esc_attr(
@@ -550,6 +574,16 @@ $sceneImage = $scene !== null
                                             )
                                         )
                                     ); ?>
+                                </span>
+                                <span
+                                    class="gmrt-token__state-badge"
+                                    data-token-state-badge
+                                    <?php echo $stateBadge === ''
+                                        ? 'hidden'
+                                        : ''; ?>
+                                    aria-hidden="true"
+                                >
+                                    <?php echo esc_html($stateBadge); ?>
                                 </span>
                                 <?php
                                 $tokenConditions = $conditions[
@@ -576,6 +610,9 @@ $sceneImage = $scene !== null
                                 <span class="screen-reader-text">
                                     <?php echo esc_html(
                                         (string) $token['label']
+                                    ); ?>
+                                    — <?php echo esc_html(
+                                        $combatantState
                                     ); ?>
                                     <?php if (
                                         ($token['visibility'] ?? '')
@@ -634,6 +671,7 @@ $sceneImage = $scene !== null
                                 ?? ''
                             );
                             $memberVitality = null;
+                            $memberCombatantState = null;
 
                             foreach ($tokens as $partyToken) {
                                 if (
@@ -648,6 +686,9 @@ $sceneImage = $scene !== null
                                         ?? ''
                                     );
                                     $memberVitality = $vitality[
+                                        $partyTokenId
+                                    ] ?? null;
+                                    $memberCombatantState = $combatantStates[
                                         $partyTokenId
                                     ] ?? null;
                                     break;
@@ -686,6 +727,26 @@ $sceneImage = $scene !== null
                                             ); ?> temp
                                         <?php endif; ?>
                                     </small>
+                                    <?php if (
+                                        is_string($memberCombatantState)
+                                        && ! in_array(
+                                            $memberCombatantState,
+                                            ['healthy', 'wounded'],
+                                            true
+                                        )
+                                    ) : ?>
+                                        <strong
+                                            class="gmrt-hp__state gmrt-hp__state--<?php echo esc_attr(
+                                                $memberCombatantState
+                                            ); ?>"
+                                        >
+                                            <?php echo esc_html(
+                                                strtoupper(
+                                                    $memberCombatantState
+                                                )
+                                            ); ?>
+                                        </strong>
+                                    <?php endif; ?>
                                 </div>
                             <?php endif; ?>
                         </li>

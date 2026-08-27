@@ -385,6 +385,44 @@
         }
     }
 
+    function updateCombatantState(node, state) {
+        const states = [
+            'healthy',
+            'wounded',
+            'downed',
+            'defeated',
+            'deceased'
+        ];
+
+        states.forEach((value) => {
+            node.classList.toggle(
+                'is-state-' + value,
+                value === state
+            );
+        });
+
+        node.dataset.combatantState = state;
+
+        const badge = node.querySelector(
+            '[data-token-state-badge]'
+        );
+
+        if (!badge) {
+            return;
+        }
+
+        const label = state === 'downed'
+            ? 'DOWN'
+            : state === 'defeated'
+                ? 'KO'
+                : state === 'deceased'
+                    ? 'DEAD'
+                    : '';
+
+        badge.textContent = label;
+        badge.hidden = label === '';
+    }
+
     async function refresh() {
         if (!tableId) {
             return;
@@ -395,6 +433,9 @@
             const tokens = Array.isArray(state.tokens) ? state.tokens : [];
 
             renderBattleLog(state.battle_log);
+
+            const combatantStates =
+                state.combatant_states || {};
 
             tokens.forEach((token) => {
                 const node = document.querySelector(
@@ -408,6 +449,15 @@
                 node.style.setProperty('--gmrt-token-x', (token.x * 100) + '%');
                 node.style.setProperty('--gmrt-token-y', (token.y * 100) + '%');
                 node.dataset.tokenRevision = String(token.revision || 1);
+
+                const combatantState =
+                    combatantStates[String(token.id)]
+                    || 'healthy';
+
+                updateCombatantState(
+                    node,
+                    combatantState
+                );
             });
         } catch (error) {
             say(error.message);

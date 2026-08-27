@@ -197,6 +197,12 @@ See `ROADMAP.md` and the `docs/` directory for the architecture plan.
 
 **First we build the table. Then we roll initiative.** 🎲
 
+### Phase IV.19.1 — Chronicle & Fallen Combatant Presentation
+
+Battle Chronicle entries now wrap and size correctly instead of inheriting the
+party-member card grid. Token presentation also distinguishes Healthy, Wounded,
+Downed, Defeated and Deceased without treating 0 HP as automatic death.
+
 ### Phase IV.19 — The Chronicle of Battle
 
 Immediate attack results now remain beside the Guild Diceworks, including roll

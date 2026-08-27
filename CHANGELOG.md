@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.19.1-alpha.1] - 2026-08-27
+
+### Fixed
+
+- Scoped party-member list styles so Battle Chronicle entries no longer
+  inherit the member card grid and overlap one another.
+- Made Chronicle rows content-sized, wrapped and comfortably scrollable.
+
+### Added
+
+- Phase IV.19.1 — Chronicle & Fallen Combatant Presentation.
+- Server-projected Healthy, Wounded, Downed, Defeated and Deceased states.
+- DOWN / KO / DEAD token badges and future pixel-sprite CSS/data hooks.
+- Distinction between 0 HP and confirmed death in board presentation.
+- Live combatant-state refresh from authoritative Tabletop state.
+
+
 ## [0.19.0-alpha.1] - 2026-08-27
 
 ### Added

@@ -379,3 +379,22 @@ Lower-latency shared-state synchronisation, presence and reconnection foundation
 - [ ] Search/filter Chronicle
 - [ ] DM annotations
 - [ ] Server-side certification on deployment
+
+
+### Phase IV.19.1 — Chronicle & Fallen Combatant Presentation
+
+- [x] Chronicle member-list CSS collision removed
+- [x] Chronicle rows grow naturally with wrapped content
+- [x] Chronicle receives a readable scroll viewport
+- [x] Server-authoritative combatant presentation states
+- [x] Healthy / Wounded / Downed / Defeated / Deceased distinction
+- [x] 0 HP character is Downed, not automatically dead
+- [x] 0 HP creature/object is Defeated
+- [x] Three failed death saves / confirmed death is Deceased
+- [x] DOWN / KO / DEAD token state badges
+- [x] Semantic token CSS/data hooks for future pixel sprites
+- [x] State refresh remains server-driven
+- [x] Party HP can surface terminal combatant state
+- [ ] Pixel-art fallen poses/icons
+- [ ] Creature-specific death-save policy
+- [ ] Server-side certification on deployment

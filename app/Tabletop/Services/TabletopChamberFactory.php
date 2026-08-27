@@ -14,6 +14,7 @@ use GreatMarketrealmTabletop\Tabletop\Battle\Repositories\WordPressDeathSaveRepo
 use GreatMarketrealmTabletop\Tabletop\Conditions\Repositories\WordPressConditionRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Repositories\WordPressBattleEventRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Presentation\BattleLogProjector;
+use GreatMarketrealmTabletop\Tabletop\Presentation\CombatantStateProjector;
 
 defined('ABSPATH') || exit;
 
@@ -31,7 +32,8 @@ final class TabletopChamberFactory
             new WordPressDeathSaveRepository(),
             new WordPressConditionRepository(),
             new WordPressBattleEventRepository(),
-            new BattleLogProjector()
+            new BattleLogProjector(),
+            new CombatantStateProjector()
         );
     }
 }

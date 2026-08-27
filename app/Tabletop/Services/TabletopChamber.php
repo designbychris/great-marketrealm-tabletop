@@ -12,6 +12,7 @@ use GreatMarketrealmTabletop\Tabletop\Battle\Contracts\DeathSaveRepository;
 use GreatMarketrealmTabletop\Tabletop\Conditions\Contracts\ConditionRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Contracts\BattleEventRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Presentation\BattleLogProjector;
+use GreatMarketrealmTabletop\Tabletop\Presentation\CombatantStateProjector;
 use GreatMarketrealmTabletop\Tables\Contracts\TableRepository;
 use GreatMarketrealmTabletop\Tables\Memberships\Contracts\TableMembershipRepository;
 use GreatMarketrealmTabletop\Tables\Memberships\Models\TableMember;
@@ -35,7 +36,8 @@ final class TabletopChamber
         private DeathSaveRepository $deathSaves,
         private ConditionRepository $conditions,
         private ?BattleEventRepository $battleEvents = null,
-        private ?BattleLogProjector $battleLogProjector = null
+        private ?BattleLogProjector $battleLogProjector = null,
+        private ?CombatantStateProjector $combatantStateProjector = null
     ) {}
 
     public function state(
@@ -111,6 +113,7 @@ final class TabletopChamber
         $vitality = [];
         $deathSaves = [];
         $conditions = [];
+        $combatantStates = [];
 
         foreach ($tokens as $token) {
             $tokenId = (string) ($token['id'] ?? '');
@@ -141,6 +144,15 @@ final class TabletopChamber
                     $tokenId
                 )
             );
+
+            if ($this->combatantStateProjector !== null) {
+                $combatantStates[$tokenId]
+                    = $this->combatantStateProjector->project(
+                        $token,
+                        $vitality[$tokenId],
+                        $deathSaves[$tokenId]
+                    );
+            }
         }
 
         $battleLog = [];
@@ -185,7 +197,8 @@ final class TabletopChamber
             $vitality,
             $deathSaves,
             $conditions,
-            $battleLog
+            $battleLog,
+            $combatantStates
         );
     }
 }
