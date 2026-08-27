@@ -1072,3 +1072,19 @@
 .gmrt-board__lens-stage { position:relative; overflow:hidden; width:100%; min-height:22rem; border-radius:inherit; touch-action:none; cursor:grab; }
 .gmrt-board__lens-stage.is-panning { cursor:grabbing; }
 .gmrt-board__lens-stage .gmrt-board__viewport { transform-origin:0 0; will-change:transform; }
+
+
+/* Phase IV.21B.1 — The Steady Lens */
+.gmrt-board__lens-stage,
+.gmrt-board__lens-stage .gmrt-board__viewport,
+.gmrt-board__lens-stage .gmrt-board__map {
+    user-select: none;
+    -webkit-user-select: none;
+}
+.gmrt-board__lens-stage .gmrt-board__map {
+    -webkit-user-drag: none;
+    pointer-events: none;
+}
+.gmrt-board__lens-stage {
+    overscroll-behavior: contain;
+}

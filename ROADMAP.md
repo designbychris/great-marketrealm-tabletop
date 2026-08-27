@@ -453,3 +453,12 @@ Lower-latency shared-state synchronisation, presence and reconnection foundation
 - [x] Drag-to-pan while zoomed
 - [x] Transform map, grid and tokens together
 - [x] Keep lens state independent from combat persistence
+
+### Phase IV.21B.1 — The Steady Lens
+
+- [x] Disable native battlemat image dragging
+- [x] Prevent battlefield text/image selection during pan
+- [x] Anchor pan movement to pointer-down origin
+- [x] Capture pointer for the complete gesture
+- [x] Add movement threshold before camera pan begins
+- [x] Preserve token and control interactions

@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.21.2-alpha.2] - 2026-08-27
+
+### Fixed
+
+- Phase IV.21B.1 — The Steady Lens.
+- Prevented native browser image dragging from interrupting battlefield panning.
+- Reworked pan movement around pointer-down origin coordinates for stable, non-accumulating motion.
+- Added full-gesture pointer capture and lost-capture cleanup.
+- Added a four-pixel movement threshold to distinguish clicks from intentional camera pans.
+- Preserved token interaction by excluding combatants and controls from camera pan gestures.
+
+
 ## [0.21.2-alpha.1] - 2026-08-27
 
 ### Added

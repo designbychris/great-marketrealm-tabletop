@@ -96,7 +96,16 @@
     const lens = {
         scale: 1, x: 0, y: 0,
         min: .25, max: 3, step: .1,
-        dragging: false, pointerX: 0, pointerY: 0
+        dragging: false,
+        panStarted: false,
+        pointerId: null,
+        pointerX: 0,
+        pointerY: 0,
+        startX: 0,
+        startY: 0,
+        originX: 0,
+        originY: 0,
+        threshold: 4
     };
 
     const clampLensScale = (scale) =>
@@ -155,35 +164,89 @@
     lensFit?.addEventListener('click', fitLens);
     lensReset?.addEventListener('click', resetLens);
 
+    const isLensInteractiveTarget = (target) =>
+        target instanceof Element
+        && Boolean(target.closest(
+            'button, input, select, textarea, a, [data-token-id]'
+        ));
+
+    lensStage?.addEventListener('dragstart', (event) => {
+        event.preventDefault();
+    });
+
     lensStage?.addEventListener('pointerdown', (event) => {
-        if (event.button !== 0 || lens.scale <= 1) return;
-        if (event.target.closest('button, input, select, a, [data-token-id]')) return;
+        if (event.button !== 0 || isLensInteractiveTarget(event.target)) {
+            return;
+        }
+
         lens.dragging = true;
+        lens.panStarted = false;
+        lens.pointerId = event.pointerId;
         lens.pointerX = event.clientX;
         lens.pointerY = event.clientY;
-        lensStage.classList.add('is-panning');
+        lens.startX = event.clientX;
+        lens.startY = event.clientY;
+        lens.originX = lens.x;
+        lens.originY = lens.y;
+
         lensStage.setPointerCapture(event.pointerId);
     });
 
     lensStage?.addEventListener('pointermove', (event) => {
-        if (!lens.dragging) return;
-        lens.x += event.clientX - lens.pointerX;
-        lens.y += event.clientY - lens.pointerY;
-        lens.pointerX = event.clientX;
-        lens.pointerY = event.clientY;
+        if (!lens.dragging || event.pointerId !== lens.pointerId) return;
+
+        const dx = event.clientX - lens.startX;
+        const dy = event.clientY - lens.startY;
+
+        if (
+            !lens.panStarted
+            && Math.hypot(dx, dy) < lens.threshold
+        ) {
+            return;
+        }
+
+        if (!lens.panStarted) {
+            lens.panStarted = true;
+            lensStage.classList.add('is-panning');
+        }
+
+        event.preventDefault();
+        lens.x = lens.originX + dx;
+        lens.y = lens.originY + dy;
         renderLens();
     });
 
     const stopLensPan = (event) => {
-        if (!lens.dragging) return;
-        lens.dragging = false;
-        lensStage?.classList.remove('is-panning');
-        if (lensStage?.hasPointerCapture(event.pointerId)) {
-            lensStage.releasePointerCapture(event.pointerId);
+        if (
+            !lens.dragging
+            || (
+                lens.pointerId !== null
+                && event.pointerId !== lens.pointerId
+            )
+        ) {
+            return;
         }
+
+        lens.dragging = false;
+        lens.panStarted = false;
+        lensStage?.classList.remove('is-panning');
+
+        if (
+            lensStage
+            && lens.pointerId !== null
+            && lensStage.hasPointerCapture(lens.pointerId)
+        ) {
+            lensStage.releasePointerCapture(lens.pointerId);
+        }
+
+        lens.pointerId = null;
     };
+
     lensStage?.addEventListener('pointerup', stopLensPan);
     lensStage?.addEventListener('pointercancel', stopLensPan);
+    lensStage?.addEventListener('lostpointercapture', (event) => {
+        if (lens.dragging) stopLensPan(event);
+    });
 
     const gridViewport = document.querySelector('.gmrt-board__viewport');
     const gridSize = document.querySelector('[data-grid-size]');

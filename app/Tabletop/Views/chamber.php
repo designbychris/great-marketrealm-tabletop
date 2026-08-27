@@ -544,6 +544,7 @@ $sceneImage = $scene !== null
                     <?php if ($sceneImage !== false) : ?>
                         <img
                             class="gmrt-board__map"
+                        draggable="false"
                             data-battlemap-image
                             src="<?php echo esc_url(
                                 $sceneImage
