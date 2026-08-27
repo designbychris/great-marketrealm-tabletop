@@ -1475,11 +1475,51 @@
 
             const combatantStates =
                 state.combatant_states || {};
+            const tokenLayer = document.querySelector('.gmrt-board__tokens');
+            const incomingTokenIds = new Set(
+                tokens.map((token) => String(token.id || ''))
+            );
+
+            document.querySelectorAll('.gmrt-board__tokens [data-token-id]').forEach((node) => {
+                if (!incomingTokenIds.has(String(node.dataset.tokenId || ''))) {
+                    node.remove();
+                }
+            });
 
             tokens.forEach((token) => {
-                const node = document.querySelector(
+                let node = document.querySelector(
                     '[data-token-id="' + CSS.escape(String(token.id)) + '"]'
                 );
+
+                if (!node && tokenLayer) {
+                    node = document.createElement('div');
+                    const label = String(token.label || 'Token');
+                    const type = String(token.type || 'character')
+                        .replace(/[^a-z0-9_-]/gi, '');
+                    node.className = 'gmrt-token gmrt-token--' + type;
+                    node.dataset.tokenId = String(token.id || '');
+                    node.dataset.tokenController = String(
+                        token.controller_user_id || ''
+                    );
+                    node.tabIndex = 0;
+                    node.setAttribute('role', 'button');
+                    node.setAttribute('aria-label', 'Select token: ' + label);
+                    node.title = label;
+
+                    const initial = document.createElement('span');
+                    initial.setAttribute('aria-hidden', 'true');
+                    initial.textContent = label.slice(0, 1).toUpperCase();
+                    node.appendChild(initial);
+
+                    const badge = document.createElement('span');
+                    badge.className = 'gmrt-token__state-badge';
+                    badge.dataset.tokenStateBadge = '';
+                    badge.setAttribute('aria-hidden', 'true');
+                    badge.hidden = true;
+                    node.appendChild(badge);
+
+                    tokenLayer.appendChild(node);
+                }
 
                 if (!node) {
                     return;

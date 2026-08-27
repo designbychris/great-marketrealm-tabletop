@@ -48,7 +48,8 @@ final class TableKeepsTimeRegressionTest extends TestCase
 
     public function testRemoteEncounterChangeUpdatesLivingTableInPlace(): void
     {
-        self::assertStringContainsString('patchEncounterState(incomingEncounter);', $this->script);
+        self::assertStringContainsString("liveRound.textContent = 'Round ' + String(incomingEncounter.round || 0);", $this->script);
+        self::assertStringContainsString('currentEncounter.dataset.encounterRevision = incomingEncounterRevision;', $this->script);
         self::assertStringContainsString("say('The Table stirred — the turn has changed.')", $this->script);
         self::assertStringContainsString('if (encounterLifecycleChanged)', $this->script);
     }
