@@ -1083,6 +1083,15 @@ $sceneImage = $scene !== null
                             );
                             $memberVitality = null;
                             $memberCombatantState = null;
+                            $memberCompanionCharacter = is_array($member['companion_character'] ?? null)
+                                ? $member['companion_character']
+                                : null;
+                            $memberCompanionPlay = is_array($memberCompanionCharacter['play'] ?? null)
+                                ? $memberCompanionCharacter['play']
+                                : [];
+                            $memberCompanionHp = is_array($memberCompanionPlay['hit_points'] ?? null)
+                                ? $memberCompanionPlay['hit_points']
+                                : [];
 
                             foreach ($tokens as $partyToken) {
                                 if (
@@ -1105,6 +1114,21 @@ $sceneImage = $scene !== null
                                     break;
                                 }
                             }
+
+                            if ($memberCompanionHp !== []) {
+                                $memberCurrentHp = max(0, (int) ($memberCompanionHp['current'] ?? 0));
+                                $memberMaximumHp = max(0, (int) ($memberCompanionHp['maximum'] ?? 0));
+                                $memberTemporaryHp = max(0, (int) ($memberCompanionHp['temporary'] ?? 0));
+                                $memberPercentage = $memberMaximumHp > 0
+                                    ? min(100, max(0, (int) round(($memberCurrentHp / $memberMaximumHp) * 100)))
+                                    : 0;
+                                $memberVitality = [
+                                    'current_hp' => $memberCurrentHp,
+                                    'maximum_hp' => $memberMaximumHp,
+                                    'temporary_hp' => $memberTemporaryHp,
+                                    'percentage' => $memberPercentage,
+                                ];
+                            }
                             ?>
                             <?php if (
                                 $state->isDungeonMaster()
@@ -1122,6 +1146,7 @@ $sceneImage = $scene !== null
                             <?php if (is_array($memberVitality)) : ?>
                                 <div
                                     class="gmrt-hp"
+                                    <?php if ($memberCharacter !== '') : ?>data-party-character-hp="<?php echo esc_attr($memberCharacter); ?>"<?php endif; ?>
                                     aria-label="<?php echo esc_attr(
                                         'Hit Points '
                                         . (string) $memberVitality['current_hp']
@@ -1138,17 +1163,17 @@ $sceneImage = $scene !== null
                                         ></span>
                                     </div>
                                     <small>
-                                        HP <?php echo esc_html(
+                                        HP <span data-party-current-hp><?php echo esc_html(
                                             (string) $memberVitality['current_hp']
-                                        ); ?>/<?php echo esc_html(
+                                        ); ?></span>/<span data-party-maximum-hp><?php echo esc_html(
                                             (string) $memberVitality['maximum_hp']
-                                        ); ?>
+                                        ); ?></span>
                                         <?php if (
                                             (int) $memberVitality['temporary_hp'] > 0
                                         ) : ?>
-                                            +<?php echo esc_html(
+                                            +<span data-party-temporary-hp><?php echo esc_html(
                                                 (string) $memberVitality['temporary_hp']
-                                            ); ?> temp
+                                            ); ?></span> temp
                                         <?php endif; ?>
                                     </small>
                                     <?php if (

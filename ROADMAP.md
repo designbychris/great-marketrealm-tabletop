@@ -643,3 +643,5 @@ Correct the final forged-token presentation boundary so Companion-generated port
 
 - Adventuring Measures at the Table: repair/confirm authoritative current, maximum and temporary HP presentation and safe live HP controls.
 - Chronicle the Satchel: encounter-time Satchel rolls enter the Battle Chronicle; Exploration/Peace Mode rolls enter a persistent Chamber Chronicle.
+
+- [x] IV.26D.1 — One Measure of the Adventurer: Satchel and Gathering share Companion-authoritative Adventuring Measures.

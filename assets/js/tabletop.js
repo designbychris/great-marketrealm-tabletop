@@ -301,6 +301,18 @@
             if (currentDisplay) currentDisplay.textContent = String(hp.current ?? '—');
             if (maximumDisplay) maximumDisplay.textContent = String(hp.maximum ?? '—');
             if (temporaryDisplay) temporaryDisplay.textContent = String(hp.temporary ?? 0);
+
+            const selectedCharacterId = String(document.querySelector('[data-companion-character-form] [name="character_id"]')?.value || '');
+            const partyHp = selectedCharacterId !== ''
+                ? document.querySelector(`[data-party-character-hp="${CSS.escape(selectedCharacterId)}"]`)
+                : null;
+            const partyCurrent = partyHp?.querySelector('[data-party-current-hp]');
+            const partyMaximum = partyHp?.querySelector('[data-party-maximum-hp]');
+            const partyTemporary = partyHp?.querySelector('[data-party-temporary-hp]');
+            if (partyCurrent) partyCurrent.textContent = String(hp.current ?? '—');
+            if (partyMaximum) partyMaximum.textContent = String(hp.maximum ?? '—');
+            if (partyTemporary) partyTemporary.textContent = String(hp.temporary ?? 0);
+
             if (current) current.value = String(hp.current ?? current.value);
             if (temporary) temporary.value = String(hp.temporary ?? temporary.value);
             if (status) status.textContent = data.message || 'Measures updated.';

@@ -97,6 +97,22 @@ final class TabletopChamber
             $memberModels
         );
 
+        if ($this->companion instanceof CompanionCharacterGateway) {
+            foreach ($members as $index => $memberProjection) {
+                $memberUserId = (int) ($memberProjection['user_id'] ?? 0);
+                $memberCharacterId = trim((string) ($memberProjection['companion_character_id'] ?? ''));
+
+                if ($memberUserId < 1 || $memberCharacterId === '') {
+                    continue;
+                }
+
+                $members[$index]['companion_character'] = $this->companion->characterForUser(
+                    $memberUserId,
+                    $memberCharacterId
+                );
+            }
+        }
+
         $activeScene = null;
 
         foreach ($this->scenes->forTable($tableId) as $scene) {

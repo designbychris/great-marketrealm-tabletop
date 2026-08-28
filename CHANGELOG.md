@@ -651,3 +651,10 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 ## 0.26.3-alpha.1 — IV.26C The Spell Pouch
 - Unfurls the Adventurer's Satchel to the available viewport height with internal scrolling and a sticky identity header.
 - Adds a Companion-authoritative Spell Pouch with casting measures, slot summary and learned spell cards.
+
+## 0.26.4-alpha.2 — IV.26D.1 One Measure of the Adventurer
+- Widens the Adventurer's Satchel and keeps its tall internal-scroll presentation without horizontal overflow.
+- Projects each seated Companion character into the Gathering through the existing owner-scoped gateway.
+- Makes Adventurers at the Table prefer Companion-authoritative current/maximum/temporary HP over stale local token vitality.
+- Mirrors successful Satchel HP edits into the current player's Gathering card immediately.
+
