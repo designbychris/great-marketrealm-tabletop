@@ -62,7 +62,8 @@ final class PeaceAndBattleRegressionTest extends TestCase
         self::assertStringContainsString('async function replaceLifecycle(message)', $this->script);
         self::assertStringContainsString("request('gmrt_tabletop_fragment', {})", $this->script);
         self::assertStringContainsString('currentLifecycle.replaceChildren', $this->script);
-        self::assertStringNotContainsString('window.location.reload()', $this->script);
+        self::assertStringContainsString('await replaceLifecycle(', $this->script);
+        self::assertStringNotContainsString('await replaceChamber(', $this->script);
     }
 
     public function testHeartbeatUsesLiveLifecycleTransition(): void
