@@ -1,3 +1,4 @@
+- IV.26G alpha.2 — Walking Shoes corrective: darker Fellowship-coloured footprints and distance-sampled trails (about one paired print per two 5 ft squares), still bounded and viewer-safe through the Living Veil.
 ## Phase IV.26F — Colours of the Fellowship
 
 - Curated Great Marketrealm Table Palette with persistent player-selected Fellowship Ribbon colours.

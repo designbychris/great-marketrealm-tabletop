@@ -23,11 +23,26 @@ final class FootstepsThroughTheVeilRegressionTest extends TestCase
         $projector = file_get_contents(dirname(__DIR__, 4) . '/app/Tabletop/Footsteps/Presentation/FootstepTrailProjector.php');
         self::assertIsString($repository);
         self::assertIsString($projector);
-        self::assertStringContainsString('MAX_PER_TOKEN = 6', $repository);
+        self::assertStringContainsString('MAX_PER_TOKEN = 12', $repository);
         self::assertStringContainsString('$owner === $viewerUserId', $projector);
         self::assertStringContainsString('isset($visible[$cellKey])', $projector);
         self::assertStringContainsString('isset($explored[$cellKey])', $projector);
         self::assertStringContainsString("'memory'", $projector);
+    }
+
+    public function testLongMovementLeavesSeveralDarkerBoundedFootprints(): void
+    {
+        $recorder = file_get_contents(dirname(__DIR__, 4) . '/app/Tabletop/Footsteps/Services/FootstepTrailRecorder.php');
+        $projector = file_get_contents(dirname(__DIR__, 4) . '/app/Tabletop/Footsteps/Presentation/FootstepTrailProjector.php');
+        $css = file_get_contents(dirname(__DIR__, 4) . '/assets/css/tabletop.css');
+        self::assertIsString($recorder);
+        self::assertIsString($projector);
+        self::assertIsString($css);
+        self::assertStringContainsString('ceil($distanceSquares / 2)', $recorder);
+        self::assertStringContainsString('min(6,', $recorder);
+        self::assertStringContainsString('$scene->gridSize()', $recorder);
+        self::assertStringContainsString('0.72 - ($age * 0.04)', $projector);
+        self::assertStringContainsString('brightness(.62)', $css);
     }
 
     public function testLivingTableRendersFellowshipColouredFootstepsUnderTheVeil(): void

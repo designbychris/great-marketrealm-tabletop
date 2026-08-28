@@ -739,8 +739,8 @@
     position: absolute;
     top: -.2rem;
     left: 50%;
-    width: 4px;
-    height: 7px;
+    width: 5px;
+    height: 8px;
     background: #f4ead6;
     box-shadow: 1px 1px 0 rgba(0, 0, 0, .7);
     animation:
@@ -1557,20 +1557,20 @@
     top: var(--gmrt-step-y);
     width: 14px;
     height: 18px;
-    opacity: var(--gmrt-step-opacity, .22);
+    opacity: var(--gmrt-step-opacity, .48);
     color: var(--gmrt-step-colour, #65b9ae);
     transform: translate(-50%, -50%) rotate(var(--gmrt-step-angle, 0deg));
     transform-origin: center;
-    filter: saturate(.76);
+    filter: saturate(1.08) brightness(.62) contrast(1.35);
 }
 
 .gmrt-footstep i {
     position: absolute;
     display: block;
-    width: 4px;
-    height: 7px;
+    width: 5px;
+    height: 8px;
     background: currentColor;
-    box-shadow: 0 2px 0 color-mix(in srgb, currentColor 82%, transparent);
+    box-shadow: 0 2px 0 color-mix(in srgb, currentColor 92%, #17120d);
     image-rendering: pixelated;
 }
 
@@ -1587,7 +1587,7 @@
 }
 
 .gmrt-footstep.is-memory {
-    filter: saturate(.45) brightness(.82);
+    filter: saturate(.72) brightness(.58) contrast(1.25);
 }
 
 @media (prefers-reduced-motion: reduce) {

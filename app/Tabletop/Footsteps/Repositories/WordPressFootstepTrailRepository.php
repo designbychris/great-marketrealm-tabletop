@@ -11,7 +11,7 @@ defined('ABSPATH') || exit;
 final class WordPressFootstepTrailRepository implements FootstepTrailRepository
 {
     private const OPTION = 'gmrt_footstep_trails';
-    private const MAX_PER_TOKEN = 6;
+    private const MAX_PER_TOKEN = 12;
 
     public function forScene(string $tableId, string $sceneId): array
     {

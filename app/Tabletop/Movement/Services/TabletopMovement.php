@@ -140,7 +140,7 @@ final class TabletopMovement
         }
 
         if ($this->footsteps !== null) {
-            $this->footsteps->movement($token, $fromX, $fromY);
+            $this->footsteps->movement($token, $scene, $fromX, $fromY);
         }
 
         return $token;

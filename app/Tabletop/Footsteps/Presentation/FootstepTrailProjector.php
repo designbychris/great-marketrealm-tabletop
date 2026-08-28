@@ -76,9 +76,9 @@ final class FootstepTrailProjector
             $count = count($indexes);
             foreach ($indexes as $position => $index) {
                 $age = max(0, $count - 1 - $position);
-                $kept[$index]['opacity'] = max(0.12, 0.42 - ($age * 0.055));
+                $kept[$index]['opacity'] = max(0.24, 0.72 - ($age * 0.04));
                 if (! empty($kept[$index]['memory'])) {
-                    $kept[$index]['opacity'] *= 0.58;
+                    $kept[$index]['opacity'] *= 0.62;
                 }
             }
         }
