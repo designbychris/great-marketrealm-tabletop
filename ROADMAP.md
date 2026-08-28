@@ -1,3 +1,7 @@
+## IV.26D — Adventuring Measures at the Table
+
+Current HP and Temporary HP can now be adjusted from the Satchel through an owner-scoped Companion write boundary. Maximum HP remains Companion-certified and read-only.
+
 
 ### Phase IV.26B — Weapons to Hand
 The Satchel now exposes equipped Companion weapons with authoritative attack and damage rolls. Target-aware battle resolution and shared DM roll visibility remain separate future surfaces.

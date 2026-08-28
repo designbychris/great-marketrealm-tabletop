@@ -274,6 +274,45 @@
         satchelToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
 
+    const measuresToggle = document.querySelector('[data-adventuring-measures-toggle]');
+    const measuresForm = document.querySelector('[data-adventuring-measures-form]');
+    measuresToggle?.addEventListener('click', () => {
+        const open = measuresForm?.hidden !== false;
+        if (measuresForm) measuresForm.hidden = !open;
+        measuresToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    measuresForm?.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const submit = measuresForm.querySelector('button[type="submit"]');
+        const status = measuresForm.querySelector('[data-adventuring-measures-status]');
+        const current = measuresForm.querySelector('[name="current_hp"]');
+        const temporary = measuresForm.querySelector('[name="temporary_hp"]');
+        if (submit) submit.disabled = true;
+        if (status) status.textContent = 'Updating…';
+        try {
+            const data = await request('gmrt_update_adventuring_measures', {
+                current_hp: current ? current.value : '',
+                temporary_hp: temporary ? temporary.value : ''
+            });
+            const hp = data.hit_points || {};
+            const currentDisplay = document.querySelector('[data-current-hp]');
+            const maximumDisplay = document.querySelector('[data-maximum-hp]');
+            const temporaryDisplay = document.querySelector('[data-temporary-hp]');
+            if (currentDisplay) currentDisplay.textContent = String(hp.current ?? '—');
+            if (maximumDisplay) maximumDisplay.textContent = String(hp.maximum ?? '—');
+            if (temporaryDisplay) temporaryDisplay.textContent = String(hp.temporary ?? 0);
+            if (current) current.value = String(hp.current ?? current.value);
+            if (temporary) temporary.value = String(hp.temporary ?? temporary.value);
+            if (status) status.textContent = data.message || 'Measures updated.';
+            say(data.message || 'Adventuring Measures updated.');
+        } catch (error) {
+            if (status) status.textContent = error.message || 'The measures could not be updated.';
+            say(error.message || 'The measures could not be updated.');
+        } finally {
+            if (submit) submit.disabled = false;
+        }
+    });
+
     const quickHandsResult = document.querySelector('[data-quick-hands-result]');
     document.querySelectorAll('[data-quick-roll]').forEach((button) => {
         button.addEventListener('click', async () => {

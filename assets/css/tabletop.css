@@ -1497,3 +1497,14 @@
 
 /* IV.26C.3 — Magic at Your Fingertips */
 .gmrt-spell-card__actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:.4rem;margin-top:.55rem}.gmrt-spell-card__actions button{font:inherit;color:inherit;cursor:pointer;padding:.42rem;border:1px solid rgba(244,214,136,.4);border-radius:5px;background:rgba(244,214,136,.08)}.gmrt-spell-card__actions button:hover,.gmrt-spell-card__actions button:focus-visible{background:rgba(244,214,136,.16);outline:none;border-color:rgba(244,214,136,.72)}.gmrt-spell-card__actions button:disabled{opacity:.6;cursor:wait}
+
+
+/* IV.26D — Adventuring Measures at the Table */
+.gmrt-satchel__hp { position: relative; }
+.gmrt-satchel__hp > button { margin-top: .35rem; font: inherit; cursor: pointer; }
+.gmrt-satchel__hp form { position: absolute; z-index: 4; left: 0; top: calc(100% + .35rem); min-width: 15rem; padding: .75rem; border: 1px solid currentColor; border-radius: .6rem; background: #17120d; box-shadow: 0 .5rem 1.5rem rgba(0,0,0,.35); }
+.gmrt-satchel__hp form[hidden] { display: none; }
+.gmrt-satchel__hp form label { display: grid; gap: .2rem; margin-bottom: .5rem; }
+.gmrt-satchel__hp form input { width: 100%; box-sizing: border-box; }
+.gmrt-satchel__hp form p { margin: .35rem 0 .6rem; }
+.gmrt-satchel__hp [role="status"] { display: block; margin-top: .4rem; font-size: .8em; }

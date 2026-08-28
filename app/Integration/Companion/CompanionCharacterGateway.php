@@ -11,4 +11,13 @@ interface CompanionCharacterGateway extends CompanionGateway
 
     /** @return array<string,mixed>|null */
     public function characterForUser(int $userId, string $characterId): ?array;
+
+    /** @return array<string,mixed>|null */
+    public function updateVitalMeasuresForUser(
+        int $userId,
+        string $characterId,
+        int $currentHp,
+        int $temporaryHp
+    ): ?array;
 }
+

@@ -91,7 +91,19 @@ $sceneImage = $scene !== null
                 </header>
                 <div class="gmrt-satchel__measures">
                     <div><span>AC</span><strong><?php echo esc_html((string) ($adventurerPlay['armour_class'] ?? '—')); ?></strong></div>
-                    <div><span>HP</span><strong><?php echo esc_html((string) ($satchelHp['current'] ?? '—')); ?>/<?php echo esc_html((string) ($satchelHp['maximum'] ?? '—')); ?></strong><?php if ((int) ($satchelHp['temporary'] ?? 0) > 0) : ?><small>+<?php echo esc_html((string) $satchelHp['temporary']); ?> temp</small><?php endif; ?></div>
+                    <div class="gmrt-satchel__hp" data-adventuring-measures>
+                        <span>HP</span>
+                        <strong><span data-current-hp><?php echo esc_html((string) ($satchelHp['current'] ?? '—')); ?></span>/<span data-maximum-hp><?php echo esc_html((string) ($satchelHp['maximum'] ?? '—')); ?></span></strong>
+                        <small><span data-temporary-hp><?php echo esc_html((string) ($satchelHp['temporary'] ?? 0)); ?></span> temp</small>
+                        <button type="button" data-adventuring-measures-toggle aria-expanded="false">Adjust</button>
+                        <form data-adventuring-measures-form hidden>
+                            <label>Current HP<input type="number" name="current_hp" min="0" max="<?php echo esc_attr((string) ($satchelHp['maximum'] ?? 0)); ?>" value="<?php echo esc_attr((string) ($satchelHp['current'] ?? 0)); ?>"></label>
+                            <label>Temporary HP<input type="number" name="temporary_hp" min="0" max="999" value="<?php echo esc_attr((string) ($satchelHp['temporary'] ?? 0)); ?>"></label>
+                            <p>Maximum HP: <strong><?php echo esc_html((string) ($satchelHp['maximum'] ?? '—')); ?></strong> <small>Companion-certified</small></p>
+                            <button type="submit">Save Measures</button>
+                            <span role="status" data-adventuring-measures-status></span>
+                        </form>
+                    </div>
                     <div><span>Speed</span><strong><?php echo esc_html((string) ($adventurerPlay['speed'] ?? '—')); ?> ft</strong></div>
                     <button type="button" class="gmrt-quick-roll gmrt-quick-roll--measure" data-quick-roll data-roll-kind="initiative" data-roll-key="initiative"><span>Initiative</span><strong><?php echo esc_html(sprintf('%+d', (int) ($adventurerPlay['initiative'] ?? 0))); ?></strong><small aria-hidden="true">🎲</small></button>
                     <div><span>Proficiency</span><strong><?php echo esc_html(sprintf('%+d', (int) ($adventurerPlay['proficiency_bonus'] ?? 0))); ?></strong></div>

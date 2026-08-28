@@ -34,4 +34,26 @@ final class WordPressCompanionCharacterGateway implements CompanionCharacterGate
         $character = apply_filters('gmrc_tabletop_owned_character', null, $userId, trim($characterId));
         return is_array($character) ? $character : null;
     }
+
+    public function updateVitalMeasuresForUser(
+        int $userId,
+        string $characterId,
+        int $currentHp,
+        int $temporaryHp
+    ): ?array {
+        if ($userId < 1 || trim($characterId) === '' || ! function_exists('apply_filters')) {
+            return null;
+        }
+
+        $character = apply_filters(
+            'gmrc_tabletop_update_vital_measures',
+            null,
+            $userId,
+            trim($characterId),
+            $currentHp,
+            $temporaryHp
+        );
+
+        return is_array($character) ? $character : null;
+    }
 }

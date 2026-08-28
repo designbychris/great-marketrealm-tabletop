@@ -1,3 +1,7 @@
+## IV.26D — Adventuring Measures at the Table
+
+Current HP and Temporary HP can now be adjusted from the Satchel through an owner-scoped Companion write boundary. Maximum HP remains Companion-certified and read-only.
+
 ## 0.26.3-alpha.2 — Phase IV.26C.3: Magic at Your Fingertips
 
 - Makes eligible Companion-projected Spell Pouch entries actionable from the Adventurer’s Satchel.

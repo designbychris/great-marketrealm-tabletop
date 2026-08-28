@@ -22,6 +22,7 @@ use GreatMarketrealmTabletop\Tabletop\Http\FogOfWarAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\VisionBarrierAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\GatheringAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\CompanionCharacterAjaxController;
+use GreatMarketrealmTabletop\Tabletop\Http\AdventuringMeasuresAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\QuickHandsAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\WeaponHandsAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\SpellPouchAjaxController;
@@ -80,6 +81,8 @@ final class TabletopServiceProvider
     private GatheringAjaxController $gatheringAjax;
 
     private CompanionCharacterAjaxController $companionCharacterAjax;
+
+    private AdventuringMeasuresAjaxController $adventuringMeasuresAjax;
 
     private QuickHandsAjaxController $quickHandsAjax;
 
@@ -161,6 +164,11 @@ final class TabletopServiceProvider
             new WordPressTableSceneRepository(),
             new WordPressTableTokenRepository(),
             TableTokenManagerFactory::make()
+        );
+
+        $this->adventuringMeasuresAjax = new AdventuringMeasuresAjaxController(
+            new WordPressCompanionCharacterGateway(),
+            new WordPressTableMembershipRepository()
         );
 
         $this->quickHandsAjax = new QuickHandsAjaxController(
@@ -333,6 +341,11 @@ final class TabletopServiceProvider
         add_action(
             'wp_ajax_gmrt_select_companion_character',
             [$this->companionCharacterAjax, 'select']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_update_adventuring_measures',
+            [$this->adventuringMeasuresAjax, 'update']
         );
 
         add_action(
