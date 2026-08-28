@@ -1484,3 +1484,10 @@
 .gmrt-quick-roll--measure{display:grid;text-align:center;padding:.45rem}
 .gmrt-quick-roll--row{display:flex;justify-content:space-between;align-items:center;padding:.28rem .35rem;border-radius:4px;text-align:left}
 .gmrt-quick-hands-result{margin:.7rem 0 0;padding:.65rem .7rem;border:1px solid rgba(244,214,136,.32);border-radius:6px;background:rgba(244,214,136,.07);font-size:.82rem;line-height:1.35}
+
+
+/* Phase IV.26B — Weapons to Hand */
+.gmrt-weapon-list{display:grid;gap:.55rem;margin-top:.55rem}.gmrt-weapon-card{padding:.6rem;border:1px solid rgba(244,214,136,.24);border-radius:6px;background:rgba(255,255,255,.035)}
+.gmrt-weapon-card header{display:flex;justify-content:space-between;gap:.65rem;align-items:flex-start}.gmrt-weapon-card header>div{display:grid}.gmrt-weapon-card header small{opacity:.7;font-size:.72rem}.gmrt-weapon-card header b{font-size:1.05rem;color:#f4d688}
+.gmrt-weapon-card p{margin:.35rem 0;font-size:.82rem}.gmrt-weapon-card__properties{display:block;opacity:.7;font-size:.7rem}.gmrt-weapon-card__actions{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-top:.5rem}
+.gmrt-weapon-card__actions button{font:inherit;color:inherit;cursor:pointer;padding:.42rem;border:1px solid rgba(244,214,136,.4);border-radius:5px;background:rgba(244,214,136,.08)}.gmrt-weapon-card__actions button:hover,.gmrt-weapon-card__actions button:focus-visible{background:rgba(244,214,136,.16);outline:none;border-color:rgba(244,214,136,.72)}.gmrt-weapon-card__actions button:disabled{opacity:.6;cursor:wait}.gmrt-satchel__empty{font-size:.8rem;opacity:.74}

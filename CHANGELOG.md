@@ -1,3 +1,8 @@
+
+## 0.26.2-alpha.1 — Phase IV.26B: Weapons to Hand
+- Adds equipped Companion weapon cards to the Adventurer's Satchel.
+- Adds server-authoritative attack and damage rolls using only Companion-projected attack IDs.
+- Keeps attack bonuses, damage formulae and modifiers off the browser trust boundary.
 ## 0.24.0-alpha.1 — Phase IV.24: Peace and Battle
 
 - Added Exploration Mode as the natural state of an active Scene when no current Encounter exists.

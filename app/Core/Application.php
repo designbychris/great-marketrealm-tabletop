@@ -72,7 +72,7 @@ final class Application
     {
         return defined('GMRT_VERSION')
             ? (string) GMRT_VERSION
-            : '0.26.1-alpha.1';
+            : '0.26.2-alpha.1';
     }
 
     public function companion(): CompanionGateway

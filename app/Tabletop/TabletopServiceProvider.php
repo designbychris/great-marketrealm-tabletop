@@ -23,8 +23,11 @@ use GreatMarketrealmTabletop\Tabletop\Http\VisionBarrierAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\GatheringAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\CompanionCharacterAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\QuickHandsAjaxController;
+use GreatMarketrealmTabletop\Tabletop\Http\WeaponHandsAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Satchel\Services\QuickHandsRoller;
+use GreatMarketrealmTabletop\Tabletop\Satchel\Services\WeaponHandsRoller;
 use GreatMarketrealmTabletop\Tabletop\Battle\Services\SecureD20Roller;
+use GreatMarketrealmTabletop\Tabletop\Battle\Services\SecureDamageDieRoller;
 use GreatMarketrealmTabletop\Integration\Companion\WordPressCompanionCharacterGateway;
 use GreatMarketrealmTabletop\Tables\Scenes\Repositories\WordPressTableSceneRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Repositories\WordPressTableTokenRepository;
@@ -77,6 +80,8 @@ final class TabletopServiceProvider
     private CompanionCharacterAjaxController $companionCharacterAjax;
 
     private QuickHandsAjaxController $quickHandsAjax;
+
+    private WeaponHandsAjaxController $weaponHandsAjax;
 
     public function __construct()
     {
@@ -158,6 +163,15 @@ final class TabletopServiceProvider
             new WordPressCompanionCharacterGateway(),
             new WordPressTableMembershipRepository(),
             new QuickHandsRoller(new SecureD20Roller())
+        );
+
+        $this->weaponHandsAjax = new WeaponHandsAjaxController(
+            new WordPressCompanionCharacterGateway(),
+            new WordPressTableMembershipRepository(),
+            new WeaponHandsRoller(
+                new SecureD20Roller(),
+                new SecureDamageDieRoller()
+            )
         );
     }
 
@@ -311,6 +325,11 @@ final class TabletopServiceProvider
         add_action(
             'wp_ajax_gmrt_quick_hands_roll',
             [$this->quickHandsAjax, 'roll']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_weapon_hands_roll',
+            [$this->weaponHandsAjax, 'roll']
         );
     }
 }

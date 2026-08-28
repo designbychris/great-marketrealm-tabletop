@@ -74,6 +74,7 @@ $sceneImage = $scene !== null
         $satchelAbilities = is_array($adventurerPlay['abilities'] ?? null) ? $adventurerPlay['abilities'] : [];
         $satchelSaves = is_array($adventurerPlay['saving_throws'] ?? null) ? $adventurerPlay['saving_throws'] : [];
         $satchelSkills = is_array($adventurerPlay['skills'] ?? null) ? $adventurerPlay['skills'] : [];
+        $satchelAttacks = is_array($adventurerPlay['attacks'] ?? null) ? $adventurerPlay['attacks'] : [];
         $abilityLabels = ['strength'=>'STR','dexterity'=>'DEX','constitution'=>'CON','intelligence'=>'INT','wisdom'=>'WIS','charisma'=>'CHA'];
         ?>
         <aside class="gmrt-satchel" data-adventurer-satchel data-open="false" aria-label="Adventurer's Satchel">
@@ -104,7 +105,24 @@ $sceneImage = $scene !== null
                 <details class="gmrt-satchel__section"><summary>Skills</summary><div class="gmrt-satchel__list">
                     <?php foreach ($satchelSkills as $key => $skill) : if (! is_array($skill)) continue; ?><button type="button" class="gmrt-quick-roll gmrt-quick-roll--row" data-quick-roll data-roll-kind="skill" data-roll-key="<?php echo esc_attr((string) $key); ?>"><span><?php echo ! empty($skill['expertise']) ? '◆◆ ' : (! empty($skill['proficient']) ? '◆ ' : ''); ?><?php echo esc_html(ucwords(str_replace('-', ' ', (string) $key))); ?></span><strong><?php echo esc_html(sprintf('%+d', (int) ($skill['modifier'] ?? 0))); ?> 🎲</strong></button><?php endforeach; ?>
                 </div></details>
-                <div class="gmrt-quick-hands-result" data-quick-hands-result role="status" aria-live="polite">Choose a check, save, skill or Initiative roll.</div><p class="gmrt-satchel__promise">◆ proficient · ◆◆ expertise. Attacks, spells and abilities join the next Satchel passes.</p>
+                <details class="gmrt-satchel__section gmrt-satchel__weapons"><summary>Weapons to Hand</summary>
+                    <?php if ($satchelAttacks === []) : ?><p class="gmrt-satchel__empty">No weapon is currently readied in the Companion Adventurer's Pack.</p><?php else : ?>
+                    <div class="gmrt-weapon-list">
+                        <?php foreach ($satchelAttacks as $attack) : if (! is_array($attack)) continue; ?>
+                        <article class="gmrt-weapon-card">
+                            <header><div><strong><?php echo esc_html((string) ($attack['label'] ?? 'Weapon')); ?></strong><small><?php echo esc_html((string) ($attack['range'] ?? '')); ?></small></div><b><?php echo esc_html(sprintf('%+d', (int) ($attack['attack_bonus'] ?? 0))); ?></b></header>
+                            <p><?php echo esc_html((string) ($attack['damage_die'] ?? '')); ?><?php echo esc_html(sprintf('%+d', (int) ($attack['damage_modifier'] ?? 0))); ?> <?php echo esc_html((string) ($attack['damage_type'] ?? 'damage')); ?> · <?php echo esc_html((string) ($attack['ability'] ?? '')); ?></p>
+                            <?php $properties = is_array($attack['properties'] ?? null) ? $attack['properties'] : []; if ($properties !== []) : ?><small class="gmrt-weapon-card__properties"><?php echo esc_html(implode(' · ', array_map('ucfirst', array_map('strval', $properties)))); ?></small><?php endif; ?>
+                            <div class="gmrt-weapon-card__actions">
+                                <button type="button" data-weapon-roll data-weapon-action="attack" data-attack-id="<?php echo esc_attr((string) ($attack['id'] ?? '')); ?>">Attack 🎲</button>
+                                <button type="button" data-weapon-roll data-weapon-action="damage" data-attack-id="<?php echo esc_attr((string) ($attack['id'] ?? '')); ?>">Damage 🎲</button>
+                            </div>
+                        </article>
+                        <?php endforeach; ?>
+                    </div>
+                    <?php endif; ?>
+                </details>
+                <div class="gmrt-quick-hands-result" data-quick-hands-result role="status" aria-live="polite">Choose a check, save, skill, Initiative roll or readied weapon.</div><p class="gmrt-satchel__promise">◆ proficient · ◆◆ expertise. Weapon rolls use the Companion's equipped attack projection. Spells and abilities join the next Satchel pass.</p>
             </div>
         </aside>
     <?php endif; ?>

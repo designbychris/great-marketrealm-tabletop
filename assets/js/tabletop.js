@@ -301,6 +301,35 @@
         });
     });
 
+
+    document.querySelectorAll('[data-weapon-roll]').forEach((button) => {
+        button.addEventListener('click', async () => {
+            const original = button.innerHTML;
+            button.disabled = true;
+            button.setAttribute('aria-busy', 'true');
+            if (quickHandsResult) quickHandsResult.textContent = 'Weapon in hand… the dice are rolling.';
+            try {
+                const data = await request('gmrt_weapon_hands_roll', {
+                    weapon_action: button.dataset.weaponAction || '',
+                    attack_id: button.dataset.attackId || ''
+                });
+                const roll = data.roll || {};
+                const flourish = roll.action === 'attack' && roll.natural_twenty
+                    ? ' ⚔ Critical! Double the weapon dice for critical damage.'
+                    : (roll.action === 'attack' && roll.natural_one ? ' · Natural 1!' : '');
+                if (quickHandsResult) quickHandsResult.textContent = (data.message || 'Weapon roll complete.') + flourish;
+                say(data.message || 'Weapons to Hand roll complete.');
+            } catch (error) {
+                if (quickHandsResult) quickHandsResult.textContent = error.message || 'The weapon roll could not be made.';
+                say(error.message || 'The weapon roll could not be made.');
+            } finally {
+                button.disabled = false;
+                button.removeAttribute('aria-busy');
+                button.innerHTML = original;
+            }
+        });
+    });
+
     if (!board) {
         return;
     }

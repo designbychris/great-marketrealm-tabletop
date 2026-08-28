@@ -1,3 +1,6 @@
+
+### Phase IV.26B — Weapons to Hand
+The Satchel now exposes equipped Companion weapons with authoritative attack and damage rolls. Target-aware battle resolution and shared DM roll visibility remain separate future surfaces.
 # Great Marketrealm Tabletop Roadmap
 
 ## Phase IV.22B.1 — The Keeper's Cartography
