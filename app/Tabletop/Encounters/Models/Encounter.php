@@ -107,6 +107,57 @@ final class Encounter
         ++$this->revision;
     }
 
+    public function removeCombatant(string $tokenId): bool
+    {
+        $tokenId = trim($tokenId);
+
+        if ($tokenId === '' || $this->status === EncounterStatus::ENDED) {
+            return false;
+        }
+
+        $removeIndex = null;
+
+        foreach ($this->combatants as $index => $combatant) {
+            if ($combatant->tokenId() === $tokenId) {
+                $removeIndex = $index;
+                break;
+            }
+        }
+
+        if ($removeIndex === null) {
+            return false;
+        }
+
+        $wasCurrent = in_array(
+            $this->status,
+            [EncounterStatus::ACTIVE, EncounterStatus::PAUSED],
+            true
+        ) && $removeIndex === $this->turnIndex;
+
+        array_splice($this->combatants, $removeIndex, 1);
+
+        if ($this->combatants === []) {
+            $this->turnIndex = 0;
+            $this->status = EncounterStatus::ENDED;
+            $this->turnEconomy->reset();
+            ++$this->revision;
+            return true;
+        }
+
+        if ($removeIndex < $this->turnIndex) {
+            --$this->turnIndex;
+        } elseif ($this->turnIndex >= count($this->combatants)) {
+            $this->turnIndex = 0;
+        }
+
+        if ($wasCurrent) {
+            $this->turnEconomy->reset();
+        }
+
+        ++$this->revision;
+        return true;
+    }
+
     public function start(): void
     {
         $this->requireStatus(

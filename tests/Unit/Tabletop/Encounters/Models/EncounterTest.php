@@ -102,6 +102,37 @@ final class EncounterTest extends TestCase
         self::assertSame($encounter->toArray(), $copy->toArray());
     }
 
+    public function testRemovingCurrentCombatantKeepsActiveEncounterCoherent(): void
+    {
+        $encounter = $this->encounter();
+        $encounter->addCombatant(new EncounterCombatant('token-a', 20));
+        $encounter->addCombatant(new EncounterCombatant('token-b', 10));
+        $encounter->start();
+
+        $beforeRevision = $encounter->revision();
+
+        self::assertTrue($encounter->removeCombatant('token-a'));
+        self::assertSame(EncounterStatus::ACTIVE, $encounter->status());
+        self::assertSame(['token-b'], array_map(
+            static fn (EncounterCombatant $combatant): string => $combatant->tokenId(),
+            $encounter->combatants()
+        ));
+        self::assertSame('token-b', $encounter->currentCombatant()?->tokenId());
+        self::assertSame($beforeRevision + 1, $encounter->revision());
+    }
+
+    public function testRemovingLastCombatantEndsEncounter(): void
+    {
+        $encounter = $this->encounter();
+        $encounter->addCombatant(new EncounterCombatant('token-a', 20));
+        $encounter->start();
+
+        self::assertTrue($encounter->removeCombatant('token-a'));
+        self::assertSame(EncounterStatus::ENDED, $encounter->status());
+        self::assertSame([], $encounter->combatants());
+        self::assertNull($encounter->currentCombatant());
+    }
+
     private function encounter(): Encounter
     {
         return Encounter::prepare(

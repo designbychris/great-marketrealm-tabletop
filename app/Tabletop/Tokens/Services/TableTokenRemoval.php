@@ -34,17 +34,6 @@ final class TableTokenRemoval
             throw new RuntimeException('That token is no longer present in this Chamber.');
         }
 
-        $encounter = $this->encounters->currentForScene($tableId, $token->sceneId());
-        if ($encounter !== null) {
-            foreach ($encounter->combatants() as $combatant) {
-                if ($combatant->tokenId() === $tokenId) {
-                    throw new RuntimeException(
-                        'End the current Encounter before removing one of its combatant tokens.'
-                    );
-                }
-            }
-        }
-
         if (! $member->isDungeonMaster()) {
             $ownsCharacter = $token->type() === TableTokenType::CHARACTER
                 && $token->controllerUserId() === $userId;
@@ -52,6 +41,12 @@ final class TableTokenRemoval
             if (! $ownsCharacter) {
                 throw new RuntimeException('Players may only remove their own Companion Character token.');
             }
+        }
+
+        $encounter = $this->encounters->currentForScene($tableId, $token->sceneId());
+
+        if ($encounter !== null && $encounter->removeCombatant($tokenId)) {
+            $this->encounters->save($encounter);
         }
 
         $this->tokens->delete($tableId, $tokenId);

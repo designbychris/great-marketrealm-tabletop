@@ -26,7 +26,8 @@ final class ClearBattlefieldLivingGatheringRegressionTest extends TestCase
         self::assertStringContainsString('isDungeonMaster()', $service);
         self::assertStringContainsString('TableTokenType::CHARACTER', $service);
         self::assertStringContainsString('controllerUserId() === $userId', $service);
-        self::assertStringContainsString('End the current Encounter before removing', $service);
+        self::assertStringContainsString('removeCombatant($tokenId)', $service);
+        self::assertStringContainsString('$this->encounters->save($encounter)', $service);
         self::assertStringContainsString("request('gmrt_remove_chamber_token'", $client);
     }
 

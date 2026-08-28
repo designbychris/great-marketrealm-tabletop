@@ -1,3 +1,10 @@
+## 0.26.5-alpha.2 — Phase IV.26D.2 Browser Corrective: Combatants May Leave
+
+- Lets the Dungeon Master remove a Chamber token even while that token participates in the current Encounter.
+- Removes the matching combatant from the authoritative Encounter before deleting the battlefield token.
+- Keeps the active turn coherent when the current combatant leaves, and ends the Encounter automatically when its final combatant is removed.
+- Adds model regression coverage for active and final-combatant removal.
+
 ## 0.26.5-alpha.1 — Phase IV.26D.2: Clear the Battlefield & The Living Gathering
 
 - Adds server-authoritative **Remove from Chamber** token removal: DMs may remove any non-encounter token, while players may remove only their own Companion Character token.
