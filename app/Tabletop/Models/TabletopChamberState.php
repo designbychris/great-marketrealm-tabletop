@@ -28,7 +28,8 @@ final class TabletopChamberState
         private array $fog = [],
         private array $visionLayer = [],
         private array $integrations = [],
-        private array $chamberLog = []
+        private array $chamberLog = [],
+        private array $footsteps = []
     ) {}
 
     /** @return array<string,mixed> */
@@ -97,6 +98,12 @@ final class TabletopChamberState
         return $this->chamberLog;
     }
 
+    /** @return array<int,array<string,mixed>> */
+    public function footsteps(): array
+    {
+        return $this->footsteps;
+    }
+
     /** @return array<string,string> */
     public function combatantStates(): array
     {
@@ -144,6 +151,7 @@ final class TabletopChamberState
             'arsenals' => $this->arsenals,
             'fog' => $this->fog,
             'vision_layer' => $this->visionLayer,
+            'footsteps' => $this->footsteps,
         ];
 
         return hash(

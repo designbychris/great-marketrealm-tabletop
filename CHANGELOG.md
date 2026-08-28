@@ -687,3 +687,9 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - Makes Adventurers at the Table prefer Companion-authoritative current/maximum/temporary HP over stale local token vitality.
 - Mirrors successful Satchel HP edits into the current player's Gathering card immediately.
 
+
+## 0.26.8-alpha.1 — Phase IV.26G: Footsteps Through the Veil
+- Records a bounded six-step trail for player-controlled character movement.
+- Projects footsteps server-side per viewer so fog never leaks hidden movement history.
+- Own recent steps may linger faintly in explored memory; other players' steps require current visibility.
+- Reuses Fellowship colours and the Living Table heartbeat.

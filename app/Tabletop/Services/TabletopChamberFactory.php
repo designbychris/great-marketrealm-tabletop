@@ -23,6 +23,8 @@ use GreatMarketrealmTabletop\Tables\Memberships\Repositories\WordPressTableMembe
 use GreatMarketrealmTabletop\Integration\Companion\WordPressCompanionCharacterGateway;
 use GreatMarketrealmTabletop\Tabletop\Chronicle\Repositories\WordPressChamberChronicleRepository;
 use GreatMarketrealmTabletop\Tabletop\Chronicle\Presentation\ChamberChronicleProjector;
+use GreatMarketrealmTabletop\Tabletop\Footsteps\Repositories\WordPressFootstepTrailRepository;
+use GreatMarketrealmTabletop\Tabletop\Footsteps\Presentation\FootstepTrailProjector;
 
 defined('ABSPATH') || exit;
 
@@ -49,7 +51,9 @@ final class TabletopChamberFactory
             new WordPressTableMemberIdentityDirectory(),
             new WordPressCompanionCharacterGateway(),
             new WordPressChamberChronicleRepository(),
-            new ChamberChronicleProjector()
+            new ChamberChronicleProjector(),
+            new WordPressFootstepTrailRepository(),
+            new FootstepTrailProjector()
         );
     }
 }

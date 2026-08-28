@@ -670,3 +670,10 @@ Correct the final forged-token presentation boundary so Companion-generated port
 - [x] Peace/Exploration rolls routed into persistent Chamber Chronicle.
 - [x] Living Table heartbeat projects Chronicle changes without a second poller.
 - [ ] Browser certification.
+
+### Phase IV.26G — Footsteps Through the Veil ✅ IMPLEMENTED / BROWSER CERTIFICATION PENDING
+- Bounded recent player-character movement trails.
+- Fellowship-coloured pixel footprints with directional orientation and progressive fading.
+- Server-authoritative viewer projection through current/remembered Living Veil state.
+- No second polling loop; footsteps ride the existing Living Table heartbeat.
+- Next: Phase IV.27 — Lanterns in the Living Veil (vision profiles, darkvision and light sources).

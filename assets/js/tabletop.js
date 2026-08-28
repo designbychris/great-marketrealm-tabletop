@@ -671,6 +671,35 @@
         if (lens.dragging) stopLensPan(event);
     });
 
+    const footstepLayer = document.querySelector('[data-footstep-layer]');
+    let footstepProjection = [];
+    if (footstepLayer) {
+        try {
+            footstepProjection = JSON.parse(footstepLayer.dataset.footsteps || '[]');
+        } catch (error) {
+            footstepProjection = [];
+        }
+    }
+
+    const renderFootsteps = (steps = footstepProjection) => {
+        if (!footstepLayer) return;
+        footstepProjection = Array.isArray(steps) ? steps : [];
+        footstepLayer.replaceChildren();
+
+        footstepProjection.forEach((step) => {
+            const mark = document.createElement('span');
+            mark.className = 'gmrt-footstep' + (step.memory ? ' is-memory' : '');
+            mark.style.setProperty('--gmrt-step-x', (Number(step.x || 0) * 100) + '%');
+            mark.style.setProperty('--gmrt-step-y', (Number(step.y || 0) * 100) + '%');
+            mark.style.setProperty('--gmrt-step-angle', String(Number(step.angle || 0) + 90) + 'deg');
+            mark.style.setProperty('--gmrt-step-opacity', String(Number(step.opacity || .2)));
+            mark.style.setProperty('--gmrt-step-colour', String(step.table_colour_hex || '#65b9ae'));
+            mark.appendChild(document.createElement('i'));
+            mark.appendChild(document.createElement('i'));
+            footstepLayer.appendChild(mark);
+        });
+    };
+
     const fogLayer = document.querySelector('[data-fog-layer]');
     const fogEnabled = document.querySelector('[data-fog-enabled]');
     const fogPreview = document.querySelector('[data-fog-preview]');
@@ -869,6 +898,7 @@
         fogLayer.append(fragment);
     };
 
+    renderFootsteps();
     renderFog();
 
     fogPreview?.addEventListener('change', () => {
@@ -1868,6 +1898,7 @@
 
             renderGathering(state.members);
             renderChronicle(state.encounter ? state.battle_log : state.chamber_log, Boolean(state.encounter));
+            renderFootsteps(state.footsteps || []);
             renderFog(state.fog || {});
             renderVisionLayer(state.vision_layer || []);
 

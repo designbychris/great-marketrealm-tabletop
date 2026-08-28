@@ -27,6 +27,8 @@ use GreatMarketrealmTabletop\Integration\Companion\CompanionGateway;
 use GreatMarketrealmTabletop\Integration\Companion\CompanionCharacterGateway;
 use GreatMarketrealmTabletop\Tabletop\Chronicle\Contracts\ChamberChronicleRepository;
 use GreatMarketrealmTabletop\Tabletop\Chronicle\Presentation\ChamberChronicleProjector;
+use GreatMarketrealmTabletop\Tabletop\Footsteps\Contracts\FootstepTrailRepository;
+use GreatMarketrealmTabletop\Tabletop\Footsteps\Presentation\FootstepTrailProjector;
 use GreatMarketrealmTabletop\Tables\Scenes\Contracts\TableSceneRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Contracts\TableTokenRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Models\TableToken;
@@ -56,7 +58,9 @@ final class TabletopChamber
         private ?TableMemberIdentityDirectory $identities = null,
         private ?CompanionGateway $companion = null,
         private ?ChamberChronicleRepository $chamberEvents = null,
-        private ?ChamberChronicleProjector $chamberChronicleProjector = null
+        private ?ChamberChronicleProjector $chamberChronicleProjector = null,
+        private ?FootstepTrailRepository $footstepTrails = null,
+        private ?FootstepTrailProjector $footstepProjector = null
     ) {}
 
     public function state(
@@ -337,6 +341,22 @@ final class TabletopChamber
         foreach ($battleLog as $i => $entry) { $battleLog[$i]['table_colour'] = $coloursByUser[(int)($entry['user_id'] ?? 0)] ?? null; }
         foreach ($chamberLog as $i => $entry) { $chamberLog[$i]['table_colour'] = $coloursByUser[(int)($entry['user_id'] ?? 0)] ?? null; }
 
+        $footsteps = [];
+        if (
+            $activeScene !== null
+            && $this->footstepTrails !== null
+            && $this->footstepProjector !== null
+        ) {
+            $footsteps = $this->footstepProjector->project(
+                $activeScene,
+                $this->footstepTrails->forScene($tableId, $activeScene->id()),
+                $viewerUserId,
+                $viewer->isDungeonMaster(),
+                $fog,
+                $coloursByUser
+            );
+        }
+
         return new TabletopChamberState(
             $table->toArray(),
             array_merge($viewer->toArray(), ['table_colour' => $viewer->tableColour(), 'table_colour_hex' => \GreatMarketrealmTabletop\Tables\Memberships\Models\TableColourPalette::hex($viewer->tableColour())]),
@@ -368,7 +388,8 @@ final class TabletopChamber
                         : null,
                 ],
             ],
-            $chamberLog
+            $chamberLog,
+            $footsteps
         );
     }
 }

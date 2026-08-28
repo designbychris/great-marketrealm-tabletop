@@ -850,6 +850,13 @@ $sceneImage = $scene !== null
                     <?php endif; ?>
 
                     <div
+                        class="gmrt-footstep-layer"
+                        data-footstep-layer
+                        data-footsteps="<?php echo esc_attr(wp_json_encode($state->footsteps())); ?>"
+                        aria-hidden="true"
+                    ></div>
+
+                    <div
                         class="gmrt-fog-layer"
                         data-fog-layer
                         data-fog="<?php echo esc_attr(

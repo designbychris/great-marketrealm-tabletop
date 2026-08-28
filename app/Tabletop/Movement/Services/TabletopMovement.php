@@ -15,6 +15,7 @@ use GreatMarketrealmTabletop\Tables\Tokens\Models\TableToken;
 use GreatMarketrealmTabletop\Tabletop\Conditions\Contracts\ConditionRepository;
 use GreatMarketrealmTabletop\Tabletop\Conditions\Services\ConditionCombatRules;
 use GreatMarketrealmTabletop\Tabletop\Fog\Services\FogOfWarManager;
+use GreatMarketrealmTabletop\Tabletop\Footsteps\Services\FootstepTrailRecorder;
 use RuntimeException;
 
 defined('ABSPATH') || exit;
@@ -29,7 +30,8 @@ final class TabletopMovement
         private TabletopMovementPolicy $policy,
         private ?ConditionRepository $conditions = null,
         private ?ConditionCombatRules $conditionRules = null,
-        private ?FogOfWarManager $fog = null
+        private ?FogOfWarManager $fog = null,
+        private ?FootstepTrailRecorder $footsteps = null
     ) {}
 
     public function move(
@@ -123,6 +125,9 @@ final class TabletopMovement
             );
         }
 
+        $fromX = $token->x();
+        $fromY = $token->y();
+
         $scene->coordinates($x, $y);
         $token->move($x, $y);
         $this->tokens->save($token);
@@ -132,6 +137,10 @@ final class TabletopMovement
                 $tableId,
                 $token
             );
+        }
+
+        if ($this->footsteps !== null) {
+            $this->footsteps->movement($token, $fromX, $fromY);
         }
 
         return $token;

@@ -11,6 +11,8 @@ use GreatMarketrealmTabletop\Tables\Tokens\Repositories\WordPressTableTokenRepos
 use GreatMarketrealmTabletop\Tabletop\Conditions\Repositories\WordPressConditionRepository;
 use GreatMarketrealmTabletop\Tabletop\Conditions\Services\ConditionCombatRules;
 use GreatMarketrealmTabletop\Tabletop\Fog\Services\FogOfWarFactory;
+use GreatMarketrealmTabletop\Tabletop\Footsteps\Repositories\WordPressFootstepTrailRepository;
+use GreatMarketrealmTabletop\Tabletop\Footsteps\Services\FootstepTrailRecorder;
 
 defined('ABSPATH') || exit;
 
@@ -26,7 +28,8 @@ final class TabletopMovementFactory
             new TabletopMovementPolicy(),
             new WordPressConditionRepository(),
             new ConditionCombatRules(),
-            FogOfWarFactory::make()
+            FogOfWarFactory::make(),
+            new FootstepTrailRecorder(new WordPressFootstepTrailRepository())
         );
     }
 }

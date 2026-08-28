@@ -1540,3 +1540,56 @@
 .gmrt-battle-log li{border-left-color:var(--gmrt-fellowship-colour,#8f8779);box-shadow:inset 2px 0 0 color-mix(in srgb,var(--gmrt-fellowship-colour,#8f8779) 45%,transparent)}
 .gmrt-satchel__panel{border-color:color-mix(in srgb,var(--gmrt-fellowship-colour,#d8ad4f) 48%,#f4d688)}.gmrt-satchel__identity img{border-color:var(--gmrt-fellowship-colour,#d8ad4f)}.gmrt-satchel__toggle{border-color:color-mix(in srgb,var(--gmrt-fellowship-colour,#d8ad4f) 58%,#f4d688)}
 .gmrt-token{--gmrt-owner-ring:var(--gmrt-fellowship-colour,transparent)}.gmrt-token[data-token-controller]:not([data-token-controller=""]){box-shadow:0 0 0 2px color-mix(in srgb,var(--gmrt-owner-ring) 58%,transparent)}
+
+
+/* Phase IV.26G — Footsteps Through the Veil */
+.gmrt-footstep-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 6;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.gmrt-footstep {
+    position: absolute;
+    left: var(--gmrt-step-x);
+    top: var(--gmrt-step-y);
+    width: 14px;
+    height: 18px;
+    opacity: var(--gmrt-step-opacity, .22);
+    color: var(--gmrt-step-colour, #65b9ae);
+    transform: translate(-50%, -50%) rotate(var(--gmrt-step-angle, 0deg));
+    transform-origin: center;
+    filter: saturate(.76);
+}
+
+.gmrt-footstep i {
+    position: absolute;
+    display: block;
+    width: 4px;
+    height: 7px;
+    background: currentColor;
+    box-shadow: 0 2px 0 color-mix(in srgb, currentColor 82%, transparent);
+    image-rendering: pixelated;
+}
+
+.gmrt-footstep i:first-child {
+    left: 2px;
+    top: 1px;
+    transform: rotate(-8deg);
+}
+
+.gmrt-footstep i:last-child {
+    right: 2px;
+    bottom: 1px;
+    transform: rotate(8deg);
+}
+
+.gmrt-footstep.is-memory {
+    filter: saturate(.45) brightness(.82);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gmrt-footstep { transition: none; }
+}
