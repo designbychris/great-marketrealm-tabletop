@@ -622,3 +622,5 @@ Correct the final forged-token presentation boundary so Companion-generated port
 - Resolves the seated Companion Character and modifier server-side; the browser never supplies its own modifier.
 - Uses the existing cryptographically secure d20 roller and reports natural 20/1 as presentation flourishes rather than automatic check/save outcomes.
 - Works from the Satchel in both Peace and Battle modes.
+
+- [x] IV.26C — The Spell Pouch: unfurled Satchel and Companion-authoritative spell projection.

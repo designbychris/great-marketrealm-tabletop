@@ -635,3 +635,7 @@
 - Resolves the seated Companion Character and modifier server-side; the browser never supplies its own modifier.
 - Uses the existing cryptographically secure d20 roller and reports natural 20/1 as presentation flourishes rather than automatic check/save outcomes.
 - Works from the Satchel in both Peace and Battle modes.
+
+## 0.26.3-alpha.1 — IV.26C The Spell Pouch
+- Unfurls the Adventurer's Satchel to the available viewport height with internal scrolling and a sticky identity header.
+- Adds a Companion-authoritative Spell Pouch with casting measures, slot summary and learned spell cards.

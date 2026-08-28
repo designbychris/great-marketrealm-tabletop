@@ -75,6 +75,9 @@ $sceneImage = $scene !== null
         $satchelSaves = is_array($adventurerPlay['saving_throws'] ?? null) ? $adventurerPlay['saving_throws'] : [];
         $satchelSkills = is_array($adventurerPlay['skills'] ?? null) ? $adventurerPlay['skills'] : [];
         $satchelAttacks = is_array($adventurerPlay['attacks'] ?? null) ? $adventurerPlay['attacks'] : [];
+        $satchelSpellcasting = is_array($adventurerPlay['spellcasting'] ?? null) ? $adventurerPlay['spellcasting'] : [];
+        $satchelSpells = is_array($satchelSpellcasting['spells'] ?? null) ? $satchelSpellcasting['spells'] : [];
+        $satchelSlots = is_array($satchelSpellcasting['slots'] ?? null) ? $satchelSpellcasting['slots'] : [];
         $abilityLabels = ['strength'=>'STR','dexterity'=>'DEX','constitution'=>'CON','intelligence'=>'INT','wisdom'=>'WIS','charisma'=>'CHA'];
         ?>
         <aside class="gmrt-satchel" data-adventurer-satchel data-open="false" aria-label="Adventurer's Satchel">
@@ -122,7 +125,26 @@ $sceneImage = $scene !== null
                     </div>
                     <?php endif; ?>
                 </details>
-                <div class="gmrt-quick-hands-result" data-quick-hands-result role="status" aria-live="polite">Choose a check, save, skill, Initiative roll or readied weapon.</div><p class="gmrt-satchel__promise">◆ proficient · ◆◆ expertise. Weapon rolls use the Companion's equipped attack projection. Spells and abilities join the next Satchel pass.</p>
+                <details class="gmrt-satchel__section gmrt-satchel__spells" open><summary>Spell Pouch ✨</summary>
+                    <?php if ($satchelSpellcasting === [] || $satchelSpells === []) : ?><p class="gmrt-satchel__empty">No spells are currently recorded in this adventurer's Companion spellbook.</p><?php else : ?>
+                    <div class="gmrt-spellcasting-measures">
+                        <div><span>Ability</span><strong><?php echo esc_html((string) ($satchelSpellcasting['ability'] ?? '—')); ?></strong></div>
+                        <div><span>Spell Attack</span><strong><?php echo $satchelSpellcasting['spell_attack'] === null ? '—' : esc_html(sprintf('%+d', (int) $satchelSpellcasting['spell_attack'])); ?></strong></div>
+                        <div><span>Save DC</span><strong><?php echo $satchelSpellcasting['save_dc'] === null ? '—' : esc_html((string) $satchelSpellcasting['save_dc']); ?></strong></div>
+                    </div>
+                    <?php if ($satchelSlots !== []) : ?><div class="gmrt-spell-slots" aria-label="Spell slots"><?php foreach ($satchelSlots as $slot) : if (! is_array($slot)) continue; ?><span>Lv <?php echo esc_html((string) ($slot['level'] ?? '')); ?> <b><?php echo esc_html((string) ($slot['total'] ?? 0)); ?></b></span><?php endforeach; ?></div><?php endif; ?>
+                    <div class="gmrt-spell-list">
+                    <?php foreach ($satchelSpells as $spell) : if (! is_array($spell)) continue; ?>
+                        <article class="gmrt-spell-card">
+                            <header><div><strong><?php echo esc_html((string) ($spell['label'] ?? 'Spell')); ?></strong><small><?php echo ((int) ($spell['spell_level'] ?? 0)) === 0 ? 'Cantrip' : 'Level ' . esc_html((string) ($spell['spell_level'] ?? '')); ?></small></div><?php if (! empty($spell['spell_attack'])) : ?><b>Attack <?php echo esc_html(sprintf('%+d', (int) $spell['spell_attack'])); ?></b><?php elseif (! empty($spell['save_ability'])) : ?><b><?php echo esc_html(strtoupper((string) $spell['save_ability'])); ?> DC <?php echo esc_html((string) ($spell['save_dc'] ?? '')); ?></b><?php endif; ?></header>
+                            <p class="gmrt-spell-card__meta"><?php echo esc_html((string) ($spell['activation'] ?? '')); ?> · <?php echo esc_html((string) ($spell['range'] ?? '')); ?> · <?php echo esc_html((string) ($spell['duration'] ?? '')); ?></p>
+                            <p><?php echo esc_html((string) ($spell['description'] ?? '')); ?></p>
+                            <?php if (! empty($spell['formula'])) : ?><small class="gmrt-spell-card__formula"><?php echo esc_html((string) $spell['formula']); ?><?php if (! empty($spell['damage_type'])) : ?> <?php echo esc_html((string) $spell['damage_type']); ?><?php endif; ?></small><?php endif; ?>
+                        </article>
+                    <?php endforeach; ?>
+                    </div><?php endif; ?>
+                </details>
+                <div class="gmrt-quick-hands-result" data-quick-hands-result role="status" aria-live="polite">Choose a check, save, skill, Initiative roll or readied weapon.</div><p class="gmrt-satchel__promise">◆ proficient · ◆◆ expertise. Weapons and spells are projected from the Companion; the Tabletop does not duplicate their mechanics.</p>
             </div>
         </aside>
     <?php endif; ?>
