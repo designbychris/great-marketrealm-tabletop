@@ -595,3 +595,11 @@ Bind a seated WordPress user to an owner-validated Companion Character and its f
 ### Phase IV.25.1 — The Character Bears Their Token
 
 Correct the final forged-token presentation boundary so Companion-generated portrait fallbacks render on the Tabletop for both Keeper and Player views while preserving the secure Character Gate ownership chain.
+
+
+## 0.25.0-alpha.3 — Phase IV.25.2: The Keeper Keeps Pace
+
+- Keeps the Keeper's local Encounter revision stale until the authoritative Living Table refresh arrives after End Turn.
+- Lets the DM consume the same in-place round/current-combatant/active-token patch already proven on Player browsers.
+- Restores the End Turn control after a successful refresh instead of leaving it disabled as “Passing…”.
+- Companion-side owner-aware portrait projection accompanies this corrective so a DM sees the seated player's actual forged/custom token artwork rather than a viewer-scoped generated fallback.

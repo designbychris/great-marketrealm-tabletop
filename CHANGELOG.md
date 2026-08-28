@@ -604,3 +604,11 @@
 - Allows the Chamber to render Companion-generated SVG portrait fallbacks as narrowly validated image data URIs instead of losing the `data:` source through WordPress `esc_url()`.
 - Keeps ordinary uploaded Tabletop Token URLs on the normal WordPress URL-escaping path.
 - Preserves the already-certified Character Gate ownership, movement, invitation, Fog, and seat-assignment behaviour.
+
+
+## 0.25.0-alpha.3 — Phase IV.25.2: The Keeper Keeps Pace
+
+- Keeps the Keeper's local Encounter revision stale until the authoritative Living Table refresh arrives after End Turn.
+- Lets the DM consume the same in-place round/current-combatant/active-token patch already proven on Player browsers.
+- Restores the End Turn control after a successful refresh instead of leaving it disabled as “Passing…”.
+- Companion-side owner-aware portrait projection accompanies this corrective so a DM sees the seated player's actual forged/custom token artwork rather than a viewer-scoped generated fallback.

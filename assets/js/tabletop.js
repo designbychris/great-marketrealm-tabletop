@@ -1918,18 +1918,19 @@
             say('Passing the turn…');
 
             try {
-                const data = await request('gmrt_advance_encounter', {
+                await request('gmrt_advance_encounter', {
                     encounter_id: encounter.dataset.encounterId || '',
                     revision: encounter.dataset.encounterRevision || '1'
                 });
 
-                if (data.encounter) {
-                    encounter.dataset.encounterRevision =
-                        String(data.encounter.revision || 1);
-                }
-
+                // Keep the DOM revision stale until refresh() receives the
+                // authoritative state. That lets the same live-state patch
+                // used by remote Players also update the Keeper's own round,
+                // current combatant, active token and Chronicle in place.
                 say('Turn passed.');
                 await refresh();
+                endTurnButton.disabled = false;
+                endTurnButton.textContent = 'End Turn ▶';
             } catch (error) {
                 say(error.message || 'The turn could not be passed.');
                 endTurnButton.disabled = false;
