@@ -45,6 +45,7 @@ final class TabletopAjaxController
                 'death_saves' => $state->deathSaves(),
                 'conditions' => $state->conditions(),
                 'battle_log' => $state->battleLog(),
+                'chamber_log' => $state->chamberLog(),
                 'combatant_states' => $state->combatantStates(),
                 'arsenals' => $state->arsenals(),
                 'fog' => $state->fog(),

@@ -8,6 +8,7 @@ use GreatMarketrealmTabletop\Integration\Companion\CompanionCharacterGateway;
 use GreatMarketrealmTabletop\Tables\Memberships\Contracts\TableMembershipRepository;
 use GreatMarketrealmTabletop\Tables\Memberships\Models\TableMemberStatus;
 use GreatMarketrealmTabletop\Tabletop\Satchel\Services\SpellPouchRoller;
+use GreatMarketrealmTabletop\Tabletop\Chronicle\Services\TableChronicleRecorder;
 use Throwable;
 
 final class SpellPouchAjaxController
@@ -15,7 +16,8 @@ final class SpellPouchAjaxController
     public function __construct(
         private CompanionCharacterGateway $companion,
         private TableMembershipRepository $members,
-        private SpellPouchRoller $spells
+        private SpellPouchRoller $spells,
+        private TableChronicleRecorder $chronicle
     ) {}
 
     public function roll(): void
@@ -84,6 +86,8 @@ final class SpellPouchAjaxController
                     $damageType === '' ? '' : ' ' . $damageType
                 );
             }
+
+            $this->chronicle->recordSatchelRoll($tableId, $userId, $character, 'spell-pouch', (string) $roll['action'], $message, $roll);
 
             wp_send_json_success(['roll' => $roll, 'message' => $message]);
         } catch (Throwable $exception) {

@@ -28,8 +28,9 @@ final class BattleLogProjector
             $event = $events[$index];
             $record = $event->toArray();
             $actorId = (string) ($record['token_id'] ?? '');
+            $isSatchelRoll = ($record['type'] ?? '') === 'satchel-roll';
 
-            if (! isset($tokenLabels[$actorId])) {
+            if (! $isSatchelRoll && ! isset($tokenLabels[$actorId])) {
                 continue;
             }
 
@@ -123,6 +124,11 @@ final class BattleLogProjector
             ? $event['payload']
             : [];
         $type = (string) ($event['type'] ?? '');
+
+        if ($type === 'satchel-roll') {
+            $summary = trim((string) ($payload['summary'] ?? ''));
+            return $summary === '' ? null : $summary . (str_ends_with($summary, '.') ? '' : '.');
+        }
 
         if ($type === 'attack-resolved') {
             return $this->attackSummary(

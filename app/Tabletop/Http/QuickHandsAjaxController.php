@@ -8,6 +8,7 @@ use GreatMarketrealmTabletop\Integration\Companion\CompanionCharacterGateway;
 use GreatMarketrealmTabletop\Tables\Memberships\Contracts\TableMembershipRepository;
 use GreatMarketrealmTabletop\Tables\Memberships\Models\TableMemberStatus;
 use GreatMarketrealmTabletop\Tabletop\Satchel\Services\QuickHandsRoller;
+use GreatMarketrealmTabletop\Tabletop\Chronicle\Services\TableChronicleRecorder;
 use Throwable;
 
 final class QuickHandsAjaxController
@@ -15,7 +16,8 @@ final class QuickHandsAjaxController
     public function __construct(
         private CompanionCharacterGateway $companion,
         private TableMembershipRepository $members,
-        private QuickHandsRoller $quickHands
+        private QuickHandsRoller $quickHands,
+        private TableChronicleRecorder $chronicle
     ) {}
 
     public function roll(): void
@@ -48,6 +50,7 @@ final class QuickHandsAjaxController
             $name = (string) ($character['name'] ?? 'Adventurer');
             $sign = ((int) $roll['modifier']) >= 0 ? '+' : '';
             $message = sprintf('%s rolls %s: %d %s%d = %d', $name, $roll['label'], $roll['die'], $sign, $roll['modifier'], $roll['total']);
+            $this->chronicle->recordSatchelRoll($tableId, $userId, $character, 'quick-hands', (string) $roll['kind'], $message, $roll);
             wp_send_json_success(['roll' => $roll, 'message' => $message]);
         } catch (Throwable $exception) {
             wp_send_json_error(['message' => $exception->getMessage()], 400);

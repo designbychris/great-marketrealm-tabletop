@@ -8,6 +8,7 @@ use GreatMarketrealmTabletop\Integration\Companion\CompanionCharacterGateway;
 use GreatMarketrealmTabletop\Tables\Memberships\Contracts\TableMembershipRepository;
 use GreatMarketrealmTabletop\Tables\Memberships\Models\TableMemberStatus;
 use GreatMarketrealmTabletop\Tabletop\Satchel\Services\WeaponHandsRoller;
+use GreatMarketrealmTabletop\Tabletop\Chronicle\Services\TableChronicleRecorder;
 use Throwable;
 
 final class WeaponHandsAjaxController
@@ -15,7 +16,8 @@ final class WeaponHandsAjaxController
     public function __construct(
         private CompanionCharacterGateway $companion,
         private TableMembershipRepository $members,
-        private WeaponHandsRoller $weapons
+        private WeaponHandsRoller $weapons,
+        private TableChronicleRecorder $chronicle
     ) {}
 
     public function roll(): void
@@ -72,6 +74,8 @@ final class WeaponHandsAjaxController
                     $roll['damage_type']
                 );
             }
+
+            $this->chronicle->recordSatchelRoll($tableId, $userId, $character, 'weapons-to-hand', (string) $roll['action'], $message, $roll);
 
             wp_send_json_success(['roll' => $roll, 'message' => $message]);
         } catch (Throwable $exception) {

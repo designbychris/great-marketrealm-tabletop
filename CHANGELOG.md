@@ -1,3 +1,11 @@
+## 0.26.6-alpha.1 — Phase IV.26E: Chronicles of the Table
+
+- Records every server-authoritative Quick Hands, Weapons to Hand, and Spell Pouch roll through one shared Chronicle recorder.
+- Satchel rolls made during an Encounter join the existing Battle Chronicle with round/turn context.
+- Satchel rolls made in Peace/Exploration persist in the new table-scoped Chamber Chronicle.
+- Both Chronicles project the latest 12 entries and update through the existing Living Table heartbeat; no second poller was added.
+- Chronicle records preserve the authoritative roll payload while presenting a safe human-readable summary.
+
 ## 0.26.5-alpha.2 — Phase IV.26D.2 Browser Corrective: Combatants May Leave
 
 - Lets the Dungeon Master remove a Chamber token even while that token participates in the current Encounter.

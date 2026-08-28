@@ -412,6 +412,7 @@
                 const flourish = roll.natural_twenty ? ' ✨ Natural 20!' : (roll.natural_one ? ' · Natural 1!' : '');
                 if (quickHandsResult) quickHandsResult.textContent = (data.message || 'Roll complete.') + flourish;
                 say(data.message || 'Quick Hands roll complete.');
+                await refresh();
             } catch (error) {
                 if (quickHandsResult) quickHandsResult.textContent = error.message || 'The roll could not be made.';
                 say(error.message || 'The roll could not be made.');
@@ -441,6 +442,7 @@
                     : (roll.action === 'attack' && roll.natural_one ? ' · Natural 1!' : '');
                 if (quickHandsResult) quickHandsResult.textContent = (data.message || 'Weapon roll complete.') + flourish;
                 say(data.message || 'Weapons to Hand roll complete.');
+                await refresh();
             } catch (error) {
                 if (quickHandsResult) quickHandsResult.textContent = error.message || 'The weapon roll could not be made.';
                 say(error.message || 'The weapon roll could not be made.');
@@ -469,6 +471,7 @@
                     : (roll.action === 'attack' && roll.natural_one ? ' · Natural 1!' : '');
                 if (quickHandsResult) quickHandsResult.textContent = (data.message || 'Spell roll complete.') + flourish;
                 say(data.message || 'Spell Pouch roll complete.');
+                await refresh();
             } catch (error) {
                 if (quickHandsResult) quickHandsResult.textContent = error.message || 'The spell roll could not be made.';
                 say(error.message || 'The spell roll could not be made.');
@@ -1695,10 +1698,17 @@
         '[data-battle-log-empty]'
     );
 
-    function renderBattleLog(entries) {
+    function renderChronicle(entries, battleMode) {
         if (!battleLog) {
             return;
         }
+
+        const chronicle = document.querySelector('[data-table-chronicle]');
+        const eyebrow = document.querySelector('[data-chronicle-eyebrow]');
+        const title = document.querySelector('[data-chronicle-title]');
+        if (chronicle) chronicle.dataset.chronicleMode = battleMode ? 'battle' : 'chamber';
+        if (eyebrow) eyebrow.textContent = battleMode ? 'Battle Chronicle' : 'Chamber Chronicle';
+        if (title) title.textContent = battleMode ? 'Deeds at the Table' : 'Tales from the Chamber';
 
         battleLog.replaceChildren();
 
@@ -1711,8 +1721,9 @@
             item.dataset.battleLogEntry = '';
 
             const round = document.createElement('small');
-            round.textContent =
-                'Round ' + String(entry.round || 0);
+            round.textContent = battleMode
+                ? 'Round ' + String(entry.round || 0)
+                : 'At the Table';
 
             const summary = document.createElement('span');
             summary.textContent = String(
@@ -1839,7 +1850,7 @@
             }
 
             renderGathering(state.members);
-            renderBattleLog(state.battle_log);
+            renderChronicle(state.encounter ? state.battle_log : state.chamber_log, Boolean(state.encounter));
             renderFog(state.fog || {});
             renderVisionLayer(state.vision_layer || []);
 

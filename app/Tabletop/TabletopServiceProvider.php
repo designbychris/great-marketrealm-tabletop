@@ -34,6 +34,10 @@ use GreatMarketrealmTabletop\Tabletop\Satchel\Services\WeaponHandsRoller;
 use GreatMarketrealmTabletop\Tabletop\Satchel\Services\SpellPouchRoller;
 use GreatMarketrealmTabletop\Tabletop\Battle\Services\SecureD20Roller;
 use GreatMarketrealmTabletop\Tabletop\Battle\Services\SecureDamageDieRoller;
+use GreatMarketrealmTabletop\Tabletop\Chronicle\Services\TableChronicleRecorder;
+use GreatMarketrealmTabletop\Tabletop\Chronicle\Repositories\WordPressChamberChronicleRepository;
+use GreatMarketrealmTabletop\Tabletop\Battle\Repositories\WordPressBattleEventRepository;
+use GreatMarketrealmTabletop\Tables\Services\SystemTableClock;
 use GreatMarketrealmTabletop\Integration\Companion\WordPressCompanionCharacterGateway;
 use GreatMarketrealmTabletop\Tables\Scenes\Repositories\WordPressTableSceneRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Repositories\WordPressTableTokenRepository;
@@ -183,10 +187,20 @@ final class TabletopServiceProvider
             new WordPressTableMembershipRepository()
         );
 
+        $chronicle = new TableChronicleRecorder(
+            new WordPressTableSceneRepository(),
+            new WordPressEncounterRepository(),
+            new WordPressTableTokenRepository(),
+            new WordPressBattleEventRepository(),
+            new WordPressChamberChronicleRepository(),
+            new SystemTableClock()
+        );
+
         $this->quickHandsAjax = new QuickHandsAjaxController(
             new WordPressCompanionCharacterGateway(),
             new WordPressTableMembershipRepository(),
-            new QuickHandsRoller(new SecureD20Roller())
+            new QuickHandsRoller(new SecureD20Roller()),
+            $chronicle
         );
 
         $this->weaponHandsAjax = new WeaponHandsAjaxController(
@@ -195,7 +209,8 @@ final class TabletopServiceProvider
             new WeaponHandsRoller(
                 new SecureD20Roller(),
                 new SecureDamageDieRoller()
-            )
+            ),
+            $chronicle
         );
 
         $this->spellPouchAjax = new SpellPouchAjaxController(
@@ -204,7 +219,8 @@ final class TabletopServiceProvider
             new SpellPouchRoller(
                 new SecureD20Roller(),
                 new SecureDamageDieRoller()
-            )
+            ),
+            $chronicle
         );
     }
 

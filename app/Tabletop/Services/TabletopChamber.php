@@ -25,6 +25,8 @@ use GreatMarketrealmTabletop\Tables\Memberships\Contracts\TableMemberIdentityDir
 use GreatMarketrealmTabletop\Tables\Memberships\Presentation\TableMemberProjector;
 use GreatMarketrealmTabletop\Integration\Companion\CompanionGateway;
 use GreatMarketrealmTabletop\Integration\Companion\CompanionCharacterGateway;
+use GreatMarketrealmTabletop\Tabletop\Chronicle\Contracts\ChamberChronicleRepository;
+use GreatMarketrealmTabletop\Tabletop\Chronicle\Presentation\ChamberChronicleProjector;
 use GreatMarketrealmTabletop\Tables\Scenes\Contracts\TableSceneRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Contracts\TableTokenRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Models\TableToken;
@@ -52,7 +54,9 @@ final class TabletopChamber
         private ?FogOfWarProjector $fogProjector = null,
         private ?VisionBarrierRepository $visionBarriers = null,
         private ?TableMemberIdentityDirectory $identities = null,
-        private ?CompanionGateway $companion = null
+        private ?CompanionGateway $companion = null,
+        private ?ChamberChronicleRepository $chamberEvents = null,
+        private ?ChamberChronicleProjector $chamberChronicleProjector = null
     ) {}
 
     public function state(
@@ -305,6 +309,13 @@ final class TabletopChamber
                 );
         }
 
+        $chamberLog = [];
+        if ($this->chamberEvents !== null && $this->chamberChronicleProjector !== null) {
+            $chamberLog = $this->chamberChronicleProjector->project(
+                $this->chamberEvents->forTable($tableId)
+            );
+        }
+
         return new TabletopChamberState(
             $table->toArray(),
             $viewer->toArray(),
@@ -335,7 +346,8 @@ final class TabletopChamber
                         )
                         : null,
                 ],
-            ]
+            ],
+            $chamberLog
         );
     }
 }

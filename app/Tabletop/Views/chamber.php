@@ -20,6 +20,8 @@ $vitality = $state?->vitality() ?? [];
 $deathSaves = $state?->deathSaves() ?? [];
 $conditions = $state?->conditions() ?? [];
 $battleLog = $state?->battleLog() ?? [];
+$chamberLog = $state?->chamberLog() ?? [];
+$chronicleLog = $encounter !== null ? $battleLog : $chamberLog;
 $combatantStates = $state?->combatantStates() ?? [];
 $arsenals = $state?->arsenals() ?? [];
 $fog = $state?->fog() ?? [];
@@ -1299,40 +1301,35 @@ $sceneImage = $scene !== null
 
 
                 <div data-live-battle-log-slot>
-                <?php if ($encounter !== null) : ?>
                 <section
                     class="gmrt-battle-log"
-                    aria-labelledby="gmrt-battle-log-title"
+                    aria-labelledby="gmrt-chronicle-title"
+                    data-table-chronicle
+                    data-chronicle-mode="<?php echo $encounter !== null ? 'battle' : 'chamber'; ?>"
                 >
                     <div class="gmrt-battle-log__heading">
                         <div>
-                            <p class="gmrt-chamber__eyebrow">
-                                Battle Chronicle
+                            <p class="gmrt-chamber__eyebrow" data-chronicle-eyebrow>
+                                <?php echo $encounter !== null ? 'Battle Chronicle' : 'Chamber Chronicle'; ?>
                             </p>
-                            <h3 id="gmrt-battle-log-title">
-                                Deeds at the Table
+                            <h3 id="gmrt-chronicle-title" data-chronicle-title>
+                                <?php echo $encounter !== null ? 'Deeds at the Table' : 'Tales from the Chamber'; ?>
                             </h3>
                         </div>
                         <span>Latest 12</span>
                     </div>
 
-                    <ol data-battle-log>
-                        <?php foreach ($battleLog as $entry) : ?>
-                            <li data-battle-log-entry>
+                    <ol data-battle-log data-chronicle-log>
+                        <?php foreach ($chronicleLog as $entry) : ?>
+                            <li data-battle-log-entry data-chronicle-log-entry>
                                 <small>
-                                    Round <?php echo esc_html(
-                                        (string) (
-                                            $entry['round'] ?? 0
-                                        )
-                                    ); ?>
+                                    <?php if ($encounter !== null) : ?>
+                                        Round <?php echo esc_html((string) ($entry['round'] ?? 0)); ?>
+                                    <?php else : ?>
+                                        At the Table
+                                    <?php endif; ?>
                                 </small>
-                                <span>
-                                    <?php echo esc_html(
-                                        (string) (
-                                            $entry['summary'] ?? ''
-                                        )
-                                    ); ?>
-                                </span>
+                                <span><?php echo esc_html((string) ($entry['summary'] ?? '')); ?></span>
                             </li>
                         <?php endforeach; ?>
                     </ol>
@@ -1340,14 +1337,14 @@ $sceneImage = $scene !== null
                     <p
                         class="gmrt-battle-log__empty"
                         data-battle-log-empty
-                        <?php echo $battleLog !== []
-                            ? 'hidden'
-                            : ''; ?>
+                        data-chronicle-log-empty
+                        <?php echo $chronicleLog !== [] ? 'hidden' : ''; ?>
                     >
-                        No deeds have been chronicled yet.
+                        <?php echo $encounter !== null
+                            ? 'No deeds have been chronicled yet.'
+                            : 'No Chamber rolls have been chronicled yet.'; ?>
                     </p>
                 </section>
-                <?php endif; ?>
                 </div>
             </aside>
         </div>

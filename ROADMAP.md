@@ -655,3 +655,12 @@ Correct the final forged-token presentation boundary so Companion-generated port
 - Chronicle the Satchel: encounter-time Satchel rolls enter the Battle Chronicle; Exploration/Peace Mode rolls enter a persistent Chamber Chronicle.
 
 - [x] IV.26D.1 — One Measure of the Adventurer: Satchel and Gathering share Companion-authoritative Adventuring Measures.
+
+
+### Phase IV.26E — Chronicles of the Table
+- [x] Shared server-authoritative Satchel Chronicle recorder.
+- [x] Quick Hands, Weapons to Hand, and Spell Pouch recording.
+- [x] Encounter rolls routed into Battle Chronicle.
+- [x] Peace/Exploration rolls routed into persistent Chamber Chronicle.
+- [x] Living Table heartbeat projects Chronicle changes without a second poller.
+- [ ] Browser certification.

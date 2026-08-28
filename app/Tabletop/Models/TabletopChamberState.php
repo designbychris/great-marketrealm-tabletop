@@ -27,7 +27,8 @@ final class TabletopChamberState
         private array $arsenals = [],
         private array $fog = [],
         private array $visionLayer = [],
-        private array $integrations = []
+        private array $integrations = [],
+        private array $chamberLog = []
     ) {}
 
     /** @return array<string,mixed> */
@@ -90,6 +91,12 @@ final class TabletopChamberState
         return $this->battleLog;
     }
 
+    /** @return array<int,array<string,mixed>> */
+    public function chamberLog(): array
+    {
+        return $this->chamberLog;
+    }
+
     /** @return array<string,string> */
     public function combatantStates(): array
     {
@@ -132,6 +139,7 @@ final class TabletopChamberState
             'death_saves' => $this->deathSaves,
             'conditions' => $this->conditions,
             'battle_log' => $this->battleLog,
+            'chamber_log' => $this->chamberLog,
             'combatant_states' => $this->combatantStates,
             'arsenals' => $this->arsenals,
             'fog' => $this->fog,
