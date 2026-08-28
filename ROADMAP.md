@@ -590,3 +590,8 @@ Real WordPress identities, avatars, Table invitations and explicit seat acceptan
 
 ### Phase IV.25 — The Companion Character Gate
 Bind a seated WordPress user to an owner-validated Companion Character and its forged battlefield token, establishing player token ownership before deeper Character Sheet projection.
+
+
+### Phase IV.25.1 — The Character Bears Their Token
+
+Correct the final forged-token presentation boundary so Companion-generated portrait fallbacks render on the Tabletop for both Keeper and Player views while preserving the secure Character Gate ownership chain.

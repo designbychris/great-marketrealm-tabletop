@@ -1,6 +1,7 @@
 <?php
 
 use GreatMarketrealmTabletop\Tabletop\Models\TabletopChamberState;
+use GreatMarketrealmTabletop\Tabletop\Presentation\CompanionTokenImageSource;
 
 defined('ABSPATH') || exit;
 
@@ -857,7 +858,7 @@ $sceneImage = $scene !== null
                                 <span class="gmrt-token__face" aria-hidden="true">
                                     <?php if ($tokenImage !== '') : ?>
                                         <img
-                                            src="<?php echo esc_url($tokenImage); ?>"
+                                            src="<?php echo CompanionTokenImageSource::escaped($tokenImage); ?>"
                                             alt=""
                                             style="--gmrt-token-focus-x: <?php echo esc_attr((string) ($tokenRecipe['focus_x'] ?? 50)); ?>%; --gmrt-token-focus-y: <?php echo esc_attr((string) ($tokenRecipe['focus_y'] ?? 50)); ?>%; --gmrt-token-zoom: <?php echo esc_attr((string) ($tokenRecipe['zoom'] ?? 100)); ?>%;"
                                         >

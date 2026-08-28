@@ -597,3 +597,10 @@
 - The selected Character creates a player-controlled CHARACTER token on the active Scene when one is not already present.
 - Forged Companion token imagery, focus and zoom are projected onto the battlefield token.
 - The Chamber shows the selected Character and owner-scoped Character picker.
+
+
+## 0.25.0-alpha.2 — Phase IV.25.1: The Character Bears Their Token
+
+- Allows the Chamber to render Companion-generated SVG portrait fallbacks as narrowly validated image data URIs instead of losing the `data:` source through WordPress `esc_url()`.
+- Keeps ordinary uploaded Tabletop Token URLs on the normal WordPress URL-escaping path.
+- Preserves the already-certified Character Gate ownership, movement, invitation, Fog, and seat-assignment behaviour.
