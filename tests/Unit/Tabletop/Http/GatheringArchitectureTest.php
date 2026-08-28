@@ -44,7 +44,8 @@ final class GatheringArchitectureTest extends TestCase
         );
 
         self::assertStringContainsString('WordPressTableMemberIdentityDirectory', $source);
-        self::assertStringContainsString('CompanionAvailability', $source);
+        self::assertStringContainsString('WordPressCompanionCharacterGateway', $source);
+        self::assertStringNotContainsString('CompanionAvailability', $source);
     }
 
     public function testPhaseKeepsCompanionNamespaceInsideIntegrationBoundary(): void
