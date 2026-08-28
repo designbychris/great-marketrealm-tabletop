@@ -617,3 +617,9 @@
 ### Phase IV.26 — The Adventurer's Satchel (0.26.0-alpha.1)
 - Tabletop support for the owner-scoped tabletop play projection and pull-out Adventurer's Satchel.
 - Companion remains authoritative for character mechanics; Tabletop consumes the projection without duplicating character persistence.
+
+
+### 0.26.0-alpha.2 — Phase IV.26 Browser Corrective
+- Fixes the Adventurer's Satchel header artwork renderer to use the supported `CompanionTokenImageSource::escaped()` API.
+- Prevents the Player Chamber fatal caused by the nonexistent `CompanionTokenImageSource::sanitize()` call.
+- Adds regression coverage that forbids the unsupported Satchel image-source call from returning.

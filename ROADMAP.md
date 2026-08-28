@@ -608,3 +608,7 @@ Correct the final forged-token presentation boundary so Companion-generated port
 ### Phase IV.26 — The Adventurer's Satchel (0.26.0-alpha.1)
 - Tabletop support for the owner-scoped tabletop play projection and pull-out Adventurer's Satchel.
 - Companion remains authoritative for character mechanics; Tabletop consumes the projection without duplicating character persistence.
+
+
+### Phase IV.26 Browser Corrective — 0.26.0-alpha.2
+- Restore Player Chamber rendering for seated Companion characters by routing Satchel artwork through the established Companion token image-source boundary.

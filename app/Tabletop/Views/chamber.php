@@ -69,7 +69,7 @@ $sceneImage = $scene !== null
     <?php if ($adventurer !== null && $adventurerPlay !== []) : ?>
         <?php
         $satchelToken = is_array($adventurer['token'] ?? null) ? $adventurer['token'] : [];
-        $satchelImage = CompanionTokenImageSource::sanitize((string) ($satchelToken['image_url'] ?? ''));
+        $satchelImage = CompanionTokenImageSource::escaped((string) ($satchelToken['image_url'] ?? ''));
         $satchelHp = is_array($adventurerPlay['hit_points'] ?? null) ? $adventurerPlay['hit_points'] : [];
         $satchelAbilities = is_array($adventurerPlay['abilities'] ?? null) ? $adventurerPlay['abilities'] : [];
         $satchelSaves = is_array($adventurerPlay['saving_throws'] ?? null) ? $adventurerPlay['saving_throws'] : [];

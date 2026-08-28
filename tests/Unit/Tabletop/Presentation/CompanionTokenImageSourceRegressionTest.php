@@ -34,4 +34,17 @@ final class CompanionTokenImageSourceRegressionTest extends TestCase
         self::assertStringContainsString('CompanionTokenImageSource::escaped($tokenImage)', $source);
         self::assertStringNotContainsString('esc_url($tokenImage)', $source);
     }
+    public function testAdventurersSatchelUsesTheSupportedEscapedImageSourceApi(): void
+    {
+        $source = (string) file_get_contents(
+            $this->root('app/Tabletop/Views/chamber.php')
+        );
+
+        self::assertStringContainsString(
+            "CompanionTokenImageSource::escaped((string) (\$satchelToken['image_url'] ?? ''))",
+            $source
+        );
+        self::assertStringNotContainsString('CompanionTokenImageSource::sanitize(', $source);
+    }
+
 }
