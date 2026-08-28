@@ -1528,3 +1528,15 @@
     background: rgba(123, 38, 25, .22) !important;
 }
 .gmrt-remove-token-button[hidden] { display: none !important; }
+
+
+/* Phase IV.26F — Colours of the Fellowship */
+.gmrt-party__member{border-color:color-mix(in srgb,var(--gmrt-fellowship-colour,#65b9ae) 58%,transparent);box-shadow:inset 4px 0 0 var(--gmrt-fellowship-colour,#65b9ae)}
+.gmrt-party__avatar{border-color:var(--gmrt-fellowship-colour,#65b9ae)}
+.gmrt-party__role{border-color:color-mix(in srgb,var(--gmrt-fellowship-colour,#65b9ae) 62%,transparent);color:color-mix(in srgb,var(--gmrt-fellowship-colour,#65b9ae) 78%,white);background:color-mix(in srgb,var(--gmrt-fellowship-colour,#65b9ae) 16%,transparent)}
+.gmrt-fellowship-colour{margin:.65rem 0 .85rem;padding:.55rem .6rem;border:1px solid rgba(244,234,214,.14);border-radius:7px;background:rgba(0,0,0,.12)}
+.gmrt-fellowship-colour>span{display:block;margin-bottom:.4rem;font:800 .62rem system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;opacity:.72}
+.gmrt-fellowship-colour__swatches{display:flex;flex-wrap:wrap;gap:.38rem}.gmrt-fellowship-colour__swatches button{width:1.45rem;height:1.45rem;border-radius:50%;border:2px solid rgba(255,255,255,.24);background:var(--gmrt-swatch);cursor:pointer;box-shadow:0 0 0 1px rgba(0,0,0,.45)}.gmrt-fellowship-colour__swatches button[aria-pressed="true"]{outline:2px solid #f4ead6;outline-offset:2px}.gmrt-fellowship-colour__swatches button:focus-visible{outline:3px solid #fff;outline-offset:2px}
+.gmrt-battle-log li{border-left-color:var(--gmrt-fellowship-colour,#8f8779);box-shadow:inset 2px 0 0 color-mix(in srgb,var(--gmrt-fellowship-colour,#8f8779) 45%,transparent)}
+.gmrt-satchel__panel{border-color:color-mix(in srgb,var(--gmrt-fellowship-colour,#d8ad4f) 48%,#f4d688)}.gmrt-satchel__identity img{border-color:var(--gmrt-fellowship-colour,#d8ad4f)}.gmrt-satchel__toggle{border-color:color-mix(in srgb,var(--gmrt-fellowship-colour,#d8ad4f) 58%,#f4d688)}
+.gmrt-token{--gmrt-owner-ring:var(--gmrt-fellowship-colour,transparent)}.gmrt-token[data-token-controller]:not([data-token-controller=""]){box-shadow:0 0 0 2px color-mix(in srgb,var(--gmrt-owner-ring) 58%,transparent)}

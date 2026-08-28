@@ -20,7 +20,8 @@ final class TableMember
         private DateTimeImmutable $invitedAt,
         private ?DateTimeImmutable $joinedAt = null,
         private ?DateTimeImmutable $leftAt = null,
-        private ?string $companionCharacterId = null
+        private ?string $companionCharacterId = null,
+        private ?string $tableColour = null
     ) {}
 
     public static function dungeonMaster(
@@ -75,7 +76,8 @@ final class TableMember
             self::date($record['left_at'] ?? null),
             self::characterId(
                 $record['companion_character_id'] ?? null
-            )
+            ),
+            isset($record['table_colour']) ? (string) $record['table_colour'] : null
         );
     }
 
@@ -152,6 +154,19 @@ final class TableMember
         $this->companionCharacterId = null;
     }
 
+    public function tableColour(): string
+    {
+        return TableColourPalette::resolve($this->tableColour, $this->tableId, $this->userId);
+    }
+
+    public function chooseTableColour(string $colour): void
+    {
+        if (! TableColourPalette::has($colour)) {
+            throw new InvalidArgumentException('Choose a colour from the Great Marketrealm Table Palette.');
+        }
+        $this->tableColour = $colour;
+    }
+
     public function tableId(): string
     {
         return $this->tableId;
@@ -199,6 +214,9 @@ final class TableMember
             'joined_at' => $this->joinedAt?->format(DATE_ATOM),
             'left_at' => $this->leftAt?->format(DATE_ATOM),
             'companion_character_id' => $this->companionCharacterId,
+            'table_colour' => $this->tableColour(),
+            'table_colour_hex' => TableColourPalette::hex($this->tableColour()),
+            'table_colour_label' => TableColourPalette::label($this->tableColour()),
         ];
     }
 

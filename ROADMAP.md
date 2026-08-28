@@ -1,3 +1,9 @@
+## Phase IV.26F — Colours of the Fellowship
+
+- Curated Great Marketrealm Table Palette with persistent player-selected Fellowship Ribbon colours.
+- Stable deterministic defaults, authenticated server-side validation, and live propagation through Gathering, Chronicles, Satchel, and player-controlled battlefield tokens.
+- Colour remains supplementary to labels, roles, names, and other ownership cues for accessibility.
+
 ## Phase IV.26D.2 — Clear the Battlefield & The Living Gathering
 
 - [x] Obvious Choose Your Adventurer guidance when no Companion Character is selected.

@@ -2,6 +2,7 @@
 
 use GreatMarketrealmTabletop\Tabletop\Models\TabletopChamberState;
 use GreatMarketrealmTabletop\Tabletop\Presentation\CompanionTokenImageSource;
+use GreatMarketrealmTabletop\Tables\Memberships\Models\TableColourPalette;
 
 defined('ABSPATH') || exit;
 
@@ -33,6 +34,8 @@ $companion = is_array($integrations['companion'] ?? null)
 $adventurer = is_array($companion['selected_character'] ?? null)
     ? $companion['selected_character']
     : null;
+$viewerColour = (string) ($viewer['table_colour'] ?? 'market-teal');
+$viewerColourHex = (string) ($viewer['table_colour_hex'] ?? TableColourPalette::hex($viewerColour));
 $adventurerPlay = is_array($adventurer['play'] ?? null)
     ? $adventurer['play']
     : [];
@@ -85,7 +88,7 @@ $sceneImage = $scene !== null
         $satchelSlots = is_array($satchelSpellcasting['slots'] ?? null) ? $satchelSpellcasting['slots'] : [];
         $abilityLabels = ['strength'=>'STR','dexterity'=>'DEX','constitution'=>'CON','intelligence'=>'INT','wisdom'=>'WIS','charisma'=>'CHA'];
         ?>
-        <aside class="gmrt-satchel" data-adventurer-satchel data-open="false" aria-label="Adventurer's Satchel">
+        <aside class="gmrt-satchel" style="--gmrt-fellowship-colour: <?php echo esc_attr($viewerColourHex); ?>" data-adventurer-satchel data-open="false" aria-label="Adventurer's Satchel">
             <button class="gmrt-satchel__toggle" type="button" data-satchel-toggle aria-expanded="false" aria-controls="gmrt-adventurer-satchel-panel">
                 <span aria-hidden="true">🎒</span><span>Satchel</span>
             </button>
@@ -948,6 +951,7 @@ $sceneImage = $scene !== null
                                     --gmrt-token-height: <?php echo esc_attr(
                                         (string) $height
                                     ); ?>;
+                                    --gmrt-fellowship-colour: <?php echo esc_attr((string) ($token['table_colour_hex'] ?? '#d8ad4f')); ?>;
                                 "
                                 title="<?php echo esc_attr(
                                     (string) $token['label']
@@ -1058,9 +1062,18 @@ $sceneImage = $scene !== null
                     Adventurers at the Table
                 </h2>
 
+                <div class="gmrt-fellowship-colour" data-fellowship-colour-picker>
+                    <span>Your Fellowship Ribbon</span>
+                    <div class="gmrt-fellowship-colour__swatches" role="group" aria-label="Choose your Great Marketrealm Table colour">
+                    <?php foreach (TableColourPalette::all() as $colourKey => $colour) : ?>
+                        <button type="button" data-table-colour="<?php echo esc_attr($colourKey); ?>" style="--gmrt-swatch: <?php echo esc_attr($colour['hex']); ?>" aria-pressed="<?php echo $viewerColour === $colourKey ? 'true' : 'false'; ?>" title="<?php echo esc_attr($colour['label']); ?>"><span class="screen-reader-text"><?php echo esc_html($colour['label']); ?></span></button>
+                    <?php endforeach; ?>
+                    </div>
+                </div>
+
                 <ul data-live-gathering-list>
                     <?php foreach ($members as $member) : ?>
-                        <li class="gmrt-party__member gmrt-party__member--<?php echo esc_attr((string) ($member['role'] ?? 'player')); ?> gmrt-party__member--<?php echo esc_attr((string) ($member['status'] ?? 'unknown')); ?>">
+                        <li style="--gmrt-fellowship-colour: <?php echo esc_attr((string) ($member['table_colour_hex'] ?? '#65b9ae')); ?>" class="gmrt-party__member gmrt-party__member--<?php echo esc_attr((string) ($member['role'] ?? 'player')); ?> gmrt-party__member--<?php echo esc_attr((string) ($member['status'] ?? 'unknown')); ?>">
                             <?php $avatarUrl = (string) ($member['avatar_url'] ?? ''); ?>
                             <span class="gmrt-party__avatar" aria-hidden="true">
                                 <?php if ($avatarUrl !== '') : ?>
@@ -1321,7 +1334,7 @@ $sceneImage = $scene !== null
 
                     <ol data-battle-log data-chronicle-log>
                         <?php foreach ($chronicleLog as $entry) : ?>
-                            <li data-battle-log-entry data-chronicle-log-entry>
+                            <li data-battle-log-entry data-chronicle-log-entry style="--gmrt-fellowship-colour: <?php echo esc_attr((string) (($entry['table_colour']['hex'] ?? null) ?: '#8f8779')); ?>">
                                 <small>
                                     <?php if ($encounter !== null) : ?>
                                         Round <?php echo esc_html((string) ($entry['round'] ?? 0)); ?>

@@ -1,3 +1,9 @@
+## Phase IV.26F — Colours of the Fellowship
+
+- Curated Great Marketrealm Table Palette with persistent player-selected Fellowship Ribbon colours.
+- Stable deterministic defaults, authenticated server-side validation, and live propagation through Gathering, Chronicles, Satchel, and player-controlled battlefield tokens.
+- Colour remains supplementary to labels, roles, names, and other ownership cues for accessibility.
+
 ## 0.26.6-alpha.1 — Phase IV.26E: Chronicles of the Table
 
 - Records every server-authoritative Quick Hands, Weapons to Hand, and Spell Pouch roll through one shared Chronicle recorder.

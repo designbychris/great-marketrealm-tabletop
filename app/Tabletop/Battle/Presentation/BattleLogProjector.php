@@ -19,7 +19,8 @@ final class BattleLogProjector
      */
     public function project(
         array $events,
-        array $tokenLabels
+        array $tokenLabels,
+        array $tokenOwners = []
     ): array {
         $entries = [];
         $count = count($events);
@@ -75,6 +76,7 @@ final class BattleLogProjector
                     $record['turn_index'] ?? 0
                 ),
                 'type' => (string) ($record['type'] ?? ''),
+                'user_id' => (int) (($record['payload']['user_id'] ?? null) ?? ($tokenOwners[$actorId] ?? 0)),
                 'summary' => $summary,
                 'occurred_at' => (string) (
                     $record['occurred_at'] ?? ''

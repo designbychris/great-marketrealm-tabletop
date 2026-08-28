@@ -21,6 +21,7 @@ final class ChamberChronicleProjector
                 'id' => (string) ($record['id'] ?? ''),
                 'kind' => (string) ($record['kind'] ?? 'satchel'),
                 'action' => (string) ($record['action'] ?? 'roll'),
+                'user_id' => (int) ($record['user_id'] ?? 0),
                 'summary' => (string) ($record['summary'] ?? ''),
                 'occurred_at' => (string) ($record['occurred_at'] ?? ''),
             ];

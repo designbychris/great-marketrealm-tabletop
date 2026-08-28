@@ -29,6 +29,7 @@ use GreatMarketrealmTabletop\Tabletop\Http\AdventuringMeasuresAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\QuickHandsAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\WeaponHandsAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\SpellPouchAjaxController;
+use GreatMarketrealmTabletop\Tabletop\Http\TableColourAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Satchel\Services\QuickHandsRoller;
 use GreatMarketrealmTabletop\Tabletop\Satchel\Services\WeaponHandsRoller;
 use GreatMarketrealmTabletop\Tabletop\Satchel\Services\SpellPouchRoller;
@@ -97,6 +98,8 @@ final class TabletopServiceProvider
     private WeaponHandsAjaxController $weaponHandsAjax;
 
     private SpellPouchAjaxController $spellPouchAjax;
+
+    private TableColourAjaxController $tableColourAjax;
 
     public function __construct()
     {
@@ -181,6 +184,8 @@ final class TabletopServiceProvider
             new WordPressTableTokenRepository(),
             TableTokenManagerFactory::make()
         );
+
+        $this->tableColourAjax = new TableColourAjaxController(new WordPressTableMembershipRepository());
 
         $this->adventuringMeasuresAjax = new AdventuringMeasuresAjaxController(
             new WordPressCompanionCharacterGateway(),
@@ -374,6 +379,11 @@ final class TabletopServiceProvider
         add_action(
             'wp_ajax_gmrt_select_companion_character',
             [$this->companionCharacterAjax, 'select']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_choose_table_colour',
+            [$this->tableColourAjax, 'choose']
         );
 
         add_action(

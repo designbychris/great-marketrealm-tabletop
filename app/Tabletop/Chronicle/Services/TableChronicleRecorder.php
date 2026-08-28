@@ -76,6 +76,7 @@ final class TableChronicleRecorder
                 $this->clock->now(),
                 [
                     'kind' => $kind,
+                    'user_id' => $userId,
                     'action' => $action,
                     'character_id' => $characterId,
                     'character_name' => $characterName,

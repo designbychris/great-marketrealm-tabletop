@@ -215,6 +215,14 @@ final class TabletopChamber
                     (string) $token->sourceReference()
                 );
             }
+            $controllerId = (int) ($projection['controller_user_id'] ?? 0);
+            foreach ($members as $memberProjection) {
+                if ((int) ($memberProjection['user_id'] ?? 0) === $controllerId) {
+                    $projection['table_colour'] = (string) ($memberProjection['table_colour'] ?? '');
+                    $projection['table_colour_hex'] = (string) ($memberProjection['table_colour_hex'] ?? '');
+                    break;
+                }
+            }
             $tokens[] = $projection;
         }
 
@@ -285,6 +293,7 @@ final class TabletopChamber
             && $this->battleLogProjector !== null
         ) {
             $labels = [];
+            $owners = [];
 
             foreach ($tokens as $token) {
                 $tokenId = (string) (
@@ -292,6 +301,7 @@ final class TabletopChamber
                 );
 
                 if ($tokenId !== '') {
+                    $owners[$tokenId] = (int) ($token['controller_user_id'] ?? 0);
                     $labels[$tokenId] = (string) (
                         $token['label']
                         ?? 'Combatant'
@@ -305,7 +315,8 @@ final class TabletopChamber
                         $tableId,
                         $encounter->id()
                     ),
-                    $labels
+                    $labels,
+                    $owners
                 );
         }
 
@@ -316,9 +327,19 @@ final class TabletopChamber
             );
         }
 
+        $coloursByUser = [];
+        foreach ($members as $memberProjection) {
+            $coloursByUser[(int) ($memberProjection['user_id'] ?? 0)] = [
+                'key' => (string) ($memberProjection['table_colour'] ?? ''),
+                'hex' => (string) ($memberProjection['table_colour_hex'] ?? ''),
+            ];
+        }
+        foreach ($battleLog as $i => $entry) { $battleLog[$i]['table_colour'] = $coloursByUser[(int)($entry['user_id'] ?? 0)] ?? null; }
+        foreach ($chamberLog as $i => $entry) { $chamberLog[$i]['table_colour'] = $coloursByUser[(int)($entry['user_id'] ?? 0)] ?? null; }
+
         return new TabletopChamberState(
             $table->toArray(),
-            $viewer->toArray(),
+            array_merge($viewer->toArray(), ['table_colour' => $viewer->tableColour(), 'table_colour_hex' => \GreatMarketrealmTabletop\Tables\Memberships\Models\TableColourPalette::hex($viewer->tableColour())]),
             $members,
             $activeScene?->toArray(),
             $tokens,

@@ -197,6 +197,7 @@
             const role = String(member.role || 'player');
             const status = String(member.status || 'unknown');
             item.className = 'gmrt-party__member gmrt-party__member--' + role + ' gmrt-party__member--' + status;
+            item.style.setProperty('--gmrt-fellowship-colour', String(member.table_colour_hex || '#65b9ae'));
 
             const avatar = document.createElement('span');
             avatar.className = 'gmrt-party__avatar';
@@ -256,6 +257,19 @@
             list.appendChild(item);
         });
     }
+
+    document.querySelectorAll('[data-table-colour]').forEach((button) => {
+        button.addEventListener('click', async () => {
+            const colour = String(button.dataset.tableColour || '');
+            if (!colour) return;
+            try {
+                const colourResult = await request('gmrt_choose_table_colour', { colour });
+                document.querySelectorAll('[data-table-colour]').forEach((swatch) => swatch.setAttribute('aria-pressed', swatch === button ? 'true' : 'false'));
+                gatheringSay(String(colourResult.message || 'Fellowship Ribbon chosen.'));
+                await refresh();
+            } catch (error) { gatheringSay(error.message); }
+        });
+    });
 
     const acceptInvitationButton = document.querySelector(
         '[data-accept-table-invitation]'
@@ -1719,6 +1733,9 @@
         safeEntries.forEach((entry) => {
             const item = document.createElement('li');
             item.dataset.battleLogEntry = '';
+            item.dataset.chronicleLogEntry = '';
+            const chronicleColour = entry.table_colour && entry.table_colour.hex ? entry.table_colour.hex : '#8f8779';
+            item.style.setProperty('--gmrt-fellowship-colour', String(chronicleColour));
 
             const round = document.createElement('small');
             round.textContent = battleMode
@@ -1930,6 +1947,7 @@
                     String(Math.max(1, Number(token.height_units || 1)))
                 );
                 node.dataset.tokenRevision = String(token.revision || 1);
+                node.style.setProperty('--gmrt-fellowship-colour', String(token.table_colour_hex || '#d8ad4f'));
 
                 const combatantState =
                     combatantStates[String(token.id)]
