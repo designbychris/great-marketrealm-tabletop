@@ -33,7 +33,7 @@ final class BattleChronicleViewRegressionTest extends TestCase
         );
 
         self::assertStringContainsString(
-            'renderBattleLog(state.battle_log)',
+            'renderChronicle(state.encounter ? state.battle_log : state.chamber_log, Boolean(state.encounter))',
             $script
         );
         self::assertStringContainsString(
