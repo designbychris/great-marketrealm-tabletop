@@ -95,6 +95,7 @@ $sceneImage = $scene !== null
     </header>
 
 
+    <div data-live-lifecycle>
     <?php if ($state !== null && $encounter === null) : ?>
         <section
             class="gmrt-exploration-strip"
@@ -460,6 +461,7 @@ $sceneImage = $scene !== null
         <?php endif; ?>
         </section>
     <?php endif; ?>
+    </div>
 
     <?php if (is_array($invitation)) : ?>
         <section class="gmrt-gathering-invitation" role="status">
@@ -1091,6 +1093,7 @@ $sceneImage = $scene !== null
                 </div>
 
 
+                <div data-live-battle-log-slot>
                 <?php if ($encounter !== null) : ?>
                 <section
                     class="gmrt-battle-log"
@@ -1140,6 +1143,7 @@ $sceneImage = $scene !== null
                     </p>
                 </section>
                 <?php endif; ?>
+                </div>
             </aside>
         </div>
     <?php endif; ?>

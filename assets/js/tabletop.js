@@ -7,7 +7,7 @@
         const current = document.querySelector('.gmrt-chamber');
         const liveStatus = document.querySelector('#gmrt-tabletop-status');
 
-        if (!current) {
+        if (!current || !window.gmrtTabletop) {
             return;
         }
 
@@ -15,17 +15,32 @@
             liveStatus.textContent = message;
         }
 
-        const response = await fetch(window.location.href, {
-            method: 'GET',
-            credentials: 'same-origin',
-            headers: { 'X-GMRT-Live-Chamber': '1' }
-        });
+        const body = new URLSearchParams();
+        body.set('action', 'gmrt_tabletop_fragment');
+        body.set('nonce', gmrtTabletop.nonce);
+        body.set('table_id', current.dataset.tableId || '');
 
-        if (!response.ok) {
-            throw new Error('The live Chamber could not be refreshed.');
+        const response = await fetch(gmrtTabletop.ajaxUrl, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+            },
+            body
+        });
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(
+                result.data && result.data.message
+                    ? result.data.message
+                    : 'The live Chamber could not be refreshed.'
+            );
         }
 
-        const html = await response.text();
+        const html = result.data && typeof result.data.html === 'string'
+            ? result.data.html
+            : '';
         const parsed = new DOMParser().parseFromString(html, 'text/html');
         const incoming = parsed.querySelector('.gmrt-chamber');
 
@@ -1815,7 +1830,7 @@
                         name: name ? name.value : 'A Sudden Encounter',
                         combatants: JSON.stringify(combatants)
                     });
-                    await replaceLifecycle('Battle begins.');
+                    await replaceChamber('Battle begins.');
                 } catch (error) {
                     startEncounterButton.disabled = false;
                     say(error.message || 'The Encounter could not begin.');
@@ -1842,7 +1857,7 @@
                         encounter_id: encounter.dataset.encounterId || '',
                         revision: encounter.dataset.encounterRevision || '1'
                     });
-                    await replaceLifecycle('Peace returns to the path.');
+                    await replaceChamber('Peace returns to the path.');
                 } catch (error) {
                     endEncounterButton.disabled = false;
                     say(error.message || 'The Encounter could not end.');

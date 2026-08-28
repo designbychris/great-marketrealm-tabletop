@@ -584,3 +584,9 @@
 - Adds an accessible live-status announcement when the remote turn changes.
 
 - IV.24 alpha.2 corrective: live Exploration/Encounter transitions now fetch viewer-specific Chamber markup through authenticated AJAX and patch only lifecycle/Chronicle regions, preserving the battlefield DOM and preventing cached DM markup from leaking into Player presentation.
+
+### 0.24.0-alpha.3 — Peace and Battle live-state repair
+- Restores the persistent lifecycle and Battle Chronicle DOM anchors required by the Living Table heartbeat.
+- Player Exploration/Encounter transitions patch only live lifecycle regions, keeping the battlefield and Fog heartbeat alive.
+- DM Begin Battle / End Encounter rebuild through the authenticated Tabletop fragment endpoint so newly rendered combat controls receive complete bindings.
+- Removes the cached frontend-page fetch from live Chamber rebuilding.

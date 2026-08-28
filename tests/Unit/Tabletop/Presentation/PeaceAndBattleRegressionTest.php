@@ -57,13 +57,21 @@ final class PeaceAndBattleRegressionTest extends TestCase
         self::assertStringContainsString("request('gmrt_end_encounter'", $this->script);
     }
 
-    public function testLifecycleTransitionPatchesOnlyLiveRegions(): void
+    public function testLifecycleTransitionKeepsPlayerBattlefieldLive(): void
     {
         self::assertStringContainsString('async function replaceLifecycle(message)', $this->script);
         self::assertStringContainsString("request('gmrt_tabletop_fragment', {})", $this->script);
         self::assertStringContainsString('currentLifecycle.replaceChildren', $this->script);
+        self::assertStringContainsString('if (encounterLifecycleChanged)', $this->script);
         self::assertStringContainsString('await replaceLifecycle(', $this->script);
-        self::assertStringNotContainsString('await replaceChamber(', $this->script);
+    }
+
+    public function testDungeonMasterLifecycleActionsRebuildAuthenticatedChamber(): void
+    {
+        self::assertStringContainsString("body.set('action', 'gmrt_tabletop_fragment')", $this->script);
+        self::assertStringContainsString("await replaceChamber('Battle begins.')", $this->script);
+        self::assertStringContainsString("await replaceChamber('Peace returns to the path.')", $this->script);
+        self::assertStringNotContainsString("fetch(window.location.href", $this->script);
     }
 
     public function testHeartbeatUsesLiveLifecycleTransition(): void
