@@ -134,6 +134,10 @@ final class ChamberTokens implements TableTokenRepository
     {
         $this->items[$token->id()] = $token;
     }
+
+    public function delete(string $tableId, string $tokenId): void
+    {
+    }
 }
 
 

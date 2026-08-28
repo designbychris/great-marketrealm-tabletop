@@ -57,6 +57,10 @@ final class EncounterTokens implements TableTokenRepository
         return $token !== null && $token->tableId() === $tableId ? $token : null;
     }
     public function save(TableToken $token): void { $this->items[$token->id()] = $token; }
+
+    public function delete(string $tableId, string $tokenId): void
+    {
+    }
 }
 
 final class EncounterStore implements EncounterRepository

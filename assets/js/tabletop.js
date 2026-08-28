@@ -68,6 +68,7 @@
 
     const tableId = root.dataset.tableId || '';
     let selected = null;
+    const removeSelectedTokenButton = document.querySelector('[data-remove-selected-token]');
     let targetingPreview = null;
     let visionDrafting = false;
 
@@ -186,6 +187,76 @@
         if (gatheringStatus) gatheringStatus.textContent = message;
     };
 
+    function renderGathering(members) {
+        const list = document.querySelector('[data-live-gathering-list]');
+        if (!list || !Array.isArray(members)) return;
+
+        list.replaceChildren();
+        members.forEach((member) => {
+            const item = document.createElement('li');
+            const role = String(member.role || 'player');
+            const status = String(member.status || 'unknown');
+            item.className = 'gmrt-party__member gmrt-party__member--' + role + ' gmrt-party__member--' + status;
+
+            const avatar = document.createElement('span');
+            avatar.className = 'gmrt-party__avatar';
+            avatar.setAttribute('aria-hidden', 'true');
+            if (member.avatar_url) {
+                const image = document.createElement('img');
+                image.src = String(member.avatar_url);
+                image.alt = '';
+                avatar.appendChild(image);
+            } else {
+                avatar.textContent = String(member.display_name || '?').slice(0, 1);
+            }
+            item.appendChild(avatar);
+
+            const roleBadge = document.createElement('span');
+            roleBadge.className = 'gmrt-party__role';
+            roleBadge.textContent = role === 'dungeon-master' ? 'DM' : 'Player';
+            item.appendChild(roleBadge);
+
+            const name = document.createElement('strong');
+            name.textContent = String(member.display_name || ('User #' + String(member.user_id || '')));
+            item.appendChild(name);
+
+            if (root?.dataset.viewerRole === 'dungeon-master' && role === 'player' && status !== 'left') {
+                const remove = document.createElement('button');
+                remove.type = 'button';
+                remove.className = 'gmrt-party__remove';
+                remove.dataset.removeTablePlayer = '';
+                remove.dataset.userId = String(member.user_id || '');
+                remove.textContent = 'Remove from Table';
+                item.appendChild(remove);
+            }
+
+            const characterId = String(member.companion_character_id || '');
+            const play = member.companion_character && member.companion_character.play
+                ? member.companion_character.play
+                : null;
+            const hp = play && play.hit_points ? play.hit_points : null;
+            if (hp) {
+                const current = Math.max(0, Number(hp.current || 0));
+                const maximum = Math.max(0, Number(hp.maximum || 0));
+                const temporary = Math.max(0, Number(hp.temporary || 0));
+                const percentage = maximum > 0 ? Math.min(100, Math.max(0, Math.round((current / maximum) * 100))) : 0;
+                const vitality = document.createElement('div');
+                vitality.className = 'gmrt-hp';
+                if (characterId) vitality.dataset.partyCharacterHp = characterId;
+                vitality.setAttribute('aria-label', 'Hit Points ' + current + ' of ' + maximum);
+                vitality.innerHTML = '<div class="gmrt-hp__track"><span class="gmrt-hp__fill"></span></div><small>HP <span data-party-current-hp></span>/<span data-party-maximum-hp></span><span data-party-temp-wrap></span></small>';
+                vitality.querySelector('.gmrt-hp__fill')?.style.setProperty('--gmrt-hp', percentage + '%');
+                vitality.querySelector('[data-party-current-hp]').textContent = String(current);
+                vitality.querySelector('[data-party-maximum-hp]').textContent = String(maximum);
+                const tempWrap = vitality.querySelector('[data-party-temp-wrap]');
+                if (tempWrap && temporary > 0) tempWrap.textContent = ' +' + temporary + ' temp';
+                item.appendChild(vitality);
+            }
+
+            list.appendChild(item);
+        });
+    }
+
     const acceptInvitationButton = document.querySelector(
         '[data-accept-table-invitation]'
     );
@@ -222,28 +293,28 @@
             const data = await request('gmrt_invite_table_player', { player });
             gatheringSay(data.message || 'Invitation sent.');
             if (input) input.value = '';
-            window.setTimeout(() => window.location.reload(), 650);
+            await refresh();
         } catch (error) {
             gatheringSay(error.message || 'The player could not be invited.');
             if (button) button.disabled = false;
         }
     });
 
-    document.querySelectorAll('[data-remove-table-player]').forEach((button) => {
-        button.addEventListener('click', async () => {
-            const userId = button.dataset.userId || '';
-            if (!userId) return;
-            button.disabled = true;
-            gatheringSay('Removing the player from the Table…');
-            try {
-                const data = await request('gmrt_remove_table_player', { user_id: userId });
-                gatheringSay(data.message || 'Player removed.');
-                window.setTimeout(() => window.location.reload(), 350);
-            } catch (error) {
-                gatheringSay(error.message || 'The player could not be removed.');
-                button.disabled = false;
-            }
-        });
+    document.addEventListener('click', async (event) => {
+        const button = event.target.closest('[data-remove-table-player]');
+        if (!button) return;
+        const userId = button.dataset.userId || '';
+        if (!userId) return;
+        button.disabled = true;
+        gatheringSay('Removing the player from the Table…');
+        try {
+            const data = await request('gmrt_remove_table_player', { user_id: userId });
+            gatheringSay(data.message || 'Player removed.');
+            await refresh();
+        } catch (error) {
+            gatheringSay(error.message || 'The player could not be removed.');
+            button.disabled = false;
+        }
     });
 
     const companionCharacterForm = document.querySelector('[data-companion-character-form]');
@@ -1547,7 +1618,37 @@
             selected.setAttribute('aria-pressed', 'true');
             say('Selected ' + (selected.title || 'token') + '.');
         }
+
+        if (removeSelectedTokenButton) {
+            const viewerId = String(root?.dataset.viewerUserId || '');
+            const isDungeonMaster = root?.dataset.viewerRole === 'dungeon-master';
+            const ownsCharacter = selected
+                && selected.dataset.tokenType === 'character'
+                && selected.dataset.tokenController === viewerId;
+            removeSelectedTokenButton.hidden = !(selected && (isDungeonMaster || ownsCharacter));
+        }
     }
+
+    removeSelectedTokenButton?.addEventListener('click', async () => {
+        if (!selected) return;
+        const tokenId = selected.dataset.tokenId || '';
+        const label = selected.title || 'this token';
+        if (!tokenId || !window.confirm('Remove ' + label + ' from this Chamber?')) return;
+
+        removeSelectedTokenButton.disabled = true;
+        try {
+            const data = await request('gmrt_remove_chamber_token', { token_id: tokenId });
+            selected.remove();
+            selected = null;
+            removeSelectedTokenButton.hidden = true;
+            say(data.message || 'Token removed from the Chamber.');
+            await refresh();
+        } catch (error) {
+            say(error.message || 'The token could not be removed.');
+        } finally {
+            removeSelectedTokenButton.disabled = false;
+        }
+    });
 
     function coordinatesFromPointer(event) {
         const rect = board.getBoundingClientRect();
@@ -1737,6 +1838,7 @@
                 root.dataset.syncRevision = String(state.sync_revision);
             }
 
+            renderGathering(state.members);
             renderBattleLog(state.battle_log);
             renderFog(state.fog || {});
             renderVisionLayer(state.vision_layer || []);
@@ -1766,9 +1868,8 @@
                         .replace(/[^a-z0-9_-]/gi, '');
                     node.className = 'gmrt-token gmrt-token--' + type;
                     node.dataset.tokenId = String(token.id || '');
-                    node.dataset.tokenController = String(
-                        token.controller_user_id || ''
-                    );
+                    node.dataset.tokenController = String(token.controller_user_id || '');
+                    node.dataset.tokenType = String(token.type || '');
                     node.tabIndex = 0;
                     node.setAttribute('role', 'button');
                     node.setAttribute('aria-label', 'Select token: ' + label);

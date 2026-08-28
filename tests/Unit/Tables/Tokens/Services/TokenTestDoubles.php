@@ -108,6 +108,10 @@ final class TokenRepository implements TableTokenRepository
     {
         $this->items[$token->id()] = $token;
     }
+
+    public function delete(string $tableId, string $tokenId): void
+    {
+    }
 }
 
 final class TokenIds implements TableTokenIdGenerator

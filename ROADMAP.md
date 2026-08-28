@@ -1,3 +1,13 @@
+## Phase IV.26D.2 — Clear the Battlefield & The Living Gathering
+
+- [x] Obvious Choose Your Adventurer guidance when no Companion Character is selected.
+- [x] Dungeon Master removal of Chamber tokens.
+- [x] Player removal limited to their own Companion Character token.
+- [x] Active encounter combatants protected from accidental token removal.
+- [x] Adventurers at the Table patched through the existing Living Table heartbeat.
+- [x] Invite/remove/member/Companion HP roster changes visible without manual refresh.
+- [ ] Browser-certify live multi-user Gathering updates and token removal permissions.
+
 ## IV.26D — Adventuring Measures at the Table
 
 Current HP and Temporary HP can now be adjusted from the Satchel through an owner-scoped Companion write boundary. Maximum HP remains Companion-certified and read-only.

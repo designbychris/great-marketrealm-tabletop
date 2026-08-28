@@ -1508,3 +1508,23 @@
 .gmrt-satchel__hp form input { width: 100%; box-sizing: border-box; }
 .gmrt-satchel__hp form p { margin: .35rem 0 .6rem; }
 .gmrt-satchel__hp [role="status"] { display: block; margin-top: .4rem; font-size: .8em; }
+
+
+/* Phase IV.26D.2 — Clear the Battlefield & The Living Gathering */
+.gmrt-character-gate__callout {
+    display: grid;
+    gap: .35rem;
+    margin-top: .8rem;
+    padding: .85rem;
+    border: 2px solid rgba(244, 214, 136, .72);
+    border-radius: 8px;
+    background: rgba(244, 214, 136, .12);
+    box-shadow: 0 0 0 3px rgba(244, 214, 136, .06);
+}
+.gmrt-character-gate__callout strong { font-size: 1.08rem; }
+.gmrt-character-gate__callout span { line-height: 1.35; }
+.gmrt-remove-token-button {
+    border-color: rgba(231, 132, 112, .56) !important;
+    background: rgba(123, 38, 25, .22) !important;
+}
+.gmrt-remove-token-button[hidden] { display: none !important; }

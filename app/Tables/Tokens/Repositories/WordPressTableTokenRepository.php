@@ -93,6 +93,30 @@ final class WordPressTableTokenRepository implements TableTokenRepository
         );
     }
 
+    public function delete(string $tableId, string $tokenId): void
+    {
+        $records = $this->records();
+
+        foreach ($records[$tableId] ?? [] as $sceneId => $tokens) {
+            if (! is_array($tokens) || ! isset($tokens[$tokenId])) {
+                continue;
+            }
+
+            unset($records[$tableId][$sceneId][$tokenId]);
+
+            if ($records[$tableId][$sceneId] === []) {
+                unset($records[$tableId][$sceneId]);
+            }
+
+            if (($records[$tableId] ?? []) === []) {
+                unset($records[$tableId]);
+            }
+
+            update_option(self::OPTION, $records, false);
+            return;
+        }
+    }
+
     /**
      * @return array<string,array<string,array<string,array<string,mixed>>>>
      */

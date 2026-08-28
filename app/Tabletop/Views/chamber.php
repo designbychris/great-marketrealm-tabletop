@@ -62,6 +62,9 @@ $sceneImage = $scene !== null
     data-viewer-role="<?php echo esc_attr(
         (string) ($viewer['role'] ?? '')
     ); ?>"
+    data-viewer-user-id="<?php echo esc_attr(
+        (string) ($viewer['user_id'] ?? '')
+    ); ?>"
     data-sync-revision="<?php echo esc_attr(
         $state?->syncRevision() ?? ''
     ); ?>"
@@ -639,6 +642,12 @@ $sceneImage = $scene !== null
                     </div>
 
                     <div class="gmrt-board__tools">
+                        <button
+                            type="button"
+                            class="gmrt-remove-token-button"
+                            data-remove-selected-token
+                            hidden
+                        >Remove from Chamber</button>
                         <?php if ($state->isDungeonMaster()) : ?>
                             <button
                                 type="button"
@@ -950,6 +959,9 @@ $sceneImage = $scene !== null
                                 data-token-controller="<?php echo esc_attr(
                                     (string) ($token['controller_user_id'] ?? '')
                                 ); ?>"
+                                data-token-type="<?php echo esc_attr(
+                                    (string) ($token['type'] ?? '')
+                                ); ?>"
                                 data-combatant-state="<?php echo esc_attr(
                                     $combatantState
                                 ); ?>"
@@ -1044,7 +1056,7 @@ $sceneImage = $scene !== null
                     Adventurers at the Table
                 </h2>
 
-                <ul>
+                <ul data-live-gathering-list>
                     <?php foreach ($members as $member) : ?>
                         <li class="gmrt-party__member gmrt-party__member--<?php echo esc_attr((string) ($member['role'] ?? 'player')); ?> gmrt-party__member--<?php echo esc_attr((string) ($member['status'] ?? 'unknown')); ?>">
                             <?php $avatarUrl = (string) ($member['avatar_url'] ?? ''); ?>
@@ -1239,6 +1251,12 @@ $sceneImage = $scene !== null
                             </p>
                         <?php endif; ?>
                         <?php if ($eligibleCharacters !== []) : ?>
+                            <?php if ($selectedCharacter === null) : ?>
+                                <div class="gmrt-character-gate__callout" role="status">
+                                    <strong>Choose Your Adventurer</strong>
+                                    <span>Select the Companion Character you are bringing into this Chamber to open your Satchel and place their token.</span>
+                                </div>
+                            <?php endif; ?>
                             <form class="gmrt-character-gate" data-companion-character-form>
                                 <label>
                                     <span>Character at this Table</span>

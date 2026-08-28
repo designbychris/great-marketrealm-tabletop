@@ -1,3 +1,11 @@
+## 0.26.5-alpha.1 — Phase IV.26D.2: Clear the Battlefield & The Living Gathering
+
+- Adds server-authoritative **Remove from Chamber** token removal: DMs may remove any non-encounter token, while players may remove only their own Companion Character token.
+- Protects active encounter integrity by refusing to remove tokens that are still registered combatants until the encounter ends.
+- Extends the existing Living Table heartbeat to patch **Adventurers at the Table** from the authoritative member projection, so invitations, seats, removals, selected characters and Companion HP changes appear without manual page refresh.
+- Adds an obvious **Choose Your Adventurer** callout whenever an active player has eligible Companion Characters but has not selected one for the Table.
+- Keeps token removal non-destructive: Companion Characters, token recipes and Table membership are not deleted.
+
 ## IV.26D — Adventuring Measures at the Table
 
 Current HP and Temporary HP can now be adjusted from the Satchel through an owner-scoped Companion write boundary. Maximum HP remains Companion-certified and read-only.

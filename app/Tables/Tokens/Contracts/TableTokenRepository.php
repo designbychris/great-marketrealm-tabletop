@@ -19,4 +19,6 @@ interface TableTokenRepository
     ): ?TableToken;
 
     public function save(TableToken $token): void;
+
+    public function delete(string $tableId, string $tokenId): void;
 }

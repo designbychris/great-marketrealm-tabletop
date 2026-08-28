@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace GreatMarketrealmTabletop\Tabletop;
 
+use GreatMarketrealmTabletop\Tabletop\Encounters\Repositories\WordPressEncounterRepository;
 use GreatMarketrealmTabletop\Tabletop\Encounters\Services\EncounterManagerFactory;
 use GreatMarketrealmTabletop\Tabletop\Http\EncounterAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\BattleDeedAjaxController;
@@ -15,6 +16,8 @@ use GreatMarketrealmTabletop\Tabletop\Battle\Services\AttackManagerFactory;
 use GreatMarketrealmTabletop\Tabletop\Battle\Services\DeathSaveManagerFactory;
 use GreatMarketrealmTabletop\Tabletop\Conditions\Services\ConditionManagerFactory;
 use GreatMarketrealmTabletop\Tabletop\Http\TabletopAjaxController;
+use GreatMarketrealmTabletop\Tabletop\Http\TableTokenRemovalAjaxController;
+use GreatMarketrealmTabletop\Tabletop\Tokens\Services\TableTokenRemoval;
 use GreatMarketrealmTabletop\Tabletop\Http\TestTableAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\TargetingAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\CartographyAjaxController;
@@ -79,6 +82,7 @@ final class TabletopServiceProvider
     private VisionBarrierAjaxController $visionAjax;
 
     private GatheringAjaxController $gatheringAjax;
+    private TableTokenRemovalAjaxController $tokenRemovalAjax;
 
     private CompanionCharacterAjaxController $companionCharacterAjax;
 
@@ -157,6 +161,14 @@ final class TabletopServiceProvider
             )
         );
 
+        $this->tokenRemovalAjax = new TableTokenRemovalAjaxController(
+            new TableTokenRemoval(
+                new WordPressTableMembershipRepository(),
+                new WordPressTableTokenRepository(),
+                new WordPressEncounterRepository()
+            )
+        );
+
         $this->companionCharacterAjax = new CompanionCharacterAjaxController(
             new WordPressCompanionCharacterGateway(),
             TableGatheringFactory::make(),
@@ -216,6 +228,11 @@ final class TabletopServiceProvider
         add_action(
             'wp_ajax_gmrt_move_token',
             [$this->ajax, 'moveToken']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_remove_chamber_token',
+            [$this->tokenRemovalAjax, 'remove']
         );
 
         add_action(
