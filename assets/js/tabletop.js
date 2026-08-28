@@ -274,6 +274,33 @@
         satchelToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
 
+    const quickHandsResult = document.querySelector('[data-quick-hands-result]');
+    document.querySelectorAll('[data-quick-roll]').forEach((button) => {
+        button.addEventListener('click', async () => {
+            const original = button.innerHTML;
+            button.disabled = true;
+            button.setAttribute('aria-busy', 'true');
+            if (quickHandsResult) quickHandsResult.textContent = 'The dice tumble across the Table…';
+            try {
+                const data = await request('gmrt_quick_hands_roll', {
+                    kind: button.dataset.rollKind || '',
+                    key: button.dataset.rollKey || ''
+                });
+                const roll = data.roll || {};
+                const flourish = roll.natural_twenty ? ' ✨ Natural 20!' : (roll.natural_one ? ' · Natural 1!' : '');
+                if (quickHandsResult) quickHandsResult.textContent = (data.message || 'Roll complete.') + flourish;
+                say(data.message || 'Quick Hands roll complete.');
+            } catch (error) {
+                if (quickHandsResult) quickHandsResult.textContent = error.message || 'The roll could not be made.';
+                say(error.message || 'The roll could not be made.');
+            } finally {
+                button.disabled = false;
+                button.removeAttribute('aria-busy');
+                button.innerHTML = original;
+            }
+        });
+    });
+
     if (!board) {
         return;
     }

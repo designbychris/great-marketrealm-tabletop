@@ -1475,3 +1475,12 @@
 .gmrt-satchel__section{border-top:1px solid rgba(244,214,136,.18);padding:.65rem 0}.gmrt-satchel__section h3{margin:0 0 .35rem}.gmrt-satchel__section summary{cursor:pointer;font-weight:800}.gmrt-satchel__list{display:grid;grid-template-columns:1fr 1fr;gap:.2rem .8rem;margin-top:.5rem}.gmrt-satchel__list>div{display:flex;justify-content:space-between;padding:.2rem 0;border-bottom:1px dotted rgba(244,234,214,.13)}.gmrt-satchel__promise{font-size:.78rem;opacity:.72;margin:.75rem 0 0}
 @media (max-width:700px){.gmrt-satchel{top:12vh}.gmrt-satchel__panel{width:calc(100vw - 4rem)}}
 @media (prefers-reduced-motion:reduce){.gmrt-satchel{transition:none}}
+
+/* Phase IV.26A — Quick Hands at the Table */
+.gmrt-quick-roll{font:inherit;color:inherit;cursor:pointer;border:1px solid rgba(244,234,214,.15);background:rgba(255,255,255,.035)}
+.gmrt-quick-roll:hover,.gmrt-quick-roll:focus-visible{border-color:rgba(244,214,136,.65);background:rgba(244,214,136,.1);outline:none}
+.gmrt-quick-roll:disabled{cursor:wait;opacity:.62}
+.gmrt-satchel__abilities .gmrt-quick-roll{display:grid;text-align:center;padding:.45rem}
+.gmrt-quick-roll--measure{display:grid;text-align:center;padding:.45rem}
+.gmrt-quick-roll--row{display:flex;justify-content:space-between;align-items:center;padding:.28rem .35rem;border-radius:4px;text-align:left}
+.gmrt-quick-hands-result{margin:.7rem 0 0;padding:.65rem .7rem;border:1px solid rgba(244,214,136,.32);border-radius:6px;background:rgba(244,214,136,.07);font-size:.82rem;line-height:1.35}

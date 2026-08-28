@@ -89,22 +89,22 @@ $sceneImage = $scene !== null
                     <div><span>AC</span><strong><?php echo esc_html((string) ($adventurerPlay['armour_class'] ?? '—')); ?></strong></div>
                     <div><span>HP</span><strong><?php echo esc_html((string) ($satchelHp['current'] ?? '—')); ?>/<?php echo esc_html((string) ($satchelHp['maximum'] ?? '—')); ?></strong><?php if ((int) ($satchelHp['temporary'] ?? 0) > 0) : ?><small>+<?php echo esc_html((string) $satchelHp['temporary']); ?> temp</small><?php endif; ?></div>
                     <div><span>Speed</span><strong><?php echo esc_html((string) ($adventurerPlay['speed'] ?? '—')); ?> ft</strong></div>
-                    <div><span>Initiative</span><strong><?php echo esc_html(sprintf('%+d', (int) ($adventurerPlay['initiative'] ?? 0))); ?></strong></div>
+                    <button type="button" class="gmrt-quick-roll gmrt-quick-roll--measure" data-quick-roll data-roll-kind="initiative" data-roll-key="initiative"><span>Initiative</span><strong><?php echo esc_html(sprintf('%+d', (int) ($adventurerPlay['initiative'] ?? 0))); ?></strong><small aria-hidden="true">🎲</small></button>
                     <div><span>Proficiency</span><strong><?php echo esc_html(sprintf('%+d', (int) ($adventurerPlay['proficiency_bonus'] ?? 0))); ?></strong></div>
                     <div><span>Passive Perception</span><strong><?php echo esc_html((string) ($adventurerPlay['passive_perception'] ?? '—')); ?></strong></div>
                 </div>
                 <section class="gmrt-satchel__section"><h3>Abilities</h3><div class="gmrt-satchel__abilities">
                     <?php foreach ($abilityLabels as $key => $label) : $ability = is_array($satchelAbilities[$key] ?? null) ? $satchelAbilities[$key] : []; ?>
-                    <div><span><?php echo esc_html($label); ?></span><strong><?php echo esc_html((string) ($ability['score'] ?? '—')); ?></strong><small><?php echo esc_html(sprintf('%+d', (int) ($ability['modifier'] ?? 0))); ?></small></div>
+                    <button type="button" class="gmrt-quick-roll" data-quick-roll data-roll-kind="ability" data-roll-key="<?php echo esc_attr($key); ?>"><span><?php echo esc_html($label); ?></span><strong><?php echo esc_html((string) ($ability['score'] ?? '—')); ?></strong><small><?php echo esc_html(sprintf('%+d', (int) ($ability['modifier'] ?? 0))); ?> 🎲</small></button>
                     <?php endforeach; ?>
                 </div></section>
                 <details class="gmrt-satchel__section"><summary>Saving Throws</summary><div class="gmrt-satchel__list">
-                    <?php foreach ($abilityLabels as $key => $label) : $save = is_array($satchelSaves[$key] ?? null) ? $satchelSaves[$key] : []; ?><div><span><?php echo ! empty($save['proficient']) ? '◆ ' : ''; ?><?php echo esc_html($label); ?></span><strong><?php echo esc_html(sprintf('%+d', (int) ($save['modifier'] ?? 0))); ?></strong></div><?php endforeach; ?>
+                    <?php foreach ($abilityLabels as $key => $label) : $save = is_array($satchelSaves[$key] ?? null) ? $satchelSaves[$key] : []; ?><button type="button" class="gmrt-quick-roll gmrt-quick-roll--row" data-quick-roll data-roll-kind="save" data-roll-key="<?php echo esc_attr($key); ?>"><span><?php echo ! empty($save['proficient']) ? '◆ ' : ''; ?><?php echo esc_html($label); ?></span><strong><?php echo esc_html(sprintf('%+d', (int) ($save['modifier'] ?? 0))); ?> 🎲</strong></button><?php endforeach; ?>
                 </div></details>
                 <details class="gmrt-satchel__section"><summary>Skills</summary><div class="gmrt-satchel__list">
-                    <?php foreach ($satchelSkills as $key => $skill) : if (! is_array($skill)) continue; ?><div><span><?php echo ! empty($skill['expertise']) ? '◆◆ ' : (! empty($skill['proficient']) ? '◆ ' : ''); ?><?php echo esc_html(ucwords(str_replace('-', ' ', (string) $key))); ?></span><strong><?php echo esc_html(sprintf('%+d', (int) ($skill['modifier'] ?? 0))); ?></strong></div><?php endforeach; ?>
+                    <?php foreach ($satchelSkills as $key => $skill) : if (! is_array($skill)) continue; ?><button type="button" class="gmrt-quick-roll gmrt-quick-roll--row" data-quick-roll data-roll-kind="skill" data-roll-key="<?php echo esc_attr((string) $key); ?>"><span><?php echo ! empty($skill['expertise']) ? '◆◆ ' : (! empty($skill['proficient']) ? '◆ ' : ''); ?><?php echo esc_html(ucwords(str_replace('-', ' ', (string) $key))); ?></span><strong><?php echo esc_html(sprintf('%+d', (int) ($skill['modifier'] ?? 0))); ?> 🎲</strong></button><?php endforeach; ?>
                 </div></details>
-                <p class="gmrt-satchel__promise">Quick Rolls, attacks, spells and abilities will join this play surface in the next Satchel passes.</p>
+                <div class="gmrt-quick-hands-result" data-quick-hands-result role="status" aria-live="polite">Choose a check, save, skill or Initiative roll.</div><p class="gmrt-satchel__promise">◆ proficient · ◆◆ expertise. Attacks, spells and abilities join the next Satchel passes.</p>
             </div>
         </aside>
     <?php endif; ?>

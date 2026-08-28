@@ -22,6 +22,9 @@ use GreatMarketrealmTabletop\Tabletop\Http\FogOfWarAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\VisionBarrierAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\GatheringAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\CompanionCharacterAjaxController;
+use GreatMarketrealmTabletop\Tabletop\Http\QuickHandsAjaxController;
+use GreatMarketrealmTabletop\Tabletop\Satchel\Services\QuickHandsRoller;
+use GreatMarketrealmTabletop\Tabletop\Battle\Services\SecureD20Roller;
 use GreatMarketrealmTabletop\Integration\Companion\WordPressCompanionCharacterGateway;
 use GreatMarketrealmTabletop\Tables\Scenes\Repositories\WordPressTableSceneRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Repositories\WordPressTableTokenRepository;
@@ -72,6 +75,8 @@ final class TabletopServiceProvider
     private GatheringAjaxController $gatheringAjax;
 
     private CompanionCharacterAjaxController $companionCharacterAjax;
+
+    private QuickHandsAjaxController $quickHandsAjax;
 
     public function __construct()
     {
@@ -147,6 +152,12 @@ final class TabletopServiceProvider
             new WordPressTableSceneRepository(),
             new WordPressTableTokenRepository(),
             TableTokenManagerFactory::make()
+        );
+
+        $this->quickHandsAjax = new QuickHandsAjaxController(
+            new WordPressCompanionCharacterGateway(),
+            new WordPressTableMembershipRepository(),
+            new QuickHandsRoller(new SecureD20Roller())
         );
     }
 
@@ -295,6 +306,11 @@ final class TabletopServiceProvider
         add_action(
             'wp_ajax_gmrt_select_companion_character',
             [$this->companionCharacterAjax, 'select']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_quick_hands_roll',
+            [$this->quickHandsAjax, 'roll']
         );
     }
 }

@@ -623,3 +623,10 @@
 - Fixes the Adventurer's Satchel header artwork renderer to use the supported `CompanionTokenImageSource::escaped()` API.
 - Prevents the Player Chamber fatal caused by the nonexistent `CompanionTokenImageSource::sanitize()` call.
 - Adds regression coverage that forbids the unsupported Satchel image-source call from returning.
+
+
+### Phase IV.26A — Quick Hands at the Table (0.26.1-alpha.1)
+- Turns Satchel abilities, saving throws, skills and Initiative into accessible d20 roll controls.
+- Resolves the seated Companion Character and modifier server-side; the browser never supplies its own modifier.
+- Uses the existing cryptographically secure d20 roller and reports natural 20/1 as presentation flourishes rather than automatic check/save outcomes.
+- Works from the Satchel in both Peace and Battle modes.

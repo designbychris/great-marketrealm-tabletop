@@ -612,3 +612,10 @@ Correct the final forged-token presentation boundary so Companion-generated port
 
 ### Phase IV.26 Browser Corrective — 0.26.0-alpha.2
 - Restore Player Chamber rendering for seated Companion characters by routing Satchel artwork through the established Companion token image-source boundary.
+
+
+### Phase IV.26A — Quick Hands at the Table (0.26.1-alpha.1)
+- Turns Satchel abilities, saving throws, skills and Initiative into accessible d20 roll controls.
+- Resolves the seated Companion Character and modifier server-side; the browser never supplies its own modifier.
+- Uses the existing cryptographically secure d20 roller and reports natural 20/1 as presentation flourishes rather than automatic check/save outcomes.
+- Works from the Satchel in both Peace and Battle modes.
