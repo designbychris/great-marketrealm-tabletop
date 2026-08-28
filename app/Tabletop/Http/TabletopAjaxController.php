@@ -8,6 +8,7 @@ use GreatMarketrealmTabletop\Tabletop\Exceptions\TabletopAccessDenied;
 use GreatMarketrealmTabletop\Tabletop\Movement\Exceptions\StaleTokenRevision;
 use GreatMarketrealmTabletop\Tabletop\Movement\Exceptions\TabletopMovementDenied;
 use GreatMarketrealmTabletop\Tabletop\Movement\Services\TabletopMovement;
+use GreatMarketrealmTabletop\Tabletop\Presentation\TabletopChamberRenderer;
 use GreatMarketrealmTabletop\Tabletop\Services\TabletopChamber;
 use Throwable;
 
@@ -19,7 +20,8 @@ final class TabletopAjaxController
 
     public function __construct(
         private TabletopChamber $chamber,
-        private TabletopMovement $movement
+        private TabletopMovement $movement,
+        private TabletopChamberRenderer $renderer
     ) {}
 
     public function state(): void
@@ -47,6 +49,33 @@ final class TabletopAjaxController
                 'arsenals' => $state->arsenals(),
                 'fog' => $state->fog(),
                 'vision_layer' => $state->visionLayer(),
+                'sync_revision' => $state->syncRevision(),
+            ]);
+        } catch (TabletopAccessDenied $exception) {
+            wp_send_json_error(
+                ['message' => $exception->getMessage()],
+                403
+            );
+        } catch (Throwable $exception) {
+            wp_send_json_error(
+                ['message' => $exception->getMessage()],
+                404
+            );
+        }
+    }
+
+    public function fragment(): void
+    {
+        $this->guard();
+
+        try {
+            $state = $this->chamber->state(
+                $this->tableId(),
+                get_current_user_id()
+            );
+
+            wp_send_json_success([
+                'html' => $this->renderer->render($state),
                 'sync_revision' => $state->syncRevision(),
             ]);
         } catch (TabletopAccessDenied $exception) {

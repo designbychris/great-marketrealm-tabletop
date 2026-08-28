@@ -579,3 +579,5 @@ Real WordPress identities, avatars, Table invitations and explicit seat acceptan
 - [x] Replace encounter-lifecycle full-page reloads with a live Chamber transition.
 - [ ] Browser-certify DM and Player move together from Exploration → Encounter without a page reload.
 - [ ] Browser-certify Encounter → Exploration preserves token positions, doors and remembered route.
+
+- IV.24 alpha.2 corrective: live Exploration/Encounter transitions now fetch viewer-specific Chamber markup through authenticated AJAX and patch only lifecycle/Chronicle regions, preserving the battlefield DOM and preventing cached DM markup from leaking into Player presentation.

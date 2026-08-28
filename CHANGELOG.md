@@ -582,3 +582,5 @@
 - Keeps the existing five-second server-authoritative polling path for tokens, Fog, Vision Layer and Battle Chronicle.
 - Retains a safe reload fallback only when the encounter lifecycle itself changes; IV.24 will replace that with Exploration/Encounter transitions.
 - Adds an accessible live-status announcement when the remote turn changes.
+
+- IV.24 alpha.2 corrective: live Exploration/Encounter transitions now fetch viewer-specific Chamber markup through authenticated AJAX and patch only lifecycle/Chronicle regions, preserving the battlefield DOM and preventing cached DM markup from leaking into Player presentation.

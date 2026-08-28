@@ -78,7 +78,8 @@ final class TabletopServiceProvider
 
         $this->ajax = new TabletopAjaxController(
             $chamber,
-            TabletopMovementFactory::make()
+            TabletopMovementFactory::make(),
+            new TabletopChamberRenderer()
         );
 
         $this->encounterAjax = new EncounterAjaxController(
@@ -143,6 +144,11 @@ final class TabletopServiceProvider
         add_action(
             'wp_ajax_gmrt_tabletop_state',
             [$this->ajax, 'state']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_tabletop_fragment',
+            [$this->ajax, 'fragment']
         );
 
         add_action(

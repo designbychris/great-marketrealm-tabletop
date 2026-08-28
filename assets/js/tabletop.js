@@ -97,6 +97,52 @@
         return data.data;
     }
 
+    async function replaceLifecycle(message) {
+        const liveStatus = document.querySelector('#gmrt-tabletop-status');
+        const currentLifecycle = document.querySelector('[data-live-lifecycle]');
+        const currentLogSlot = document.querySelector('[data-live-battle-log-slot]');
+
+        if (!currentLifecycle) {
+            throw new Error('The live lifecycle region could not be found.');
+        }
+
+        if (message && liveStatus) {
+            liveStatus.textContent = message;
+        }
+
+        const data = await request('gmrt_tabletop_fragment', {});
+        const html = typeof data.html === 'string' ? data.html : '';
+        const parsed = new DOMParser().parseFromString(html, 'text/html');
+        const incomingLifecycle = parsed.querySelector('[data-live-lifecycle]');
+        const incomingLogSlot = parsed.querySelector('[data-live-battle-log-slot]');
+
+        if (!incomingLifecycle) {
+            throw new Error('The refreshed lifecycle region was not found.');
+        }
+
+        currentLifecycle.replaceChildren(...incomingLifecycle.childNodes);
+
+        if (currentLogSlot && incomingLogSlot) {
+            currentLogSlot.replaceChildren(...incomingLogSlot.childNodes);
+        }
+
+        const incomingActive = parsed.querySelector('[data-token-id].is-active-turn');
+        const incomingActiveId = incomingActive?.dataset.tokenId || '';
+        document.querySelectorAll('[data-token-id]').forEach((node) => {
+            node.classList.toggle(
+                'is-active-turn',
+                incomingActiveId !== '' && node.dataset.tokenId === incomingActiveId
+            );
+        });
+
+        const root = document.querySelector('.gmrt-chamber');
+        if (root && typeof data.sync_revision === 'string') {
+            root.dataset.syncRevision = data.sync_revision;
+        }
+
+        bindEncounterLifecycleControls();
+    }
+
     const prepareTestTableButton = document.querySelector(
         '[data-prepare-test-table]'
     );
@@ -1465,7 +1511,7 @@
                 currentEncounterRevision !== incomingEncounterRevision;
 
             if (encounterLifecycleChanged) {
-                await replaceChamber(
+                await replaceLifecycle(
                     incomingEncounter
                         ? 'Battle has begun — the Table takes its places.'
                         : 'Peace returns — exploration resumes.'
@@ -1729,77 +1775,83 @@
     });
 
 
-    const startEncounterButton = document.querySelector(
-        '[data-start-encounter]'
-    );
+    function bindEncounterLifecycleControls() {
+        const startEncounterButton = document.querySelector(
+            '[data-start-encounter]'
+        );
 
-    if (startEncounterButton) {
-        startEncounterButton.addEventListener('click', async () => {
-            const name = document.querySelector('[data-encounter-name]');
-            const selectedCombatants = Array.from(
-                document.querySelectorAll('[data-encounter-combatant]:checked')
-            );
-            const combatants = selectedCombatants.map((checkbox) => {
-                const tokenId = String(checkbox.value || '');
-                const initiative = document.querySelector(
-                    '[data-encounter-initiative="'
-                    + CSS.escape(tokenId)
-                    + '"]'
+        if (startEncounterButton && !startEncounterButton.dataset.liveBound) {
+            startEncounterButton.dataset.liveBound = '1';
+            startEncounterButton.addEventListener('click', async () => {
+                const name = document.querySelector('[data-encounter-name]');
+                const selectedCombatants = Array.from(
+                    document.querySelectorAll('[data-encounter-combatant]:checked')
                 );
+                const combatants = selectedCombatants.map((checkbox) => {
+                    const tokenId = String(checkbox.value || '');
+                    const initiative = document.querySelector(
+                        '[data-encounter-initiative="'
+                        + CSS.escape(tokenId)
+                        + '"]'
+                    );
 
-                return {
-                    token_id: tokenId,
-                    initiative: initiative ? parseInt(initiative.value || '0', 10) : 0,
-                    initiative_modifier: 0
-                };
+                    return {
+                        token_id: tokenId,
+                        initiative: initiative ? parseInt(initiative.value || '0', 10) : 0,
+                        initiative_modifier: 0
+                    };
+                });
+
+                if (combatants.length === 0) {
+                    say('Choose at least one combatant before beginning battle.');
+                    return;
+                }
+
+                startEncounterButton.disabled = true;
+                say('Calling the Table to battle…');
+
+                try {
+                    await request('gmrt_begin_encounter', {
+                        name: name ? name.value : 'A Sudden Encounter',
+                        combatants: JSON.stringify(combatants)
+                    });
+                    await replaceLifecycle('Battle begins.');
+                } catch (error) {
+                    startEncounterButton.disabled = false;
+                    say(error.message || 'The Encounter could not begin.');
+                }
             });
+        }
 
-            if (combatants.length === 0) {
-                say('Choose at least one combatant before beginning battle.');
-                return;
-            }
+        const endEncounterButton = document.querySelector('[data-end-encounter]');
 
-            startEncounterButton.disabled = true;
-            say('Calling the Table to battle…');
+        if (endEncounterButton && !endEncounterButton.dataset.liveBound) {
+            endEncounterButton.dataset.liveBound = '1';
+            endEncounterButton.addEventListener('click', async () => {
+                const encounter = document.querySelector('[data-encounter-id]');
+                if (!encounter) {
+                    say('No current Encounter.');
+                    return;
+                }
 
-            try {
-                await request('gmrt_begin_encounter', {
-                    name: name ? name.value : 'A Sudden Encounter',
-                    combatants: JSON.stringify(combatants)
-                });
-                await replaceChamber('Battle begins.');
-            } catch (error) {
-                startEncounterButton.disabled = false;
-                say(error.message || 'The Encounter could not begin.');
-            }
-        });
+                endEncounterButton.disabled = true;
+                say('Ending the Encounter…');
+
+                try {
+                    await request('gmrt_end_encounter', {
+                        encounter_id: encounter.dataset.encounterId || '',
+                        revision: encounter.dataset.encounterRevision || '1'
+                    });
+                    await replaceLifecycle('Peace returns to the path.');
+                } catch (error) {
+                    endEncounterButton.disabled = false;
+                    say(error.message || 'The Encounter could not end.');
+                }
+            });
+        }
     }
 
-    const endEncounterButton = document.querySelector('[data-end-encounter]');
-
-    if (endEncounterButton) {
-        endEncounterButton.addEventListener('click', async () => {
-            const encounter = document.querySelector('[data-encounter-id]');
-            if (!encounter) {
-                say('No current Encounter.');
-                return;
-            }
-
-            endEncounterButton.disabled = true;
-            say('Ending the Encounter…');
-
-            try {
-                await request('gmrt_end_encounter', {
-                    encounter_id: encounter.dataset.encounterId || '',
-                    revision: encounter.dataset.encounterRevision || '1'
-                });
-                await replaceChamber('Peace returns to the path.');
-            } catch (error) {
-                endEncounterButton.disabled = false;
-                say(error.message || 'The Encounter could not end.');
-            }
-        });
-    }
+    bindEncounterLifecycleControls();
 
     const endTurnButton = document.querySelector('[data-end-turn]');
 

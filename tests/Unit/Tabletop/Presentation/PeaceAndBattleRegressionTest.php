@@ -57,12 +57,12 @@ final class PeaceAndBattleRegressionTest extends TestCase
         self::assertStringContainsString("request('gmrt_end_encounter'", $this->script);
     }
 
-    public function testLifecycleTransitionUsesLiveChamberReplacementNotPageReload(): void
+    public function testLifecycleTransitionPatchesOnlyLiveRegions(): void
     {
-        self::assertStringContainsString('async function replaceChamber(message)', $this->script);
-        self::assertStringContainsString("parsed.querySelector('.gmrt-chamber')", $this->script);
-        self::assertStringContainsString('current.replaceWith(incoming);', $this->script);
-        self::assertStringContainsString('bootTabletop();', $this->script);
+        self::assertStringContainsString('async function replaceLifecycle(message)', $this->script);
+        self::assertStringContainsString("request('gmrt_tabletop_fragment', {})", $this->script);
+        self::assertStringContainsString('currentLifecycle.replaceChildren', $this->script);
+        self::assertStringNotContainsString('window.location.reload()', $this->script);
     }
 
     public function testHeartbeatUsesLiveLifecycleTransition(): void
