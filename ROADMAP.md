@@ -624,3 +624,18 @@ Correct the final forged-token presentation boundary so Companion-generated port
 - Works from the Satchel in both Peace and Battle modes.
 
 - [x] IV.26C — The Spell Pouch: unfurled Satchel and Companion-authoritative spell projection.
+
+
+### Phase IV.26C.3 — Magic at Your Fingertips
+
+- [x] Roll Spell Pouch spell attacks from authoritative Companion projection.
+- [x] Roll spell damage from authoritative projected dice/formula.
+- [x] Roll healing separately from damage and include the projected spellcasting modifier.
+- [x] Browser submits only `spell_id` and `spell_action`; Tabletop re-resolves the seated owned Companion Character.
+- [ ] Later: resolve saving throws against actual battlefield targets instead of asking the caster to roll the target save.
+- [ ] Later: expend/restore live spell slots through the Companion-authoritative play boundary.
+
+### Next after IV.26C.3
+
+- Adventuring Measures at the Table: repair/confirm authoritative current, maximum and temporary HP presentation and safe live HP controls.
+- Chronicle the Satchel: encounter-time Satchel rolls enter the Battle Chronicle; Exploration/Peace Mode rolls enter a persistent Chamber Chronicle.

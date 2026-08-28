@@ -24,8 +24,10 @@ use GreatMarketrealmTabletop\Tabletop\Http\GatheringAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\CompanionCharacterAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\QuickHandsAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\WeaponHandsAjaxController;
+use GreatMarketrealmTabletop\Tabletop\Http\SpellPouchAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Satchel\Services\QuickHandsRoller;
 use GreatMarketrealmTabletop\Tabletop\Satchel\Services\WeaponHandsRoller;
+use GreatMarketrealmTabletop\Tabletop\Satchel\Services\SpellPouchRoller;
 use GreatMarketrealmTabletop\Tabletop\Battle\Services\SecureD20Roller;
 use GreatMarketrealmTabletop\Tabletop\Battle\Services\SecureDamageDieRoller;
 use GreatMarketrealmTabletop\Integration\Companion\WordPressCompanionCharacterGateway;
@@ -82,6 +84,8 @@ final class TabletopServiceProvider
     private QuickHandsAjaxController $quickHandsAjax;
 
     private WeaponHandsAjaxController $weaponHandsAjax;
+
+    private SpellPouchAjaxController $spellPouchAjax;
 
     public function __construct()
     {
@@ -169,6 +173,15 @@ final class TabletopServiceProvider
             new WordPressCompanionCharacterGateway(),
             new WordPressTableMembershipRepository(),
             new WeaponHandsRoller(
+                new SecureD20Roller(),
+                new SecureDamageDieRoller()
+            )
+        );
+
+        $this->spellPouchAjax = new SpellPouchAjaxController(
+            new WordPressCompanionCharacterGateway(),
+            new WordPressTableMembershipRepository(),
+            new SpellPouchRoller(
                 new SecureD20Roller(),
                 new SecureDamageDieRoller()
             )
@@ -330,6 +343,11 @@ final class TabletopServiceProvider
         add_action(
             'wp_ajax_gmrt_weapon_hands_roll',
             [$this->weaponHandsAjax, 'roll']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_spell_pouch_roll',
+            [$this->spellPouchAjax, 'roll']
         );
     }
 }

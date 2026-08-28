@@ -1,3 +1,11 @@
+## 0.26.3-alpha.2 — Phase IV.26C.3: Magic at Your Fingertips
+
+- Makes eligible Companion-projected Spell Pouch entries actionable from the Adventurer’s Satchel.
+- Spell attacks roll against the authoritative projected spell attack modifier; damage and healing use the authoritative projected formula and roll modifier.
+- Adds distinct Attack, Damage and Healing actions while keeping save resolution and battlefield targeting for a later combat integration.
+- Adds an authenticated `gmrt_spell_pouch_roll` boundary that accepts only spell/action identifiers and re-resolves the seated Companion Character server-side.
+- Keeps natural 20/1 spell-attack behaviour as presentation flourishes rather than inventing new automatic outcomes.
+
 
 ## 0.26.2-alpha.1 — Phase IV.26B: Weapons to Hand
 - Adds equipped Companion weapon cards to the Adventurer's Satchel.

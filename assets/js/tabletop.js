@@ -330,6 +330,34 @@
         });
     });
 
+    document.querySelectorAll('[data-spell-roll]').forEach((button) => {
+        button.addEventListener('click', async () => {
+            const original = button.innerHTML;
+            button.disabled = true;
+            button.setAttribute('aria-busy', 'true');
+            if (quickHandsResult) quickHandsResult.textContent = 'Magic gathers… the dice are rolling.';
+            try {
+                const data = await request('gmrt_spell_pouch_roll', {
+                    spell_action: button.dataset.spellAction || '',
+                    spell_id: button.dataset.spellId || ''
+                });
+                const roll = data.roll || {};
+                const flourish = roll.action === 'attack' && roll.natural_twenty
+                    ? ' ✨ Spell attack critical!'
+                    : (roll.action === 'attack' && roll.natural_one ? ' · Natural 1!' : '');
+                if (quickHandsResult) quickHandsResult.textContent = (data.message || 'Spell roll complete.') + flourish;
+                say(data.message || 'Spell Pouch roll complete.');
+            } catch (error) {
+                if (quickHandsResult) quickHandsResult.textContent = error.message || 'The spell roll could not be made.';
+                say(error.message || 'The spell roll could not be made.');
+            } finally {
+                button.disabled = false;
+                button.removeAttribute('aria-busy');
+                button.innerHTML = original;
+            }
+        });
+    });
+
     if (!board) {
         return;
     }
