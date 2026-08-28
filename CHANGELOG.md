@@ -590,3 +590,10 @@
 - Player Exploration/Encounter transitions patch only live lifecycle regions, keeping the battlefield and Fog heartbeat alive.
 - DM Begin Battle / End Encounter rebuild through the authenticated Tabletop fragment endpoint so newly rendered combat controls receive complete bindings.
 - Removes the cached frontend-page fetch from live Chamber rebuilding.
+
+## 0.25.0-alpha.1 — Phase IV.25: The Companion Character Gate
+- Active Table members can choose only Companion Characters owned by their WordPress account.
+- Character ownership is revalidated server-side before the Table seat is assigned.
+- The selected Character creates a player-controlled CHARACTER token on the active Scene when one is not already present.
+- Forged Companion token imagery, focus and zoom are projected onto the battlefield token.
+- The Chamber shows the selected Character and owner-scoped Character picker.

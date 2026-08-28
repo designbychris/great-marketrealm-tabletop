@@ -21,6 +21,11 @@ use GreatMarketrealmTabletop\Tabletop\Http\CartographyAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\FogOfWarAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\VisionBarrierAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\GatheringAjaxController;
+use GreatMarketrealmTabletop\Tabletop\Http\CompanionCharacterAjaxController;
+use GreatMarketrealmTabletop\Integration\Companion\WordPressCompanionCharacterGateway;
+use GreatMarketrealmTabletop\Tables\Scenes\Repositories\WordPressTableSceneRepository;
+use GreatMarketrealmTabletop\Tables\Tokens\Repositories\WordPressTableTokenRepository;
+use GreatMarketrealmTabletop\Tables\Tokens\Services\TableTokenManagerFactory;
 use GreatMarketrealmTabletop\Tables\Memberships\Services\TableGatheringFactory;
 use GreatMarketrealmTabletop\Tables\Memberships\Repositories\WordPressTableMembershipRepository;
 use GreatMarketrealmTabletop\Tables\Memberships\Repositories\WordPressTableMemberIdentityDirectory;
@@ -65,6 +70,8 @@ final class TabletopServiceProvider
     private VisionBarrierAjaxController $visionAjax;
 
     private GatheringAjaxController $gatheringAjax;
+
+    private CompanionCharacterAjaxController $companionCharacterAjax;
 
     public function __construct()
     {
@@ -131,6 +138,15 @@ final class TabletopServiceProvider
                 new WordPressTableRepository(),
                 $identityDirectory
             )
+        );
+
+        $this->companionCharacterAjax = new CompanionCharacterAjaxController(
+            new WordPressCompanionCharacterGateway(),
+            TableGatheringFactory::make(),
+            new WordPressTableMembershipRepository(),
+            new WordPressTableSceneRepository(),
+            new WordPressTableTokenRepository(),
+            TableTokenManagerFactory::make()
         );
     }
 
@@ -274,6 +290,11 @@ final class TabletopServiceProvider
         add_action(
             'wp_ajax_gmrt_remove_table_player',
             [$this->gatheringAjax, 'remove']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_select_companion_character',
+            [$this->companionCharacterAjax, 'select']
         );
     }
 }

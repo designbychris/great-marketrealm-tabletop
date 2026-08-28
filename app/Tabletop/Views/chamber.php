@@ -845,16 +845,25 @@ $sceneImage = $scene !== null
                                     . (string) $token['label']
                                 ); ?>"
                             >
-                                <span aria-hidden="true">
-                                    <?php echo esc_html(
-                                        strtoupper(
-                                            substr(
-                                                (string) $token['label'],
-                                                0,
-                                                1
-                                            )
-                                        )
-                                    ); ?>
+                                <?php
+                                $companionCharacter = is_array($token['companion_character'] ?? null)
+                                    ? $token['companion_character']
+                                    : null;
+                                $tokenRecipe = is_array($companionCharacter['token'] ?? null)
+                                    ? $companionCharacter['token']
+                                    : [];
+                                $tokenImage = (string) ($tokenRecipe['image_url'] ?? '');
+                                ?>
+                                <span class="gmrt-token__face" aria-hidden="true">
+                                    <?php if ($tokenImage !== '') : ?>
+                                        <img
+                                            src="<?php echo esc_url($tokenImage); ?>"
+                                            alt=""
+                                            style="--gmrt-token-focus-x: <?php echo esc_attr((string) ($tokenRecipe['focus_x'] ?? 50)); ?>%; --gmrt-token-focus-y: <?php echo esc_attr((string) ($tokenRecipe['focus_y'] ?? 50)); ?>%; --gmrt-token-zoom: <?php echo esc_attr((string) ($tokenRecipe['zoom'] ?? 100)); ?>%;"
+                                        >
+                                    <?php else : ?>
+                                        <?php echo esc_html(strtoupper(substr((string) $token['label'], 0, 1))); ?>
+                                    <?php endif; ?>
                                 </span>
                                 <span
                                     class="gmrt-token__state-badge"
@@ -1073,7 +1082,45 @@ $sceneImage = $scene !== null
                     <strong>Great Marketrealm Companion</strong>
                     <?php if (! empty($companion['available'])) : ?>
                         <span class="is-connected">Connected<?php echo ! empty($companion['version']) ? ' · ' . esc_html((string) $companion['version']) : ''; ?></span>
-                        <p>Table membership is ready for Companion character assignment through the integration boundary.</p>
+                        <?php
+                        $eligibleCharacters = is_array($companion['characters'] ?? null)
+                            ? $companion['characters']
+                            : [];
+                        $selectedCharacter = is_array($companion['selected_character'] ?? null)
+                            ? $companion['selected_character']
+                            : null;
+                        ?>
+                        <?php if ($selectedCharacter !== null) : ?>
+                            <p class="gmrt-character-gate__chosen">
+                                <strong><?php echo esc_html((string) ($selectedCharacter['name'] ?? 'Adventurer')); ?></strong>
+                                · Level <?php echo esc_html((string) ($selectedCharacter['level'] ?? '')); ?>
+                                <?php echo esc_html((string) ($selectedCharacter['race'] ?? '')); ?>
+                                <?php echo esc_html((string) ($selectedCharacter['class'] ?? '')); ?>
+                            </p>
+                        <?php endif; ?>
+                        <?php if ($eligibleCharacters !== []) : ?>
+                            <form class="gmrt-character-gate" data-companion-character-form>
+                                <label>
+                                    <span>Character at this Table</span>
+                                    <select name="character_id" required>
+                                        <option value="">Choose your adventurer…</option>
+                                        <?php foreach ($eligibleCharacters as $eligibleCharacter) : ?>
+                                            <option
+                                                value="<?php echo esc_attr((string) ($eligibleCharacter['id'] ?? '')); ?>"
+                                                <?php selected(
+                                                    (string) ($eligibleCharacter['id'] ?? ''),
+                                                    (string) ($selectedCharacter['id'] ?? '')
+                                                ); ?>
+                                            ><?php echo esc_html((string) ($eligibleCharacter['name'] ?? 'Adventurer')); ?> — Lv <?php echo esc_html((string) ($eligibleCharacter['level'] ?? '')); ?> <?php echo esc_html((string) ($eligibleCharacter['race'] ?? '')); ?> <?php echo esc_html((string) ($eligibleCharacter['class'] ?? '')); ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </label>
+                                <button type="submit">Bring Character to Table</button>
+                                <span data-companion-character-status role="status" aria-live="polite"></span>
+                            </form>
+                        <?php else : ?>
+                            <p>No eligible Companion Characters were found for this Guild account.</p>
+                        <?php endif; ?>
                     <?php else : ?>
                         <span>Not detected</span>
                         <p>The Tabletop remains fully usable with manual combatants and NPCs.</p>

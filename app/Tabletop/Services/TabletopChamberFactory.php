@@ -20,7 +20,7 @@ use GreatMarketrealmTabletop\Tabletop\Fog\Repositories\WordPressFogOfWarReposito
 use GreatMarketrealmTabletop\Tabletop\Fog\Services\FogOfWarProjector;
 use GreatMarketrealmTabletop\Tabletop\Vision\Repositories\WordPressVisionBarrierRepository;
 use GreatMarketrealmTabletop\Tables\Memberships\Repositories\WordPressTableMemberIdentityDirectory;
-use GreatMarketrealmTabletop\Integration\Companion\CompanionAvailability;
+use GreatMarketrealmTabletop\Integration\Companion\WordPressCompanionCharacterGateway;
 
 defined('ABSPATH') || exit;
 
@@ -45,7 +45,7 @@ final class TabletopChamberFactory
             new FogOfWarProjector(),
             new WordPressVisionBarrierRepository(),
             new WordPressTableMemberIdentityDirectory(),
-            new CompanionAvailability()
+            new WordPressCompanionCharacterGateway()
         );
     }
 }

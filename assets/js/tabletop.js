@@ -246,6 +246,26 @@
         });
     });
 
+    const companionCharacterForm = document.querySelector('[data-companion-character-form]');
+    companionCharacterForm?.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const select = companionCharacterForm.querySelector('[name="character_id"]');
+        const button = companionCharacterForm.querySelector('button[type="submit"]');
+        const status = companionCharacterForm.querySelector('[data-companion-character-status]');
+        const characterId = select ? select.value : '';
+        if (!characterId) return;
+        if (button) button.disabled = true;
+        if (status) status.textContent = 'Opening the Companion Character Gate…';
+        try {
+            const data = await request('gmrt_select_companion_character', { character_id: characterId });
+            if (status) status.textContent = data.message || 'Character ready.';
+            await replaceChamber(data.message || 'Your adventurer has entered the Table.');
+        } catch (error) {
+            if (status) status.textContent = error.message || 'The Character could not enter the Table.';
+            if (button) button.disabled = false;
+        }
+    });
+
     if (!board) {
         return;
     }
@@ -1612,8 +1632,22 @@
                     node.title = label;
 
                     const initial = document.createElement('span');
+                    initial.className = 'gmrt-token__face';
                     initial.setAttribute('aria-hidden', 'true');
-                    initial.textContent = label.slice(0, 1).toUpperCase();
+                    const recipe = token.companion_character && token.companion_character.token
+                        ? token.companion_character.token
+                        : null;
+                    if (recipe && recipe.image_url) {
+                        const image = document.createElement('img');
+                        image.src = String(recipe.image_url);
+                        image.alt = '';
+                        image.style.setProperty('--gmrt-token-focus-x', String(recipe.focus_x || 50) + '%');
+                        image.style.setProperty('--gmrt-token-focus-y', String(recipe.focus_y || 50) + '%');
+                        image.style.setProperty('--gmrt-token-zoom', String(recipe.zoom || 100) + '%');
+                        initial.appendChild(image);
+                    } else {
+                        initial.textContent = label.slice(0, 1).toUpperCase();
+                    }
                     node.appendChild(initial);
 
                     const badge = document.createElement('span');

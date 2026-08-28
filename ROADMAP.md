@@ -587,3 +587,6 @@ Real WordPress identities, avatars, Table invitations and explicit seat acceptan
 - Player Exploration/Encounter transitions patch only live lifecycle regions, keeping the battlefield and Fog heartbeat alive.
 - DM Begin Battle / End Encounter rebuild through the authenticated Tabletop fragment endpoint so newly rendered combat controls receive complete bindings.
 - Removes the cached frontend-page fetch from live Chamber rebuilding.
+
+### Phase IV.25 — The Companion Character Gate
+Bind a seated WordPress user to an owner-validated Companion Character and its forged battlefield token, establishing player token ownership before deeper Character Sheet projection.

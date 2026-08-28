@@ -24,6 +24,7 @@ use GreatMarketrealmTabletop\Tables\Memberships\Models\TableMemberStatus;
 use GreatMarketrealmTabletop\Tables\Memberships\Contracts\TableMemberIdentityDirectory;
 use GreatMarketrealmTabletop\Tables\Memberships\Presentation\TableMemberProjector;
 use GreatMarketrealmTabletop\Integration\Companion\CompanionGateway;
+use GreatMarketrealmTabletop\Integration\Companion\CompanionCharacterGateway;
 use GreatMarketrealmTabletop\Tables\Scenes\Contracts\TableSceneRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Contracts\TableTokenRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Models\TableToken;
@@ -182,7 +183,19 @@ final class TabletopChamber
                 continue;
             }
 
-            $tokens[] = $token->toArray();
+            $projection = $token->toArray();
+            if (
+                $this->companion instanceof CompanionCharacterGateway
+                && $token->type() === TableTokenType::CHARACTER
+                && $token->sourceReference() !== null
+                && ($token->controllerUserId() ?? 0) > 0
+            ) {
+                $projection['companion_character'] = $this->companion->characterForUser(
+                    (int) $token->controllerUserId(),
+                    (string) $token->sourceReference()
+                );
+            }
+            $tokens[] = $projection;
         }
 
         $encounter = $activeScene !== null
@@ -295,6 +308,16 @@ final class TabletopChamber
                 'companion' => [
                     'available' => $this->companion?->available() ?? false,
                     'version' => $this->companion?->version(),
+                    'characters' => $this->companion instanceof CompanionCharacterGateway
+                        ? $this->companion->charactersForUser($viewerUserId)
+                        : [],
+                    'selected_character' => $this->companion instanceof CompanionCharacterGateway
+                        && $viewer->companionCharacterId() !== null
+                        ? $this->companion->characterForUser(
+                            $viewerUserId,
+                            $viewer->companionCharacterId()
+                        )
+                        : null,
                 ],
             ]
         );

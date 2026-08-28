@@ -1456,3 +1456,11 @@
     outline: 3px solid currentColor;
     outline-offset: 3px;
 }
+
+/* Phase IV.25 — The Companion Character Gate */
+.gmrt-token__face { position:absolute; inset:3px; display:grid; place-items:center; overflow:hidden; border-radius:50%; }
+.gmrt-token__face img { width:var(--gmrt-token-zoom,100%); height:var(--gmrt-token-zoom,100%); max-width:none; object-fit:cover; object-position:var(--gmrt-token-focus-x,50%) var(--gmrt-token-focus-y,50%); pointer-events:none; }
+.gmrt-character-gate { display:grid; gap:.55rem; margin-top:.75rem; }
+.gmrt-character-gate label { display:grid; gap:.35rem; }
+.gmrt-character-gate select { width:100%; }
+.gmrt-character-gate__chosen { margin:.55rem 0 0; }
