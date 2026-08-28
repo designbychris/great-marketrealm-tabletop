@@ -11,7 +11,7 @@ final class KeeperKeepsPaceRegressionTest extends TestCase
     private function tabletopJavascript(): string
     {
         return (string) file_get_contents(
-            dirname(__DIR__, 5) . '/assets/js/tabletop.js'
+            dirname(__DIR__, 4) . '/assets/js/tabletop.js'
         );
     }
 
