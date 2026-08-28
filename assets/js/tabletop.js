@@ -266,6 +266,14 @@
         }
     });
 
+    const satchel = document.querySelector('[data-adventurer-satchel]');
+    const satchelToggle = document.querySelector('[data-satchel-toggle]');
+    satchelToggle?.addEventListener('click', () => {
+        const open = satchel?.dataset.open !== 'true';
+        if (satchel) satchel.dataset.open = open ? 'true' : 'false';
+        satchelToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+
     if (!board) {
         return;
     }

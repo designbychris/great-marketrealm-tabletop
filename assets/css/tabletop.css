@@ -1464,3 +1464,14 @@
 .gmrt-character-gate label { display:grid; gap:.35rem; }
 .gmrt-character-gate select { width:100%; }
 .gmrt-character-gate__chosen { margin:.55rem 0 0; }
+
+
+/* Phase IV.26 — The Adventurer's Satchel */
+.gmrt-satchel{position:fixed;left:0;top:18vh;z-index:80;display:flex;align-items:flex-start;transform:translateX(calc(-100% + 3.25rem));transition:transform .2s ease}.gmrt-satchel[data-open="true"]{transform:translateX(0)}
+.gmrt-satchel__toggle{order:2;width:3.25rem;min-height:7rem;padding:.55rem .35rem;border:1px solid rgba(244,214,136,.48);border-left:0;border-radius:0 8px 8px 0;background:#2b2118;color:#f4ead6;display:grid;gap:.35rem;place-items:center;cursor:pointer}.gmrt-satchel__toggle span:last-child{writing-mode:vertical-rl;text-orientation:mixed;font-weight:800;letter-spacing:.04em}
+.gmrt-satchel__panel{width:min(360px,calc(100vw - 4rem));max-height:76vh;overflow:auto;padding:1rem;background:#1d1812;color:#f4ead6;border:1px solid rgba(244,214,136,.4);border-left:0;box-shadow:10px 12px 30px rgba(0,0,0,.35)}
+.gmrt-satchel__identity{display:flex;gap:.8rem;align-items:center;border-bottom:1px solid rgba(244,214,136,.2);padding-bottom:.8rem}.gmrt-satchel__identity img{width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid rgba(244,214,136,.6)}.gmrt-satchel__identity h2,.gmrt-satchel__identity p{margin:.1rem 0}
+.gmrt-satchel__measures,.gmrt-satchel__abilities{display:grid;grid-template-columns:repeat(3,1fr);gap:.45rem;margin:.8rem 0}.gmrt-satchel__measures>div,.gmrt-satchel__abilities>div{display:grid;text-align:center;padding:.45rem;border:1px solid rgba(244,234,214,.15);background:rgba(255,255,255,.035)}.gmrt-satchel__measures span,.gmrt-satchel__abilities span{font-size:.68rem;text-transform:uppercase;opacity:.72}.gmrt-satchel__measures strong,.gmrt-satchel__abilities strong{font-size:1.05rem}.gmrt-satchel__measures small,.gmrt-satchel__abilities small{font-size:.72rem;opacity:.78}
+.gmrt-satchel__section{border-top:1px solid rgba(244,214,136,.18);padding:.65rem 0}.gmrt-satchel__section h3{margin:0 0 .35rem}.gmrt-satchel__section summary{cursor:pointer;font-weight:800}.gmrt-satchel__list{display:grid;grid-template-columns:1fr 1fr;gap:.2rem .8rem;margin-top:.5rem}.gmrt-satchel__list>div{display:flex;justify-content:space-between;padding:.2rem 0;border-bottom:1px dotted rgba(244,234,214,.13)}.gmrt-satchel__promise{font-size:.78rem;opacity:.72;margin:.75rem 0 0}
+@media (max-width:700px){.gmrt-satchel{top:12vh}.gmrt-satchel__panel{width:calc(100vw - 4rem)}}
+@media (prefers-reduced-motion:reduce){.gmrt-satchel{transition:none}}

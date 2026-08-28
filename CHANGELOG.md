@@ -612,3 +612,8 @@
 - Lets the DM consume the same in-place round/current-combatant/active-token patch already proven on Player browsers.
 - Restores the End Turn control after a successful refresh instead of leaving it disabled as “Passing…”.
 - Companion-side owner-aware portrait projection accompanies this corrective so a DM sees the seated player's actual forged/custom token artwork rather than a viewer-scoped generated fallback.
+
+
+### Phase IV.26 — The Adventurer's Satchel (0.26.0-alpha.1)
+- Tabletop support for the owner-scoped tabletop play projection and pull-out Adventurer's Satchel.
+- Companion remains authoritative for character mechanics; Tabletop consumes the projection without duplicating character persistence.

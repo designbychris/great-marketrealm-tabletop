@@ -28,6 +28,13 @@ $integrations = $state?->integrations() ?? [];
 $companion = is_array($integrations['companion'] ?? null)
     ? $integrations['companion']
     : [];
+$adventurer = is_array($companion['selected_character'] ?? null)
+    ? $companion['selected_character']
+    : null;
+$adventurerPlay = is_array($adventurer['play'] ?? null)
+    ? $adventurer['play']
+    : [];
+
 
 $tokenLabels = [];
 foreach ($tokens as $token) {
@@ -59,6 +66,49 @@ $sceneImage = $scene !== null
         $state?->syncRevision() ?? ''
     ); ?>"
 >
+    <?php if ($adventurer !== null && $adventurerPlay !== []) : ?>
+        <?php
+        $satchelToken = is_array($adventurer['token'] ?? null) ? $adventurer['token'] : [];
+        $satchelImage = CompanionTokenImageSource::sanitize((string) ($satchelToken['image_url'] ?? ''));
+        $satchelHp = is_array($adventurerPlay['hit_points'] ?? null) ? $adventurerPlay['hit_points'] : [];
+        $satchelAbilities = is_array($adventurerPlay['abilities'] ?? null) ? $adventurerPlay['abilities'] : [];
+        $satchelSaves = is_array($adventurerPlay['saving_throws'] ?? null) ? $adventurerPlay['saving_throws'] : [];
+        $satchelSkills = is_array($adventurerPlay['skills'] ?? null) ? $adventurerPlay['skills'] : [];
+        $abilityLabels = ['strength'=>'STR','dexterity'=>'DEX','constitution'=>'CON','intelligence'=>'INT','wisdom'=>'WIS','charisma'=>'CHA'];
+        ?>
+        <aside class="gmrt-satchel" data-adventurer-satchel data-open="false" aria-label="Adventurer's Satchel">
+            <button class="gmrt-satchel__toggle" type="button" data-satchel-toggle aria-expanded="false" aria-controls="gmrt-adventurer-satchel-panel">
+                <span aria-hidden="true">🎒</span><span>Satchel</span>
+            </button>
+            <div class="gmrt-satchel__panel" id="gmrt-adventurer-satchel-panel">
+                <header class="gmrt-satchel__identity">
+                    <?php if ($satchelImage !== '') : ?><img src="<?php echo $satchelImage; ?>" alt="" aria-hidden="true"><?php endif; ?>
+                    <div><p class="gmrt-chamber__eyebrow">Adventurer's Satchel</p><h2><?php echo esc_html((string) ($adventurer['name'] ?? 'Adventurer')); ?></h2><p>Level <?php echo esc_html((string) ($adventurer['level'] ?? '')); ?> <?php echo esc_html((string) ($adventurer['race'] ?? '')); ?> <?php echo esc_html((string) ($adventurer['class'] ?? '')); ?></p></div>
+                </header>
+                <div class="gmrt-satchel__measures">
+                    <div><span>AC</span><strong><?php echo esc_html((string) ($adventurerPlay['armour_class'] ?? '—')); ?></strong></div>
+                    <div><span>HP</span><strong><?php echo esc_html((string) ($satchelHp['current'] ?? '—')); ?>/<?php echo esc_html((string) ($satchelHp['maximum'] ?? '—')); ?></strong><?php if ((int) ($satchelHp['temporary'] ?? 0) > 0) : ?><small>+<?php echo esc_html((string) $satchelHp['temporary']); ?> temp</small><?php endif; ?></div>
+                    <div><span>Speed</span><strong><?php echo esc_html((string) ($adventurerPlay['speed'] ?? '—')); ?> ft</strong></div>
+                    <div><span>Initiative</span><strong><?php echo esc_html(sprintf('%+d', (int) ($adventurerPlay['initiative'] ?? 0))); ?></strong></div>
+                    <div><span>Proficiency</span><strong><?php echo esc_html(sprintf('%+d', (int) ($adventurerPlay['proficiency_bonus'] ?? 0))); ?></strong></div>
+                    <div><span>Passive Perception</span><strong><?php echo esc_html((string) ($adventurerPlay['passive_perception'] ?? '—')); ?></strong></div>
+                </div>
+                <section class="gmrt-satchel__section"><h3>Abilities</h3><div class="gmrt-satchel__abilities">
+                    <?php foreach ($abilityLabels as $key => $label) : $ability = is_array($satchelAbilities[$key] ?? null) ? $satchelAbilities[$key] : []; ?>
+                    <div><span><?php echo esc_html($label); ?></span><strong><?php echo esc_html((string) ($ability['score'] ?? '—')); ?></strong><small><?php echo esc_html(sprintf('%+d', (int) ($ability['modifier'] ?? 0))); ?></small></div>
+                    <?php endforeach; ?>
+                </div></section>
+                <details class="gmrt-satchel__section"><summary>Saving Throws</summary><div class="gmrt-satchel__list">
+                    <?php foreach ($abilityLabels as $key => $label) : $save = is_array($satchelSaves[$key] ?? null) ? $satchelSaves[$key] : []; ?><div><span><?php echo ! empty($save['proficient']) ? '◆ ' : ''; ?><?php echo esc_html($label); ?></span><strong><?php echo esc_html(sprintf('%+d', (int) ($save['modifier'] ?? 0))); ?></strong></div><?php endforeach; ?>
+                </div></details>
+                <details class="gmrt-satchel__section"><summary>Skills</summary><div class="gmrt-satchel__list">
+                    <?php foreach ($satchelSkills as $key => $skill) : if (! is_array($skill)) continue; ?><div><span><?php echo ! empty($skill['expertise']) ? '◆◆ ' : (! empty($skill['proficient']) ? '◆ ' : ''); ?><?php echo esc_html(ucwords(str_replace('-', ' ', (string) $key))); ?></span><strong><?php echo esc_html(sprintf('%+d', (int) ($skill['modifier'] ?? 0))); ?></strong></div><?php endforeach; ?>
+                </div></details>
+                <p class="gmrt-satchel__promise">Quick Rolls, attacks, spells and abilities will join this play surface in the next Satchel passes.</p>
+            </div>
+        </aside>
+    <?php endif; ?>
+
     <header class="gmrt-chamber__masthead">
         <div>
             <p class="gmrt-chamber__eyebrow">
