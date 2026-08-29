@@ -29,6 +29,7 @@ use GreatMarketrealmTabletop\Tabletop\Chronicle\Contracts\ChamberChronicleReposi
 use GreatMarketrealmTabletop\Tabletop\Chronicle\Presentation\ChamberChronicleProjector;
 use GreatMarketrealmTabletop\Tabletop\Footsteps\Contracts\FootstepTrailRepository;
 use GreatMarketrealmTabletop\Tabletop\Footsteps\Presentation\FootstepTrailProjector;
+use GreatMarketrealmTabletop\Tabletop\Light\Contracts\CarriedLightRepository;
 use GreatMarketrealmTabletop\Tables\Scenes\Contracts\TableSceneRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Contracts\TableTokenRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Models\TableToken;
@@ -60,7 +61,8 @@ final class TabletopChamber
         private ?ChamberChronicleRepository $chamberEvents = null,
         private ?ChamberChronicleProjector $chamberChronicleProjector = null,
         private ?FootstepTrailRepository $footstepTrails = null,
-        private ?FootstepTrailProjector $footstepProjector = null
+        private ?FootstepTrailProjector $footstepProjector = null,
+        private ?CarriedLightRepository $carriedLights = null
     ) {}
 
     public function state(
@@ -198,8 +200,11 @@ final class TabletopChamber
                     $senses = is_array($character['play']['senses'] ?? null)
                         ? $character['play']['senses']
                         : [];
+                    $lit = $this->carriedLights !== null && $this->carriedLights->isLit($tableId, $activeScene->id(), $visionToken->id());
                     $visionProfiles[$visionToken->id()] = [
                         'darkvision' => max(0, (int) ($senses['darkvision'] ?? 0)),
+                        'carried_light' => $lit,
+                        'light_radius_feet' => $lit ? 40 : 0,
                     ];
                 }
             }

@@ -700,6 +700,19 @@
         });
     };
 
+    const lightLayer = document.querySelector('[data-light-layer]');
+    const renderLightSources = (projection = fogProjection) => {
+        if (!lightLayer) return;
+        lightLayer.replaceChildren();
+        (Array.isArray(projection?.light_sources) ? projection.light_sources : []).forEach((source) => {
+            const glow = document.createElement('span');
+            glow.className = 'gmrt-carried-light';
+            glow.style.setProperty('--gmrt-light-x', (Number(source.x || 0) * 100) + '%');
+            glow.style.setProperty('--gmrt-light-y', (Number(source.y || 0) * 100) + '%');
+            lightLayer.appendChild(glow);
+        });
+    };
+
     const fogLayer = document.querySelector('[data-fog-layer]');
     const fogEnabled = document.querySelector('[data-fog-enabled]');
     const fogPreview = document.querySelector('[data-fog-preview]');
@@ -730,6 +743,7 @@
         if (!fogLayer) return;
 
         fogProjection = projection || {};
+        renderLightSources(fogProjection);
         fogLayer.replaceChildren();
 
         const enabled = Boolean(fogProjection.enabled);
@@ -901,6 +915,27 @@
     renderFootsteps();
     renderFog();
 
+
+    // Phase IV.27B — The First Lantern. The browser chooses only on/off;
+    // range and visibility remain server-authoritative.
+    const lanternButton = document.querySelector('[data-toggle-carried-light]');
+    const lanternState = document.querySelector('[data-lantern-state]');
+    const lanternStatus = document.querySelector('[data-lantern-status]');
+    lanternButton?.addEventListener('click', async () => {
+        lanternButton.disabled = true;
+        try {
+            const response = await request('gmrt_toggle_carried_light', { table_id: tableId });
+            const data = response || {};
+            const lit = Boolean(data.lit);
+            if (lanternState) lanternState.textContent = lit ? 'Burning' : 'Doused';
+            lanternButton.textContent = lit ? 'Douse Torch' : 'Light Torch';
+            if (lanternStatus) lanternStatus.textContent = String(data.message || '');
+            const fresh = await request('gmrt_tabletop_state', { table_id: tableId });
+            if (fresh?.fog) renderFog(fresh.fog);
+        } catch (error) {
+            if (lanternStatus) lanternStatus.textContent = error?.message || 'The lantern could not be tended.';
+        } finally { lanternButton.disabled = false; }
+    });
     fogPreview?.addEventListener('change', () => {
         window.sessionStorage.setItem(
             fogPreviewStorageKey,

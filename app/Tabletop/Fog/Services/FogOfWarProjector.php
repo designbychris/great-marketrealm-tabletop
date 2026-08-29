@@ -39,7 +39,8 @@ final class FogOfWarProjector
                 ? $visionProfiles[$token->id()]
                 : [];
             $darkvisionFeet = max(0, (int) ($profile['darkvision'] ?? 0));
-            $visionFeet = max(15, $darkvisionFeet);
+            $lightFeet = !empty($profile['carried_light']) ? max(0, (int) ($profile['light_radius_feet'] ?? 40)) : 0;
+            $visionFeet = max(15, $darkvisionFeet, $lightFeet);
             $visionRadius = max(1, (int) ceil($visionFeet / 5));
 
             $visionOrigins[] = [
@@ -48,6 +49,10 @@ final class FogOfWarProjector
                 'token_id' => $token->id(),
                 'range_feet' => $visionFeet,
                 'darkvision' => $darkvisionFeet,
+                'carried_light' => $lightFeet > 0,
+                'light_radius_feet' => $lightFeet,
+                'bright_light_feet' => $lightFeet > 0 ? 20 : 0,
+                'dim_light_feet' => $lightFeet > 0 ? 20 : 0,
             ];
 
             $visible = array_merge(
@@ -78,6 +83,7 @@ final class FogOfWarProjector
                 $visible
             )),
             'vision_origins' => $visionOrigins,
+            'light_sources' => array_values(array_filter($visionOrigins, static fn (array $origin): bool => !empty($origin['carried_light']))),
             'has_blockers' => $barriers !== [],
         ];
     }

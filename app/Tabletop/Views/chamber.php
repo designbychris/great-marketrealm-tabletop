@@ -118,6 +118,8 @@ $sceneImage = $scene !== null
                     <div><span>Passive Perception</span><strong><?php echo esc_html((string) ($adventurerPlay['passive_perception'] ?? '—')); ?></strong></div>
                     <?php $darkvision = max(0, (int) ($adventurerPlay['senses']['darkvision'] ?? 0)); ?>
                     <div><span>Sight</span><strong class="gmrt-sight-measure" data-sight-measure><?php echo esc_html($darkvision > 0 ? 'Darkvision ' . $darkvision . ' ft' : 'Normal'); ?></strong></div>
+                    <?php $carriedLight = false; foreach ((array) ($fog['light_sources'] ?? []) as $lightSource) { if ((string) ($lightSource['token_id'] ?? '') !== '') { $carriedLight = true; break; } } ?>
+                    <div class="gmrt-lantern-measure"><span>Lantern</span><strong data-lantern-state><?php echo $carriedLight ? 'Burning' : 'Doused'; ?></strong><button type="button" data-toggle-carried-light><?php echo $carriedLight ? 'Douse Torch' : 'Light Torch'; ?></button><small role="status" data-lantern-status></small></div>
                 </div>
                 <section class="gmrt-satchel__section"><h3>Abilities</h3><div class="gmrt-satchel__abilities">
                     <?php foreach ($abilityLabels as $key => $label) : $ability = is_array($satchelAbilities[$key] ?? null) ? $satchelAbilities[$key] : []; ?>
@@ -857,6 +859,8 @@ $sceneImage = $scene !== null
                         data-footsteps="<?php echo esc_attr(wp_json_encode($state->footsteps())); ?>"
                         aria-hidden="true"
                     ></div>
+
+                    <div class="gmrt-light-layer" data-light-layer aria-hidden="true"></div>
 
                     <div
                         class="gmrt-fog-layer"
