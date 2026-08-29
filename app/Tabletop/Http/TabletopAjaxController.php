@@ -39,6 +39,7 @@ final class TabletopAjaxController
                 'viewer' => $state->viewer(),
                 'members' => $state->members(),
                 'scene' => $state->scene(),
+                'scenes' => $state->scenes(),
                 'tokens' => $state->tokens(),
                 'encounter' => $state->encounter(),
                 'vitality' => $state->vitality(),

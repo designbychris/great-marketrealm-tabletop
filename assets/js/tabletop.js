@@ -1452,6 +1452,95 @@
         });
     }
 
+    const atlasStatus = document.querySelector('[data-atlas-status]');
+    const atlasAddMap = document.querySelector('[data-atlas-add-map]');
+    const atlasSceneName = document.querySelector('[data-atlas-scene-name]');
+    const atlasGridSize = document.querySelector('[data-atlas-grid-size]');
+
+    document.querySelectorAll('[data-atlas-open-map]').forEach((button) => {
+        button.addEventListener('click', async () => {
+            const sceneId = String(button.dataset.sceneId || '');
+            if (!sceneId) return;
+
+            const previousLabel = button.textContent;
+            button.disabled = true;
+            button.textContent = 'Opening…';
+            if (atlasStatus) atlasStatus.textContent = 'Opening the chosen Scene…';
+
+            try {
+                const data = await request('gmrt_atlas_open_map', { scene_id: sceneId });
+                const message = data.message || 'Scene opened.';
+                if (atlasStatus) atlasStatus.textContent = message;
+                say(message);
+                window.location.reload();
+            } catch (error) {
+                const message = error.message || 'The Scene could not be opened.';
+                if (atlasStatus) atlasStatus.textContent = message;
+                say(message);
+                button.disabled = false;
+                button.textContent = previousLabel;
+            }
+        });
+    });
+
+    if (atlasAddMap) {
+        atlasAddMap.addEventListener('click', () => {
+            const sceneName = atlasSceneName ? atlasSceneName.value.trim() : '';
+            const gridSize = atlasGridSize ? Math.max(1, Number(atlasGridSize.value || 64)) : 64;
+
+            if (!sceneName) {
+                const message = 'Give this place a name before choosing its map.';
+                if (atlasStatus) atlasStatus.textContent = message;
+                if (atlasSceneName) atlasSceneName.focus();
+                say(message);
+                return;
+            }
+
+            if (!window.wp || !window.wp.media) {
+                say('The WordPress Media Library is unavailable.');
+                return;
+            }
+
+            const frame = window.wp.media({
+                title: 'Add a Map to the Keeper\'s Atlas',
+                button: { text: 'Enter Map in Atlas' },
+                library: { type: 'image' },
+                multiple: false
+            });
+
+            frame.on('select', async () => {
+                const selected = frame.state().get('selection').first();
+                if (!selected) return;
+                const attachment = selected.toJSON();
+
+                atlasAddMap.disabled = true;
+                const previousLabel = atlasAddMap.textContent;
+                atlasAddMap.textContent = 'Inscribing…';
+                if (atlasStatus) atlasStatus.textContent = `Adding ${sceneName} to the Atlas…`;
+
+                try {
+                    const data = await request('gmrt_atlas_add_map', {
+                        scene_name: sceneName,
+                        attachment_id: attachment.id,
+                        grid_size: gridSize
+                    });
+                    const message = data.message || `${sceneName} has been added to the Atlas.`;
+                    if (atlasStatus) atlasStatus.textContent = message;
+                    say(message);
+                    window.location.reload();
+                } catch (error) {
+                    const message = error.message || 'The map could not be added to the Atlas.';
+                    if (atlasStatus) atlasStatus.textContent = message;
+                    say(message);
+                    atlasAddMap.disabled = false;
+                    atlasAddMap.textContent = previousLabel;
+                }
+            });
+
+            frame.open();
+        });
+    }
+
     const chooseBattlemap = document.querySelector(
         '[data-choose-battlemap]'
     );

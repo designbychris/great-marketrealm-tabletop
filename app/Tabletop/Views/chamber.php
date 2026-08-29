@@ -14,6 +14,7 @@ defined('ABSPATH') || exit;
 $table = $state?->table() ?? [];
 $viewer = $state?->viewer() ?? [];
 $scene = $state?->scene();
+$scenes = $state?->scenes() ?? [];
 $tokens = $state?->tokens() ?? [];
 $members = $state?->members() ?? [];
 $encounter = $state?->encounter();
@@ -228,6 +229,81 @@ $sceneImage = $scene !== null
         <?php endif; ?>
     </header>
 
+
+    <?php if ($state !== null && $state->isDungeonMaster()) : ?>
+        <details class="gmrt-atlas" data-keepers-atlas open>
+            <summary>
+                <span>
+                    <strong>The Keeper's Atlas</strong>
+                    <small><?php echo esc_html((string) count($scenes)); ?> mapped place<?php echo count($scenes) === 1 ? '' : 's'; ?></small>
+                </span>
+                <span aria-hidden="true">🗺️</span>
+            </summary>
+            <div class="gmrt-atlas__body">
+                <div class="gmrt-atlas__introduction">
+                    <p>
+                        Keep every battlemap belonging to this Table in one register.
+                        Opening another place changes only the active Scene; its tokens,
+                        Veil, grid and cartography remain bound to that Scene.
+                    </p>
+                    <span data-atlas-status role="status" aria-live="polite"></span>
+                </div>
+
+                <?php if ($scenes !== []) : ?>
+                    <div class="gmrt-atlas__register" aria-label="Mapped Scenes">
+                        <?php foreach ($scenes as $atlasScene) :
+                            if (! is_array($atlasScene)) continue;
+                            $atlasImage = wp_get_attachment_image_url(
+                                (int) ($atlasScene['map_attachment_id'] ?? 0),
+                                'medium'
+                            );
+                            $atlasActive = ! empty($atlasScene['active']);
+                        ?>
+                            <article class="gmrt-atlas-card<?php echo $atlasActive ? ' is-active' : ''; ?>" data-atlas-scene="<?php echo esc_attr((string) ($atlasScene['id'] ?? '')); ?>">
+                                <div class="gmrt-atlas-card__image">
+                                    <?php if (is_string($atlasImage) && $atlasImage !== '') : ?>
+                                        <img src="<?php echo esc_url($atlasImage); ?>" alt="" loading="lazy">
+                                    <?php else : ?>
+                                        <span aria-hidden="true">◇</span>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="gmrt-atlas-card__copy">
+                                    <strong><?php echo esc_html((string) ($atlasScene['name'] ?? 'Unnamed Scene')); ?></strong>
+                                    <small>
+                                        <?php echo esc_html((string) ((int) ($atlasScene['width'] ?? 0))); ?> ×
+                                        <?php echo esc_html((string) ((int) ($atlasScene['height'] ?? 0))); ?> ·
+                                        <?php echo esc_html((string) ($atlasScene['grid_type'] ?? 'gridless')); ?>
+                                    </small>
+                                </div>
+                                <?php if ($atlasActive) : ?>
+                                    <span class="gmrt-atlas-card__active">Active Scene</span>
+                                <?php else : ?>
+                                    <button
+                                        type="button"
+                                        data-atlas-open-map
+                                        data-scene-id="<?php echo esc_attr((string) ($atlasScene['id'] ?? '')); ?>"
+                                    >Open Scene</button>
+                                <?php endif; ?>
+                            </article>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+
+                <div class="gmrt-atlas__add">
+                    <label>
+                        Place name
+                        <input type="text" maxlength="120" placeholder="e.g. The Pickled Cellar" data-atlas-scene-name>
+                    </label>
+                    <label>
+                        Starting grid
+                        <span><input type="number" min="1" max="500" value="64" data-atlas-grid-size> px</span>
+                    </label>
+                    <button type="button" data-atlas-add-map>Add Map to Atlas</button>
+                    <small>The new map is added safely in the background. It does not become active until you open it.</small>
+                </div>
+            </div>
+        </details>
+    <?php endif; ?>
 
     <div data-live-lifecycle>
     <?php if ($state !== null && $encounter === null) : ?>

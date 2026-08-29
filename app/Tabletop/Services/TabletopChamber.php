@@ -467,7 +467,13 @@ final class TabletopChamber
                 ],
             ],
             $chamberLog,
-            $footsteps
+            $footsteps,
+            $viewer->isDungeonMaster()
+                ? array_map(
+                    static fn ($scene): array => $scene->toArray(),
+                    $this->scenes->forTable($tableId)
+                )
+                : []
         );
     }
 }

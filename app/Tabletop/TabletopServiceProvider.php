@@ -33,6 +33,8 @@ use GreatMarketrealmTabletop\Tabletop\Http\TableColourAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\CarriedLightAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\DroppedLightAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\MagicalLightAjaxController;
+use GreatMarketrealmTabletop\Tabletop\Http\KeepersAtlasAjaxController;
+use GreatMarketrealmTabletop\Tabletop\Atlas\Services\KeepersAtlasFactory;
 use GreatMarketrealmTabletop\Tabletop\Light\Repositories\WordPressCarriedLightRepository;
 use GreatMarketrealmTabletop\Tabletop\Light\Repositories\WordPressDroppedLightRepository;
 use GreatMarketrealmTabletop\Tabletop\Light\Repositories\WordPressMagicalLightRepository;
@@ -112,6 +114,8 @@ final class TabletopServiceProvider
     private DroppedLightAjaxController $droppedLightAjax;
 
     private MagicalLightAjaxController $magicalLightAjax;
+
+    private KeepersAtlasAjaxController $keepersAtlasAjax;
 
     public function __construct()
     {
@@ -217,6 +221,10 @@ final class TabletopServiceProvider
         );
 
 
+        $this->keepersAtlasAjax = new KeepersAtlasAjaxController(
+            KeepersAtlasFactory::make()
+        );
+
         $this->magicalLightAjax = new MagicalLightAjaxController(
             new WordPressCompanionCharacterGateway(),
             new WordPressTableMembershipRepository(),
@@ -294,6 +302,16 @@ final class TabletopServiceProvider
             [$this->tokenRemovalAjax, 'remove']
         );
 
+
+        add_action(
+            'wp_ajax_gmrt_atlas_add_map',
+            [$this->keepersAtlasAjax, 'addMap']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_atlas_open_map',
+            [$this->keepersAtlasAjax, 'openMap']
+        );
 
         add_action(
             'wp_ajax_gmrt_toggle_magical_light',

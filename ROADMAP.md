@@ -692,3 +692,10 @@ Correct the final forged-token presentation boundary so Companion-generated port
 - Server-authoritative viewer projection through current/remembered Living Veil state.
 - No second polling loop; footsteps ride the existing Living Table heartbeat.
 - Next: Phase IV.27 — Lanterns in the Living Veil (vision profiles, darkvision and light sources).
+
+## IV.28 — The Keeper's Atlas
+
+- [x] **IV.28A — The Atlas Register** — DM-only persistent multi-Scene register, add maps without disturbing the active Scene, and explicitly open a retained Scene.
+- [ ] **IV.28B — Behind the Curtain** — privately prepare inactive Scenes before adventurers enter them.
+- [ ] **IV.28C — Passage Between Places** — synchronise active-Scene travel through the Living Table without player reloads.
+- [ ] **Keeper's Cartography Assistant** — analyse uploaded dungeon artwork and suggest walls, doors and room boundaries for Dungeon Master review/edit before authoritative save.

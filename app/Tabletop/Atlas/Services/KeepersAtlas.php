@@ -1,0 +1,74 @@
+<?php
+
+declare(strict_types=1);
+
+namespace GreatMarketrealmTabletop\Tabletop\Atlas\Services;
+
+defined('ABSPATH') || exit;
+
+use GreatMarketrealmTabletop\Tables\Memberships\Contracts\TableMembershipRepository;
+use GreatMarketrealmTabletop\Tables\Memberships\Models\TableMemberRole;
+use GreatMarketrealmTabletop\Tables\Memberships\Models\TableMemberStatus;
+use GreatMarketrealmTabletop\Tables\Scenes\Models\GridType;
+use GreatMarketrealmTabletop\Tables\Scenes\Models\TableScene;
+use GreatMarketrealmTabletop\Tables\Scenes\Services\TableSceneManager;
+use GreatMarketrealmTabletop\Tabletop\Atlas\Exceptions\AtlasDenied;
+use GreatMarketrealmTabletop\Tabletop\Cartography\Services\BattlemapInspector;
+
+final class KeepersAtlas
+{
+    public function __construct(
+        private TableMembershipRepository $members,
+        private TableSceneManager $scenes,
+        private BattlemapInspector $images
+    ) {}
+
+    public function addMap(
+        string $tableId,
+        int $viewerUserId,
+        string $name,
+        int $attachmentId,
+        int $gridSize = 64
+    ): TableScene {
+        $this->assertDungeonMaster($tableId, $viewerUserId);
+
+        $name = trim($name);
+        if ($name === '') {
+            throw new AtlasDenied('Give this place a name before adding it to the Atlas.');
+        }
+
+        $image = $this->images->inspect($attachmentId);
+
+        return $this->scenes->create(
+            $tableId,
+            $name,
+            $image->attachmentId(),
+            $image->width(),
+            $image->height(),
+            GridType::SQUARE,
+            max(1, $gridSize)
+        );
+    }
+
+    public function openMap(
+        string $tableId,
+        int $viewerUserId,
+        string $sceneId
+    ): TableScene {
+        $this->assertDungeonMaster($tableId, $viewerUserId);
+        return $this->scenes->activate($tableId, $sceneId);
+    }
+
+    private function assertDungeonMaster(string $tableId, int $viewerUserId): void
+    {
+        $member = $this->members->find($tableId, $viewerUserId);
+
+        if (
+            $member === null
+            || $member->status() !== TableMemberStatus::ACTIVE
+            || $member->role() !== TableMemberRole::DUNGEON_MASTER
+        ) {
+            throw new AtlasDenied('Only the Dungeon Master may open the Keeper\'s Atlas.');
+        }
+    }
+}
