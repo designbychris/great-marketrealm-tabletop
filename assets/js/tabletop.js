@@ -70,6 +70,7 @@
     }
 
     const tableId = root.dataset.tableId || '';
+    const projectedSceneId = root.dataset.sceneId || '';
     const preparationSceneId = root.dataset.preparationSceneId || '';
     let selected = null;
     const removeSelectedTokenButton = document.querySelector('[data-remove-selected-token]');
@@ -2099,6 +2100,24 @@
 
         try {
             const state = await request('gmrt_tabletop_state', {});
+            const incomingSceneId = String(state.scene?.id || '');
+
+            /*
+             * Passage Between Places: live viewers follow the authoritative
+             * Scene selected by the Keeper. A DM Behind the Curtain is pinned
+             * to the private preparation Scene and must not be pulled away.
+             */
+            if (
+                !preparationSceneId
+                && incomingSceneId !== projectedSceneId
+            ) {
+                await replaceChamber(
+                    'Passage Between Places — the Table carries you to a new Scene.',
+                    null
+                );
+                return;
+            }
+
             const tokens = Array.isArray(state.tokens) ? state.tokens : [];
             const selectedCharacter = state.integrations?.companion?.selected_character || null;
             const satchel = document.querySelector('[data-adventurer-satchel]');

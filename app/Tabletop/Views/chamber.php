@@ -76,6 +76,7 @@ $sceneImage = $scene !== null
     data-sync-revision="<?php echo esc_attr(
         $state?->syncRevision() ?? ''
     ); ?>"
+    data-scene-id="<?php echo esc_attr((string) ($scene['id'] ?? '')); ?>"
     data-preparation-scene-id="<?php echo esc_attr((string) ($preparation['scene_id'] ?? '')); ?>"
 >
     <?php if ($adventurer !== null && $adventurerPlay !== []) : ?>
