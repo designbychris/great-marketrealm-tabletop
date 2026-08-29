@@ -163,6 +163,7 @@ $sceneImage = $scene !== null
                         $spellAttack = array_key_exists('spell_attack', $spell) ? $spell['spell_attack'] : null;
                         $rollKind = (string) ($spell['roll_kind'] ?? '');
                         $spellFormula = (string) ($spell['formula'] ?? '');
+                        $spellIllumination = is_array($spell['illumination'] ?? null) ? $spell['illumination'] : [];
                     ?>
                         <article class="gmrt-spell-card">
                             <header><div><strong><?php echo esc_html((string) ($spell['label'] ?? 'Spell')); ?></strong><small><?php echo ((int) ($spell['spell_level'] ?? 0)) === 0 ? 'Cantrip' : 'Level ' . esc_html((string) ($spell['spell_level'] ?? '')); ?></small></div><?php if ($spellAttack !== null) : ?><b>Attack <?php echo esc_html(sprintf('%+d', (int) $spellAttack)); ?></b><?php elseif (! empty($spell['save_ability'])) : ?><b><?php echo esc_html(strtoupper((string) $spell['save_ability'])); ?> DC <?php echo esc_html((string) ($spell['save_dc'] ?? '')); ?></b><?php endif; ?></header>
@@ -174,6 +175,12 @@ $sceneImage = $scene !== null
                                 <?php if ($spellAttack !== null) : ?><button type="button" data-spell-roll data-spell-action="attack" data-spell-id="<?php echo esc_attr($spellId); ?>">Attack 🎲</button><?php endif; ?>
                                 <?php if ($spellFormula !== '' && $rollKind === 'damage') : ?><button type="button" data-spell-roll data-spell-action="damage" data-spell-id="<?php echo esc_attr($spellId); ?>">Damage 🎲</button><?php endif; ?>
                                 <?php if ($spellFormula !== '' && $rollKind === 'healing') : ?><button type="button" data-spell-roll data-spell-action="healing" data-spell-id="<?php echo esc_attr($spellId); ?>">Healing 🎲</button><?php endif; ?>
+                            </div>
+                            <?php endif; ?>
+                            <?php if ($spellId !== '' && ($spellIllumination['source'] ?? '') === 'magical') : ?>
+                            <div class="gmrt-spell-card__actions gmrt-spell-card__illumination">
+                                <button type="button" data-magical-light data-spell-id="<?php echo esc_attr($spellId); ?>">Weave / Quench <?php echo esc_html((string) ($spell['label'] ?? 'Light')); ?> ✨</button>
+                                <small><?php echo esc_html((string) ($spellIllumination['bright_feet'] ?? 0)); ?> ft bright + <?php echo esc_html((string) ($spellIllumination['dim_feet'] ?? 0)); ?> ft dim · Companion-certified</small>
                             </div>
                             <?php endif; ?>
                         </article>

@@ -1610,3 +1610,14 @@
 @keyframes gmrt-pixel-ember-pop { 0%,55% { opacity:0; transform:translate(0,4px); } 60% { opacity:1; transform:translate(0,0); } 80% { opacity:1; transform:translate(-2px,-4px); } 100% { opacity:0; transform:translate(1px,-7px); } }
 .gmrt-lantern-measure [data-dropped-light-action] { margin-top:.3rem; }
 @media (prefers-reduced-motion: reduce) { .gmrt-pixel-flame, .gmrt-pixel-flame > em { animation:none; } .gmrt-pixel-flame > em { display:none; } }
+
+
+/* Phase IV.27E — Light Wrought by Magic. */
+.gmrt-carried-light.is-magical { display:grid; place-items:center; width:20%; filter:none; background:radial-gradient(circle, rgba(255,250,190,.28) 0 18%, rgba(223,209,117,.15) 19% 48%, rgba(210,190,85,0) 72%); }
+.gmrt-shelfshine-spark { position:relative; width:12px; height:12px; image-rendering:pixelated; animation:gmrt-shelfshine-pulse 1s steps(3,end) infinite; }
+.gmrt-shelfshine-spark::before { content:""; position:absolute; left:5px; top:0; width:2px; height:12px; background:#fff8a8; box-shadow:-5px 5px 0 #e8cf62,5px 5px 0 #e8cf62,-3px 3px 0 #fff3a0,3px 3px 0 #fff3a0; }
+.gmrt-shelfshine-spark::after { content:""; position:absolute; left:0; top:5px; width:12px; height:2px; background:#fff8a8; }
+.gmrt-spell-card__illumination { align-items:center; flex-wrap:wrap; }
+.gmrt-spell-card__illumination small { display:block; flex-basis:100%; opacity:.78; }
+@keyframes gmrt-shelfshine-pulse { 0%,100% { transform:scale(.9); opacity:.72; } 50% { transform:scale(1.12); opacity:1; } }
+@media (prefers-reduced-motion: reduce) { .gmrt-shelfshine-spark { animation:none; } }

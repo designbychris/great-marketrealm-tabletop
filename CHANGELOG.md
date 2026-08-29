@@ -1,3 +1,9 @@
+## 0.27.4-alpha.1 — IV.27E Light Wrought by Magic
+
+- Adds server-authoritative magical world lights driven by Companion-certified spell illumination metadata.
+- Shelfshine can be woven/quenched from the Satchel and obeys the Living Veil, walls and doors.
+- Removes the viewer's Satchel immediately when their selected Companion token leaves the Chamber.
+
 
 ### Phase IV.27D.1 — The Little Flame
 - Replaces the dropped-torch emoji with a tiny animated SNES-era pixel flame.

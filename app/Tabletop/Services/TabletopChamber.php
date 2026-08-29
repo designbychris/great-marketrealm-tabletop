@@ -31,6 +31,7 @@ use GreatMarketrealmTabletop\Tabletop\Footsteps\Contracts\FootstepTrailRepositor
 use GreatMarketrealmTabletop\Tabletop\Footsteps\Presentation\FootstepTrailProjector;
 use GreatMarketrealmTabletop\Tabletop\Light\Contracts\CarriedLightRepository;
 use GreatMarketrealmTabletop\Tabletop\Light\Contracts\DroppedLightRepository;
+use GreatMarketrealmTabletop\Tabletop\Light\Contracts\MagicalLightRepository;
 use GreatMarketrealmTabletop\Tables\Scenes\Contracts\TableSceneRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Contracts\TableTokenRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Models\TableToken;
@@ -64,7 +65,8 @@ final class TabletopChamber
         private ?FootstepTrailRepository $footstepTrails = null,
         private ?FootstepTrailProjector $footstepProjector = null,
         private ?CarriedLightRepository $carriedLights = null,
-        private ?DroppedLightRepository $droppedLights = null
+        private ?DroppedLightRepository $droppedLights = null,
+        private ?MagicalLightRepository $magicalLights = null
     ) {}
 
     public function state(
@@ -179,6 +181,18 @@ final class TabletopChamber
         if ($activeScene !== null && $this->droppedLights !== null) {
             foreach ($this->droppedLights->forScene($tableId, $activeScene->id()) as $droppedLight) {
                 $worldLightSourceModels[] = $droppedLight;
+            }
+        }
+
+        if ($activeScene !== null && $this->magicalLights !== null) {
+            foreach ($this->magicalLights->forScene($tableId, $activeScene->id()) as $magicalLight) {
+                $sourceToken = $this->tokens->find($tableId, $magicalLight->tokenId());
+                if ($sourceToken !== null && $sourceToken->sceneId() === $activeScene->id()) {
+                    $worldLightSourceModels[] = [
+                        'magical_light' => $magicalLight,
+                        'token' => $sourceToken,
+                    ];
+                }
             }
         }
 
@@ -405,6 +419,21 @@ final class TabletopChamber
             );
         }
 
+        $viewerCharacterPresent = false;
+        $viewerCharacterId = (string) ($viewer->companionCharacterId() ?? '');
+        if ($viewerCharacterId !== '') {
+            foreach ($tokenModels as $tokenModel) {
+                if (
+                    $tokenModel->type() === TableTokenType::CHARACTER
+                    && $tokenModel->controllerUserId() === $viewerUserId
+                    && (string) ($tokenModel->sourceReference() ?? '') === $viewerCharacterId
+                ) {
+                    $viewerCharacterPresent = true;
+                    break;
+                }
+            }
+        }
+
         return new TabletopChamberState(
             $table->toArray(),
             array_merge($viewer->toArray(), ['table_colour' => $viewer->tableColour(), 'table_colour_hex' => \GreatMarketrealmTabletop\Tables\Memberships\Models\TableColourPalette::hex($viewer->tableColour())]),
@@ -429,6 +458,7 @@ final class TabletopChamber
                         : [],
                     'selected_character' => $this->companion instanceof CompanionCharacterGateway
                         && $viewer->companionCharacterId() !== null
+                        && $viewerCharacterPresent
                         ? $this->companion->characterForUser(
                             $viewerUserId,
                             $viewer->companionCharacterId()

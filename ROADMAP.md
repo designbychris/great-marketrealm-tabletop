@@ -1,3 +1,5 @@
+- [x] IV.27E — Light Wrought by Magic: Companion-certified magical illumination in the Living Veil.
+- [x] IV.27E corrective — The Satchel leaves the Chamber with its character token.
 
 ### Phase IV.27D.1 — The Little Flame
 - Replaces the dropped-torch emoji with a tiny animated SNES-era pixel flame.

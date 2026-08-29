@@ -497,6 +497,30 @@
         });
     });
 
+    document.querySelectorAll('[data-magical-light]').forEach((button) => {
+        button.addEventListener('click', async () => {
+            const original = button.innerHTML;
+            button.disabled = true;
+            button.setAttribute('aria-busy', 'true');
+            if (quickHandsResult) quickHandsResult.textContent = 'Shelf-light gathers between the aisles…';
+            try {
+                const data = await request('gmrt_toggle_magical_light', {
+                    spell_id: button.dataset.spellId || ''
+                });
+                if (quickHandsResult) quickHandsResult.textContent = data.message || 'Magical illumination changes.';
+                say(data.message || 'Magical illumination changes.');
+                await refresh();
+            } catch (error) {
+                if (quickHandsResult) quickHandsResult.textContent = error.message || 'The magical light could not be changed.';
+                say(error.message || 'The magical light could not be changed.');
+            } finally {
+                button.disabled = false;
+                button.removeAttribute('aria-busy');
+                button.innerHTML = original;
+            }
+        });
+    });
+
     if (!board) {
         return;
     }
@@ -706,8 +730,9 @@
         lightLayer.replaceChildren();
         (Array.isArray(projection?.light_sources) ? projection.light_sources : []).forEach((source) => {
             const glow = document.createElement('span');
-            glow.className = 'gmrt-carried-light' + (source.source_kind === 'dropped' ? ' is-dropped' : '');
-            if (source.source_kind === 'dropped') {
+            const sourceKind = String(source.source_kind || 'carried');
+            glow.className = 'gmrt-carried-light' + (sourceKind === 'dropped' ? ' is-dropped' : '') + (sourceKind === 'magical' ? ' is-magical' : '');
+            if (sourceKind === 'dropped') {
                 const flame = document.createElement('i');
                 flame.className = 'gmrt-pixel-flame';
                 flame.setAttribute('aria-hidden', 'true');
@@ -715,6 +740,12 @@
                 flame.appendChild(document.createElement('em'));
                 glow.appendChild(flame);
                 glow.setAttribute('aria-label', 'Dropped burning torch');
+            } else if (sourceKind === 'magical') {
+                const sparkle = document.createElement('i');
+                sparkle.className = 'gmrt-shelfshine-spark';
+                sparkle.setAttribute('aria-hidden', 'true');
+                glow.appendChild(sparkle);
+                glow.setAttribute('aria-label', 'Shelfshine magical light');
             }
             glow.style.setProperty('--gmrt-light-x', (Number(source.x || 0) * 100) + '%');
             glow.style.setProperty('--gmrt-light-y', (Number(source.y || 0) * 100) + '%');
@@ -1904,6 +1935,11 @@
         try {
             const state = await request('gmrt_tabletop_state', {});
             const tokens = Array.isArray(state.tokens) ? state.tokens : [];
+            const selectedCharacter = state.integrations?.companion?.selected_character || null;
+            const satchel = document.querySelector('[data-adventurer-satchel]');
+            if (satchel && !selectedCharacter) {
+                satchel.remove();
+            }
             const currentEncounter = document.querySelector('[data-encounter-id]');
             const incomingEncounter = state.encounter || null;
             const currentEncounterId = currentEncounter?.dataset.encounterId || '';

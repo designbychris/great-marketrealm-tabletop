@@ -27,6 +27,7 @@ use GreatMarketrealmTabletop\Tabletop\Footsteps\Repositories\WordPressFootstepTr
 use GreatMarketrealmTabletop\Tabletop\Footsteps\Presentation\FootstepTrailProjector;
 use GreatMarketrealmTabletop\Tabletop\Light\Repositories\WordPressCarriedLightRepository;
 use GreatMarketrealmTabletop\Tabletop\Light\Repositories\WordPressDroppedLightRepository;
+use GreatMarketrealmTabletop\Tabletop\Light\Repositories\WordPressMagicalLightRepository;
 
 defined('ABSPATH') || exit;
 
@@ -57,7 +58,8 @@ final class TabletopChamberFactory
             new WordPressFootstepTrailRepository(),
             new FootstepTrailProjector(),
             new WordPressCarriedLightRepository(),
-            new WordPressDroppedLightRepository()
+            new WordPressDroppedLightRepository(),
+            new WordPressMagicalLightRepository()
         );
     }
 }

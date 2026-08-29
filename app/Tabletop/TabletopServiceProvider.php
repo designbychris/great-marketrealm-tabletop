@@ -32,8 +32,10 @@ use GreatMarketrealmTabletop\Tabletop\Http\SpellPouchAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\TableColourAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\CarriedLightAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\DroppedLightAjaxController;
+use GreatMarketrealmTabletop\Tabletop\Http\MagicalLightAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Light\Repositories\WordPressCarriedLightRepository;
 use GreatMarketrealmTabletop\Tabletop\Light\Repositories\WordPressDroppedLightRepository;
+use GreatMarketrealmTabletop\Tabletop\Light\Repositories\WordPressMagicalLightRepository;
 use GreatMarketrealmTabletop\Tabletop\Satchel\Services\QuickHandsRoller;
 use GreatMarketrealmTabletop\Tabletop\Satchel\Services\WeaponHandsRoller;
 use GreatMarketrealmTabletop\Tabletop\Satchel\Services\SpellPouchRoller;
@@ -109,6 +111,8 @@ final class TabletopServiceProvider
 
     private DroppedLightAjaxController $droppedLightAjax;
 
+    private MagicalLightAjaxController $magicalLightAjax;
+
     public function __construct()
     {
         $chamber = TabletopChamberFactory::make();
@@ -180,7 +184,8 @@ final class TabletopServiceProvider
             new TableTokenRemoval(
                 new WordPressTableMembershipRepository(),
                 new WordPressTableTokenRepository(),
-                new WordPressEncounterRepository()
+                new WordPressEncounterRepository(),
+                new WordPressMagicalLightRepository()
             )
         );
 
@@ -209,6 +214,15 @@ final class TabletopServiceProvider
             new WordPressTableTokenRepository(),
             new WordPressCarriedLightRepository(),
             new WordPressDroppedLightRepository()
+        );
+
+
+        $this->magicalLightAjax = new MagicalLightAjaxController(
+            new WordPressCompanionCharacterGateway(),
+            new WordPressTableMembershipRepository(),
+            new WordPressTableSceneRepository(),
+            new WordPressTableTokenRepository(),
+            new WordPressMagicalLightRepository()
         );
 
         $this->adventuringMeasuresAjax = new AdventuringMeasuresAjaxController(
@@ -278,6 +292,12 @@ final class TabletopServiceProvider
         add_action(
             'wp_ajax_gmrt_remove_chamber_token',
             [$this->tokenRemovalAjax, 'remove']
+        );
+
+
+        add_action(
+            'wp_ajax_gmrt_toggle_magical_light',
+            [$this->magicalLightAjax, 'toggle']
         );
 
         add_action(

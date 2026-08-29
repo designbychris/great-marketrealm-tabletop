@@ -10,6 +10,7 @@ use GreatMarketrealmTabletop\Tables\Memberships\Models\TableMemberStatus;
 use GreatMarketrealmTabletop\Tables\Tokens\Contracts\TableTokenRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Models\TableToken;
 use GreatMarketrealmTabletop\Tables\Tokens\Models\TableTokenType;
+use GreatMarketrealmTabletop\Tabletop\Light\Contracts\MagicalLightRepository;
 use RuntimeException;
 
 final class TableTokenRemoval
@@ -17,7 +18,8 @@ final class TableTokenRemoval
     public function __construct(
         private TableMembershipRepository $members,
         private TableTokenRepository $tokens,
-        private EncounterRepository $encounters
+        private EncounterRepository $encounters,
+        private ?MagicalLightRepository $magicalLights = null
     ) {}
 
     public function remove(string $tableId, int $userId, string $tokenId): TableToken
@@ -49,6 +51,7 @@ final class TableTokenRemoval
             $this->encounters->save($encounter);
         }
 
+        $this->magicalLights?->deleteForToken($tableId, $token->sceneId(), $tokenId);
         $this->tokens->delete($tableId, $tokenId);
 
         return $token;

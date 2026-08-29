@@ -8,6 +8,7 @@ use GreatMarketrealmTabletop\Tables\Tokens\Models\TableToken;
 use GreatMarketrealmTabletop\Tables\Tokens\Models\TableTokenType;
 use GreatMarketrealmTabletop\Tabletop\Fog\Models\FogOfWarState;
 use GreatMarketrealmTabletop\Tabletop\Light\Models\DroppedLight;
+use GreatMarketrealmTabletop\Tabletop\Light\Models\MagicalLight;
 use DateTimeImmutable;
 
 defined('ABSPATH') || exit;
@@ -85,6 +86,8 @@ final class FogOfWarProjector
 
         foreach ($worldLightSources as $lightSource) {
             $sourceKind = 'carried';
+            $brightFeet = 20;
+            $dimFeet = 20;
             if ($lightSource instanceof DroppedLight) {
                 $sourceKind = 'dropped';
                 $lightSource = TableToken::create(
@@ -92,13 +95,24 @@ final class FogOfWarProjector
                     'Dropped Torch', TableTokenType::OBJECT, 'dropped-torch', null,
                     $lightSource->x(), $lightSource->y(), 1, 1, 'visible', new DateTimeImmutable()
                 );
+            } elseif (
+                is_array($lightSource)
+                && ($lightSource['magical_light'] ?? null) instanceof MagicalLight
+                && ($lightSource['token'] ?? null) instanceof TableToken
+            ) {
+                $magicalLight = $lightSource['magical_light'];
+                $sourceKind = 'magical';
+                $brightFeet = $magicalLight->brightFeet();
+                $dimFeet = $magicalLight->dimFeet();
+                $lightSource = $lightSource['token'];
             }
             if (! $lightSource instanceof TableToken || ! in_array($lightSource->type(), [TableTokenType::CHARACTER, TableTokenType::OBJECT], true)) {
                 continue;
             }
 
             $mapper = new FogCellMapper();
-            $illuminated = $mapper->visibleAround($scene, $lightSource, $barriers, 8);
+            $lightRadius = max(1, (int) ceil(($brightFeet + $dimFeet) / 5));
+            $illuminated = $mapper->visibleAround($scene, $lightSource, $barriers, $lightRadius);
             $sharedVisible = array_values(array_intersect($illuminated, $viewerLineOfSight));
             $visible = array_merge($visible, $sharedVisible);
 
@@ -109,9 +123,9 @@ final class FogOfWarProjector
                     'x' => $lightSource->x(),
                     'y' => $lightSource->y(),
                     'token_id' => $lightSource->id(),
-                    'range_feet' => 40,
-                    'bright_light_feet' => 20,
-                    'dim_light_feet' => 20,
+                    'range_feet' => $brightFeet + $dimFeet,
+                    'bright_light_feet' => $brightFeet,
+                    'dim_light_feet' => $dimFeet,
                     'shared' => true,
                     'source_kind' => $sourceKind,
                 ];
