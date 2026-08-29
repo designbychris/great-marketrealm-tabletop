@@ -706,7 +706,8 @@
         lightLayer.replaceChildren();
         (Array.isArray(projection?.light_sources) ? projection.light_sources : []).forEach((source) => {
             const glow = document.createElement('span');
-            glow.className = 'gmrt-carried-light';
+            glow.className = 'gmrt-carried-light' + (source.source_kind === 'dropped' ? ' is-dropped' : '');
+            if (source.source_kind === 'dropped') { glow.textContent = '🔥'; glow.setAttribute('aria-hidden', 'true'); }
             glow.style.setProperty('--gmrt-light-x', (Number(source.x || 0) * 100) + '%');
             glow.style.setProperty('--gmrt-light-y', (Number(source.y || 0) * 100) + '%');
             lightLayer.appendChild(glow);
@@ -930,12 +931,39 @@
             if (lanternState) lanternState.textContent = lit ? 'Burning' : 'Doused';
             lanternButton.textContent = lit ? 'Douse Torch' : 'Light Torch';
             if (lanternStatus) lanternStatus.textContent = String(data.message || '');
+            syncTorchButtons(lit);
             const fresh = await request('gmrt_tabletop_state', { table_id: tableId });
             if (fresh?.fog) renderFog(fresh.fog);
         } catch (error) {
             if (lanternStatus) lanternStatus.textContent = error?.message || 'The lantern could not be tended.';
         } finally { lanternButton.disabled = false; }
     });
+    // Phase IV.27D — Fire Upon the Floor. Drop/pick-up intent contains no
+    // coordinates: the server derives the adventurer position and nearest torch.
+    const droppedLightButtons = Array.from(document.querySelectorAll('[data-dropped-light-action]'));
+    const syncTorchButtons = (carried) => {
+        droppedLightButtons.forEach((button) => {
+            const action = button.dataset.droppedLightAction;
+            button.hidden = action === 'drop' ? !carried : carried;
+        });
+    };
+    droppedLightButtons.forEach((button) => button.addEventListener('click', async () => {
+        const action = String(button.dataset.droppedLightAction || '');
+        droppedLightButtons.forEach((item) => { item.disabled = true; });
+        try {
+            const data = await request('gmrt_tend_dropped_light', { table_id: tableId, light_action: action });
+            const carried = Boolean(data?.carried);
+            if (lanternState) lanternState.textContent = carried ? 'Burning' : 'Doused';
+            if (lanternButton) lanternButton.textContent = carried ? 'Douse Torch' : 'Light Torch';
+            if (lanternStatus) lanternStatus.textContent = String(data?.message || '');
+            syncTorchButtons(carried);
+            const fresh = await request('gmrt_tabletop_state', { table_id: tableId });
+            if (fresh?.fog) renderFog(fresh.fog);
+        } catch (error) {
+            if (lanternStatus) lanternStatus.textContent = error?.message || 'The torch could not be tended.';
+        } finally { droppedLightButtons.forEach((item) => { item.disabled = false; }); }
+    }));
+
     fogPreview?.addEventListener('change', () => {
         window.sessionStorage.setItem(
             fogPreviewStorageKey,

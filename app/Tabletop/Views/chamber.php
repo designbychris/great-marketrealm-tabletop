@@ -119,7 +119,7 @@ $sceneImage = $scene !== null
                     <?php $darkvision = max(0, (int) ($adventurerPlay['senses']['darkvision'] ?? 0)); ?>
                     <div><span>Sight</span><strong class="gmrt-sight-measure" data-sight-measure><?php echo esc_html($darkvision > 0 ? 'Darkvision ' . $darkvision . ' ft' : 'Normal'); ?></strong></div>
                     <?php $carriedLight = ! empty($fog['viewer_carried_light']); ?>
-                    <div class="gmrt-lantern-measure"><span>Lantern</span><strong data-lantern-state><?php echo $carriedLight ? 'Burning' : 'Doused'; ?></strong><button type="button" data-toggle-carried-light><?php echo $carriedLight ? 'Douse Torch' : 'Light Torch'; ?></button><small role="status" data-lantern-status></small></div>
+                    <div class="gmrt-lantern-measure"><span>Lantern</span><strong data-lantern-state><?php echo $carriedLight ? 'Burning' : 'Doused'; ?></strong><button type="button" data-toggle-carried-light><?php echo $carriedLight ? 'Douse Torch' : 'Light Torch'; ?></button><button type="button" data-dropped-light-action="drop"<?php echo $carriedLight ? '' : ' hidden'; ?>>Drop Torch</button><button type="button" data-dropped-light-action="pickup"<?php echo $carriedLight ? ' hidden' : ''; ?>>Pick Up Nearby Torch</button><small role="status" data-lantern-status></small></div>
                 </div>
                 <section class="gmrt-satchel__section"><h3>Abilities</h3><div class="gmrt-satchel__abilities">
                     <?php foreach ($abilityLabels as $key => $label) : $ability = is_array($satchelAbilities[$key] ?? null) ? $satchelAbilities[$key] : []; ?>

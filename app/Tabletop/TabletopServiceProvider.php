@@ -31,7 +31,9 @@ use GreatMarketrealmTabletop\Tabletop\Http\WeaponHandsAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\SpellPouchAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\TableColourAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\CarriedLightAjaxController;
+use GreatMarketrealmTabletop\Tabletop\Http\DroppedLightAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Light\Repositories\WordPressCarriedLightRepository;
+use GreatMarketrealmTabletop\Tabletop\Light\Repositories\WordPressDroppedLightRepository;
 use GreatMarketrealmTabletop\Tabletop\Satchel\Services\QuickHandsRoller;
 use GreatMarketrealmTabletop\Tabletop\Satchel\Services\WeaponHandsRoller;
 use GreatMarketrealmTabletop\Tabletop\Satchel\Services\SpellPouchRoller;
@@ -104,6 +106,8 @@ final class TabletopServiceProvider
     private TableColourAjaxController $tableColourAjax;
 
     private CarriedLightAjaxController $carriedLightAjax;
+
+    private DroppedLightAjaxController $droppedLightAjax;
 
     public function __construct()
     {
@@ -195,7 +199,16 @@ final class TabletopServiceProvider
             new WordPressTableMembershipRepository(),
             new WordPressTableSceneRepository(),
             new WordPressTableTokenRepository(),
-            new WordPressCarriedLightRepository()
+            new WordPressCarriedLightRepository(),
+            new WordPressDroppedLightRepository()
+        );
+
+        $this->droppedLightAjax = new DroppedLightAjaxController(
+            new WordPressTableMembershipRepository(),
+            new WordPressTableSceneRepository(),
+            new WordPressTableTokenRepository(),
+            new WordPressCarriedLightRepository(),
+            new WordPressDroppedLightRepository()
         );
 
         $this->adventuringMeasuresAjax = new AdventuringMeasuresAjaxController(
@@ -400,6 +413,11 @@ final class TabletopServiceProvider
         add_action(
             'wp_ajax_gmrt_toggle_carried_light',
             [$this->carriedLightAjax, 'toggle']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_tend_dropped_light',
+            [$this->droppedLightAjax, 'tend']
         );
 
         add_action(

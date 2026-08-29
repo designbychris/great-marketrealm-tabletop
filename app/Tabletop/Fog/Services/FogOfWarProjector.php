@@ -7,6 +7,8 @@ use GreatMarketrealmTabletop\Tables\Scenes\Models\TableScene;
 use GreatMarketrealmTabletop\Tables\Tokens\Models\TableToken;
 use GreatMarketrealmTabletop\Tables\Tokens\Models\TableTokenType;
 use GreatMarketrealmTabletop\Tabletop\Fog\Models\FogOfWarState;
+use GreatMarketrealmTabletop\Tabletop\Light\Models\DroppedLight;
+use DateTimeImmutable;
 
 defined('ABSPATH') || exit;
 
@@ -82,7 +84,16 @@ final class FogOfWarProjector
         $safeLightSources = [];
 
         foreach ($worldLightSources as $lightSource) {
-            if (! $lightSource instanceof TableToken || $lightSource->type() !== TableTokenType::CHARACTER) {
+            $sourceKind = 'carried';
+            if ($lightSource instanceof DroppedLight) {
+                $sourceKind = 'dropped';
+                $lightSource = TableToken::create(
+                    $lightSource->id(), $lightSource->tableId(), $lightSource->sceneId(),
+                    'Dropped Torch', TableTokenType::OBJECT, 'dropped-torch', null,
+                    $lightSource->x(), $lightSource->y(), 1, 1, 'visible', new DateTimeImmutable()
+                );
+            }
+            if (! $lightSource instanceof TableToken || ! in_array($lightSource->type(), [TableTokenType::CHARACTER, TableTokenType::OBJECT], true)) {
                 continue;
             }
 
@@ -102,6 +113,7 @@ final class FogOfWarProjector
                     'bright_light_feet' => 20,
                     'dim_light_feet' => 20,
                     'shared' => true,
+                    'source_kind' => $sourceKind,
                 ];
             }
         }

@@ -1,4 +1,7 @@
 
+## Phase IV.27D — Fire Upon the Floor
+Dropped torches are persistent scene-scoped world light sources. A lit carried torch may be dropped at the server-derived adventurer position, continues illuminating through the shared barrier-aware Living Veil, and may be recovered when the adventurer is close enough. Browser intent never supplies authoritative coordinates or light radii. THUNK. 🔥. REGRET.
+
 ## Phase IV.27B — The First Lantern
 Carried, server-authoritative torchlight: 20 ft bright + 20 ft dim, bound to the player-controlled Companion token and clipped by Living Veil LOS barriers.
 - IV.27A — The Adventurer's Sight: viewer-specific server-authoritative sight now consumes Companion-certified darkvision, converts feet to 5 ft grid squares, and prevents another player's character from extending your current visibility.
@@ -698,10 +701,3 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - Projects footsteps server-side per viewer so fog never leaks hidden movement history.
 - Own recent steps may linger faintly in explored memory; other players' steps require current visibility.
 - Reuses Fellowship colours and the Living Table heartbeat.
-
-## 0.27.2-alpha.1 — Phase IV.27C: By Another's Light
-- Promotes carried torches into server-authoritative world light sources that can illuminate space for other adventurers.
-- Shared illumination is intersected with each viewer's own barrier-aware line of sight before cells are revealed.
-- Hidden light-source coordinates are not projected merely because a torch is burning; a source glow is sent only when its cell is visible to that viewer (or to the Keeper).
-- Keeps the Satchel Lantern control scoped to the viewer's own carried light rather than another adventurer's torch.
-- Reuses the existing Living Table heartbeat; no second polling loop is introduced.

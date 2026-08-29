@@ -30,6 +30,7 @@ use GreatMarketrealmTabletop\Tabletop\Chronicle\Presentation\ChamberChroniclePro
 use GreatMarketrealmTabletop\Tabletop\Footsteps\Contracts\FootstepTrailRepository;
 use GreatMarketrealmTabletop\Tabletop\Footsteps\Presentation\FootstepTrailProjector;
 use GreatMarketrealmTabletop\Tabletop\Light\Contracts\CarriedLightRepository;
+use GreatMarketrealmTabletop\Tabletop\Light\Contracts\DroppedLightRepository;
 use GreatMarketrealmTabletop\Tables\Scenes\Contracts\TableSceneRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Contracts\TableTokenRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Models\TableToken;
@@ -62,7 +63,8 @@ final class TabletopChamber
         private ?ChamberChronicleProjector $chamberChronicleProjector = null,
         private ?FootstepTrailRepository $footstepTrails = null,
         private ?FootstepTrailProjector $footstepProjector = null,
-        private ?CarriedLightRepository $carriedLights = null
+        private ?CarriedLightRepository $carriedLights = null,
+        private ?DroppedLightRepository $droppedLights = null
     ) {}
 
     public function state(
@@ -171,6 +173,12 @@ final class TabletopChamber
                 }
 
                 $tokenModels[] = $token;
+            }
+        }
+
+        if ($activeScene !== null && $this->droppedLights !== null) {
+            foreach ($this->droppedLights->forScene($tableId, $activeScene->id()) as $droppedLight) {
+                $worldLightSourceModels[] = $droppedLight;
             }
         }
 

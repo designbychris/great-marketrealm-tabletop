@@ -1599,3 +1599,6 @@
 .gmrt-carried-light { position:absolute; left:var(--gmrt-light-x); top:var(--gmrt-light-y); width:18%; aspect-ratio:1; transform:translate(-50%,-50%); border-radius:50%; background:radial-gradient(circle, rgba(255,232,160,.22) 0 28%, rgba(255,190,92,.12) 29% 58%, rgba(255,160,64,0) 72%); filter:blur(2px); }
 .gmrt-lantern-measure button { display:block; margin:.35rem auto 0; font:inherit; }
 .gmrt-lantern-measure small { display:block; margin-top:.25rem; line-height:1.15; }
+/* Phase IV.27D — Fire Upon the Floor. */
+.gmrt-carried-light.is-dropped { display:grid; place-items:center; font-size:clamp(12px,1.4vw,22px); text-shadow:0 0 8px rgba(255,196,88,.9); }
+.gmrt-lantern-measure [data-dropped-light-action] { margin-top:.3rem; }

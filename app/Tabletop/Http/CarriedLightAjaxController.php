@@ -7,11 +7,12 @@ use GreatMarketrealmTabletop\Tables\Scenes\Contracts\TableSceneRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Contracts\TableTokenRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Models\TableTokenType;
 use GreatMarketrealmTabletop\Tabletop\Light\Contracts\CarriedLightRepository;
+use GreatMarketrealmTabletop\Tabletop\Light\Contracts\DroppedLightRepository;
 use Throwable;
 defined('ABSPATH') || exit;
 final class CarriedLightAjaxController
 {
-    public function __construct(private TableMembershipRepository $members, private TableSceneRepository $scenes, private TableTokenRepository $tokens, private CarriedLightRepository $lights) {}
+    public function __construct(private TableMembershipRepository $members, private TableSceneRepository $scenes, private TableTokenRepository $tokens, private CarriedLightRepository $lights, private ?DroppedLightRepository $dropped = null) {}
     public function toggle(): void
     {
         if (!is_user_logged_in()) wp_send_json_error(['message'=>'Authentication required.'],401);
@@ -28,6 +29,13 @@ final class CarriedLightAjaxController
             }
             if ($token===null) throw new \RuntimeException('Bring your Companion adventurer to the Table before lighting a torch.');
             $lit=!$this->lights->isLit($tableId,$scene->id(),$token->id());
+            if ($lit && $this->dropped !== null) {
+                foreach ($this->dropped->forScene($tableId, $scene->id()) as $dropped) {
+                    if ($dropped->ownerUserId() === $userId) {
+                        throw new \RuntimeException('Your torch is already burning upon the floor. Pick it up first.');
+                    }
+                }
+            }
             $this->lights->setLit($tableId,$scene->id(),$token->id(),$lit);
             wp_send_json_success(['lit'=>$lit,'token_id'=>$token->id(),'range_feet'=>40,'message'=>$lit?'The First Lantern burns: 20 ft bright light, then 20 ft dim light.':'The lantern is doused.']);
         } catch (Throwable $e) { wp_send_json_error(['message'=>$e->getMessage()],400); }

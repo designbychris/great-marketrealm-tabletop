@@ -1,4 +1,7 @@
 
+## Phase IV.27D — Fire Upon the Floor
+Dropped torches are persistent scene-scoped world light sources. A lit carried torch may be dropped at the server-derived adventurer position, continues illuminating through the shared barrier-aware Living Veil, and may be recovered when the adventurer is close enough. Browser intent never supplies authoritative coordinates or light radii. THUNK. 🔥. REGRET.
+
 ## Phase IV.27B — The First Lantern
 Carried, server-authoritative torchlight: 20 ft bright + 20 ft dim, bound to the player-controlled Companion token and clipped by Living Veil LOS barriers.
 - IV.27A — The Adventurer's Sight: viewer-specific server-authoritative sight now consumes Companion-certified darkvision, converts feet to 5 ft grid squares, and prevents another player's character from extending your current visibility.
@@ -682,6 +685,3 @@ Correct the final forged-token presentation boundary so Companion-generated port
 - Server-authoritative viewer projection through current/remembered Living Veil state.
 - No second polling loop; footsteps ride the existing Living Table heartbeat.
 - Next: Phase IV.27 — Lanterns in the Living Veil (vision profiles, darkvision and light sources).
-
-### Phase IV.27C — By Another's Light
-A carried torch is now a light source in the shared Table scene. Other adventurers may benefit from its illumination only where their own server-authoritative line of sight reaches that illuminated space. Walls and closed doors remain absolute blockers, and hidden light-source coordinates are never exposed merely because the source exists.
