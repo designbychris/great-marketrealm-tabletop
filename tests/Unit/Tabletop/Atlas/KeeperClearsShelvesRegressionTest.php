@@ -30,7 +30,7 @@ final class KeeperClearsShelvesRegressionTest extends TestCase
     public function test_scene_record_is_removed_by_the_same_authoritative_cleaner(): void
     {
         $source = file_get_contents($this->root . '/app/Tabletop/Atlas/Services/SceneShelfCleaner.php');
-        self::assertStringContainsString("forgetScene('gmrt_table_scenes', $tableId, $sceneId)", $source);
+        self::assertStringContainsString('forgetScene(\'gmrt_table_scenes\', $tableId, $sceneId)', $source);
     }
 
     public function test_atlas_drawer_requires_named_confirmation_for_removal(): void
