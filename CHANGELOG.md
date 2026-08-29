@@ -1,3 +1,4 @@
+- IV.27A — The Adventurer's Sight: viewer-specific server-authoritative sight now consumes Companion-certified darkvision, converts feet to 5 ft grid squares, and prevents another player's character from extending your current visibility.
 - IV.26G alpha.2 — Walking Shoes corrective: darker Fellowship-coloured footprints and distance-sampled trails (about one paired print per two 5 ft squares), still bounded and viewer-safe through the Living Veil.
 ## Phase IV.26F — Colours of the Fellowship
 

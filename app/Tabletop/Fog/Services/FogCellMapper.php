@@ -18,11 +18,14 @@ final class FogCellMapper
     public function visibleAround(
         TableScene $scene,
         TableToken $token,
-        array $barriers = []
+        array $barriers = [],
+        int $visionRadius = self::VISION_RADIUS
     ): array {
         if ($scene->gridSize() < 1) {
             return [];
         }
+
+        $visionRadius = max(1, min(60, $visionRadius));
 
         $center = $this->cellFor(
             $scene,
@@ -33,20 +36,20 @@ final class FogCellMapper
         $cells = [];
 
         for (
-            $row = $center['row'] - self::VISION_RADIUS;
-            $row <= $center['row'] + self::VISION_RADIUS;
+            $row = $center['row'] - $visionRadius;
+            $row <= $center['row'] + $visionRadius;
             ++$row
         ) {
             for (
-                $column = $center['column'] - self::VISION_RADIUS;
-                $column <= $center['column'] + self::VISION_RADIUS;
+                $column = $center['column'] - $visionRadius;
+                $column <= $center['column'] + $visionRadius;
                 ++$column
             ) {
                 if (
                     max(
                         abs($column - $center['column']),
                         abs($row - $center['row'])
-                    ) > self::VISION_RADIUS
+                    ) > $visionRadius
                 ) {
                     continue;
                 }

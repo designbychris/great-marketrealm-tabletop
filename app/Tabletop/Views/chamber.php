@@ -116,6 +116,8 @@ $sceneImage = $scene !== null
                     <button type="button" class="gmrt-quick-roll gmrt-quick-roll--measure" data-quick-roll data-roll-kind="initiative" data-roll-key="initiative"><span>Initiative</span><strong><?php echo esc_html(sprintf('%+d', (int) ($adventurerPlay['initiative'] ?? 0))); ?></strong><small aria-hidden="true">🎲</small></button>
                     <div><span>Proficiency</span><strong><?php echo esc_html(sprintf('%+d', (int) ($adventurerPlay['proficiency_bonus'] ?? 0))); ?></strong></div>
                     <div><span>Passive Perception</span><strong><?php echo esc_html((string) ($adventurerPlay['passive_perception'] ?? '—')); ?></strong></div>
+                    <?php $darkvision = max(0, (int) ($adventurerPlay['senses']['darkvision'] ?? 0)); ?>
+                    <div><span>Sight</span><strong class="gmrt-sight-measure" data-sight-measure><?php echo esc_html($darkvision > 0 ? 'Darkvision ' . $darkvision . ' ft' : 'Normal'); ?></strong></div>
                 </div>
                 <section class="gmrt-satchel__section"><h3>Abilities</h3><div class="gmrt-satchel__abilities">
                     <?php foreach ($abilityLabels as $key => $label) : $ability = is_array($satchelAbilities[$key] ?? null) ? $satchelAbilities[$key] : []; ?>

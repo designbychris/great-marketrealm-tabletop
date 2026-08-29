@@ -142,7 +142,13 @@ final class TabletopChamber
                 )
                 as $token
             ) {
-                if ($token->type() === TableTokenType::CHARACTER) {
+                if (
+                    $token->type() === TableTokenType::CHARACTER
+                    && (
+                        $viewer->isDungeonMaster()
+                        || $token->controllerUserId() === $viewerUserId
+                    )
+                ) {
                     $visionTokenModels[] = $token;
                 }
 
@@ -180,6 +186,24 @@ final class TabletopChamber
             && $this->fogRepository !== null
             && $this->fogProjector !== null
         ) {
+            $visionProfiles = [];
+            if ($this->companion instanceof CompanionCharacterGateway) {
+                foreach ($visionTokenModels as $visionToken) {
+                    $controller = $visionToken->controllerUserId();
+                    $characterId = (string) ($visionToken->sourceReference() ?? '');
+                    if ($controller === null || $characterId === '') {
+                        continue;
+                    }
+                    $character = $this->companion->characterForUser($controller, $characterId);
+                    $senses = is_array($character['play']['senses'] ?? null)
+                        ? $character['play']['senses']
+                        : [];
+                    $visionProfiles[$visionToken->id()] = [
+                        'darkvision' => max(0, (int) ($senses['darkvision'] ?? 0)),
+                    ];
+                }
+            }
+
             $fog = $this->fogProjector->project(
                 $activeScene,
                 $this->fogRepository->forScene(
@@ -188,7 +212,8 @@ final class TabletopChamber
                 ),
                 $visionTokenModels,
                 $viewer->isDungeonMaster(),
-                $barrierModels
+                $barrierModels,
+                $visionProfiles
             );
         }
 

@@ -21,7 +21,8 @@ final class FogOfWarProjector
         FogOfWarState $fog,
         array $tokens,
         bool $dungeonMaster,
-        array $barriers = []
+        array $barriers = [],
+        array $visionProfiles = []
     ): array {
         $visible = [];
         $visionOrigins = [];
@@ -34,9 +35,19 @@ final class FogOfWarProjector
                 continue;
             }
 
+            $profile = is_array($visionProfiles[$token->id()] ?? null)
+                ? $visionProfiles[$token->id()]
+                : [];
+            $darkvisionFeet = max(0, (int) ($profile['darkvision'] ?? 0));
+            $visionFeet = max(15, $darkvisionFeet);
+            $visionRadius = max(1, (int) ceil($visionFeet / 5));
+
             $visionOrigins[] = [
                 'x' => $token->x(),
                 'y' => $token->y(),
+                'token_id' => $token->id(),
+                'range_feet' => $visionFeet,
+                'darkvision' => $darkvisionFeet,
             ];
 
             $visible = array_merge(
@@ -44,7 +55,8 @@ final class FogOfWarProjector
                 (new FogCellMapper())->visibleAround(
                     $scene,
                     $token,
-                    $barriers
+                    $barriers,
+                    $visionRadius
                 )
             );
         }
