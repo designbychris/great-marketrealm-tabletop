@@ -26,7 +26,8 @@ final class ByAnothersLightRegressionTest extends TestCase
 
         self::assertStringContainsString('array $worldLightSources = []', $fog);
         self::assertStringContainsString('$viewerLineOfSight', $fog);
-        self::assertStringContainsString('$mapper->visibleAround($scene, $lightSource, $barriers, 8)', $fog);
+        self::assertStringContainsString('$lightRadius = max(1, (int) ceil(($brightFeet + $dimFeet) / 5));', $fog);
+        self::assertStringContainsString('$mapper->visibleAround($scene, $lightSource, $barriers, $lightRadius)', $fog);
         self::assertStringContainsString('array_intersect($illuminated, $viewerLineOfSight)', $fog);
         self::assertStringContainsString("'shared' => true", $fog);
         self::assertStringContainsString("'viewer_carried_light' => \$ownLightSources !== []", $fog);

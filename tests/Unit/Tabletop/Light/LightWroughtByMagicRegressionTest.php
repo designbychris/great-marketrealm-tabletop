@@ -14,7 +14,7 @@ final class LightWroughtByMagicRegressionTest extends TestCase
     {
         $controller = file_get_contents($this->root('app/Tabletop/Http/MagicalLightAjaxController.php'));
         self::assertStringContainsString("spell_id", $controller);
-        self::assertStringNotContainsString("bright_feet'] ?? \\$_POST", $controller);
+        self::assertStringNotContainsString("bright_feet'] ?? \$_POST", $controller);
         self::assertStringContainsString("\$spell['illumination']", $controller);
         self::assertStringContainsString("\$illum['bright_feet']", $controller);
         self::assertStringContainsString("\$illum['dim_feet']", $controller);

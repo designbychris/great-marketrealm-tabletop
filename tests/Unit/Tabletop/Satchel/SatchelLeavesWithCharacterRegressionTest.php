@@ -18,6 +18,12 @@ final class SatchelLeavesWithCharacterRegressionTest extends TestCase
         self::assertStringContainsString('$tokenModel->controllerUserId() === $viewerUserId', $chamber);
     }
 
+    public function test_live_state_exposes_the_companion_projection_used_by_satchel_cleanup(): void
+    {
+        $controller = file_get_contents($this->root('app/Tabletop/Http/TabletopAjaxController.php'));
+        self::assertStringContainsString("'integrations' => $state->integrations()", $controller);
+    }
+
     public function test_live_refresh_removes_an_orphaned_satchel(): void
     {
         $js = file_get_contents($this->root('assets/js/tabletop.js'));

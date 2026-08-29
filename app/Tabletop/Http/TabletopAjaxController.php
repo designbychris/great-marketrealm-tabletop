@@ -50,6 +50,7 @@ final class TabletopAjaxController
                 'arsenals' => $state->arsenals(),
                 'fog' => $state->fog(),
                 'vision_layer' => $state->visionLayer(),
+                'integrations' => $state->integrations(),
                 'footsteps' => $state->footsteps(),
                 'sync_revision' => $state->syncRevision(),
             ]);
