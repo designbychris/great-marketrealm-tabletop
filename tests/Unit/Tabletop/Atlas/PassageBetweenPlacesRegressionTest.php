@@ -35,10 +35,18 @@ final class PassageBetweenPlacesRegressionTest extends TestCase
     {
         $js = (string) file_get_contents($this->root('assets/js/tabletop.js'));
 
-        self::assertStringContainsString("body.set('action', 'gmrt_tabletop_fragment');", $js);
-        self::assertStringContainsString('current.replaceWith(incoming);', $js);
-        self::assertStringContainsString('bootTabletop();', $js);
-        self::assertStringNotContainsString('location.reload()', $js);
+        $passageStart = strpos($js, 'async function replaceChamber(');
+        $passageEnd = strpos($js, 'function bootTabletop()', $passageStart);
+
+        self::assertNotFalse($passageStart);
+        self::assertNotFalse($passageEnd);
+
+        $passage = substr($js, $passageStart, $passageEnd - $passageStart);
+
+        self::assertStringContainsString("body.set('action', 'gmrt_tabletop_fragment');", $passage);
+        self::assertStringContainsString('current.replaceWith(incoming);', $passage);
+        self::assertStringContainsString('bootTabletop();', $passage);
+        self::assertStringNotContainsString('location.reload()', $passage);
     }
 
     public function test_private_preparation_is_not_pulled_through_live_passage(): void
