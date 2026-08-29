@@ -307,7 +307,9 @@ final class TabletopChamberTest extends TestCase
 
         $state = $this->chamber->state('table-1', 84);
 
-        self::assertContains(
+        // A hidden character controlled by the DM must not become a vision
+        // source for this player. IV.27A projects sight per viewer.
+        self::assertNotContains(
             '16:9',
             $state->fog()['visible'] ?? []
         );
