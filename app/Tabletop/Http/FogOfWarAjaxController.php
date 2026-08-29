@@ -41,7 +41,8 @@ final class FogOfWarAjaxController
                 filter_var(
                     $_POST['clear'] ?? false,
                     FILTER_VALIDATE_BOOLEAN
-                )
+                ),
+                sanitize_text_field((string) ($_POST['scene_id'] ?? ''))
             );
 
             wp_send_json_success([

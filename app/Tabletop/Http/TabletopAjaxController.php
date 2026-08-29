@@ -31,7 +31,8 @@ final class TabletopAjaxController
         try {
             $state = $this->chamber->state(
                 $this->tableId(),
-                get_current_user_id()
+                get_current_user_id(),
+                $this->sceneId()
             );
 
             wp_send_json_success([
@@ -53,6 +54,7 @@ final class TabletopAjaxController
                 'vision_layer' => $state->visionLayer(),
                 'integrations' => $state->integrations(),
                 'footsteps' => $state->footsteps(),
+                'preparation' => $state->preparation(),
                 'sync_revision' => $state->syncRevision(),
             ]);
         } catch (TabletopAccessDenied $exception) {
@@ -75,7 +77,8 @@ final class TabletopAjaxController
         try {
             $state = $this->chamber->state(
                 $this->tableId(),
-                get_current_user_id()
+                get_current_user_id(),
+                $this->sceneId()
             );
 
             wp_send_json_success([
@@ -123,7 +126,8 @@ final class TabletopAjaxController
                         $_POST['revision']
                         ?? 1
                     )
-                )
+                ),
+                $this->sceneId()
             );
 
             wp_send_json_success([
@@ -159,6 +163,17 @@ final class TabletopAjaxController
         check_ajax_referer(
             self::NONCE_ACTION,
             'nonce'
+        );
+    }
+
+
+    private function sceneId(): string
+    {
+        return sanitize_text_field(
+            (string) (
+                $_POST['scene_id']
+                ?? ''
+            )
         );
     }
 

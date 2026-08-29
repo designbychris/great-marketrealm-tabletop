@@ -30,7 +30,8 @@ final class TabletopChamberState
         private array $integrations = [],
         private array $chamberLog = [],
         private array $footsteps = [],
-        private array $scenes = []
+        private array $scenes = [],
+        private array $preparation = []
     ) {}
 
     /** @return array<string,mixed> */
@@ -111,6 +112,17 @@ final class TabletopChamberState
         return $this->scenes;
     }
 
+    /** @return array<string,mixed> */
+    public function preparation(): array
+    {
+        return $this->preparation;
+    }
+
+    public function isPreparingScene(): bool
+    {
+        return ! empty($this->preparation['active']);
+    }
+
     /** @return array<string,string> */
     public function combatantStates(): array
     {
@@ -160,6 +172,7 @@ final class TabletopChamberState
             'vision_layer' => $this->visionLayer,
             'footsteps' => $this->footsteps,
             'scenes' => $this->scenes,
+            'preparation' => $this->preparation,
         ];
 
         return hash(

@@ -23,7 +23,8 @@ final class CartographersTable
     public function replaceActiveBattlemap(
         string $tableId,
         int $viewerUserId,
-        int $attachmentId
+        int $attachmentId,
+        string $sceneId = ''
     ): BattlemapImage {
         $member = $this->members->find(
             $tableId,
@@ -40,13 +41,7 @@ final class CartographersTable
             );
         }
 
-        $scene = null;
-        foreach ($this->scenes->forTable($tableId) as $candidate) {
-            if ($candidate->isActive()) {
-                $scene = $candidate;
-                break;
-            }
-        }
+        $scene = $this->targetScene($tableId, $sceneId);
 
         if ($scene === null) {
             throw new CartographyDenied(
@@ -75,7 +70,8 @@ final class CartographersTable
         int $offsetY,
         int $opacity,
         bool $visible,
-        int $referenceWidth
+        int $referenceWidth,
+        string $sceneId = ''
     ): array {
         $member = $this->members->find($tableId, $viewerUserId);
 
@@ -89,13 +85,7 @@ final class CartographersTable
             );
         }
 
-        $scene = null;
-        foreach ($this->scenes->forTable($tableId) as $candidate) {
-            if ($candidate->isActive()) {
-                $scene = $candidate;
-                break;
-            }
-        }
+        $scene = $this->targetScene($tableId, $sceneId);
 
         if ($scene === null) {
             throw new CartographyDenied(
@@ -121,6 +111,23 @@ final class CartographersTable
             'visible' => $scene->gridVisible(),
             'reference_width' => $scene->gridReferenceWidth(),
         ];
+    }
+
+
+    private function targetScene(string $tableId, string $sceneId): ?\GreatMarketrealmTabletop\Tables\Scenes\Models\TableScene
+    {
+        $sceneId = trim($sceneId);
+        if ($sceneId !== '') {
+            return $this->scenes->find($tableId, $sceneId);
+        }
+
+        foreach ($this->scenes->forTable($tableId) as $candidate) {
+            if ($candidate->isActive()) {
+                return $candidate;
+            }
+        }
+
+        return null;
     }
 
 }

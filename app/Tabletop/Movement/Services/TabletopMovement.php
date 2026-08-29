@@ -40,7 +40,8 @@ final class TabletopMovement
         string $tokenId,
         float $x,
         float $y,
-        int $expectedRevision
+        int $expectedRevision,
+        string $sceneId = ''
     ): TableToken {
         $table = $this->tables->find($tableId);
 
@@ -89,9 +90,20 @@ final class TabletopMovement
             );
         }
 
+        $preparationSceneId = trim($sceneId);
         if (! $scene->isActive()) {
+            if (
+                ! $member->isDungeonMaster()
+                || $preparationSceneId === ''
+                || $preparationSceneId !== $scene->id()
+            ) {
+                throw new TabletopMovementDenied(
+                    'Only tokens on the active Scene may move unless the Dungeon Master is preparing that Scene.'
+                );
+            }
+        } elseif ($preparationSceneId !== '' && $preparationSceneId !== $scene->id()) {
             throw new TabletopMovementDenied(
-                'Only tokens on the active Scene may move.'
+                'The requested preparation Scene does not contain that token.'
             );
         }
 

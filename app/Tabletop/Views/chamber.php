@@ -15,6 +15,8 @@ $table = $state?->table() ?? [];
 $viewer = $state?->viewer() ?? [];
 $scene = $state?->scene();
 $scenes = $state?->scenes() ?? [];
+$preparation = $state?->preparation() ?? [];
+$isPreparingScene = ! empty($preparation['active']);
 $tokens = $state?->tokens() ?? [];
 $members = $state?->members() ?? [];
 $encounter = $state?->encounter();
@@ -74,6 +76,7 @@ $sceneImage = $scene !== null
     data-sync-revision="<?php echo esc_attr(
         $state?->syncRevision() ?? ''
     ); ?>"
+    data-preparation-scene-id="<?php echo esc_attr((string) ($preparation['scene_id'] ?? '')); ?>"
 >
     <?php if ($adventurer !== null && $adventurerPlay !== []) : ?>
         <?php
@@ -231,14 +234,10 @@ $sceneImage = $scene !== null
 
 
     <?php if ($state !== null && $state->isDungeonMaster()) : ?>
-        <details class="gmrt-atlas" data-keepers-atlas open>
-            <summary>
-                <span>
-                    <strong>The Keeper's Atlas</strong>
-                    <small><?php echo esc_html((string) count($scenes)); ?> mapped place<?php echo count($scenes) === 1 ? '' : 's'; ?></small>
-                </span>
-                <span aria-hidden="true">🗺️</span>
-            </summary>
+        <aside class="gmrt-atlas-drawer" data-keepers-atlas data-open="false" aria-label="The Keeper's Atlas">
+            <button class="gmrt-atlas-drawer__toggle" type="button" data-atlas-toggle aria-expanded="false" aria-controls="gmrt-keepers-atlas-panel"><span aria-hidden="true">🗺️</span><span>Atlas</span></button>
+            <div class="gmrt-atlas gmrt-atlas-drawer__panel" id="gmrt-keepers-atlas-panel">
+            <header class="gmrt-atlas__header"><div><p class="gmrt-chamber__eyebrow">Dungeon Master's Drawer</p><h2>The Keeper's Atlas</h2><small><?php echo esc_html((string) count($scenes)); ?> mapped place<?php echo count($scenes) === 1 ? '' : 's'; ?></small></div><button type="button" data-atlas-close aria-label="Close the Keeper's Atlas">×</button></header>
             <div class="gmrt-atlas__body">
                 <div class="gmrt-atlas__introduction">
                     <p>
@@ -276,13 +275,12 @@ $sceneImage = $scene !== null
                                     </small>
                                 </div>
                                 <?php if ($atlasActive) : ?>
-                                    <span class="gmrt-atlas-card__active">Active Scene</span>
+                                    <span class="gmrt-atlas-card__active">Live Scene</span>
                                 <?php else : ?>
-                                    <button
-                                        type="button"
-                                        data-atlas-open-map
-                                        data-scene-id="<?php echo esc_attr((string) ($atlasScene['id'] ?? '')); ?>"
-                                    >Open Scene</button>
+                                    <div class="gmrt-atlas-card__actions">
+                                        <button type="button" data-atlas-prepare-map data-scene-id="<?php echo esc_attr((string) ($atlasScene['id'] ?? '')); ?>">Prepare Scene</button>
+                                        <button type="button" data-atlas-open-map data-scene-id="<?php echo esc_attr((string) ($atlasScene['id'] ?? '')); ?>">Open Scene</button>
+                                    </div>
                                 <?php endif; ?>
                             </article>
                         <?php endforeach; ?>
@@ -302,7 +300,15 @@ $sceneImage = $scene !== null
                     <small>The new map is added safely in the background. It does not become active until you open it.</small>
                 </div>
             </div>
-        </details>
+            </div>
+        </aside>
+    <?php endif; ?>
+
+    <?php if ($state !== null && $state->isDungeonMaster() && $isPreparingScene && $scene !== null) : ?>
+        <section class="gmrt-preparation-banner" data-preparation-banner>
+            <div><p class="gmrt-chamber__eyebrow">Behind the Curtain</p><strong>Preparing <?php echo esc_html((string) ($scene['name'] ?? 'Scene')); ?></strong><span>Players remain on the live Scene. Cartography changes here are bound only to this prepared map.</span></div>
+            <button type="button" data-exit-preparation>Return to Live Scene</button>
+        </section>
     <?php endif; ?>
 
     <div data-live-lifecycle>

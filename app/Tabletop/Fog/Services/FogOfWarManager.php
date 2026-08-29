@@ -32,7 +32,8 @@ final class FogOfWarManager
         string $tableId,
         int $viewerUserId,
         bool $enabled,
-        bool $clear = false
+        bool $clear = false,
+        string $sceneId = ''
     ): array {
         $member = $this->members->find(
             $tableId,
@@ -49,7 +50,7 @@ final class FogOfWarManager
             );
         }
 
-        $scene = $this->activeScene($tableId);
+        $scene = $this->targetScene($tableId, $sceneId);
         $state = $this->fog->forScene(
             $tableId,
             $scene->id()
@@ -134,9 +135,18 @@ final class FogOfWarManager
         );
     }
 
-    private function activeScene(
-        string $tableId
+    private function targetScene(
+        string $tableId,
+        string $sceneId = ''
     ): \GreatMarketrealmTabletop\Tables\Scenes\Models\TableScene {
+        $sceneId = trim($sceneId);
+        if ($sceneId !== '') {
+            $scene = $this->scenes->find($tableId, $sceneId);
+            if ($scene !== null) {
+                return $scene;
+            }
+        }
+
         foreach ($this->scenes->forTable($tableId) as $scene) {
             if ($scene->isActive()) {
                 return $scene;

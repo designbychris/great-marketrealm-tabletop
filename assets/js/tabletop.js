@@ -3,7 +3,7 @@
 
     let activeRefreshTimer = null;
 
-    async function replaceChamber(message) {
+    async function replaceChamber(message, sceneId = null) {
         const current = document.querySelector('.gmrt-chamber');
         const liveStatus = document.querySelector('#gmrt-tabletop-status');
 
@@ -19,6 +19,9 @@
         body.set('action', 'gmrt_tabletop_fragment');
         body.set('nonce', gmrtTabletop.nonce);
         body.set('table_id', current.dataset.tableId || '');
+        if (sceneId !== null && String(sceneId) !== '') {
+            body.set('scene_id', String(sceneId));
+        }
 
         const response = await fetch(gmrtTabletop.ajaxUrl, {
             method: 'POST',
@@ -67,6 +70,7 @@
     }
 
     const tableId = root.dataset.tableId || '';
+    const preparationSceneId = root.dataset.preparationSceneId || '';
     let selected = null;
     const removeSelectedTokenButton = document.querySelector('[data-remove-selected-token]');
     let targetingPreview = null;
@@ -83,6 +87,9 @@
         body.set('action', action);
         body.set('nonce', gmrtTabletop.nonce);
         body.set('table_id', tableId);
+        if (preparationSceneId) {
+            body.set('scene_id', preparationSceneId);
+        }
 
         Object.entries(values || {}).forEach(([key, value]) => {
             body.set(key, String(value));
@@ -1456,6 +1463,50 @@
     const atlasAddMap = document.querySelector('[data-atlas-add-map]');
     const atlasSceneName = document.querySelector('[data-atlas-scene-name]');
     const atlasGridSize = document.querySelector('[data-atlas-grid-size]');
+    const atlasDrawer = document.querySelector('[data-keepers-atlas]');
+    const atlasToggle = document.querySelector('[data-atlas-toggle]');
+    const atlasClose = document.querySelector('[data-atlas-close]');
+    const setAtlasOpen = (open) => {
+        if (!atlasDrawer || !atlasToggle) return;
+        atlasDrawer.dataset.open = open ? 'true' : 'false';
+        atlasToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    };
+    atlasToggle?.addEventListener('click', () => setAtlasOpen(atlasDrawer?.dataset.open !== 'true'));
+    atlasClose?.addEventListener('click', () => setAtlasOpen(false));
+
+    document.querySelectorAll('[data-atlas-prepare-map]').forEach((button) => {
+        button.addEventListener('click', async () => {
+            const sceneId = String(button.dataset.sceneId || '');
+            if (!sceneId) return;
+            button.disabled = true;
+            const previousLabel = button.textContent;
+            button.textContent = 'Preparing…';
+            if (atlasStatus) atlasStatus.textContent = 'Drawing the curtain around the chosen Scene…';
+            try {
+                await replaceChamber('Behind the Curtain — private Scene preparation.', sceneId);
+            } catch (error) {
+                const message = error.message || 'The Scene could not be prepared privately.';
+                if (atlasStatus) atlasStatus.textContent = message;
+                say(message);
+                button.disabled = false;
+                button.textContent = previousLabel;
+            }
+        });
+    });
+
+    document.querySelector('[data-exit-preparation]')?.addEventListener('click', async (event) => {
+        const button = event.currentTarget;
+        button.disabled = true;
+        const previousLabel = button.textContent;
+        button.textContent = 'Returning…';
+        try {
+            await replaceChamber('Returned to the live Scene.', null);
+        } catch (error) {
+            say(error.message || 'The live Scene could not be restored.');
+            button.disabled = false;
+            button.textContent = previousLabel;
+        }
+    });
 
     document.querySelectorAll('[data-atlas-open-map]').forEach((button) => {
         button.addEventListener('click', async () => {
@@ -1472,7 +1523,7 @@
                 const message = data.message || 'Scene opened.';
                 if (atlasStatus) atlasStatus.textContent = message;
                 say(message);
-                window.location.reload();
+                await replaceChamber(message, null);
             } catch (error) {
                 const message = error.message || 'The Scene could not be opened.';
                 if (atlasStatus) atlasStatus.textContent = message;

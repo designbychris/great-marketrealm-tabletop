@@ -71,7 +71,8 @@ final class TabletopChamber
 
     public function state(
         string $tableId,
-        int $viewerUserId
+        int $viewerUserId,
+        string $sceneId = ''
     ): TabletopChamberState {
         $table = $this->tables->find($tableId);
 
@@ -127,13 +128,32 @@ final class TabletopChamber
             }
         }
 
-        $activeScene = null;
+        $liveScene = null;
 
         foreach ($this->scenes->forTable($tableId) as $scene) {
             if ($scene->isActive()) {
-                $activeScene = $scene;
+                $liveScene = $scene;
                 break;
             }
+        }
+
+        $activeScene = $liveScene;
+        $preparationSceneId = trim($sceneId);
+        if ($preparationSceneId !== '') {
+            if (! $viewer->isDungeonMaster()) {
+                throw new TabletopAccessDenied(
+                    'Only the Dungeon Master may prepare a Scene behind the curtain.'
+                );
+            }
+
+            $preparedScene = $this->scenes->find($tableId, $preparationSceneId);
+            if ($preparedScene === null) {
+                throw new TabletopAccessDenied(
+                    'That Scene could not be found in the Keeper\'s Atlas.'
+                );
+            }
+
+            $activeScene = $preparedScene;
         }
 
         $tokens = [];
@@ -473,7 +493,12 @@ final class TabletopChamber
                     static fn ($scene): array => $scene->toArray(),
                     $this->scenes->forTable($tableId)
                 )
-                : []
+                : [],
+            [
+                'active' => $preparationSceneId !== '',
+                'scene_id' => $preparationSceneId,
+                'live_scene_id' => $liveScene?->id() ?? '',
+            ]
         );
     }
 }

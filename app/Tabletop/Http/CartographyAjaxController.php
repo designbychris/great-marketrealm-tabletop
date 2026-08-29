@@ -35,7 +35,8 @@ final class CartographyAjaxController
                     (string) ($_POST['table_id'] ?? '')
                 ),
                 get_current_user_id(),
-                absint($_POST['attachment_id'] ?? 0)
+                absint($_POST['attachment_id'] ?? 0),
+                sanitize_text_field((string) ($_POST['scene_id'] ?? ''))
             );
 
             wp_send_json_success([
@@ -79,7 +80,8 @@ final class CartographyAjaxController
                         $_POST['grid_reference_width']
                         ?? 1
                     )
-                )
+                ),
+                sanitize_text_field((string) ($_POST['scene_id'] ?? ''))
             );
 
             wp_send_json_success(['grid' => $grid]);
