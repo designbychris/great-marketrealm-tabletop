@@ -135,6 +135,7 @@ final class TabletopChamber
         $tokens = [];
         $tokenModels = [];
         $visionTokenModels = [];
+        $worldLightSourceModels = [];
 
         if ($activeScene !== null) {
             foreach (
@@ -152,6 +153,14 @@ final class TabletopChamber
                     )
                 ) {
                     $visionTokenModels[] = $token;
+                }
+
+                if (
+                    $token->type() === TableTokenType::CHARACTER
+                    && $this->carriedLights !== null
+                    && $this->carriedLights->isLit($tableId, $activeScene->id(), $token->id())
+                ) {
+                    $worldLightSourceModels[] = $token;
                 }
 
                 if (
@@ -218,7 +227,8 @@ final class TabletopChamber
                 $visionTokenModels,
                 $viewer->isDungeonMaster(),
                 $barrierModels,
-                $visionProfiles
+                $visionProfiles,
+                $worldLightSourceModels
             );
         }
 

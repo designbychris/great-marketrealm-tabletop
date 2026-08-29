@@ -682,3 +682,6 @@ Correct the final forged-token presentation boundary so Companion-generated port
 - Server-authoritative viewer projection through current/remembered Living Veil state.
 - No second polling loop; footsteps ride the existing Living Table heartbeat.
 - Next: Phase IV.27 — Lanterns in the Living Veil (vision profiles, darkvision and light sources).
+
+### Phase IV.27C — By Another's Light
+A carried torch is now a light source in the shared Table scene. Other adventurers may benefit from its illumination only where their own server-authoritative line of sight reaches that illuminated space. Walls and closed doors remain absolute blockers, and hidden light-source coordinates are never exposed merely because the source exists.

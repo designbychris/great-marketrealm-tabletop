@@ -698,3 +698,10 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - Projects footsteps server-side per viewer so fog never leaks hidden movement history.
 - Own recent steps may linger faintly in explored memory; other players' steps require current visibility.
 - Reuses Fellowship colours and the Living Table heartbeat.
+
+## 0.27.2-alpha.1 — Phase IV.27C: By Another's Light
+- Promotes carried torches into server-authoritative world light sources that can illuminate space for other adventurers.
+- Shared illumination is intersected with each viewer's own barrier-aware line of sight before cells are revealed.
+- Hidden light-source coordinates are not projected merely because a torch is burning; a source glow is sent only when its cell is visible to that viewer (or to the Keeper).
+- Keeps the Satchel Lantern control scoped to the viewer's own carried light rather than another adventurer's torch.
+- Reuses the existing Living Table heartbeat; no second polling loop is introduced.

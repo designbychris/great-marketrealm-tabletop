@@ -22,10 +22,12 @@ final class FogOfWarProjector
         array $tokens,
         bool $dungeonMaster,
         array $barriers = [],
-        array $visionProfiles = []
+        array $visionProfiles = [],
+        array $worldLightSources = []
     ): array {
         $visible = [];
         $visionOrigins = [];
+        $viewerLineOfSight = [];
 
         foreach ($tokens as $token) {
             if (
@@ -55,15 +57,60 @@ final class FogOfWarProjector
                 'dim_light_feet' => $lightFeet > 0 ? 20 : 0,
             ];
 
+            $mapper = new FogCellMapper();
             $visible = array_merge(
                 $visible,
-                (new FogCellMapper())->visibleAround(
+                $mapper->visibleAround(
                     $scene,
                     $token,
                     $barriers,
                     $visionRadius
                 )
             );
+
+            // Shared illumination may be seen beyond the adventurer's natural
+            // sight radius, but only where the viewer has an unobstructed line
+            // of sight. This remains server-authoritative.
+            $viewerLineOfSight = array_merge(
+                $viewerLineOfSight,
+                $mapper->visibleAround($scene, $token, $barriers, 60)
+            );
+        }
+
+        $visible = array_values(array_unique($visible));
+        $viewerLineOfSight = array_values(array_unique($viewerLineOfSight));
+        $safeLightSources = [];
+
+        foreach ($worldLightSources as $lightSource) {
+            if (! $lightSource instanceof TableToken || $lightSource->type() !== TableTokenType::CHARACTER) {
+                continue;
+            }
+
+            $mapper = new FogCellMapper();
+            $illuminated = $mapper->visibleAround($scene, $lightSource, $barriers, 8);
+            $sharedVisible = array_values(array_intersect($illuminated, $viewerLineOfSight));
+            $visible = array_merge($visible, $sharedVisible);
+
+            $sourceCell = $mapper->cellFor($scene, $lightSource->x(), $lightSource->y());
+            $sourceKey = FogCellMapper::key($sourceCell['column'], $sourceCell['row']);
+            if ($dungeonMaster || in_array($sourceKey, $visible, true)) {
+                $safeLightSources[] = [
+                    'x' => $lightSource->x(),
+                    'y' => $lightSource->y(),
+                    'token_id' => $lightSource->id(),
+                    'range_feet' => 40,
+                    'bright_light_feet' => 20,
+                    'dim_light_feet' => 20,
+                    'shared' => true,
+                ];
+            }
+        }
+
+        $visible = array_values(array_unique($visible));
+        $ownLightSources = array_values(array_filter($visionOrigins, static fn (array $origin): bool => !empty($origin['carried_light'])));
+        $lightSources = [];
+        foreach (array_merge($ownLightSources, $safeLightSources) as $source) {
+            $lightSources[(string) ($source['token_id'] ?? '')] = $source;
         }
 
         return [
@@ -79,11 +126,10 @@ final class FogOfWarProjector
             'explored' => array_values(array_unique(
                 $fog->explored()
             )),
-            'visible' => array_values(array_unique(
-                $visible
-            )),
+            'visible' => $visible,
             'vision_origins' => $visionOrigins,
-            'light_sources' => array_values(array_filter($visionOrigins, static fn (array $origin): bool => !empty($origin['carried_light']))),
+            'light_sources' => array_values($lightSources),
+            'viewer_carried_light' => $ownLightSources !== [],
             'has_blockers' => $barriers !== [],
         ];
     }
