@@ -707,7 +707,15 @@
         (Array.isArray(projection?.light_sources) ? projection.light_sources : []).forEach((source) => {
             const glow = document.createElement('span');
             glow.className = 'gmrt-carried-light' + (source.source_kind === 'dropped' ? ' is-dropped' : '');
-            if (source.source_kind === 'dropped') { glow.textContent = '🔥'; glow.setAttribute('aria-hidden', 'true'); }
+            if (source.source_kind === 'dropped') {
+                const flame = document.createElement('i');
+                flame.className = 'gmrt-pixel-flame';
+                flame.setAttribute('aria-hidden', 'true');
+                flame.appendChild(document.createElement('b'));
+                flame.appendChild(document.createElement('em'));
+                glow.appendChild(flame);
+                glow.setAttribute('aria-label', 'Dropped burning torch');
+            }
             glow.style.setProperty('--gmrt-light-x', (Number(source.x || 0) * 100) + '%');
             glow.style.setProperty('--gmrt-light-y', (Number(source.y || 0) * 100) + '%');
             lightLayer.appendChild(glow);

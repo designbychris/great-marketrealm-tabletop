@@ -1,4 +1,9 @@
 
+### Phase IV.27D.1 — The Little Flame
+- Replaces the dropped-torch emoji with a tiny animated SNES-era pixel flame.
+- Flame flicker and ember animation are presentation-only; authoritative illumination remains unchanged.
+- Respects `prefers-reduced-motion`.
+
 ## Phase IV.27D — Fire Upon the Floor
 Dropped torches are persistent scene-scoped world light sources. A lit carried torch may be dropped at the server-derived adventurer position, continues illuminating through the shared barrier-aware Living Veil, and may be recovered when the adventurer is close enough. Browser intent never supplies authoritative coordinates or light radii. THUNK. 🔥. REGRET.
 

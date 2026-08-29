@@ -1600,5 +1600,13 @@
 .gmrt-lantern-measure button { display:block; margin:.35rem auto 0; font:inherit; }
 .gmrt-lantern-measure small { display:block; margin-top:.25rem; line-height:1.15; }
 /* Phase IV.27D — Fire Upon the Floor. */
-.gmrt-carried-light.is-dropped { display:grid; place-items:center; font-size:clamp(12px,1.4vw,22px); text-shadow:0 0 8px rgba(255,196,88,.9); }
+.gmrt-carried-light.is-dropped { display:grid; place-items:center; filter:none; }
+.gmrt-pixel-flame { position:relative; display:block; width:14px; height:18px; image-rendering:pixelated; filter:drop-shadow(0 0 4px rgba(255,184,64,.95)); animation:gmrt-pixel-flame-flicker .52s steps(2,end) infinite; transform-origin:50% 100%; }
+.gmrt-pixel-flame::before { content:""; position:absolute; left:4px; top:2px; width:6px; height:12px; background:#f47b20; box-shadow:-2px 4px 0 #f47b20,2px 2px 0 #ffb52e,-4px 8px 0 #d94b1f,4px 8px 0 #f47b20,-2px 12px 0 #8b3d22,2px 12px 0 #8b3d22; }
+.gmrt-pixel-flame::after { content:""; position:absolute; left:6px; top:6px; width:4px; height:6px; background:#ffe36a; box-shadow:-2px 4px 0 #ffb52e; }
+.gmrt-pixel-flame > b { position:absolute; left:1px; bottom:0; width:12px; height:2px; background:#5a321f; box-shadow:2px -2px 0 #7b4829; }
+.gmrt-pixel-flame > em { position:absolute; left:1px; top:4px; width:2px; height:2px; background:#ffb52e; opacity:0; animation:gmrt-pixel-ember-pop 1.15s steps(3,end) infinite; }
+@keyframes gmrt-pixel-flame-flicker { 0%,100% { transform:translateY(0) scaleX(1); } 50% { transform:translate(1px,-1px) scaleX(.86); } }
+@keyframes gmrt-pixel-ember-pop { 0%,55% { opacity:0; transform:translate(0,4px); } 60% { opacity:1; transform:translate(0,0); } 80% { opacity:1; transform:translate(-2px,-4px); } 100% { opacity:0; transform:translate(1px,-7px); } }
 .gmrt-lantern-measure [data-dropped-light-action] { margin-top:.3rem; }
+@media (prefers-reduced-motion: reduce) { .gmrt-pixel-flame, .gmrt-pixel-flame > em { animation:none; } .gmrt-pixel-flame > em { display:none; } }
