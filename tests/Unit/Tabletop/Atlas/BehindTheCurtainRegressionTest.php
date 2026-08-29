@@ -23,14 +23,14 @@ final class BehindTheCurtainRegressionTest extends TestCase
         $chamber = (string) file_get_contents($this->root('app/Tabletop/Services/TabletopChamber.php'));
         self::assertStringContainsString("Only the Dungeon Master may prepare a Scene behind the curtain.", $chamber);
         self::assertStringContainsString('$this->scenes->find($tableId, $preparationSceneId)', $chamber);
-        self::assertStringContainsString("'live_scene_id' => $liveScene?->id() ?? ''", $chamber);
+        self::assertStringContainsString("'live_scene_id' => \$liveScene?->id() ?? ''", $chamber);
     }
 
     public function test_live_state_and_fragment_accept_the_private_scene_projection(): void
     {
         $controller = (string) file_get_contents($this->root('app/Tabletop/Http/TabletopAjaxController.php'));
         self::assertGreaterThanOrEqual(2, substr_count($controller, '$this->sceneId()'));
-        self::assertStringContainsString("'preparation' => $state->preparation()", $controller);
+        self::assertStringContainsString("'preparation' => \$state->preparation()", $controller);
     }
 
     public function test_cartography_fog_and_walls_are_bound_to_the_prepared_scene(): void
