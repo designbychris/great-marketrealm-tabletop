@@ -40,7 +40,7 @@ final class KeepersAtlasRegressionTest extends TestCase
 
         self::assertStringContainsString('TableMemberRole::DUNGEON_MASTER', $atlas);
         self::assertStringContainsString('TableMemberStatus::ACTIVE', $atlas);
-        self::assertStringContainsString("Only the Dungeon Master may open the Keeper's Atlas.", $atlas);
+        self::assertStringContainsString("Only the Dungeon Master may open the Keeper\\'s Atlas.", $atlas);
     }
 
     public function test_atlas_actions_are_nonce_guarded_and_server_authoritative(): void
