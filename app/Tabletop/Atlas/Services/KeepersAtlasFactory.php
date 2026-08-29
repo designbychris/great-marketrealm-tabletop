@@ -17,7 +17,8 @@ final class KeepersAtlasFactory
         return new KeepersAtlas(
             new WordPressTableMembershipRepository(),
             TableSceneManagerFactory::make(),
-            new BattlemapInspector()
+            new BattlemapInspector(),
+            new SceneShelfCleaner()
         );
     }
 }

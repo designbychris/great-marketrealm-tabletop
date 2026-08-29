@@ -280,6 +280,7 @@ $sceneImage = $scene !== null
                                     <div class="gmrt-atlas-card__actions">
                                         <button type="button" data-atlas-prepare-map data-scene-id="<?php echo esc_attr((string) ($atlasScene['id'] ?? '')); ?>">Prepare Scene</button>
                                         <button type="button" data-atlas-open-map data-scene-id="<?php echo esc_attr((string) ($atlasScene['id'] ?? '')); ?>">Open Scene</button>
+                                        <button class="gmrt-atlas-card__remove" type="button" data-atlas-delete-map data-scene-id="<?php echo esc_attr((string) ($atlasScene['id'] ?? '')); ?>" data-scene-name="<?php echo esc_attr((string) ($atlasScene['name'] ?? 'Unnamed Scene')); ?>">Remove from Atlas</button>
                                     </div>
                                 <?php endif; ?>
                             </article>

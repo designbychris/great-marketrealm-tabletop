@@ -1673,3 +1673,8 @@
 .gmrt-preparation-banner{display:flex;justify-content:space-between;gap:1rem;align-items:center;margin:0 0 1rem;padding:.8rem 1rem;border:1px solid rgba(244,214,136,.4);border-radius:8px;background:rgba(56,40,23,.86);color:#f4ead6}.gmrt-preparation-banner div{display:grid;gap:.18rem}.gmrt-preparation-banner strong{font-size:1.05rem}.gmrt-preparation-banner span{font-size:.84rem;opacity:.82}.gmrt-preparation-banner button{white-space:nowrap}
 @media(max-width:700px){.gmrt-atlas-drawer__panel{width:calc(100vw - 4rem)}.gmrt-preparation-banner{display:grid}}
 @media(prefers-reduced-motion:reduce){.gmrt-atlas-drawer{transition:none}}
+
+
+/* IV.28B.1 — The Keeper Clears the Shelves */
+.gmrt-atlas-card__remove { opacity: .78; font-size: .82rem; }
+.gmrt-atlas-card__remove:hover, .gmrt-atlas-card__remove:focus-visible { opacity: 1; }

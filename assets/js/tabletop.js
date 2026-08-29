@@ -1534,6 +1534,31 @@
         });
     });
 
+    document.querySelectorAll('[data-atlas-delete-map]').forEach((button) => {
+        button.addEventListener('click', async () => {
+            const sceneId = String(button.dataset.sceneId || '');
+            const sceneName = String(button.dataset.sceneName || 'this Scene');
+            if (!sceneId) return;
+            if (!window.confirm(`Permanently delete “${sceneName}”? Its tokens, Fog, walls, doors, encounters, lights and other Scene state will also be removed.`)) return;
+
+            const previousLabel = button.textContent;
+            button.disabled = true;
+            button.textContent = 'Clearing…';
+            try {
+                const data = await request('gmrt_atlas_delete_map', { scene_id: sceneId });
+                const message = data.message || 'Scene removed from the Atlas.';
+                say(message);
+                await replaceChamber(message, null);
+            } catch (error) {
+                const message = error.message || 'The Scene could not be removed.';
+                if (atlasStatus) atlasStatus.textContent = message;
+                say(message);
+                button.disabled = false;
+                button.textContent = previousLabel;
+            }
+        });
+    });
+
     if (atlasAddMap) {
         atlasAddMap.addEventListener('click', () => {
             const sceneName = atlasSceneName ? atlasSceneName.value.trim() : '';

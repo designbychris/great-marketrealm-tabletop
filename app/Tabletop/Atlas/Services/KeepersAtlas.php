@@ -20,7 +20,8 @@ final class KeepersAtlas
     public function __construct(
         private TableMembershipRepository $members,
         private TableSceneManager $scenes,
-        private BattlemapInspector $images
+        private BattlemapInspector $images,
+        private SceneShelfCleaner $cleaner
     ) {}
 
     public function addMap(
@@ -57,6 +58,33 @@ final class KeepersAtlas
     ): TableScene {
         $this->assertDungeonMaster($tableId, $viewerUserId);
         return $this->scenes->activate($tableId, $sceneId);
+    }
+
+    public function deleteMap(string $tableId, int $viewerUserId, string $sceneId): string
+    {
+        $this->assertDungeonMaster($tableId, $viewerUserId);
+        $sceneId = trim($sceneId);
+        $scene = null;
+        $scenes = $this->scenes->scenes($tableId);
+        foreach ($scenes as $candidate) {
+            if ($candidate->id() === $sceneId) {
+                $scene = $candidate;
+                break;
+            }
+        }
+        if ($scene === null) {
+            throw new AtlasDenied('That Scene could not be found in the Keeper\'s Atlas.');
+        }
+        if (count($scenes) <= 1) {
+            throw new AtlasDenied('The Keeper cannot remove the final Scene from the Table.');
+        }
+        if ($scene->isActive()) {
+            throw new AtlasDenied('The live Scene cannot be removed. Open another Scene first.');
+        }
+
+        $name = $scene->name();
+        $this->cleaner->clear($tableId, $sceneId);
+        return $name;
     }
 
     private function assertDungeonMaster(string $tableId, int $viewerUserId): void

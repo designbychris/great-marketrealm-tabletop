@@ -314,6 +314,11 @@ final class TabletopServiceProvider
         );
 
         add_action(
+            'wp_ajax_gmrt_atlas_delete_map',
+            [$this->keepersAtlasAjax, 'deleteMap']
+        );
+
+        add_action(
             'wp_ajax_gmrt_toggle_magical_light',
             [$this->magicalLightAjax, 'toggle']
         );

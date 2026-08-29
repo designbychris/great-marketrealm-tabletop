@@ -697,5 +697,6 @@ Correct the final forged-token presentation boundary so Companion-generated port
 
 - [x] **IV.28A — The Atlas Register** — DM-only persistent multi-Scene register, add maps without disturbing the active Scene, and explicitly open a retained Scene.
 - [x] **IV.28B — Behind the Curtain** — Keeper's Atlas DM drawer and private inactive-Scene preparation. Preparation projections and cartography/Fog/vision/token movement are explicitly bound to the selected Scene while players remain on the live Scene.
+- [x] **IV.28B.1 — The Keeper Clears the Shelves** — safely remove inactive Scenes and their Scene-owned battlefield state while protecting the live and final Scene.
 - [ ] **IV.28C — Passage Between Places** — synchronise active-Scene travel through the Living Table without player reloads.
 - [ ] **Keeper's Cartography Assistant** — analyse uploaded dungeon artwork and suggest walls, doors and room boundaries for Dungeon Master review/edit before authoritative save.

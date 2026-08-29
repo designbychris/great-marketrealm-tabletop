@@ -48,6 +48,20 @@ final class KeepersAtlasAjaxController
         });
     }
 
+    public function deleteMap(): void
+    {
+        $this->respond(function (): array {
+            $name = $this->atlas->deleteMap(
+                $this->tableId(),
+                get_current_user_id(),
+                sanitize_text_field((string) ($_POST['scene_id'] ?? ''))
+            );
+            return [
+                'message' => $name . ' has been cleared from the Keeper\'s Atlas.',
+            ];
+        });
+    }
+
     private function respond(callable $action): void
     {
         if (! is_user_logged_in()) {
