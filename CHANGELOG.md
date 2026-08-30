@@ -1,3 +1,11 @@
+## 0.29.5-alpha.1 — Phase IV.29D: The Keeper's Menagerie
+
+- Adds a source-agnostic BestiarySource boundary and composite Menagerie repository.
+- Connects the first external source through a neutral Great Marketrealm Companion WordPress filter; Tabletop does not import Companion internals.
+- Keeps the Training Grounds trio as the independent fallback shelf when Companion is unavailable.
+- Companion records override matching stable IDs and future summons snapshot the currently published definition; deployed creatures are never silently rewritten.
+- Completes the IV.29 Bestiary umbrella before the Keeper's Cartography Assistant.
+
 ## 0.29.4-alpha.1 — Phase IV.29C.1A: Roll for Damage
 
 - Successful battlefield attacks now stop after the authoritative d20 result and expose a Guild Diceworks **Roll Damage** control to the acting Player or Keeper.

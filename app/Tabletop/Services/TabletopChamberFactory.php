@@ -29,7 +29,7 @@ use GreatMarketrealmTabletop\Tabletop\Light\Repositories\WordPressCarriedLightRe
 use GreatMarketrealmTabletop\Tabletop\Light\Repositories\WordPressDroppedLightRepository;
 use GreatMarketrealmTabletop\Tabletop\Light\Repositories\WordPressMagicalLightRepository;
 use GreatMarketrealmTabletop\Tabletop\Atlas\Thresholds\Repositories\WordPressThresholdRepository;
-use GreatMarketrealmTabletop\Tabletop\Bestiary\Repositories\TrainingBestiaryRepository;
+use GreatMarketrealmTabletop\Tabletop\Bestiary\Services\BestiaryRepositoryFactory;
 
 defined('ABSPATH') || exit;
 
@@ -63,7 +63,7 @@ final class TabletopChamberFactory
             new WordPressDroppedLightRepository(),
             new WordPressMagicalLightRepository(),
             new WordPressThresholdRepository(),
-            new TrainingBestiaryRepository()
+            BestiaryRepositoryFactory::make()
         );
     }
 }

@@ -341,11 +341,11 @@ $sceneImage = $scene !== null
             <button class="gmrt-bestiary-drawer__toggle" type="button" data-bestiary-toggle aria-expanded="false" aria-controls="gmrt-keepers-bestiary-panel"><span aria-hidden="true">🐲</span><span>Bestiary</span></button>
             <div class="gmrt-bestiary gmrt-bestiary-drawer__panel" id="gmrt-keepers-bestiary-panel">
                 <header class="gmrt-bestiary__header">
-                    <div><p class="gmrt-chamber__eyebrow">Dungeon Master's Drawer · IV.29C.1</p><h2>The Keeper's Bestiary</h2><small><?php echo esc_html((string) count($bestiary)); ?> creature record<?php echo count($bestiary) === 1 ? '' : 's'; ?></small></div>
+                    <div><p class="gmrt-chamber__eyebrow">Dungeon Master's Drawer · IV.29D</p><h2>The Keeper's Bestiary</h2><small><?php echo esc_html((string) count($bestiary)); ?> creature record<?php echo count($bestiary) === 1 ? '' : 's'; ?></small></div>
                     <button type="button" data-bestiary-close aria-label="Close the Keeper's Bestiary">×</button>
                 </header>
                 <div class="gmrt-bestiary__body">
-                    <p class="gmrt-bestiary__introduction">Browse reusable creature definitions, then summon Scene-owned instances onto the live map or a privately prepared Scene.</p>
+                    <p class="gmrt-bestiary__introduction">Browse the Keeper’s Menagerie: Tabletop training creatures plus published Companion creatures, then summon Scene-owned snapshots onto the live map or a privately prepared Scene.</p>
                     <label class="gmrt-bestiary__search">Search the shelves<input type="search" autocomplete="off" placeholder="Name, kind, attack, damage…" data-bestiary-search></label>
                     <small data-bestiary-results aria-live="polite"><?php echo esc_html((string) count($bestiary)); ?> records shown</small>
                     <div class="gmrt-bestiary__register" data-bestiary-register>

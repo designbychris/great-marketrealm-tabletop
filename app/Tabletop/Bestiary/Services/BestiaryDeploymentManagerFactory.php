@@ -9,7 +9,7 @@ use GreatMarketrealmTabletop\Tables\Scenes\Repositories\WordPressTableSceneRepos
 use GreatMarketrealmTabletop\Tables\Tokens\Repositories\WordPressTableTokenRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Services\TableTokenManagerFactory;
 use GreatMarketrealmTabletop\Tabletop\Atlas\Thresholds\Repositories\WordPressThresholdRepository;
-use GreatMarketrealmTabletop\Tabletop\Bestiary\Repositories\TrainingBestiaryRepository;
+use GreatMarketrealmTabletop\Tabletop\Bestiary\Services\BestiaryRepositoryFactory;
 use GreatMarketrealmTabletop\Tabletop\Arsenal\Repositories\WordPressCombatArsenalRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Repositories\WordPressCombatProfileRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Repositories\WordPressDamageDefenseRepository;
@@ -28,7 +28,7 @@ final class BestiaryDeploymentManagerFactory
             new WordPressThresholdRepository(),
             new WordPressTableTokenRepository(),
             TableTokenManagerFactory::make(),
-            new TrainingBestiaryRepository(),
+            BestiaryRepositoryFactory::make(),
             new BestiaryCombatProvisioner(
                 new WordPressCombatProfileRepository(),
                 new WordPressDamageProfileRepository(),
