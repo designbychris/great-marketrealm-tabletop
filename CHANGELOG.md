@@ -1,3 +1,10 @@
+## 0.29.5-alpha.2 — Phase IV.29D.1: Menagerie Filters
+- Adds Keeper-only `All`, `On This Map`, and `Not On This Map` filters above the Bestiary register.
+- Combines deployment filtering with the existing Bestiary text search rather than replacing it.
+- Marks each creature record with Scene-aware deployment metadata and shows an `ON MAP · ×N` badge when one or more instances are deployed in the current live or privately prepared Scene.
+- Keeps counts definition-based: `On This Map (4)` means four Bestiary creature records are represented on that Scene, while the card badge reports the number of deployed instances for that creature.
+- Uses the already viewer-safe Scene token projection; no additional Player-facing catalogue or deployment state is exposed.
+
 ## 0.29.5-alpha.1 — Phase IV.29D: The Keeper's Menagerie
 
 - Adds a source-agnostic BestiarySource boundary and composite Menagerie repository.

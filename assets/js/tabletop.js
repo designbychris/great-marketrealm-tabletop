@@ -1470,6 +1470,8 @@
     const bestiarySearch = document.querySelector('[data-bestiary-search]');
     const bestiaryResults = document.querySelector('[data-bestiary-results]');
     const bestiaryEmpty = document.querySelector('[data-bestiary-empty]');
+    const bestiaryFilterButtons = Array.from(document.querySelectorAll('[data-bestiary-filter]'));
+    let bestiaryMapFilter = 'all';
     const setBestiaryOpen = (open) => {
         if (!bestiaryDrawer || !bestiaryToggle) return;
         if (open) {
@@ -1486,12 +1488,28 @@
     };
     bestiaryToggle?.addEventListener('click', () => setBestiaryOpen(bestiaryDrawer?.dataset.open !== 'true'));
     bestiaryClose?.addEventListener('click', () => setBestiaryOpen(false));
-    bestiarySearch?.addEventListener('input', () => {
-        const query = String(bestiarySearch.value || '').trim().toLowerCase();
+
+    function refreshBestiaryFilterCounts() {
+        const cards = Array.from(document.querySelectorAll('[data-bestiary-card]'));
+        const onMap = cards.filter((card) => card.dataset.bestiaryOnMap === '1').length;
+        const counts = { all: cards.length, 'on-map': onMap, 'not-on-map': cards.length - onMap };
+        Object.entries(counts).forEach(([key, count]) => {
+            const node = document.querySelector(`[data-bestiary-filter-count="${key}"]`);
+            if (node) node.textContent = String(count);
+        });
+    }
+
+    function applyBestiaryFilters() {
+        const query = String(bestiarySearch?.value || '').trim().toLowerCase();
         let visible = 0;
         document.querySelectorAll('[data-bestiary-card]').forEach((card) => {
             const haystack = String(card.dataset.bestiarySearchText || '');
-            const matches = query === '' || haystack.includes(query);
+            const onMap = card.dataset.bestiaryOnMap === '1';
+            const matchesSearch = query === '' || haystack.includes(query);
+            const matchesMap = bestiaryMapFilter === 'all'
+                || (bestiaryMapFilter === 'on-map' && onMap)
+                || (bestiaryMapFilter === 'not-on-map' && !onMap);
+            const matches = matchesSearch && matchesMap;
             card.hidden = !matches;
             if (matches) visible += 1;
         });
@@ -1499,7 +1517,20 @@
             bestiaryResults.textContent = visible + (visible === 1 ? ' record shown' : ' records shown');
         }
         if (bestiaryEmpty) bestiaryEmpty.hidden = visible !== 0;
+    }
+
+    bestiarySearch?.addEventListener('input', applyBestiaryFilters);
+    bestiaryFilterButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+            bestiaryMapFilter = String(button.dataset.bestiaryFilter || 'all');
+            bestiaryFilterButtons.forEach((candidate) => {
+                candidate.setAttribute('aria-pressed', candidate === button ? 'true' : 'false');
+            });
+            applyBestiaryFilters();
+        });
     });
+    refreshBestiaryFilterCounts();
+    applyBestiaryFilters();
 
 
     function clearBestiaryPlacement() {

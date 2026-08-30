@@ -347,6 +347,11 @@ $sceneImage = $scene !== null
                 <div class="gmrt-bestiary__body">
                     <p class="gmrt-bestiary__introduction">Browse the Keeper’s Menagerie: Tabletop training creatures plus published Companion creatures, then summon Scene-owned snapshots onto the live map or a privately prepared Scene.</p>
                     <label class="gmrt-bestiary__search">Search the shelves<input type="search" autocomplete="off" placeholder="Name, kind, attack, damage…" data-bestiary-search></label>
+                    <div class="gmrt-bestiary__filters" role="group" aria-label="Filter Bestiary records by deployment">
+                        <button type="button" data-bestiary-filter="all" aria-pressed="true">All <span data-bestiary-filter-count="all"><?php echo esc_html((string) count($bestiary)); ?></span></button>
+                        <button type="button" data-bestiary-filter="on-map" aria-pressed="false">On This Map <span data-bestiary-filter-count="on-map">0</span></button>
+                        <button type="button" data-bestiary-filter="not-on-map" aria-pressed="false">Not On This Map <span data-bestiary-filter-count="not-on-map">0</span></button>
+                    </div>
                     <small data-bestiary-results aria-live="polite"><?php echo esc_html((string) count($bestiary)); ?> records shown</small>
                     <div class="gmrt-bestiary__register" data-bestiary-register>
                         <?php foreach ($bestiary as $creature) :
@@ -377,8 +382,8 @@ $sceneImage = $scene !== null
                             }
                             $searchParts = array_merge($searchParts, $resistances, $immunities, $weaknesses, $traits);
                         ?>
-                            <article class="gmrt-bestiary-card<?php echo $creatureHasTurn ? ' is-active-turn' : ''; ?>" data-bestiary-card data-bestiary-creature-id="<?php echo esc_attr($creatureId); ?>" data-bestiary-search-text="<?php echo esc_attr(strtolower(implode(' ', array_map('strval', $searchParts)))); ?>">
-                                <header><div class="gmrt-bestiary-card__sigil" aria-hidden="true">◆</div><div><strong><?php echo esc_html((string) ($creature['name'] ?? 'Unknown Creature')); ?></strong><small><?php echo esc_html((string) ($creature['size'] ?? 'Unknown')); ?> · <?php echo esc_html((string) ($creature['kind'] ?? 'creature')); ?></small></div></header>
+                            <article class="gmrt-bestiary-card<?php echo $creatureHasTurn ? ' is-active-turn' : ''; ?>" data-bestiary-card data-bestiary-creature-id="<?php echo esc_attr($creatureId); ?>" data-bestiary-on-map="<?php echo $deployedInstances !== [] ? '1' : '0'; ?>" data-bestiary-deployed-count="<?php echo esc_attr((string) count($deployedInstances)); ?>" data-bestiary-search-text="<?php echo esc_attr(strtolower(implode(' ', array_map('strval', $searchParts)))); ?>">
+                                <header><div class="gmrt-bestiary-card__sigil" aria-hidden="true">◆</div><div><strong><?php echo esc_html((string) ($creature['name'] ?? 'Unknown Creature')); ?></strong><small><?php echo esc_html((string) ($creature['size'] ?? 'Unknown')); ?> · <?php echo esc_html((string) ($creature['kind'] ?? 'creature')); ?></small></div><?php if ($deployedInstances !== []) : ?><span class="gmrt-bestiary-card__map-badge">ON MAP · ×<?php echo esc_html((string) count($deployedInstances)); ?></span><?php endif; ?></header>
                                 <dl class="gmrt-bestiary-card__measures"><div><dt>AC</dt><dd><?php echo esc_html((string) ($creature['armor_class'] ?? '—')); ?></dd></div><div><dt>HP</dt><dd><?php echo esc_html((string) ($creature['hit_points'] ?? '—')); ?></dd></div><div><dt>Speed</dt><dd><?php echo esc_html((string) ($creature['speed_feet'] ?? '—')); ?> ft</dd></div></dl>
                                 <details class="gmrt-bestiary-card__record">
                                     <summary>Inspect creature record</summary>
@@ -422,7 +427,7 @@ $sceneImage = $scene !== null
                             </article>
                         <?php endforeach; ?>
                     </div>
-                    <p class="gmrt-bestiary__empty" data-bestiary-empty hidden>No creature records match that search.</p>
+                    <p class="gmrt-bestiary__empty" data-bestiary-empty hidden>No creature records match the current search and map filter.</p>
                 </div>
             </div>
         </aside>
