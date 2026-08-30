@@ -136,7 +136,7 @@ $sceneImage = $scene !== null
                 <section class="gmrt-satchel__battle" data-satchel-combat-home>
                     <div>
                         <p class="gmrt-chamber__eyebrow">IV.29C.1 · Eyes on the Enemy</p>
-                        <h3>Battle Actions</h3>
+                        <div class="gmrt-satchel__battle-heading"><h3>Battle Actions</h3><span class="gmrt-player-turn-badge" data-player-turn-badge hidden>YOUR TURN</span></div>
                         <small data-satchel-turn-hint>Your Attack, Dash, Disengage, Dodge and Help controls appear here when this adventurer has the turn.</small>
                     </div>
                     <div data-satchel-combat-mount></div>
@@ -485,7 +485,7 @@ $sceneImage = $scene !== null
                         <button type="button" class="gmrt-deed" data-battle-deed="<?php echo esc_attr($deedKey); ?>"><?php echo esc_html($deedLabel); ?></button>
                     <?php endforeach; ?>
                 </div>
-                <span class="gmrt-target-range" data-target-range-status role="status" aria-live="polite">Waiting for a target</span>
+                <span class="gmrt-target-range" data-target-range-status role="status" aria-live="polite" aria-label="Target status">NO TARGET SELECTED</span>
                 <small class="gmrt-combat-dock__hint">Choose a visible battlefield target for attacks. Range and legality are reported in Turn of Battle.</small>
             </div>
 
@@ -674,6 +674,7 @@ $sceneImage = $scene !== null
             <?php endif; ?>
 
             <div class="gmrt-combat-guidance" data-combat-guidance>
+                <span class="gmrt-combat-turn-badge" data-combat-turn-badge hidden>YOUR TURN</span>
                 <span>Battle actions live with the combatant.</span>
                 <strong data-combat-guidance-copy>
                     <?php echo $state !== null && $state->isDungeonMaster()

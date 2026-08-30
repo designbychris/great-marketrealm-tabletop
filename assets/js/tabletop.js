@@ -1999,6 +1999,8 @@
 
     const combatDock = document.querySelector('[data-combat-dock]');
     const combatGuidanceCopy = document.querySelector('[data-combat-guidance-copy]');
+    const combatTurnBadge = document.querySelector('[data-combat-turn-badge]');
+    const playerTurnBadge = document.querySelector('[data-player-turn-badge]');
     const satchelCombatHome = document.querySelector('[data-satchel-combat-home]');
     const satchelCombatMount = document.querySelector('[data-satchel-combat-mount]');
 
@@ -2118,12 +2120,21 @@
         let mount = null;
         let guidance = '';
 
-        if (viewerRole === 'player' && controller !== '' && controller === viewerUserId) {
+        const playerHasTurn = viewerRole === 'player'
+            && controller !== ''
+            && controller === viewerUserId;
+
+        satchelToggle?.classList.toggle('has-active-turn', playerHasTurn);
+        satchelCombatHome?.classList.toggle('is-active-turn', playerHasTurn);
+        if (playerTurnBadge) playerTurnBadge.hidden = !playerHasTurn;
+        if (combatTurnBadge) {
+            combatTurnBadge.hidden = !playerHasTurn;
+            combatTurnBadge.textContent = playerHasTurn ? 'YOUR TURN' : '';
+        }
+
+        if (playerHasTurn) {
             mount = satchelCombatMount;
-            guidance = 'Your turn — choose the action in your Satchel. Range and legality are reported here.';
-            satchelCombatHome?.classList.add('is-active-turn');
-        } else {
-            satchelCombatHome?.classList.remove('is-active-turn');
+            guidance = 'YOUR TURN — choose the action in your Satchel. Range and legality are reported here.';
         }
 
         if (viewerRole === 'dungeon-master' && source.startsWith('gmrt-bestiary:')) {
@@ -2173,7 +2184,7 @@
         }
 
         if (rangeStatus) {
-            rangeStatus.textContent = 'Choose target';
+            rangeStatus.textContent = 'NO TARGET SELECTED';
             rangeStatus.className = 'gmrt-target-range';
             delete rangeStatus.dataset.rollMode;
         }
@@ -3281,10 +3292,22 @@
         }
     }
 
-    function cancelCombatRoll() {
-        if (diceworks) {
-            diceworks.classList.remove('is-rolling');
+    function cancelCombatRoll(reason = '') {
+        if (!diceworks) {
+            return;
         }
+
+        diceworks.classList.remove('is-rolling');
+        if (diceworksMode) diceworksMode.textContent = 'D20';
+        if (diceworksResult) {
+            diceworksResult.textContent = reason
+                ? 'Roll halted — ' + String(reason)
+                : 'Roll halted.';
+        }
+        combatDice.forEach((die) => {
+            die.classList.remove('is-chosen', 'is-rejected');
+        });
+        if (diceworksOutcome) diceworksOutcome.hidden = true;
     }
 
     const syncDeathSaveHud = (data) => {
@@ -3513,7 +3536,7 @@
 
                 say('Battle deed recorded: ' + deed + '.');
             } catch (error) {
-                cancelCombatRoll();
+                cancelCombatRoll(error.message || 'That action could not be resolved.');
                 say(error.message);
                 await refresh();
             }

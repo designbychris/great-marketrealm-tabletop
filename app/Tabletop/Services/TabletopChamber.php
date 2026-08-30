@@ -14,6 +14,7 @@ use GreatMarketrealmTabletop\Tabletop\Battle\Contracts\BattleEventRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Presentation\BattleLogProjector;
 use GreatMarketrealmTabletop\Tabletop\Presentation\CombatantStateProjector;
 use GreatMarketrealmTabletop\Tabletop\Arsenal\Contracts\CombatArsenalRepository;
+use GreatMarketrealmTabletop\Tabletop\Arsenal\Services\CompanionCombatArsenalProjector;
 use GreatMarketrealmTabletop\Tabletop\Fog\Contracts\FogOfWarRepository;
 use GreatMarketrealmTabletop\Tabletop\Fog\Services\FogOfWarProjector;
 use GreatMarketrealmTabletop\Tabletop\Vision\Contracts\VisionBarrierRepository;
@@ -369,9 +370,26 @@ final class TabletopChamber
             }
 
             if ($this->arsenals !== null) {
-                $arsenals[$tokenId] = $this->arsenals
-                    ->forToken($tableId, $tokenId)
-                    ->toArray();
+                $companionCharacter = is_array($token['companion_character'] ?? null)
+                    ? $token['companion_character']
+                    : null;
+
+                $currentArsenal = $this->arsenals->forToken(
+                    $tableId,
+                    $tokenId
+                );
+
+                if ($companionCharacter !== null) {
+                    $projectedArsenal = (new CompanionCombatArsenalProjector())
+                        ->project($tokenId, $companionCharacter);
+
+                    if ($projectedArsenal->toArray() !== $currentArsenal->toArray()) {
+                        $this->arsenals->save($tableId, $projectedArsenal);
+                        $currentArsenal = $projectedArsenal;
+                    }
+                }
+
+                $arsenals[$tokenId] = $currentArsenal->toArray();
             }
         }
 

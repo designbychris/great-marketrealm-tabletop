@@ -19,3 +19,10 @@ The current Bestiary instance receives an ACTIVE TURN marker and its definition 
 ## Phase boundary
 
 This phase relocates and unifies existing combat interaction; it does not create a second combat engine and does not yet expand the catalogue. **IV.29D — The Keeper's Menagerie** remains the next Bestiary phase, followed by the Keeper's Cartography Assistant.
+
+## Browser corrective — alpha.2
+
+- Companion-certified Weapons to Hand now project into the active character token's Tabletop Combat Arsenal, so Player turns can select and resolve real battlefield attacks without browser-supplied combat maths.
+- Denied creature attacks now halt Guild Diceworks explicitly instead of leaving the certified d20 in its rolling presentation state.
+- Turn of Battle target feedback is presentation-only (`NO TARGET SELECTED`, range, legality) rather than resembling an inert Choose Target control.
+- Player turns gain an explicit YOUR TURN badge in both the Satchel battle surface and shared Turn of Battle guidance, plus a Satchel tab turn beacon.

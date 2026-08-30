@@ -742,3 +742,8 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - Projects footsteps server-side per viewer so fog never leaks hidden movement history.
 - Own recent steps may linger faintly in explored memory; other players' steps require current visibility.
 - Reuses Fellowship colours and the Living Table heartbeat.
+
+### 0.29.3-alpha.2 — Eyes on the Enemy browser corrective
+- Bridge Companion-certified equipped weapon attacks into the active character token Combat Arsenal for authoritative Player battlefield targeting and attacks.
+- Make denied Guild Diceworks rolls visibly halt rather than appearing permanently in-progress.
+- Clarify Turn of Battle target status and add conspicuous Player-turn beacons to the Satchel and shared combat guidance.
