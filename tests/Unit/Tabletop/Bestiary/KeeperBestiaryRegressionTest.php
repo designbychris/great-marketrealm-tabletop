@@ -49,7 +49,7 @@ final class KeeperBestiaryRegressionTest extends TestCase
     public function test_factory_wires_the_tabletop_owned_bestiary_repository(): void
     {
         $factory = file_get_contents($this->root('app/Tabletop/Services/TabletopChamberFactory.php'));
-        self::assertStringContainsString('new TrainingBestiaryRepository()', $factory);
+        self::assertStringContainsString('BestiaryRepositoryFactory::make()', $factory);
     }
 
     public function test_live_state_exposes_only_the_already_authorized_bestiary_projection(): void

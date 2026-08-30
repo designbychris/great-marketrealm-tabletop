@@ -101,7 +101,7 @@ final class CreaturesInBattleRegressionTest extends TestCase
     {
         $roadmap = file_get_contents($this->root('ROADMAP.md'));
         self::assertStringContainsString('[x] **IV.29C — Creatures in Battle**', $roadmap);
-        self::assertStringContainsString("[ ] **IV.29D — The Keeper's Menagerie**", $roadmap);
+        self::assertStringContainsString("[x] **IV.29D — The Keeper's Menagerie**", $roadmap);
         self::assertLessThan(
             strpos($roadmap, "Keeper's Cartography Assistant"),
             strpos($roadmap, "IV.29D — The Keeper's Menagerie")

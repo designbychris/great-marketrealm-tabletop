@@ -36,7 +36,7 @@ final class KeeperMenagerieRegressionTest extends TestCase
     public function test_external_records_require_battlefield_measures(): void
     {
         $mapper = file_get_contents($this->root('app/Tabletop/Bestiary/Services/ExternalBestiaryMapper.php'));
-        self::assertStringContainsString("$ac < 1 || $hp < 1", $mapper);
+        self::assertStringContainsString('$ac < 1 || $hp < 1', $mapper);
         self::assertStringContainsString('return null;', $mapper);
     }
 

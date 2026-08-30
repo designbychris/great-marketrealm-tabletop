@@ -94,7 +94,7 @@ final class EyesOnEnemyRegressionTest extends TestCase
     {
         $roadmap = file_get_contents($this->root('ROADMAP.md'));
         self::assertStringContainsString('[x] **IV.29C.1 — Eyes on the Enemy**', $roadmap);
-        self::assertStringContainsString("[ ] **IV.29D — The Keeper's Menagerie**", $roadmap);
+        self::assertStringContainsString("[x] **IV.29D — The Keeper's Menagerie**", $roadmap);
         self::assertLessThan(
             strpos($roadmap, "IV.29D — The Keeper's Menagerie"),
             strpos($roadmap, 'IV.29C.1 — Eyes on the Enemy')

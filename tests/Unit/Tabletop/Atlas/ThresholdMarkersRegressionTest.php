@@ -105,7 +105,7 @@ final class ThresholdMarkersRegressionTest extends TestCase
         $roadmap = (string) file_get_contents($this->root('ROADMAP.md'));
         $phase = (string) file_get_contents($this->root('docs/Roadmap/PHASE-IV.28D.md'));
         self::assertStringContainsString('[x] **IV.28D — The Threshold Markers**', $roadmap);
-        self::assertStringContainsString("[ ] **IV.29 — The Keeper's Bestiary**", $roadmap);
+        self::assertStringContainsString("[x] **IV.29 — The Keeper's Bestiary**", $roadmap);
         self::assertLessThan(
             strpos($roadmap, "Keeper's Cartography Assistant"),
             strpos($roadmap, "IV.29 — The Keeper's Bestiary")
