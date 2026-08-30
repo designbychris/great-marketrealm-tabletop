@@ -57,6 +57,37 @@ final class ThresholdManager
         return $marker;
     }
 
+    public function move(
+        string $tableId,
+        int $viewerUserId,
+        string $sceneId,
+        string $markerId,
+        float $x,
+        float $y
+    ): ThresholdMarker {
+        $this->assertDungeonMaster($tableId, $viewerUserId);
+        $scene = $this->requiredScene($tableId, $sceneId);
+        $scene->coordinates($x, $y);
+
+        $existing = $this->thresholds->find($tableId, $sceneId, $markerId);
+        if ($existing === null) {
+            throw new AtlasDenied('That Threshold Marker could not be found.');
+        }
+
+        $marker = ThresholdMarker::create(
+            $existing->id(),
+            $existing->tableId(),
+            $existing->sceneId(),
+            $existing->type(),
+            $x,
+            $y,
+            $existing->createdAt()
+        );
+        $this->thresholds->save($marker);
+
+        return $marker;
+    }
+
     public function remove(string $tableId, int $viewerUserId, string $sceneId, string $markerId): void
     {
         $this->assertDungeonMaster($tableId, $viewerUserId);

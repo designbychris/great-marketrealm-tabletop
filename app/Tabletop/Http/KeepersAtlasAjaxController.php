@@ -68,6 +68,27 @@ final class KeepersAtlasAjaxController
         });
     }
 
+    public function moveThreshold(): void
+    {
+        $this->respond(function (): array {
+            $marker = $this->atlas->moveThreshold(
+                $this->tableId(),
+                get_current_user_id(),
+                sanitize_text_field((string) ($_POST['scene_id'] ?? '')),
+                sanitize_text_field((string) ($_POST['marker_id'] ?? '')),
+                (float) ($_POST['x'] ?? 0),
+                (float) ($_POST['y'] ?? 0)
+            );
+
+            return [
+                'marker' => $marker->toArray(),
+                'message' => $marker->type() === 'party'
+                    ? 'Party Arrival Threshold repositioned.'
+                    : 'Monster Deployment Threshold repositioned.',
+            ];
+        });
+    }
+
     public function removeThreshold(): void
     {
         $this->respond(function (): array {

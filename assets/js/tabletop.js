@@ -1527,9 +1527,12 @@
         notice.setAttribute('aria-live', 'polite');
 
         const copy = document.createElement('span');
-        copy.textContent = type === 'party'
-            ? 'Party Arrival armed — click anywhere on the map to place the Threshold.'
-            : 'Monster Deployment armed — click anywhere on the map to place the Threshold.';
+        const repositioning = Boolean(thresholdPlacement && thresholdPlacement.markerId);
+        copy.textContent = repositioning
+            ? 'Threshold repositioning armed — click the map to choose its new position.'
+            : (type === 'party'
+                ? 'Party Arrival armed — click anywhere on the map to place the Threshold.'
+                : 'Monster Deployment armed — click anywhere on the map to place the Threshold.');
 
         const cancel = document.createElement('button');
         cancel.type = 'button';
@@ -1583,12 +1586,18 @@
         const point = coordinatesFromPointer(event);
 
         try {
-            const data = await request('gmrt_atlas_place_threshold', {
+            const action = placement.markerId
+                ? 'gmrt_atlas_move_threshold'
+                : 'gmrt_atlas_place_threshold';
+            const values = {
                 scene_id: placement.sceneId,
                 threshold_type: placement.type,
                 x: point.x,
                 y: point.y
-            });
+            };
+            if (placement.markerId) values.marker_id = placement.markerId;
+
+            const data = await request(action, values);
             clearThresholdPlacement();
             await replaceChamber(
                 data.message || 'Threshold Marker placed.',
@@ -1601,23 +1610,35 @@
         }
     }, true);
 
-    document.querySelectorAll('[data-threshold-remove]').forEach((button) => {
+    document.querySelectorAll('[data-threshold-marker]').forEach((button) => {
         button.addEventListener('click', async (event) => {
             event.preventDefault();
             event.stopPropagation();
-            const markerId = String(button.dataset.thresholdRemove || '');
+
+            const markerId = String(button.dataset.thresholdMarker || '');
+            const type = String(button.dataset.thresholdType || 'party');
             const sceneId = String(button.dataset.sceneId || projectedSceneId);
             if (!markerId || !sceneId) return;
-            if (!window.confirm('Remove this Threshold Marker?')) return;
-            try {
-                const data = await request('gmrt_atlas_remove_threshold', {
-                    scene_id: sceneId,
-                    marker_id: markerId
-                });
-                await replaceChamber(data.message || 'Threshold Marker removed.', preparationSceneId || null);
-            } catch (error) {
-                say(error.message || 'The Threshold Marker could not be removed.');
+
+            if (event.shiftKey) {
+                if (!window.confirm('Remove this Threshold Marker?')) return;
+                try {
+                    const data = await request('gmrt_atlas_remove_threshold', {
+                        scene_id: sceneId,
+                        marker_id: markerId
+                    });
+                    await replaceChamber(data.message || 'Threshold Marker removed.', preparationSceneId || null);
+                } catch (error) {
+                    say(error.message || 'The Threshold Marker could not be removed.');
+                }
+                return;
             }
+
+            thresholdPlacement = { type, sceneId, markerId };
+            root.dataset.thresholdPlacement = type;
+            board.classList.add('is-threshold-placing');
+            showThresholdPlacementNotice(type);
+            say('Threshold repositioning armed — click the map to choose its new position. Shift-click the marker to remove it instead.');
         });
     });
 
@@ -2078,11 +2099,12 @@
     });
 
     function coordinatesFromPointer(event) {
-        const rect = board.getBoundingClientRect();
+        const battlemap = board.querySelector('[data-battlemap-image]');
+        const rect = (battlemap || board).getBoundingClientRect();
 
         return {
-            x: Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width)),
-            y: Math.max(0, Math.min(1, (event.clientY - rect.top) / rect.height))
+            x: Math.max(0, Math.min(1, (event.clientX - rect.left) / Math.max(1, rect.width))),
+            y: Math.max(0, Math.min(1, (event.clientY - rect.top) / Math.max(1, rect.height)))
         };
     }
 

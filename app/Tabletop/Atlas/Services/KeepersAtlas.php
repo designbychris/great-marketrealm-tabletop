@@ -77,6 +77,17 @@ final class KeepersAtlas
         return $this->thresholds->place($tableId, $viewerUserId, $sceneId, $type, $x, $y);
     }
 
+    public function moveThreshold(
+        string $tableId,
+        int $viewerUserId,
+        string $sceneId,
+        string $markerId,
+        float $x,
+        float $y
+    ): ThresholdMarker {
+        return $this->thresholds->move($tableId, $viewerUserId, $sceneId, $markerId, $x, $y);
+    }
+
     public function removeThreshold(
         string $tableId,
         int $viewerUserId,

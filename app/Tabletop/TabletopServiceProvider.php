@@ -324,6 +324,11 @@ final class TabletopServiceProvider
         );
 
         add_action(
+            'wp_ajax_gmrt_atlas_move_threshold',
+            [$this->keepersAtlasAjax, 'moveThreshold']
+        );
+
+        add_action(
             'wp_ajax_gmrt_atlas_remove_threshold',
             [$this->keepersAtlasAjax, 'removeThreshold']
         );

@@ -91,4 +91,41 @@ final class ThresholdMarkersRegressionTest extends TestCase
         );
         self::assertStringContainsString('A character token already present in the destination Scene is never moved', $phase);
     }
+    public function test_threshold_coordinates_follow_the_battlemap_not_the_viewport_shell(): void
+    {
+        $js = (string) file_get_contents($this->root('assets/js/tabletop.js'));
+        self::assertStringContainsString("board.querySelector('[data-battlemap-image]')", $js);
+        self::assertStringContainsString('const rect = (battlemap || board).getBoundingClientRect();', $js);
+    }
+
+    public function test_multiple_thresholds_are_stored_by_marker_id_without_replacing_their_siblings(): void
+    {
+        $repository = (string) file_get_contents($this->root('app/Tabletop/Atlas/Thresholds/Repositories/WordPressThresholdRepository.php'));
+        self::assertStringContainsString('$records[$marker->tableId()][$marker->sceneId()][$marker->id()] = $marker->toArray();', $repository);
+        self::assertStringContainsString('foreach ($this->records()[$tableId][$sceneId] ?? [] as $record)', $repository);
+    }
+
+    public function test_keeper_can_reposition_a_threshold_without_forging_a_second_marker(): void
+    {
+        $manager = (string) file_get_contents($this->root('app/Tabletop/Atlas/Thresholds/Services/ThresholdManager.php'));
+        $provider = (string) file_get_contents($this->root('app/Tabletop/TabletopServiceProvider.php'));
+        $js = (string) file_get_contents($this->root('assets/js/tabletop.js'));
+
+        self::assertStringContainsString('public function move(', $manager);
+        self::assertStringContainsString('$existing->id()', $manager);
+        self::assertStringContainsString('wp_ajax_gmrt_atlas_move_threshold', $provider);
+        self::assertStringContainsString("? 'gmrt_atlas_move_threshold'", $js);
+    }
+
+    public function test_threshold_markers_offer_reposition_and_explicit_shift_remove(): void
+    {
+        $view = (string) file_get_contents($this->root('app/Tabletop/Views/chamber.php'));
+        $js = (string) file_get_contents($this->root('assets/js/tabletop.js'));
+
+        self::assertStringContainsString('data-threshold-marker=', $view);
+        self::assertStringContainsString('data-threshold-type=', $view);
+        self::assertStringContainsString('Click to reposition; Shift-click to remove.', $view);
+        self::assertStringContainsString('if (event.shiftKey)', $js);
+    }
+
 }

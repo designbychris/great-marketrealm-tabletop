@@ -261,7 +261,7 @@ $sceneImage = $scene !== null
                             <button type="button" data-threshold-place="party" data-scene-id="<?php echo esc_attr((string) ($scene['id'] ?? '')); ?>">Place Party Arrival</button>
                             <button type="button" data-threshold-place="monster" data-scene-id="<?php echo esc_attr((string) ($scene['id'] ?? '')); ?>">Place Monster Deployment</button>
                         </div>
-                        <small><?php echo esc_html((string) count($thresholds)); ?> marker<?php echo count($thresholds) === 1 ? '' : 's'; ?> on the Scene currently before the Keeper.</small>
+                        <small data-threshold-count><?php echo esc_html((string) count($thresholds)); ?> marker<?php echo count($thresholds) === 1 ? '' : 's'; ?> on the Scene currently before the Keeper.</small>
                     </section>
                 <?php endif; ?>
 
@@ -1005,11 +1005,12 @@ $sceneImage = $scene !== null
                                 <button
                                     type="button"
                                     class="gmrt-threshold-marker gmrt-threshold-marker--<?php echo esc_attr($thresholdType); ?>"
-                                    data-threshold-remove="<?php echo esc_attr((string) ($threshold['id'] ?? '')); ?>"
+                                    data-threshold-marker="<?php echo esc_attr((string) ($threshold['id'] ?? '')); ?>"
+                                    data-threshold-type="<?php echo esc_attr($thresholdType); ?>"
                                     data-scene-id="<?php echo esc_attr((string) ($threshold['scene_id'] ?? '')); ?>"
                                     style="--gmrt-threshold-x: <?php echo esc_attr((string) ((float) ($threshold['x'] ?? 0) * 100)); ?>%; --gmrt-threshold-y: <?php echo esc_attr((string) ((float) ($threshold['y'] ?? 0) * 100)); ?>%;"
-                                    aria-label="<?php echo esc_attr($thresholdLabel . '. Click to remove.'); ?>"
-                                    title="<?php echo esc_attr($thresholdLabel . ' · click to remove'); ?>"
+                                    aria-label="<?php echo esc_attr($thresholdLabel . '. Click to reposition; Shift-click to remove.'); ?>"
+                                    title="<?php echo esc_attr($thresholdLabel . ' · click to reposition · Shift-click to remove'); ?>"
                                 ><span aria-hidden="true"><?php echo $thresholdType === 'monster' ? '◆' : '◇'; ?></span></button>
                             <?php endforeach; ?>
                         </div>

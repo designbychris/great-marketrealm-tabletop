@@ -63,6 +63,7 @@ final class ThresholdMarker
     public function type(): string { return $this->type; }
     public function x(): float { return $this->x; }
     public function y(): float { return $this->y; }
+    public function createdAt(): DateTimeImmutable { return $this->createdAt; }
 
     /** @return array<string,mixed> */
     public function toArray(): array
