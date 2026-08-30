@@ -1721,3 +1721,44 @@
 .gmrt-threshold-marker--party { color: #f2d887; }
 .gmrt-threshold-marker--monster { color: #d79a9a; }
 .gmrt-threshold-marker:focus-visible { outline: 3px solid currentColor; outline-offset: 3px; }
+
+/* IV.28D.1 — Threshold placement interaction hardening */
+.gmrt-board__viewport.is-threshold-placing,
+.gmrt-board__viewport.is-threshold-placing * {
+    cursor: crosshair !important;
+}
+
+.gmrt-threshold-placement {
+    position: fixed;
+    z-index: 96;
+    top: clamp(5rem, 10vh, 8rem);
+    left: 50%;
+    display: flex;
+    gap: .8rem;
+    align-items: center;
+    max-width: min(42rem, calc(100vw - 2rem));
+    padding: .7rem .85rem;
+    transform: translateX(-50%);
+    border: 1px solid rgba(242, 216, 135, .72);
+    border-radius: .7rem;
+    background: rgba(24, 21, 16, .96);
+    color: #f4ead6;
+    box-shadow: 0 .75rem 2rem rgba(0, 0, 0, .38);
+    font-weight: 700;
+}
+
+.gmrt-threshold-placement span {
+    flex: 1 1 auto;
+}
+
+.gmrt-threshold-placement button {
+    flex: 0 0 auto;
+    white-space: nowrap;
+}
+
+@media(max-width:700px) {
+    .gmrt-threshold-placement {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}

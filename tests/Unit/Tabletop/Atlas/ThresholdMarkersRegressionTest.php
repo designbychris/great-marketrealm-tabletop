@@ -30,6 +30,20 @@ final class ThresholdMarkersRegressionTest extends TestCase
         self::assertStringContainsString("request('gmrt_atlas_place_threshold'", $js);
     }
 
+    public function test_threshold_placement_owns_the_next_map_click_and_stays_visible(): void
+    {
+        $js = (string) file_get_contents($this->root('assets/js/tabletop.js'));
+        $css = (string) file_get_contents($this->root('assets/css/tabletop.css'));
+
+        self::assertStringContainsString("board.addEventListener('click', async (event) => {", $js);
+        self::assertStringContainsString('event.stopImmediatePropagation();', $js);
+        self::assertStringContainsString("}, true);", $js);
+        self::assertStringContainsString('data-threshold-placement-notice', $js);
+        self::assertStringContainsString("board.classList.add('is-threshold-placing')", $js);
+        self::assertStringContainsString('.gmrt-board__viewport.is-threshold-placing', $css);
+        self::assertStringContainsString('cursor: crosshair !important;', $css);
+    }
+
     public function test_threshold_mutations_are_server_side_dm_guarded(): void
     {
         $manager = (string) file_get_contents($this->root('app/Tabletop/Atlas/Thresholds/Services/ThresholdManager.php'));

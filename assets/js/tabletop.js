@@ -1510,21 +1510,96 @@
         }
     });
 
+    function clearThresholdPlacement() {
+        thresholdPlacement = null;
+        root.dataset.thresholdPlacement = '';
+        board.classList.remove('is-threshold-placing');
+        document.querySelector('[data-threshold-placement-notice]')?.remove();
+    }
+
+    function showThresholdPlacementNotice(type) {
+        document.querySelector('[data-threshold-placement-notice]')?.remove();
+
+        const notice = document.createElement('div');
+        notice.className = 'gmrt-threshold-placement';
+        notice.dataset.thresholdPlacementNotice = '1';
+        notice.setAttribute('role', 'status');
+        notice.setAttribute('aria-live', 'polite');
+
+        const copy = document.createElement('span');
+        copy.textContent = type === 'party'
+            ? 'Party Arrival armed — click anywhere on the map to place the Threshold.'
+            : 'Monster Deployment armed — click anywhere on the map to place the Threshold.';
+
+        const cancel = document.createElement('button');
+        cancel.type = 'button';
+        cancel.textContent = 'Cancel placement';
+        cancel.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            clearThresholdPlacement();
+            say('Threshold placement cancelled.');
+        });
+
+        notice.append(copy, cancel);
+        root.appendChild(notice);
+    }
+
     document.querySelectorAll('[data-threshold-place]').forEach((button) => {
-        button.addEventListener('click', () => {
+        button.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+
             const type = String(button.dataset.thresholdPlace || '');
             const sceneId = String(button.dataset.sceneId || projectedSceneId);
             if (!['party', 'monster'].includes(type) || !sceneId) return;
+
             thresholdPlacement = { type, sceneId };
+            root.dataset.thresholdPlacement = type;
+            board.classList.add('is-threshold-placing');
+            showThresholdPlacementNotice(type);
+
             const atlasDrawer = document.querySelector('[data-keepers-atlas]');
             const atlasToggle = document.querySelector('[data-atlas-toggle]');
             if (atlasDrawer) atlasDrawer.dataset.open = 'false';
             if (atlasToggle) atlasToggle.setAttribute('aria-expanded', 'false');
+
             say(type === 'party'
-                ? 'Threshold Marker armed — click the map where arriving adventurers should gather.'
-                : 'Deployment Marker armed — click the map where the Keeper may summon creatures.');
+                ? 'Party Arrival armed — click the map to place the Threshold.'
+                : 'Monster Deployment armed — click the map to place the Threshold.');
         });
     });
+
+    // Threshold placement owns the next map click before cartography/token handlers.
+    // Capture phase is intentional: placement must remain reliable even when the
+    // Keeper clicks over a token or another interactive battlefield layer.
+    board.addEventListener('click', async (event) => {
+        if (!thresholdPlacement) return;
+
+        event.preventDefault();
+        event.stopImmediatePropagation();
+
+        const placement = thresholdPlacement;
+        const point = coordinatesFromPointer(event);
+
+        try {
+            const data = await request('gmrt_atlas_place_threshold', {
+                scene_id: placement.sceneId,
+                threshold_type: placement.type,
+                x: point.x,
+                y: point.y
+            });
+            clearThresholdPlacement();
+            await replaceChamber(
+                data.message || 'Threshold Marker placed.',
+                preparationSceneId || null
+            );
+        } catch (error) {
+            const message = error.message || 'The Threshold Marker could not be placed.';
+            say(message + ' Placement remains armed; click the map to try again or cancel.');
+            showThresholdPlacementNotice(placement.type);
+        }
+    }, true);
 
     document.querySelectorAll('[data-threshold-remove]').forEach((button) => {
         button.addEventListener('click', async (event) => {
@@ -2447,24 +2522,6 @@
     });
 
     board.addEventListener('click', async (event) => {
-        if (thresholdPlacement) {
-            const placement = thresholdPlacement;
-            thresholdPlacement = null;
-            const point = coordinatesFromPointer(event);
-            try {
-                const data = await request('gmrt_atlas_place_threshold', {
-                    scene_id: placement.sceneId,
-                    threshold_type: placement.type,
-                    x: point.x,
-                    y: point.y
-                });
-                await replaceChamber(data.message || 'Threshold Marker placed.', preparationSceneId || null);
-            } catch (error) {
-                say(error.message || 'The Threshold Marker could not be placed.');
-            }
-            return;
-        }
-
         if (!selected) {
             return;
         }
