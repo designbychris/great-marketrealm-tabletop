@@ -1462,6 +1462,43 @@
         });
     }
 
+    const bestiaryDrawer = document.querySelector('[data-keepers-bestiary]');
+    const bestiaryToggle = document.querySelector('[data-bestiary-toggle]');
+    const bestiaryClose = document.querySelector('[data-bestiary-close]');
+    const bestiarySearch = document.querySelector('[data-bestiary-search]');
+    const bestiaryResults = document.querySelector('[data-bestiary-results]');
+    const bestiaryEmpty = document.querySelector('[data-bestiary-empty]');
+    const setBestiaryOpen = (open) => {
+        if (!bestiaryDrawer || !bestiaryToggle) return;
+        if (open) {
+            const atlas = document.querySelector('[data-keepers-atlas]');
+            const atlasButton = document.querySelector('[data-atlas-toggle]');
+            if (atlas) atlas.dataset.open = 'false';
+            if (atlasButton) atlasButton.setAttribute('aria-expanded', 'false');
+        }
+        bestiaryDrawer.dataset.open = open ? 'true' : 'false';
+        bestiaryToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (open && bestiarySearch) {
+            window.setTimeout(() => bestiarySearch.focus(), 210);
+        }
+    };
+    bestiaryToggle?.addEventListener('click', () => setBestiaryOpen(bestiaryDrawer?.dataset.open !== 'true'));
+    bestiaryClose?.addEventListener('click', () => setBestiaryOpen(false));
+    bestiarySearch?.addEventListener('input', () => {
+        const query = String(bestiarySearch.value || '').trim().toLowerCase();
+        let visible = 0;
+        document.querySelectorAll('[data-bestiary-card]').forEach((card) => {
+            const haystack = String(card.dataset.bestiarySearchText || '');
+            const matches = query === '' || haystack.includes(query);
+            card.hidden = !matches;
+            if (matches) visible += 1;
+        });
+        if (bestiaryResults) {
+            bestiaryResults.textContent = visible + (visible === 1 ? ' record shown' : ' records shown');
+        }
+        if (bestiaryEmpty) bestiaryEmpty.hidden = visible !== 0;
+    });
+
     const atlasStatus = document.querySelector('[data-atlas-status]');
     const atlasAddMap = document.querySelector('[data-atlas-add-map]');
     const atlasSceneName = document.querySelector('[data-atlas-scene-name]');
@@ -1471,6 +1508,12 @@
     const atlasClose = document.querySelector('[data-atlas-close]');
     const setAtlasOpen = (open) => {
         if (!atlasDrawer || !atlasToggle) return;
+        if (open) {
+            const bestiary = document.querySelector('[data-keepers-bestiary]');
+            const bestiaryButton = document.querySelector('[data-bestiary-toggle]');
+            if (bestiary) bestiary.dataset.open = 'false';
+            if (bestiaryButton) bestiaryButton.setAttribute('aria-expanded', 'false');
+        }
         atlasDrawer.dataset.open = open ? 'true' : 'false';
         atlasToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
     };

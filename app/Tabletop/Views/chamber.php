@@ -17,6 +17,7 @@ $scene = $state?->scene();
 $scenes = $state?->scenes() ?? [];
 $preparation = $state?->preparation() ?? [];
 $thresholds = $state?->thresholds() ?? [];
+$bestiary = $state?->bestiary() ?? [];
 $isPreparingScene = ! empty($preparation['active']);
 $tokens = $state?->tokens() ?? [];
 $members = $state?->members() ?? [];
@@ -318,6 +319,54 @@ $sceneImage = $scene !== null
                     <small>The new map is added safely in the background. It does not become active until you open it.</small>
                 </div>
             </div>
+            </div>
+        </aside>
+    <?php endif; ?>
+
+    <?php if ($state !== null && $state->isDungeonMaster()) : ?>
+        <aside class="gmrt-bestiary-drawer" data-keepers-bestiary data-open="false" aria-label="The Keeper's Bestiary">
+            <button class="gmrt-bestiary-drawer__toggle" type="button" data-bestiary-toggle aria-expanded="false" aria-controls="gmrt-keepers-bestiary-panel"><span aria-hidden="true">🐲</span><span>Bestiary</span></button>
+            <div class="gmrt-bestiary gmrt-bestiary-drawer__panel" id="gmrt-keepers-bestiary-panel">
+                <header class="gmrt-bestiary__header">
+                    <div><p class="gmrt-chamber__eyebrow">Dungeon Master's Drawer · IV.29A</p><h2>The Keeper's Bestiary</h2><small><?php echo esc_html((string) count($bestiary)); ?> creature record<?php echo count($bestiary) === 1 ? '' : 's'; ?></small></div>
+                    <button type="button" data-bestiary-close aria-label="Close the Keeper's Bestiary">×</button>
+                </header>
+                <div class="gmrt-bestiary__body">
+                    <p class="gmrt-bestiary__introduction">Browse the Keeper's creature register. These are reusable definitions, not battlefield tokens. Summoning them to a Scene arrives in IV.29B.</p>
+                    <label class="gmrt-bestiary__search">Search the shelves<input type="search" autocomplete="off" placeholder="Name, kind, attack, damage…" data-bestiary-search></label>
+                    <small data-bestiary-results aria-live="polite"><?php echo esc_html((string) count($bestiary)); ?> records shown</small>
+                    <div class="gmrt-bestiary__register" data-bestiary-register>
+                        <?php foreach ($bestiary as $creature) :
+                            if (! is_array($creature)) continue;
+                            $attacks = is_array($creature['attacks'] ?? null) ? $creature['attacks'] : [];
+                            $resistances = is_array($creature['resistances'] ?? null) ? $creature['resistances'] : [];
+                            $immunities = is_array($creature['immunities'] ?? null) ? $creature['immunities'] : [];
+                            $weaknesses = is_array($creature['weaknesses'] ?? null) ? $creature['weaknesses'] : [];
+                            $traits = is_array($creature['traits'] ?? null) ? $creature['traits'] : [];
+                            $searchParts = [(string) ($creature['name'] ?? ''), (string) ($creature['kind'] ?? ''), (string) ($creature['size'] ?? '')];
+                            foreach ($attacks as $attack) {
+                                if (! is_array($attack)) continue;
+                                $searchParts[] = (string) ($attack['name'] ?? '');
+                                $searchParts[] = (string) (($attack['damage']['type'] ?? ''));
+                            }
+                            $searchParts = array_merge($searchParts, $resistances, $immunities, $weaknesses, $traits);
+                        ?>
+                            <article class="gmrt-bestiary-card" data-bestiary-card data-bestiary-search-text="<?php echo esc_attr(strtolower(implode(' ', array_map('strval', $searchParts)))); ?>">
+                                <header><div class="gmrt-bestiary-card__sigil" aria-hidden="true">◆</div><div><strong><?php echo esc_html((string) ($creature['name'] ?? 'Unknown Creature')); ?></strong><small><?php echo esc_html((string) ($creature['size'] ?? 'Unknown')); ?> · <?php echo esc_html((string) ($creature['kind'] ?? 'creature')); ?></small></div></header>
+                                <dl class="gmrt-bestiary-card__measures"><div><dt>AC</dt><dd><?php echo esc_html((string) ($creature['armor_class'] ?? '—')); ?></dd></div><div><dt>HP</dt><dd><?php echo esc_html((string) ($creature['hit_points'] ?? '—')); ?></dd></div><div><dt>Speed</dt><dd><?php echo esc_html((string) ($creature['speed_feet'] ?? '—')); ?> ft</dd></div></dl>
+                                <details class="gmrt-bestiary-card__record">
+                                    <summary>Inspect creature record</summary>
+                                    <?php if ($attacks !== []) : ?><section><h3>Actions</h3><ul><?php foreach ($attacks as $attack) : if (! is_array($attack)) continue; $damage = is_array($attack['damage'] ?? null) ? $attack['damage'] : []; ?><li><strong><?php echo esc_html((string) ($attack['name'] ?? 'Attack')); ?></strong><span>+<?php echo esc_html((string) ($attack['attack_modifier'] ?? 0)); ?> · <?php echo esc_html((string) ($attack['range_feet'] ?? 5)); ?><?php if ((int) ($attack['long_range_feet'] ?? 5) > (int) ($attack['range_feet'] ?? 5)) : ?>/<?php echo esc_html((string) ($attack['long_range_feet'] ?? 5)); ?><?php endif; ?> ft · <?php echo esc_html((string) ($damage['dice_count'] ?? 1)); ?>d<?php echo esc_html((string) ($damage['die_sides'] ?? 4)); ?><?php $mod = (int) ($damage['modifier'] ?? 0); if ($mod !== 0) echo esc_html(($mod > 0 ? '+' : '') . (string) $mod); ?> <?php echo esc_html((string) ($damage['type'] ?? 'damage')); ?></span></li><?php endforeach; ?></ul></section><?php endif; ?>
+                                    <?php if ($resistances !== [] || $immunities !== [] || $weaknesses !== []) : ?><section><h3>Defences</h3><?php if ($resistances !== []) : ?><p><strong>Resists:</strong> <?php echo esc_html(implode(', ', $resistances)); ?></p><?php endif; ?><?php if ($immunities !== []) : ?><p><strong>Immune:</strong> <?php echo esc_html(implode(', ', $immunities)); ?></p><?php endif; ?><?php if ($weaknesses !== []) : ?><p><strong>Weak:</strong> <?php echo esc_html(implode(', ', $weaknesses)); ?></p><?php endif; ?></section><?php endif; ?>
+                                    <?php if ($traits !== []) : ?><section><h3>Traits</h3><ul><?php foreach ($traits as $trait) : ?><li><?php echo esc_html((string) $trait); ?></li><?php endforeach; ?></ul></section><?php endif; ?>
+                                    <small class="gmrt-bestiary-card__source">Definition: <?php echo esc_html((string) ($creature['source'] ?? 'gmrt-bestiary')); ?></small>
+                                </details>
+                                <button type="button" class="gmrt-bestiary-card__summon" disabled title="Creature deployment arrives in IV.29B">Summon to Scene · IV.29B</button>
+                            </article>
+                        <?php endforeach; ?>
+                    </div>
+                    <p class="gmrt-bestiary__empty" data-bestiary-empty hidden>No creature records match that search.</p>
+                </div>
             </div>
         </aside>
     <?php endif; ?>

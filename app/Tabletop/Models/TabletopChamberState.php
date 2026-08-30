@@ -32,7 +32,8 @@ final class TabletopChamberState
         private array $footsteps = [],
         private array $scenes = [],
         private array $preparation = [],
-        private array $thresholds = []
+        private array $thresholds = [],
+        private array $bestiary = []
     ) {}
 
     /** @return array<string,mixed> */
@@ -117,6 +118,12 @@ final class TabletopChamberState
     public function thresholds(): array
     {
         return $this->thresholds;
+    }
+
+    /** @return array<int,array<string,mixed>> */
+    public function bestiary(): array
+    {
+        return $this->bestiary;
     }
 
     /** @return array<string,mixed> */

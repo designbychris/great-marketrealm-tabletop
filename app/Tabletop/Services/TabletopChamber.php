@@ -37,6 +37,7 @@ use GreatMarketrealmTabletop\Tables\Tokens\Contracts\TableTokenRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Models\TableToken;
 use GreatMarketrealmTabletop\Tables\Tokens\Models\TableTokenType;
 use GreatMarketrealmTabletop\Tabletop\Atlas\Thresholds\Contracts\ThresholdRepository;
+use GreatMarketrealmTabletop\Tabletop\Bestiary\Contracts\BestiaryRepository;
 use RuntimeException;
 
 defined('ABSPATH') || exit;
@@ -68,7 +69,8 @@ final class TabletopChamber
         private ?CarriedLightRepository $carriedLights = null,
         private ?DroppedLightRepository $droppedLights = null,
         private ?MagicalLightRepository $magicalLights = null,
-        private ?ThresholdRepository $thresholds = null
+        private ?ThresholdRepository $thresholds = null,
+        private ?BestiaryRepository $bestiary = null
     ) {}
 
     public function state(
@@ -505,6 +507,12 @@ final class TabletopChamber
                 ? array_map(
                     static fn ($marker): array => $marker->toArray(),
                     $this->thresholds->forScene($tableId, $activeScene->id())
+                )
+                : [],
+            $viewer->isDungeonMaster() && $this->bestiary !== null
+                ? array_map(
+                    static fn ($creature): array => $creature->toArray(),
+                    $this->bestiary->all()
                 )
                 : []
         );
