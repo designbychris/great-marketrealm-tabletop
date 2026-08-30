@@ -2,6 +2,16 @@
 
 
 
+## 0.29.2-alpha.1 — Phase IV.29C: Creatures in Battle
+
+- Provisions every newly summoned Bestiary creature with authoritative AC, HP, damage defenses and a complete Combat Arsenal.
+- Converts each Bestiary attack into the existing Tabletop Arsenal/Combat/Damage model rather than adding parallel monster-combat rules.
+- Uses the first Bestiary attack as the legacy Combat Profile/Damage Profile compatibility fallback.
+- Keeps combat state instance-owned: later catalogue changes do not silently rewrite already-deployed creatures.
+- Reuses existing initiative, conditions, targeting, range, vitality, defeated-state and Chronicle systems.
+- Preserves hidden-creature privacy because combat projections are built only for viewer-authorized tokens.
+- Records IV.29D — The Keeper's Menagerie as the next Bestiary expansion phase before the Cartography Assistant.
+
 ## 0.29.1-alpha.1 — Phase IV.29B: Summoned to the Table
 
 - Enables Dungeon Master-only Bestiary deployment into the current live Scene or a privately prepared Atlas Scene.

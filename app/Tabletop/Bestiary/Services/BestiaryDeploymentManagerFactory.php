@@ -10,6 +10,11 @@ use GreatMarketrealmTabletop\Tables\Tokens\Repositories\WordPressTableTokenRepos
 use GreatMarketrealmTabletop\Tables\Tokens\Services\TableTokenManagerFactory;
 use GreatMarketrealmTabletop\Tabletop\Atlas\Thresholds\Repositories\WordPressThresholdRepository;
 use GreatMarketrealmTabletop\Tabletop\Bestiary\Repositories\TrainingBestiaryRepository;
+use GreatMarketrealmTabletop\Tabletop\Arsenal\Repositories\WordPressCombatArsenalRepository;
+use GreatMarketrealmTabletop\Tabletop\Battle\Repositories\WordPressCombatProfileRepository;
+use GreatMarketrealmTabletop\Tabletop\Battle\Repositories\WordPressDamageDefenseRepository;
+use GreatMarketrealmTabletop\Tabletop\Battle\Repositories\WordPressDamageProfileRepository;
+use GreatMarketrealmTabletop\Tabletop\Battle\Repositories\WordPressVitalityRepository;
 
 defined('ABSPATH') || exit;
 
@@ -23,7 +28,14 @@ final class BestiaryDeploymentManagerFactory
             new WordPressThresholdRepository(),
             new WordPressTableTokenRepository(),
             TableTokenManagerFactory::make(),
-            new TrainingBestiaryRepository()
+            new TrainingBestiaryRepository(),
+            new BestiaryCombatProvisioner(
+                new WordPressCombatProfileRepository(),
+                new WordPressDamageProfileRepository(),
+                new WordPressCombatArsenalRepository(),
+                new WordPressDamageDefenseRepository(),
+                new WordPressVitalityRepository()
+            )
         );
     }
 }

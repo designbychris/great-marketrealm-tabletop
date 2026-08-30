@@ -38,7 +38,8 @@ final class BestiaryDeploymentManager
         private ThresholdRepository $thresholds,
         private TableTokenRepository $tokens,
         private TableTokenManager $tokenManager,
-        private BestiaryRepository $bestiary
+        private BestiaryRepository $bestiary,
+        private BestiaryCombatProvisioner $combatProvisioner
     ) {}
 
     /** @return array<int,TableToken> */
@@ -158,7 +159,7 @@ final class BestiaryDeploymentManager
             }
         }
 
-        return $this->tokenManager->place(
+        $token = $this->tokenManager->place(
             $tableId,
             $scene->id(),
             $ordinal === 1 ? $creature->name() : $creature->name() . ' ' . $ordinal,
@@ -171,6 +172,14 @@ final class BestiaryDeploymentManager
             1,
             $hidden ? TableTokenVisibility::HIDDEN : TableTokenVisibility::VISIBLE
         );
+
+        $this->combatProvisioner->provision(
+            $tableId,
+            $token,
+            $creature
+        );
+
+        return $token;
     }
 
     /** @return array{x:float,y:float} */

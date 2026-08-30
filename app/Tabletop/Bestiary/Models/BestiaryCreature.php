@@ -53,6 +53,21 @@ final class BestiaryCreature
 
     public function id(): string { return $this->id; }
     public function name(): string { return $this->name; }
+    public function armorClass(): int { return $this->armorClass; }
+    public function hitPoints(): int { return $this->hitPoints; }
+    public function speedFeet(): int { return $this->speedFeet; }
+
+    /** @return array<int,array<string,mixed>> */
+    public function attacks(): array { return $this->attacks; }
+
+    /** @return array<int,string> */
+    public function resistances(): array { return array_values($this->resistances); }
+
+    /** @return array<int,string> */
+    public function immunities(): array { return array_values($this->immunities); }
+
+    /** @return array<int,string> */
+    public function weaknesses(): array { return array_values($this->weaknesses); }
 
     /** @return array<string,mixed> */
     public function toArray(): array
