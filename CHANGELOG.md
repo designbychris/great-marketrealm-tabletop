@@ -1,5 +1,16 @@
 ## 0.27.4-alpha.1 — IV.27E Light Wrought by Magic
 
+
+
+## 0.29.1-alpha.1 — Phase IV.29B: Summoned to the Table
+
+- Enables Dungeon Master-only Bestiary deployment into the current live Scene or a privately prepared Atlas Scene.
+- Supports manual map-click placement and Monster Deployment Threshold placement.
+- Supports 1–12 copies per summon with grid-aware spreading and distinct Scene-owned token identities.
+- Keeps Bestiary definitions separate from battlefield creature instances through the deployment service boundary.
+- Supports visible or hidden creature tokens; existing player-state filtering remains authoritative.
+- Pushes the Bestiary drawer tab down for clearer separation from the Keeper's Atlas tab.
+
 - Adds server-authoritative magical world lights driven by Companion-certified spell illumination metadata.
 - Shelfshine can be woven/quenched from the Satchel and obeys the Living Veil, walls and doors.
 - Removes the viewer's Satchel immediately when their selected Companion token leaves the Chamber.

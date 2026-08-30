@@ -34,7 +34,9 @@ use GreatMarketrealmTabletop\Tabletop\Http\CarriedLightAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\DroppedLightAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\MagicalLightAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\KeepersAtlasAjaxController;
+use GreatMarketrealmTabletop\Tabletop\Http\BestiaryAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Atlas\Services\KeepersAtlasFactory;
+use GreatMarketrealmTabletop\Tabletop\Bestiary\Services\BestiaryDeploymentManagerFactory;
 use GreatMarketrealmTabletop\Tabletop\Light\Repositories\WordPressCarriedLightRepository;
 use GreatMarketrealmTabletop\Tabletop\Light\Repositories\WordPressDroppedLightRepository;
 use GreatMarketrealmTabletop\Tabletop\Light\Repositories\WordPressMagicalLightRepository;
@@ -116,6 +118,8 @@ final class TabletopServiceProvider
     private MagicalLightAjaxController $magicalLightAjax;
 
     private KeepersAtlasAjaxController $keepersAtlasAjax;
+
+    private BestiaryAjaxController $bestiaryAjax;
 
     public function __construct()
     {
@@ -223,6 +227,10 @@ final class TabletopServiceProvider
 
         $this->keepersAtlasAjax = new KeepersAtlasAjaxController(
             KeepersAtlasFactory::make()
+        );
+
+        $this->bestiaryAjax = new BestiaryAjaxController(
+            BestiaryDeploymentManagerFactory::make()
         );
 
         $this->magicalLightAjax = new MagicalLightAjaxController(
@@ -336,6 +344,16 @@ final class TabletopServiceProvider
         add_action(
             'wp_ajax_gmrt_atlas_remove_threshold',
             [$this->keepersAtlasAjax, 'removeThreshold']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_bestiary_deploy_at_point',
+            [$this->bestiaryAjax, 'deployAtPoint']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_bestiary_deploy_at_threshold',
+            [$this->bestiaryAjax, 'deployAtThreshold']
         );
 
         add_action(

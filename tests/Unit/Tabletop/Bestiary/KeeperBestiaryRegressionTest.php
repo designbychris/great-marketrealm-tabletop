@@ -58,15 +58,17 @@ final class KeeperBestiaryRegressionTest extends TestCase
         self::assertStringContainsString("'bestiary' => \$state->bestiary()", $controller);
     }
 
-    public function test_keeper_gets_a_searchable_second_drawer_without_deployment_yet(): void
+    public function test_keeper_gets_a_searchable_second_drawer_with_deployment_controls(): void
     {
         $view = file_get_contents($this->root('app/Tabletop/Views/chamber.php'));
         self::assertStringContainsString('data-keepers-bestiary', $view);
         self::assertStringContainsString("The Keeper's Bestiary", $view);
         self::assertStringContainsString('data-bestiary-search', $view);
         self::assertStringContainsString('data-bestiary-card', $view);
-        self::assertStringContainsString('Summon to Scene · IV.29B', $view);
-        self::assertStringContainsString('disabled title=', $view);
+        self::assertStringContainsString('data-bestiary-place', $view);
+        self::assertStringContainsString('data-bestiary-threshold', $view);
+        self::assertStringContainsString('data-bestiary-quantity', $view);
+        self::assertStringContainsString('data-bestiary-hidden', $view);
     }
 
     public function test_search_filters_the_rendered_catalogue_client_side(): void

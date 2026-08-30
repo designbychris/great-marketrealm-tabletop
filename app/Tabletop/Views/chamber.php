@@ -328,11 +328,11 @@ $sceneImage = $scene !== null
             <button class="gmrt-bestiary-drawer__toggle" type="button" data-bestiary-toggle aria-expanded="false" aria-controls="gmrt-keepers-bestiary-panel"><span aria-hidden="true">🐲</span><span>Bestiary</span></button>
             <div class="gmrt-bestiary gmrt-bestiary-drawer__panel" id="gmrt-keepers-bestiary-panel">
                 <header class="gmrt-bestiary__header">
-                    <div><p class="gmrt-chamber__eyebrow">Dungeon Master's Drawer · IV.29A</p><h2>The Keeper's Bestiary</h2><small><?php echo esc_html((string) count($bestiary)); ?> creature record<?php echo count($bestiary) === 1 ? '' : 's'; ?></small></div>
+                    <div><p class="gmrt-chamber__eyebrow">Dungeon Master's Drawer · IV.29B</p><h2>The Keeper's Bestiary</h2><small><?php echo esc_html((string) count($bestiary)); ?> creature record<?php echo count($bestiary) === 1 ? '' : 's'; ?></small></div>
                     <button type="button" data-bestiary-close aria-label="Close the Keeper's Bestiary">×</button>
                 </header>
                 <div class="gmrt-bestiary__body">
-                    <p class="gmrt-bestiary__introduction">Browse the Keeper's creature register. These are reusable definitions, not battlefield tokens. Summoning them to a Scene arrives in IV.29B.</p>
+                    <p class="gmrt-bestiary__introduction">Browse reusable creature definitions, then summon Scene-owned instances onto the live map or a privately prepared Scene.</p>
                     <label class="gmrt-bestiary__search">Search the shelves<input type="search" autocomplete="off" placeholder="Name, kind, attack, damage…" data-bestiary-search></label>
                     <small data-bestiary-results aria-live="polite"><?php echo esc_html((string) count($bestiary)); ?> records shown</small>
                     <div class="gmrt-bestiary__register" data-bestiary-register>
@@ -361,7 +361,17 @@ $sceneImage = $scene !== null
                                     <?php if ($traits !== []) : ?><section><h3>Traits</h3><ul><?php foreach ($traits as $trait) : ?><li><?php echo esc_html((string) $trait); ?></li><?php endforeach; ?></ul></section><?php endif; ?>
                                     <small class="gmrt-bestiary-card__source">Definition: <?php echo esc_html((string) ($creature['source'] ?? 'gmrt-bestiary')); ?></small>
                                 </details>
-                                <button type="button" class="gmrt-bestiary-card__summon" disabled title="Creature deployment arrives in IV.29B">Summon to Scene · IV.29B</button>
+                                <div class="gmrt-bestiary-card__deployment" data-bestiary-deployment data-creature-id="<?php echo esc_attr((string) ($creature['id'] ?? '')); ?>">
+                                    <div class="gmrt-bestiary-card__deployment-options">
+                                        <label>Copies <input type="number" min="1" max="12" value="1" data-bestiary-quantity></label>
+                                        <label class="gmrt-bestiary-card__hidden"><input type="checkbox" data-bestiary-hidden> Hidden from Players</label>
+                                    </div>
+                                    <div class="gmrt-bestiary-card__deployment-actions">
+                                        <button type="button" class="gmrt-bestiary-card__summon" data-bestiary-place>Place on Map</button>
+                                        <button type="button" class="gmrt-bestiary-card__summon" data-bestiary-threshold>Use Monster Threshold</button>
+                                    </div>
+                                    <small>Target: <?php echo esc_html((string) ($scene['name'] ?? 'Current Scene')); ?><?php echo $isPreparingScene ? ' · private preparation' : ' · live Scene'; ?></small>
+                                </div>
                             </article>
                         <?php endforeach; ?>
                     </div>

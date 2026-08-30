@@ -702,6 +702,6 @@ Correct the final forged-token presentation boundary so Companion-generated port
 - [x] **IV.28D — The Threshold Markers** — DM-only Party Arrival and Monster Deployment markers; first-time adventurers are forged into a newly opened Scene at Party thresholds while existing Scene-owned character tokens retain their remembered positions.
 - [ ] **IV.29 — The Keeper's Bestiary** — umbrella phase for the Keeper's private creature catalogue, authoritative Scene summoning, and complete battlefield combat integration.
 - [x] **IV.29A — The Keeper's Bestiary** — DM-only searchable creature-definition drawer with the combat-certified Training Grounds trio; definitions remain separate from battlefield instances.
-- [ ] **IV.29B — Summoned to the Table** — controlled creature placement into live or privately prepared Scenes, using Monster Deployment Thresholds where appropriate.
+- [x] **IV.29B — Summoned to the Table** — DM-only creature deployment into live or privately prepared Scenes, with manual map placement, Monster Deployment Threshold placement, bounded multi-summon groups, and optional hidden-from-Players visibility.
 - [ ] **IV.29C — Creatures in Battle** — carry deployed Bestiary instances through vitality, Arsenal, initiative, conditions and combat.
 - [ ] **Keeper's Cartography Assistant** — analyse uploaded dungeon artwork and suggest walls, doors and room boundaries for Dungeon Master review/edit before authoritative save.

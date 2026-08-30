@@ -77,6 +77,7 @@
     let targetingPreview = null;
     let visionDrafting = false;
     let thresholdPlacement = null;
+    let bestiaryPlacement = null;
 
     function say(message) {
         if (status) {
@@ -631,6 +632,7 @@
             event.button !== 0
             || visionDrafting
             || thresholdPlacement
+            || bestiaryPlacement
             || isLensInteractiveTarget(event.target)
         ) {
             return;
@@ -1498,6 +1500,107 @@
         }
         if (bestiaryEmpty) bestiaryEmpty.hidden = visible !== 0;
     });
+
+
+    function clearBestiaryPlacement() {
+        bestiaryPlacement = null;
+        root.dataset.bestiaryPlacement = '';
+        board.classList.remove('is-bestiary-placing');
+        document.querySelector('[data-bestiary-placement-notice]')?.remove();
+    }
+
+    function showBestiaryPlacementNotice(name) {
+        document.querySelector('[data-bestiary-placement-notice]')?.remove();
+        const notice = document.createElement('div');
+        notice.className = 'gmrt-threshold-placement gmrt-bestiary-placement';
+        notice.dataset.bestiaryPlacementNotice = '1';
+        notice.setAttribute('role', 'status');
+        notice.setAttribute('aria-live', 'polite');
+        const copy = document.createElement('span');
+        copy.textContent = `${name} ready — click the map to choose the deployment point.`;
+        const cancel = document.createElement('button');
+        cancel.type = 'button';
+        cancel.textContent = 'Cancel summoning';
+        const cancelPlacement = (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            clearBestiaryPlacement();
+            say('Bestiary summoning cancelled.');
+        };
+        cancel.addEventListener('pointerdown', cancelPlacement);
+        cancel.addEventListener('click', cancelPlacement);
+        notice.append(copy, cancel);
+        root.appendChild(notice);
+    }
+
+    document.querySelectorAll('[data-bestiary-deployment]').forEach((deployment) => {
+        const creatureId = String(deployment.dataset.creatureId || '');
+        const card = deployment.closest('[data-bestiary-card]');
+        const creatureName = card?.querySelector('header strong')?.textContent?.trim() || 'Creature';
+        const quantityInput = deployment.querySelector('[data-bestiary-quantity]');
+        const hiddenInput = deployment.querySelector('[data-bestiary-hidden]');
+        const values = () => ({
+            scene_id: preparationSceneId || projectedSceneId,
+            creature_id: creatureId,
+            quantity: Math.max(1, Math.min(12, Number(quantityInput?.value || 1))),
+            hidden: hiddenInput?.checked ? '1' : '0'
+        });
+
+        deployment.querySelector('[data-bestiary-threshold]')?.addEventListener('click', async (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            const button = event.currentTarget;
+            const previousLabel = button.textContent;
+            button.disabled = true;
+            button.textContent = 'Summoning…';
+            try {
+                const data = await request('gmrt_bestiary_deploy_at_threshold', values());
+                say(data.message || `${creatureName} summoned.`);
+                await replaceChamber(data.message || `${creatureName} summoned.`, preparationSceneId || null);
+            } catch (error) {
+                say(error.message || 'The creature could not be summoned.');
+                button.disabled = false;
+                button.textContent = previousLabel;
+            }
+        });
+
+        deployment.querySelector('[data-bestiary-place]')?.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            bestiaryPlacement = { ...values(), creatureName };
+            root.dataset.bestiaryPlacement = creatureId;
+            board.classList.add('is-bestiary-placing');
+            setBestiaryOpen(false);
+            showBestiaryPlacementNotice(creatureName);
+            say(`${creatureName} ready — click the map to choose the deployment point.`);
+        });
+    });
+
+    board.addEventListener('click', async (event) => {
+        if (!bestiaryPlacement) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        const placement = bestiaryPlacement;
+        const point = coordinatesFromPointer(event);
+        try {
+            const data = await request('gmrt_bestiary_deploy_at_point', {
+                scene_id: placement.scene_id,
+                creature_id: placement.creature_id,
+                quantity: placement.quantity,
+                hidden: placement.hidden,
+                x: point.x,
+                y: point.y
+            });
+            clearBestiaryPlacement();
+            await replaceChamber(
+                data.message || `${placement.creatureName} summoned.`,
+                preparationSceneId || null
+            );
+        } catch (error) {
+            say((error.message || 'The creature could not be summoned.') + ' Placement remains armed; click the map to try again or cancel.');
+            showBestiaryPlacementNotice(placement.creatureName);
+        }
+    }, true);
 
     const atlasStatus = document.querySelector('[data-atlas-status]');
     const atlasAddMap = document.querySelector('[data-atlas-add-map]');
