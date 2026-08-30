@@ -27,7 +27,9 @@ final class ThresholdMarkersRegressionTest extends TestCase
         $js = (string) file_get_contents($this->root('assets/js/tabletop.js'));
         self::assertStringContainsString('data-threshold-place="party"', $view);
         self::assertStringContainsString('data-threshold-place="monster"', $view);
-        self::assertStringContainsString("request('gmrt_atlas_place_threshold'", $js);
+        self::assertStringContainsString("? 'gmrt_atlas_move_threshold'", $js);
+        self::assertStringContainsString(": 'gmrt_atlas_place_threshold'", $js);
+        self::assertStringContainsString("request(action,", $js);
     }
 
     public function test_threshold_placement_owns_the_next_map_click_and_stays_visible(): void
