@@ -21,7 +21,7 @@ final class BestiaryAjaxController
                 $this->tableId(),
                 get_current_user_id(),
                 $this->sceneId(),
-                sanitize_key((string) ($_POST['creature_id'] ?? '')),
+                sanitize_text_field((string) ($_POST['creature_id'] ?? '')),
                 (float) ($_POST['x'] ?? 0),
                 (float) ($_POST['y'] ?? 0),
                 $this->quantity(),
@@ -39,7 +39,7 @@ final class BestiaryAjaxController
                 $this->tableId(),
                 get_current_user_id(),
                 $this->sceneId(),
-                sanitize_key((string) ($_POST['creature_id'] ?? '')),
+                sanitize_text_field((string) ($_POST['creature_id'] ?? '')),
                 $this->quantity(),
                 ! empty($_POST['hidden'])
             );

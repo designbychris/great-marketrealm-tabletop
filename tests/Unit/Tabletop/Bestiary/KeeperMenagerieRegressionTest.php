@@ -54,6 +54,13 @@ final class KeeperMenagerieRegressionTest extends TestCase
         self::assertStringContainsString('Keeper’s Menagerie', $view);
     }
 
+    public function test_deployment_preserves_namespaced_menagerie_creature_ids(): void
+    {
+        $controller = file_get_contents($this->root('app/Tabletop/Http/BestiaryAjaxController.php'));
+        self::assertStringNotContainsString('sanitize_key((string) ($_POST[\'creature_id\'] ?? \'\'))', $controller);
+        self::assertSame(2, substr_count($controller, 'sanitize_text_field((string) ($_POST[\'creature_id\'] ?? \'\'))'));
+    }
+
     public function test_roadmap_completes_bestiary_umbrella_before_cartography_assistant(): void
     {
         $roadmap = file_get_contents($this->root('ROADMAP.md'));
