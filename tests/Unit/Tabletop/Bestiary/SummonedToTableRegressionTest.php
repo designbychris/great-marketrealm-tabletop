@@ -46,7 +46,7 @@ final class SummonedToTableRegressionTest extends TestCase
         self::assertStringContainsString('$quantity < 1 || $quantity > 12', $service);
         self::assertStringContainsString('$scene->gridSize() / $scene->width()', $service);
         self::assertStringContainsString('$scene->gridSize() / $scene->height()', $service);
-        self::assertStringContainsString('\$ordinal === 1 ? \$creature->name()', $service);
+        self::assertStringContainsString('$ordinal === 1 ? $creature->name()', $service);
     }
 
     public function test_hidden_summons_reuse_existing_authoritative_token_visibility(): void
