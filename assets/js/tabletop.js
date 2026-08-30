@@ -1997,6 +1997,164 @@
         '.gmrt-deeds[data-current-token]'
     );
 
+    const combatDock = document.querySelector('[data-combat-dock]');
+    const combatGuidanceCopy = document.querySelector('[data-combat-guidance-copy]');
+    const satchelCombatHome = document.querySelector('[data-satchel-combat-home]');
+    const satchelCombatMount = document.querySelector('[data-satchel-combat-mount]');
+
+    function attackOptionLabel(attack) {
+        const combat = attack && attack.combat ? attack.combat : {};
+        const damage = attack && attack.damage ? attack.damage : {};
+        const normal = Number(combat.attack_range_feet || 5);
+        const long = Number(combat.long_range_feet || normal);
+        const range = long > normal ? normal + '/' + long + ' ft' : normal + ' ft';
+        const count = Number(damage.dice_count || 1);
+        const sides = Number(damage.die_sides || 6);
+        const modifier = Number(damage.modifier || 0);
+        const formula = count + 'd' + sides + (modifier > 0 ? '+' + modifier : modifier < 0 ? String(modifier) : '');
+        return String(attack.name || 'Attack') + ' · ' + formula + ' ' + String(damage.damage_type || '').toUpperCase() + ' · ' + range;
+    }
+
+    function populateCombatDock(currentTokenId, tokens, arsenals) {
+        if (!combatDock || !attackTarget || !arsenalAttack) return;
+
+        const arsenalRecord = arsenals && arsenals[currentTokenId]
+            ? arsenals[currentTokenId]
+            : {};
+        const attacks = Array.isArray(arsenalRecord.attacks)
+            ? arsenalRecord.attacks
+            : [];
+
+        arsenalAttack.replaceChildren();
+        if (attacks.length === 0) {
+            const option = document.createElement('option');
+            option.value = '';
+            option.textContent = 'No attack readied';
+            arsenalAttack.append(option);
+            arsenalAttack.disabled = true;
+        } else {
+            arsenalAttack.disabled = false;
+            attacks.forEach((attack) => {
+                const option = document.createElement('option');
+                option.value = String(attack.id || '');
+                option.textContent = attackOptionLabel(attack);
+                arsenalAttack.append(option);
+            });
+        }
+
+        attackTarget.replaceChildren();
+        const empty = document.createElement('option');
+        empty.value = '';
+        empty.textContent = 'Choose target…';
+        attackTarget.append(empty);
+        (Array.isArray(tokens) ? tokens : []).forEach((token) => {
+            const id = String(token.id || '');
+            if (!id || id === currentTokenId) return;
+            const option = document.createElement('option');
+            option.value = id;
+            option.textContent = String(token.label || 'Token');
+            attackTarget.append(option);
+        });
+    }
+
+    function syncCombatDock(state = null) {
+        if (!combatDock || !deedsPanel) return;
+
+        const currentTokenId = state && state.encounter
+            ? String(state.encounter.current_token_id || '')
+            : String(deedsPanel.dataset.currentToken || '');
+        deedsPanel.dataset.currentToken = currentTokenId;
+
+        const combatStatusMount = document.querySelector('[data-combat-status-mount]');
+        if (rangeStatus && combatStatusMount && rangeStatus.parentElement !== combatStatusMount) {
+            combatStatusMount.append(rangeStatus);
+        }
+
+        document.querySelectorAll('[data-bestiary-instance-id]').forEach((instance) => {
+            const active = instance.dataset.bestiaryInstanceId === currentTokenId;
+            instance.classList.toggle('is-active-turn', active);
+            const badge = instance.querySelector('[data-bestiary-turn-badge]');
+            if (badge) badge.hidden = !active;
+        });
+        document.querySelectorAll('[data-bestiary-card]').forEach((card) => {
+            card.classList.toggle('is-active-turn', Boolean(card.querySelector('[data-bestiary-instance-id].is-active-turn')));
+        });
+
+        if (state) {
+            document.querySelectorAll('[data-bestiary-instance-id]').forEach((instance) => {
+                const tokenId = String(instance.dataset.bestiaryInstanceId || '');
+                const vitality = state.vitality && state.vitality[tokenId] ? state.vitality[tokenId] : null;
+                const hp = instance.querySelector('[data-bestiary-instance-hp]');
+                if (hp && vitality) {
+                    hp.textContent = String(vitality.current_hp) + '/' + String(vitality.maximum_hp);
+                }
+                const conditions = state.conditions && Array.isArray(state.conditions[tokenId])
+                    ? state.conditions[tokenId]
+                    : [];
+                const conditionNode = instance.querySelector('[data-bestiary-instance-conditions]');
+                if (conditionNode) {
+                    conditionNode.textContent = conditions.length === 0
+                        ? 'No conditions'
+                        : conditions.map((condition) => String(condition.condition || condition.type || '')).filter(Boolean).join(', ');
+                }
+            });
+        }
+
+        if (!currentTokenId) {
+            combatDock.hidden = true;
+            if (combatGuidanceCopy) combatGuidanceCopy.textContent = 'No combatant currently has the turn.';
+            return;
+        }
+
+        if (state) {
+            populateCombatDock(currentTokenId, state.tokens || [], state.arsenals || {});
+        }
+
+        const actor = document.querySelector('[data-token-id="' + CSS.escape(currentTokenId) + '"]');
+        const viewerRole = String(root?.dataset.viewerRole || '');
+        const viewerUserId = String(root?.dataset.viewerUserId || '');
+        const controller = String(actor?.dataset.tokenController || '');
+        const source = String(actor?.dataset.tokenSource || '');
+        let mount = null;
+        let guidance = '';
+
+        if (viewerRole === 'player' && controller !== '' && controller === viewerUserId) {
+            mount = satchelCombatMount;
+            guidance = 'Your turn — choose the action in your Satchel. Range and legality are reported here.';
+            satchelCombatHome?.classList.add('is-active-turn');
+        } else {
+            satchelCombatHome?.classList.remove('is-active-turn');
+        }
+
+        if (viewerRole === 'dungeon-master' && source.startsWith('gmrt-bestiary:')) {
+            const instance = document.querySelector('[data-bestiary-instance-id="' + CSS.escape(currentTokenId) + '"]');
+            mount = instance?.querySelector('[data-bestiary-combat-mount]') || null;
+            guidance = 'Creature turn — act from the highlighted Bestiary instance. End Turn remains here.';
+            bestiaryToggle?.classList.add('has-active-turn');
+            if (bestiaryDrawer?.dataset.open === 'true') {
+                instance?.scrollIntoView({block: 'nearest', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
+            }
+        } else {
+            bestiaryToggle?.classList.remove('has-active-turn');
+        }
+
+        if (!mount) {
+            combatDock.hidden = true;
+            if (combatGuidanceCopy) {
+                combatGuidanceCopy.textContent = viewerRole === 'dungeon-master'
+                    ? 'The active combatant is not a Bestiary creature. Turn control remains here.'
+                    : 'Waiting for your adventurer\'s turn.';
+            }
+            clearTargeting();
+            return;
+        }
+
+        if (combatDock.parentElement !== mount) mount.append(combatDock);
+        combatDock.hidden = false;
+        if (combatGuidanceCopy) combatGuidanceCopy.textContent = guidance;
+        clearTargeting();
+    }
+
     function attackButton() {
         return document.querySelector(
             '[data-battle-deed="attack"]'
@@ -2187,6 +2345,8 @@
         );
     }
 
+    syncCombatDock();
+
     window.addEventListener('resize', () => {
         if (
             targetingPreview
@@ -2214,6 +2374,16 @@
             selected.classList.add('is-selected');
             selected.setAttribute('aria-pressed', 'true');
             say('Selected ' + (selected.title || 'token') + '.');
+        }
+
+        if (selected && attackTarget && !combatDock?.hidden) {
+            const tokenId = String(selected.dataset.tokenId || '');
+            const attackerId = String(deedsPanel?.dataset.currentToken || '');
+            const hasTarget = Array.from(attackTarget.options).some((option) => option.value === tokenId);
+            if (tokenId && tokenId !== attackerId && hasTarget) {
+                attackTarget.value = tokenId;
+                updateTargeting();
+            }
         }
 
         if (removeSelectedTokenButton) {
@@ -2432,6 +2602,7 @@
                         ? 'Battle has begun — the Table takes its places.'
                         : 'Peace returns — exploration resumes.'
                 );
+                syncCombatDock(state);
                 return;
             }
 
@@ -2468,6 +2639,7 @@
                     deeds.dataset.currentToken = currentTokenId;
                 }
 
+                syncCombatDock(state);
                 say('The Table stirred — the turn has changed.');
             }
 

@@ -56,6 +56,11 @@ foreach ($tokens as $token) {
     }
 }
 
+$currentTokenId = (string) ($encounter['current_token_id'] ?? '');
+$currentArsenal = $currentTokenId !== ''
+    ? ($arsenals[$currentTokenId]['attacks'] ?? [])
+    : [];
+
 $sceneImage = $scene !== null
     ? wp_get_attachment_image_url(
         (int) ($scene['map_attachment_id'] ?? 0),
@@ -128,6 +133,14 @@ $sceneImage = $scene !== null
                     <?php $carriedLight = ! empty($fog['viewer_carried_light']); ?>
                     <div class="gmrt-lantern-measure"><span>Lantern</span><strong data-lantern-state><?php echo $carriedLight ? 'Burning' : 'Doused'; ?></strong><button type="button" data-toggle-carried-light><?php echo $carriedLight ? 'Douse Torch' : 'Light Torch'; ?></button><button type="button" data-dropped-light-action="drop"<?php echo $carriedLight ? '' : ' hidden'; ?>>Drop Torch</button><button type="button" data-dropped-light-action="pickup"<?php echo $carriedLight ? ' hidden' : ''; ?>>Pick Up Nearby Torch</button><small role="status" data-lantern-status></small></div>
                 </div>
+                <section class="gmrt-satchel__battle" data-satchel-combat-home>
+                    <div>
+                        <p class="gmrt-chamber__eyebrow">IV.29C.1 · Eyes on the Enemy</p>
+                        <h3>Battle Actions</h3>
+                        <small data-satchel-turn-hint>Your Attack, Dash, Disengage, Dodge and Help controls appear here when this adventurer has the turn.</small>
+                    </div>
+                    <div data-satchel-combat-mount></div>
+                </section>
                 <section class="gmrt-satchel__section"><h3>Abilities</h3><div class="gmrt-satchel__abilities">
                     <?php foreach ($abilityLabels as $key => $label) : $ability = is_array($satchelAbilities[$key] ?? null) ? $satchelAbilities[$key] : []; ?>
                     <button type="button" class="gmrt-quick-roll" data-quick-roll data-roll-kind="ability" data-roll-key="<?php echo esc_attr($key); ?>"><span><?php echo esc_html($label); ?></span><strong><?php echo esc_html((string) ($ability['score'] ?? '—')); ?></strong><small><?php echo esc_html(sprintf('%+d', (int) ($ability['modifier'] ?? 0))); ?> 🎲</small></button>
@@ -328,7 +341,7 @@ $sceneImage = $scene !== null
             <button class="gmrt-bestiary-drawer__toggle" type="button" data-bestiary-toggle aria-expanded="false" aria-controls="gmrt-keepers-bestiary-panel"><span aria-hidden="true">🐲</span><span>Bestiary</span></button>
             <div class="gmrt-bestiary gmrt-bestiary-drawer__panel" id="gmrt-keepers-bestiary-panel">
                 <header class="gmrt-bestiary__header">
-                    <div><p class="gmrt-chamber__eyebrow">Dungeon Master's Drawer · IV.29B</p><h2>The Keeper's Bestiary</h2><small><?php echo esc_html((string) count($bestiary)); ?> creature record<?php echo count($bestiary) === 1 ? '' : 's'; ?></small></div>
+                    <div><p class="gmrt-chamber__eyebrow">Dungeon Master's Drawer · IV.29C.1</p><h2>The Keeper's Bestiary</h2><small><?php echo esc_html((string) count($bestiary)); ?> creature record<?php echo count($bestiary) === 1 ? '' : 's'; ?></small></div>
                     <button type="button" data-bestiary-close aria-label="Close the Keeper's Bestiary">×</button>
                 </header>
                 <div class="gmrt-bestiary__body">
@@ -343,6 +356,19 @@ $sceneImage = $scene !== null
                             $immunities = is_array($creature['immunities'] ?? null) ? $creature['immunities'] : [];
                             $weaknesses = is_array($creature['weaknesses'] ?? null) ? $creature['weaknesses'] : [];
                             $traits = is_array($creature['traits'] ?? null) ? $creature['traits'] : [];
+                            $creatureId = (string) ($creature['id'] ?? '');
+                            $creatureSource = 'gmrt-bestiary:' . $creatureId;
+                            $deployedInstances = array_values(array_filter(
+                                $tokens,
+                                static fn (array $token): bool => (string) ($token['source_reference'] ?? '') === $creatureSource
+                            ));
+                            $creatureHasTurn = false;
+                            foreach ($deployedInstances as $instance) {
+                                if ((string) ($instance['id'] ?? '') === $currentTokenId) {
+                                    $creatureHasTurn = true;
+                                    break;
+                                }
+                            }
                             $searchParts = [(string) ($creature['name'] ?? ''), (string) ($creature['kind'] ?? ''), (string) ($creature['size'] ?? '')];
                             foreach ($attacks as $attack) {
                                 if (! is_array($attack)) continue;
@@ -351,7 +377,7 @@ $sceneImage = $scene !== null
                             }
                             $searchParts = array_merge($searchParts, $resistances, $immunities, $weaknesses, $traits);
                         ?>
-                            <article class="gmrt-bestiary-card" data-bestiary-card data-bestiary-search-text="<?php echo esc_attr(strtolower(implode(' ', array_map('strval', $searchParts)))); ?>">
+                            <article class="gmrt-bestiary-card<?php echo $creatureHasTurn ? ' is-active-turn' : ''; ?>" data-bestiary-card data-bestiary-creature-id="<?php echo esc_attr($creatureId); ?>" data-bestiary-search-text="<?php echo esc_attr(strtolower(implode(' ', array_map('strval', $searchParts)))); ?>">
                                 <header><div class="gmrt-bestiary-card__sigil" aria-hidden="true">◆</div><div><strong><?php echo esc_html((string) ($creature['name'] ?? 'Unknown Creature')); ?></strong><small><?php echo esc_html((string) ($creature['size'] ?? 'Unknown')); ?> · <?php echo esc_html((string) ($creature['kind'] ?? 'creature')); ?></small></div></header>
                                 <dl class="gmrt-bestiary-card__measures"><div><dt>AC</dt><dd><?php echo esc_html((string) ($creature['armor_class'] ?? '—')); ?></dd></div><div><dt>HP</dt><dd><?php echo esc_html((string) ($creature['hit_points'] ?? '—')); ?></dd></div><div><dt>Speed</dt><dd><?php echo esc_html((string) ($creature['speed_feet'] ?? '—')); ?> ft</dd></div></dl>
                                 <details class="gmrt-bestiary-card__record">
@@ -361,6 +387,27 @@ $sceneImage = $scene !== null
                                     <?php if ($traits !== []) : ?><section><h3>Traits</h3><ul><?php foreach ($traits as $trait) : ?><li><?php echo esc_html((string) $trait); ?></li><?php endforeach; ?></ul></section><?php endif; ?>
                                     <small class="gmrt-bestiary-card__source">Definition: <?php echo esc_html((string) ($creature['source'] ?? 'gmrt-bestiary')); ?></small>
                                 </details>
+                                <?php if ($deployedInstances !== []) : ?>
+                                    <section class="gmrt-bestiary-card__instances" aria-label="Deployed instances">
+                                        <h3>At the Table</h3>
+                                        <?php foreach ($deployedInstances as $instance) :
+                                            $instanceId = (string) ($instance['id'] ?? '');
+                                            $instanceVitality = is_array($vitality[$instanceId] ?? null) ? $vitality[$instanceId] : [];
+                                            $instanceConditions = is_array($conditions[$instanceId] ?? null) ? $conditions[$instanceId] : [];
+                                            $instanceHasTurn = $instanceId !== '' && $instanceId === $currentTokenId;
+                                        ?>
+                                            <div class="gmrt-bestiary-instance<?php echo $instanceHasTurn ? ' is-active-turn' : ''; ?>" data-bestiary-instance-id="<?php echo esc_attr($instanceId); ?>">
+                                                <div class="gmrt-bestiary-instance__summary">
+                                                    <strong><?php echo esc_html((string) ($instance['label'] ?? $creature['name'] ?? 'Creature')); ?></strong>
+                                                    <?php if ($instanceVitality !== []) : ?><small><span data-bestiary-instance-hp><?php echo esc_html((string) ($instanceVitality['current_hp'] ?? '—')); ?>/<?php echo esc_html((string) ($instanceVitality['maximum_hp'] ?? '—')); ?></span> HP</small><?php endif; ?>
+                                                    <small data-bestiary-instance-conditions><?php echo esc_html($instanceConditions === [] ? 'No conditions' : implode(', ', array_map(static fn (array $condition): string => (string) ($condition['condition'] ?? $condition['type'] ?? ''), $instanceConditions))); ?></small>
+                                                </div>
+                                                <span class="gmrt-bestiary-instance__turn"<?php echo $instanceHasTurn ? '' : ' hidden'; ?> data-bestiary-turn-badge>ACTIVE TURN</span>
+                                                <div data-bestiary-combat-mount></div>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </section>
+                                <?php endif; ?>
                                 <div class="gmrt-bestiary-card__deployment" data-bestiary-deployment data-creature-id="<?php echo esc_attr((string) ($creature['id'] ?? '')); ?>">
                                     <div class="gmrt-bestiary-card__deployment-options">
                                         <label>Copies <input type="number" min="1" max="12" value="1" data-bestiary-quantity></label>
@@ -387,6 +434,60 @@ $sceneImage = $scene !== null
             <button type="button" data-exit-preparation>Return to Live Scene</button>
         </section>
     <?php endif; ?>
+
+    <div
+                class="gmrt-deeds gmrt-combat-dock"
+                aria-label="Current combatant actions"
+                data-combat-dock
+                data-current-token="<?php echo esc_attr($currentTokenId); ?>"
+                hidden
+            >
+                <label class="gmrt-deeds__attack">
+                    <span>Attack</span>
+                    <select data-arsenal-attack<?php echo $currentArsenal === [] ? ' disabled' : ''; ?>>
+                        <?php if ($currentArsenal === []) : ?>
+                            <option value="">No attack readied</option>
+                        <?php else : ?>
+                            <?php foreach ($currentArsenal as $arsenalAttack) :
+                                $combat = $arsenalAttack['combat'] ?? [];
+                                $damage = $arsenalAttack['damage'] ?? [];
+                                $normal = (int) ($combat['attack_range_feet'] ?? 5);
+                                $long = (int) ($combat['long_range_feet'] ?? $normal);
+                                $rangeLabel = $long > $normal ? $normal . '/' . $long . ' ft' : $normal . ' ft';
+                                $diceLabel = (int) ($damage['dice_count'] ?? 1) . 'd' . (int) ($damage['die_sides'] ?? 6);
+                                $damageModifier = (int) ($damage['modifier'] ?? 0);
+                                if ($damageModifier > 0) $diceLabel .= '+' . $damageModifier;
+                                elseif ($damageModifier < 0) $diceLabel .= (string) $damageModifier;
+                            ?>
+                                <option value="<?php echo esc_attr((string) ($arsenalAttack['id'] ?? '')); ?>">
+                                    <?php echo esc_html((string) ($arsenalAttack['name'] ?? 'Attack') . ' · ' . $diceLabel . ' ' . strtoupper((string) ($damage['damage_type'] ?? '')) . ' · ' . $rangeLabel); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </select>
+                </label>
+                <label class="gmrt-deeds__target">
+                    <span>Target</span>
+                    <select data-attack-target>
+                        <option value="">Choose target…</option>
+                        <?php foreach ($tokens as $targetToken) :
+                            if ((string) ($targetToken['id'] ?? '') === $currentTokenId) continue;
+                        ?>
+                            <option value="<?php echo esc_attr((string) ($targetToken['id'] ?? '')); ?>"><?php echo esc_html((string) ($targetToken['label'] ?? 'Token')); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </label>
+                <div class="gmrt-combat-dock__deeds">
+                    <?php foreach (
+                        ['attack' => 'Attack', 'dash' => 'Dash', 'disengage' => 'Disengage', 'dodge' => 'Dodge', 'help' => 'Help']
+                        as $deedKey => $deedLabel
+                    ) : ?>
+                        <button type="button" class="gmrt-deed" data-battle-deed="<?php echo esc_attr($deedKey); ?>"><?php echo esc_html($deedLabel); ?></button>
+                    <?php endforeach; ?>
+                </div>
+                <span class="gmrt-target-range" data-target-range-status role="status" aria-live="polite">Waiting for a target</span>
+                <small class="gmrt-combat-dock__hint">Choose a visible battlefield target for attacks. Range and legality are reported in Turn of Battle.</small>
+            </div>
 
     <div data-live-lifecycle>
     <?php if ($state !== null && $encounter === null) : ?>
@@ -572,100 +673,17 @@ $sceneImage = $scene !== null
                 </div>
             <?php endif; ?>
 
-            <div
-                class="gmrt-deeds"
-                aria-label="Battle deeds"
-                data-current-token="<?php echo esc_attr(
-                    (string) $encounter['current_token_id']
-                ); ?>"
-            >
-                <?php if ($currentArsenal !== []) : ?>
-                    <label class="gmrt-deeds__attack">
-                        <span>Attack</span>
-                        <select data-arsenal-attack>
-                            <?php foreach ($currentArsenal as $arsenalAttack) :
-                                $combat = $arsenalAttack['combat'] ?? [];
-                                $damage = $arsenalAttack['damage'] ?? [];
-                                $normal = (int) ($combat['attack_range_feet'] ?? 5);
-                                $long = (int) ($combat['long_range_feet'] ?? $normal);
-                                $rangeLabel = $long > $normal
-                                    ? $normal . '/' . $long . ' ft'
-                                    : $normal . ' ft';
-                                $diceLabel = (int) ($damage['dice_count'] ?? 1)
-                                    . 'd'
-                                    . (int) ($damage['die_sides'] ?? 6);
-                                $damageModifier = (int) ($damage['modifier'] ?? 0);
-                                if ($damageModifier > 0) {
-                                    $diceLabel .= '+' . $damageModifier;
-                                } elseif ($damageModifier < 0) {
-                                    $diceLabel .= (string) $damageModifier;
-                                }
-                                ?>
-                                <option value="<?php echo esc_attr(
-                                    (string) ($arsenalAttack['id'] ?? '')
-                                ); ?>">
-                                    <?php echo esc_html(
-                                        (string) ($arsenalAttack['name'] ?? 'Attack')
-                                        . ' · ' . $diceLabel
-                                        . ' ' . strtoupper(
-                                            (string) ($damage['damage_type'] ?? '')
-                                        )
-                                        . ' · ' . $rangeLabel
-                                    ); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </label>
-                <?php endif; ?>
-                <label class="gmrt-deeds__target">
-                    <span>Target</span>
-                    <select data-attack-target>
-                        <option value="">Choose target…</option>
-                        <?php foreach ($tokens as $targetToken) :
-                            if (
-                                ($targetToken['id'] ?? '')
-                                === ($encounter['current_token_id'] ?? '')
-                            ) {
-                                continue;
-                            }
-                            ?>
-                            <option
-                                value="<?php echo esc_attr(
-                                    (string) ($targetToken['id'] ?? '')
-                                ); ?>"
-                            >
-                                <?php echo esc_html(
-                                    (string) ($targetToken['label'] ?? 'Token')
-                                ); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </label>
-                <span
-                    class="gmrt-target-range"
-                    data-target-range-status
-                    role="status"
-                    aria-live="polite"
-                >
-                    Choose target
-                </span>
-                <?php foreach (
-                    ['attack' => 'Attack', 'dash' => 'Dash',
-                     'disengage' => 'Disengage', 'dodge' => 'Dodge',
-                     'help' => 'Help']
-                    as $deedKey => $deedLabel
-                ) : ?>
-                    <button
-                        type="button"
-                        class="gmrt-deed"
-                        data-battle-deed="<?php echo esc_attr(
-                            $deedKey
-                        ); ?>"
-                    >
-                        <?php echo esc_html($deedLabel); ?>
-                    </button>
-                <?php endforeach; ?>
+            <div class="gmrt-combat-guidance" data-combat-guidance>
+                <span>Battle actions live with the combatant.</span>
+                <strong data-combat-guidance-copy>
+                    <?php echo $state !== null && $state->isDungeonMaster()
+                        ? 'Use the Keeper\'s Bestiary for creature actions; End Turn remains here.'
+                        : 'Use the Adventurer\'s Satchel when your turn arrives.'; ?>
+                </strong>
+                <div data-combat-status-mount></div>
             </div>
+
+
 
             <?php if ($state !== null && $state->isDungeonMaster()) : ?>
                 <div class="gmrt-afflictions" data-affliction-controls>
@@ -1169,6 +1187,9 @@ $sceneImage = $scene !== null
                                 ); ?>"
                                 data-token-type="<?php echo esc_attr(
                                     (string) ($token['type'] ?? '')
+                                ); ?>"
+                                data-token-source="<?php echo esc_attr(
+                                    (string) ($token['source_reference'] ?? '')
                                 ); ?>"
                                 data-combatant-state="<?php echo esc_attr(
                                     $combatantState

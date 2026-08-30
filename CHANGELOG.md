@@ -1,6 +1,15 @@
 ## 0.27.4-alpha.1 — IV.27E Light Wrought by Magic
 
+## 0.29.3-alpha.1 — Phase IV.29C.1: Eyes on the Enemy
 
+- Moves Attack, Dash, Disengage, Dodge and Help out of the brown Turn of Battle controls and into the combatant-owned surfaces.
+- Player turns surface the authoritative combat dock inside the Adventurer's Satchel.
+- Bestiary creature turns surface the same authoritative dock on the exact deployed creature instance, not merely its reusable definition.
+- Highlights the active Bestiary card/instance and marks the Bestiary tab when one of the Keeper's creatures has the turn.
+- Keeps End Turn and range/legality feedback in Turn of Battle.
+- Lets selecting a visible battlefield token also select it as the current attack target.
+- Reuses the existing AttackManager, BattleDeedManager, Arsenal, range and damage-defense machinery; no second combat rules engine is introduced.
+- Keeps IV.29D — The Keeper's Menagerie next, before the Keeper's Cartography Assistant.
 
 ## 0.29.2-alpha.1 — Phase IV.29C: Creatures in Battle
 
