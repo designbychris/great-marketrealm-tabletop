@@ -3077,6 +3077,9 @@
     const diceworksOutcomeDetail = document.querySelector(
         '[data-diceworks-outcome-detail]'
     );
+    const damageRollButton = document.querySelector(
+        '[data-roll-attack-damage]'
+    );
     const combatDice = Array.from(
         document.querySelectorAll('[data-combat-die]')
     );
@@ -3120,6 +3123,12 @@
 
         if (diceworksOutcome) {
             diceworksOutcome.hidden = true;
+        }
+
+        if (damageRollButton) {
+            damageRollButton.hidden = true;
+            damageRollButton.disabled = false;
+            damageRollButton.dataset.attackEventId = '';
         }
 
         combatDice.forEach((die, index) => {
@@ -3220,6 +3229,114 @@
         }
 
         diceworksOutcome.hidden = false;
+    }
+
+    function armDamageRoll(pendingDamage) {
+        if (!damageRollButton || !pendingDamage) {
+            return;
+        }
+
+        const profile = pendingDamage.damage_profile || {};
+        const critical = Boolean(pendingDamage.critical);
+        const diceCount = Math.max(1, Number(profile.dice_count || 1))
+            * (critical ? 2 : 1);
+        const sides = Math.max(2, Number(profile.die_sides || 6));
+        const modifier = Number(profile.modifier || 0);
+        const formula =
+            String(diceCount) + 'd' + String(sides)
+            + (modifier > 0 ? '+' + String(modifier) : modifier < 0 ? String(modifier) : '');
+
+        damageRollButton.dataset.attackEventId =
+            String(pendingDamage.attack_event_id || '');
+        damageRollButton.textContent =
+            'Roll Damage · ' + formula
+            + (critical ? ' CRITICAL' : '');
+        damageRollButton.hidden = false;
+    }
+
+    function revealDamageRoll(data) {
+        if (!diceworks || !data || !data.damage) {
+            return;
+        }
+
+        const damage = data.damage;
+        const rolls = Array.isArray(damage.rolls) ? damage.rolls : [];
+        const adjusted = data.damage_adjustment || {};
+        const vitality = data.vitality || {};
+        const effects = Array.isArray(adjusted.effects) ? adjusted.effects : [];
+        let effect = '';
+
+        if (effects.includes('immune')) {
+            effect = ' · IMMUNE!';
+        } else {
+            if (effects.includes('resistant')) { effect += ' · RESIST!'; }
+            if (effects.includes('vulnerable')) { effect += ' · WEAK!'; }
+        }
+
+        diceworks.classList.remove('is-rolling');
+        if (diceworksMode) {
+            diceworksMode.textContent = damage.critical ? 'CRITICAL DAMAGE' : 'DAMAGE';
+        }
+        combatDice.forEach((die, index) => {
+            die.hidden = index >= Math.min(2, rolls.length);
+            const value = die.querySelector('[data-die-value]');
+            if (value && rolls[index] !== undefined) {
+                value.textContent = String(rolls[index]);
+            }
+        });
+        if (diceworksOutcomeTitle) {
+            diceworksOutcomeTitle.textContent = damage.critical ? 'CRITICAL DAMAGE!' : 'DAMAGE ROLLED';
+        }
+        if (diceworksOutcomeDetail) {
+            diceworksOutcomeDetail.textContent =
+                '[' + rolls.join(' + ') + ']'
+                + (Number(damage.modifier || 0) !== 0 ? ' + ' + String(damage.modifier) : '')
+                + ' = ' + String(damage.total)
+                + ' rolled · ' + String(adjusted.resolved_damage || 0)
+                + ' ' + String(adjusted.damage_type || '').toUpperCase()
+                + ' DAMAGE' + effect
+                + ' · HP ' + String(vitality.current_hp || 0)
+                + '/' + String(vitality.maximum_hp || 0);
+        }
+        if (diceworksOutcome) {
+            diceworksOutcome.hidden = false;
+        }
+        if (diceworksResult) {
+            diceworksResult.textContent = 'The Guild Diceworks has certified the damage roll.';
+        }
+        if (damageRollButton) {
+            damageRollButton.hidden = true;
+            damageRollButton.dataset.attackEventId = '';
+        }
+    }
+
+    if (damageRollButton) {
+        damageRollButton.addEventListener('click', async () => {
+            const encounter = document.querySelector('[data-encounter-id]');
+            const attackEventId = damageRollButton.dataset.attackEventId || '';
+            if (!encounter || !attackEventId) {
+                return;
+            }
+
+            damageRollButton.disabled = true;
+            if (diceworks) { diceworks.classList.add('is-rolling'); }
+            if (diceworksResult) { diceworksResult.textContent = 'The damage dice are rolling…'; }
+
+            try {
+                const data = await request('gmrt_roll_attack_damage', {
+                    encounter_id: encounter.dataset.encounterId || '',
+                    attack_event_id: attackEventId
+                });
+                revealDamageRoll(data);
+                say('Damage resolved — see Guild Diceworks.');
+                await refresh();
+            } catch (error) {
+                if (diceworks) { diceworks.classList.remove('is-rolling'); }
+                if (diceworksResult) { diceworksResult.textContent = 'Damage roll halted — ' + (error.message || 'unable to resolve damage.'); }
+                damageRollButton.disabled = false;
+                say(error.message || 'Damage could not be resolved.');
+            }
+        });
     }
 
     function revealCombatRoll(attack) {
@@ -3521,6 +3638,15 @@
                             + data.vitality.current_hp
                             + '/' + data.vitality.maximum_hp
                             + '.';
+                    }
+
+                    if (data.pending_damage) {
+                        armDamageRoll(data.pending_damage);
+                        if (diceworksResult) {
+                            diceworksResult.textContent = 'Hit certified — roll the authoritative damage dice.';
+                        }
+                        say('Hit confirmed — roll damage in Guild Diceworks.');
+                        return;
                     }
 
                     say('Attack resolved — see Guild Diceworks.');

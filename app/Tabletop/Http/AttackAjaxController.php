@@ -48,7 +48,8 @@ final class AttackAjaxController
                 max(1, (int) ($_POST['revision'] ?? 1)),
                 sanitize_text_field(
                     (string) ($_POST['attack_id'] ?? '')
-                ) ?: null
+                ) ?: null,
+                false
             );
 
             wp_send_json_success([
@@ -62,6 +63,7 @@ final class AttackAjaxController
                 'death_saves' => $result['death_saves']?->toArray(),
                 'event' => $result['attack_event']->toArray(),
                 'damage_event' => $result['damage_event']?->toArray(),
+                'pending_damage' => $result['pending_damage'],
             ]);
         } catch (StaleEncounterRevision $exception) {
             wp_send_json_error(

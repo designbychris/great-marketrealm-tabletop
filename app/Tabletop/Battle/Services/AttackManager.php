@@ -59,7 +59,8 @@ final class AttackManager
         string $encounterId,
         string $targetTokenId,
         int $expectedRevision,
-        ?string $attackId = null
+        ?string $attackId = null,
+        bool $autoResolveDamage = true
     ): array {
         $encounter = $this->encounters->find(
             $tableId,
@@ -256,6 +257,7 @@ final class AttackManager
                 'attack_name' => $selectedAttack?->name(),
                 'attack_kind' => $selectedAttack?->kind(),
                 'targeting' => $range?->toArray(),
+                'damage_profile' => $damageProfile->toArray(),
             ] + $outcome->toArray()
         );
 
@@ -266,7 +268,7 @@ final class AttackManager
         $damageAdjustment = null;
         $vitality = null;
 
-        if ($outcome->isHit()) {
+        if ($outcome->isHit() && $autoResolveDamage) {
             $damageRoll = $this->damageResolver->resolve(
                 $damageProfile,
                 $outcome->result()
@@ -364,6 +366,14 @@ final class AttackManager
             'vitality' => $vitality,
             'death_saves' => isset($deathSaveState)
                 ? $deathSaveState
+                : null,
+            'pending_damage' => $outcome->isHit() && ! $autoResolveDamage
+                ? [
+                    'attack_event_id' => $event->toArray()['id'],
+                    'attack_name' => $selectedAttack?->name() ?? 'Attack',
+                    'damage_profile' => $damageProfile->toArray(),
+                    'critical' => $outcome->result() === \GreatMarketrealmTabletop\Tabletop\Battle\Models\AttackOutcome::CRITICAL_HIT,
+                ]
                 : null,
         ];
     }

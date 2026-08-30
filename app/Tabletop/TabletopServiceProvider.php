@@ -9,10 +9,12 @@ use GreatMarketrealmTabletop\Tabletop\Encounters\Services\EncounterManagerFactor
 use GreatMarketrealmTabletop\Tabletop\Http\EncounterAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\BattleDeedAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\AttackAjaxController;
+use GreatMarketrealmTabletop\Tabletop\Http\DamageRollAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\DeathSaveAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\ConditionAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Battle\Services\BattleDeedManagerFactory;
 use GreatMarketrealmTabletop\Tabletop\Battle\Services\AttackManagerFactory;
+use GreatMarketrealmTabletop\Tabletop\Battle\Services\DamageRollManagerFactory;
 use GreatMarketrealmTabletop\Tabletop\Battle\Services\DeathSaveManagerFactory;
 use GreatMarketrealmTabletop\Tabletop\Conditions\Services\ConditionManagerFactory;
 use GreatMarketrealmTabletop\Tabletop\Http\TabletopAjaxController;
@@ -82,6 +84,8 @@ final class TabletopServiceProvider
 
     private AttackAjaxController $attackAjax;
 
+    private DamageRollAjaxController $damageRollAjax;
+
     private DeathSaveAjaxController $deathSaveAjax;
 
     private ConditionAjaxController $conditionAjax;
@@ -147,6 +151,10 @@ final class TabletopServiceProvider
 
         $this->attackAjax = new AttackAjaxController(
             AttackManagerFactory::make()
+        );
+
+        $this->damageRollAjax = new DamageRollAjaxController(
+            DamageRollManagerFactory::make()
         );
 
         $this->deathSaveAjax = new DeathSaveAjaxController(
@@ -409,6 +417,11 @@ final class TabletopServiceProvider
         add_action(
             'wp_ajax_gmrt_resolve_attack',
             [$this->attackAjax, 'attack']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_roll_attack_damage',
+            [$this->damageRollAjax, 'roll']
         );
 
         add_action(

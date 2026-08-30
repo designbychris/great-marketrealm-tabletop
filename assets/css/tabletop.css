@@ -1825,3 +1825,16 @@
     0%,100% { filter: brightness(1); }
     50% { filter: brightness(1.18); }
 }
+
+/* IV.29C.1A — Roll for Damage */
+.gmrt-diceworks__damage-roll {
+    margin-top: .55rem;
+    align-self: flex-start;
+    font: inherit;
+    font-weight: 800;
+    letter-spacing: .035em;
+}
+
+.gmrt-diceworks__damage-roll[hidden] {
+    display: none !important;
+}

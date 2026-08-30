@@ -759,6 +759,14 @@ $sceneImage = $scene !== null
                         Awaiting result
                     </strong>
                     <span data-diceworks-outcome-detail></span>
+                    <button
+                        type="button"
+                        class="gmrt-diceworks__damage-roll"
+                        data-roll-attack-damage
+                        hidden
+                    >
+                        Roll Damage
+                    </button>
                 </div>
                 <small data-diceworks-result>
                     Awaiting the roll…

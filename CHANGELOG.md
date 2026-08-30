@@ -1,3 +1,12 @@
+## 0.29.4-alpha.1 — Phase IV.29C.1A: Roll for Damage
+
+- Successful battlefield attacks now stop after the authoritative d20 result and expose a Guild Diceworks **Roll Damage** control to the acting Player or Keeper.
+- The attack event becomes a server-owned single-use damage receipt; the browser submits only its opaque ID.
+- Damage dice/formula, modifier, damage type, critical doubling, target, defenses, HP application and death consequences are resolved from authoritative server state.
+- Misses never expose a damage roll and a damage receipt cannot be consumed twice.
+- Damage must be rolled before the acting combatant ends its turn, preventing stale delayed damage.
+- Existing direct AttackManager callers retain automatic damage resolution for backwards-compatible domain tests; the live AJAX battle flow opts into the explicit Diceworks step.
+
 ## 0.27.4-alpha.1 — IV.27E Light Wrought by Magic
 
 ## 0.29.3-alpha.1 — Phase IV.29C.1: Eyes on the Enemy
