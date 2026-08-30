@@ -14,6 +14,8 @@ use GreatMarketrealmTabletop\Tables\Scenes\Models\TableScene;
 use GreatMarketrealmTabletop\Tables\Scenes\Services\TableSceneManager;
 use GreatMarketrealmTabletop\Tabletop\Atlas\Exceptions\AtlasDenied;
 use GreatMarketrealmTabletop\Tabletop\Cartography\Services\BattlemapInspector;
+use GreatMarketrealmTabletop\Tabletop\Atlas\Thresholds\Models\ThresholdMarker;
+use GreatMarketrealmTabletop\Tabletop\Atlas\Thresholds\Services\ThresholdManager;
 
 final class KeepersAtlas
 {
@@ -21,7 +23,8 @@ final class KeepersAtlas
         private TableMembershipRepository $members,
         private TableSceneManager $scenes,
         private BattlemapInspector $images,
-        private SceneShelfCleaner $cleaner
+        private SceneShelfCleaner $cleaner,
+        private ThresholdManager $thresholds
     ) {}
 
     public function addMap(
@@ -57,7 +60,30 @@ final class KeepersAtlas
         string $sceneId
     ): TableScene {
         $this->assertDungeonMaster($tableId, $viewerUserId);
-        return $this->scenes->activate($tableId, $sceneId);
+        $scene = $this->scenes->activate($tableId, $sceneId);
+        $this->thresholds->welcomeParty($tableId, $scene);
+        return $scene;
+    }
+
+
+    public function placeThreshold(
+        string $tableId,
+        int $viewerUserId,
+        string $sceneId,
+        string $type,
+        float $x,
+        float $y
+    ): ThresholdMarker {
+        return $this->thresholds->place($tableId, $viewerUserId, $sceneId, $type, $x, $y);
+    }
+
+    public function removeThreshold(
+        string $tableId,
+        int $viewerUserId,
+        string $sceneId,
+        string $markerId
+    ): void {
+        $this->thresholds->remove($tableId, $viewerUserId, $sceneId, $markerId);
     }
 
     public function deleteMap(string $tableId, int $viewerUserId, string $sceneId): string

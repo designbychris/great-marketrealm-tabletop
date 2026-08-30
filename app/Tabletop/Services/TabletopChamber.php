@@ -36,6 +36,7 @@ use GreatMarketrealmTabletop\Tables\Scenes\Contracts\TableSceneRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Contracts\TableTokenRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Models\TableToken;
 use GreatMarketrealmTabletop\Tables\Tokens\Models\TableTokenType;
+use GreatMarketrealmTabletop\Tabletop\Atlas\Thresholds\Contracts\ThresholdRepository;
 use RuntimeException;
 
 defined('ABSPATH') || exit;
@@ -66,7 +67,8 @@ final class TabletopChamber
         private ?FootstepTrailProjector $footstepProjector = null,
         private ?CarriedLightRepository $carriedLights = null,
         private ?DroppedLightRepository $droppedLights = null,
-        private ?MagicalLightRepository $magicalLights = null
+        private ?MagicalLightRepository $magicalLights = null,
+        private ?ThresholdRepository $thresholds = null
     ) {}
 
     public function state(
@@ -498,7 +500,13 @@ final class TabletopChamber
                 'active' => $preparationSceneId !== '',
                 'scene_id' => $preparationSceneId,
                 'live_scene_id' => $liveScene?->id() ?? '',
-            ]
+            ],
+            $viewer->isDungeonMaster() && $activeScene !== null && $this->thresholds !== null
+                ? array_map(
+                    static fn ($marker): array => $marker->toArray(),
+                    $this->thresholds->forScene($tableId, $activeScene->id())
+                )
+                : []
         );
     }
 }

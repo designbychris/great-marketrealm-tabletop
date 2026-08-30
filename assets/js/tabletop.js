@@ -76,6 +76,7 @@
     const removeSelectedTokenButton = document.querySelector('[data-remove-selected-token]');
     let targetingPreview = null;
     let visionDrafting = false;
+    let thresholdPlacement = null;
 
     function say(message) {
         if (status) {
@@ -1509,6 +1510,42 @@
         }
     });
 
+    document.querySelectorAll('[data-threshold-place]').forEach((button) => {
+        button.addEventListener('click', () => {
+            const type = String(button.dataset.thresholdPlace || '');
+            const sceneId = String(button.dataset.sceneId || projectedSceneId);
+            if (!['party', 'monster'].includes(type) || !sceneId) return;
+            thresholdPlacement = { type, sceneId };
+            const atlasDrawer = document.querySelector('[data-keepers-atlas]');
+            const atlasToggle = document.querySelector('[data-atlas-toggle]');
+            if (atlasDrawer) atlasDrawer.dataset.open = 'false';
+            if (atlasToggle) atlasToggle.setAttribute('aria-expanded', 'false');
+            say(type === 'party'
+                ? 'Threshold Marker armed — click the map where arriving adventurers should gather.'
+                : 'Deployment Marker armed — click the map where the Keeper may summon creatures.');
+        });
+    });
+
+    document.querySelectorAll('[data-threshold-remove]').forEach((button) => {
+        button.addEventListener('click', async (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            const markerId = String(button.dataset.thresholdRemove || '');
+            const sceneId = String(button.dataset.sceneId || projectedSceneId);
+            if (!markerId || !sceneId) return;
+            if (!window.confirm('Remove this Threshold Marker?')) return;
+            try {
+                const data = await request('gmrt_atlas_remove_threshold', {
+                    scene_id: sceneId,
+                    marker_id: markerId
+                });
+                await replaceChamber(data.message || 'Threshold Marker removed.', preparationSceneId || null);
+            } catch (error) {
+                say(error.message || 'The Threshold Marker could not be removed.');
+            }
+        });
+    });
+
     document.querySelectorAll('[data-atlas-open-map]').forEach((button) => {
         button.addEventListener('click', async () => {
             const sceneId = String(button.dataset.sceneId || '');
@@ -2409,7 +2446,25 @@
         });
     });
 
-    board.addEventListener('click', (event) => {
+    board.addEventListener('click', async (event) => {
+        if (thresholdPlacement) {
+            const placement = thresholdPlacement;
+            thresholdPlacement = null;
+            const point = coordinatesFromPointer(event);
+            try {
+                const data = await request('gmrt_atlas_place_threshold', {
+                    scene_id: placement.sceneId,
+                    threshold_type: placement.type,
+                    x: point.x,
+                    y: point.y
+                });
+                await replaceChamber(data.message || 'Threshold Marker placed.', preparationSceneId || null);
+            } catch (error) {
+                say(error.message || 'The Threshold Marker could not be placed.');
+            }
+            return;
+        }
+
         if (!selected) {
             return;
         }

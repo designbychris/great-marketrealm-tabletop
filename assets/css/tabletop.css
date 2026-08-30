@@ -1678,3 +1678,46 @@
 /* IV.28B.1 — The Keeper Clears the Shelves */
 .gmrt-atlas-card__remove { opacity: .78; font-size: .82rem; }
 .gmrt-atlas-card__remove:hover, .gmrt-atlas-card__remove:focus-visible { opacity: 1; }
+
+/* IV.28D — The Threshold Markers */
+.gmrt-threshold-tools {
+    display: grid;
+    gap: .75rem;
+    margin: 1rem 0;
+    padding: .9rem;
+    border: 1px solid rgba(216, 173, 79, .32);
+    border-radius: .75rem;
+    background: rgba(20, 23, 24, .78);
+}
+
+.gmrt-threshold-tools h3,
+.gmrt-threshold-tools p { margin: 0; }
+.gmrt-threshold-tools__actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+
+.gmrt-threshold-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 8;
+    pointer-events: none;
+}
+
+.gmrt-threshold-marker {
+    position: absolute;
+    left: var(--gmrt-threshold-x);
+    top: var(--gmrt-threshold-y);
+    width: 2.1rem;
+    height: 2.1rem;
+    padding: 0;
+    transform: translate(-50%, -50%);
+    border: 2px dashed currentColor;
+    border-radius: 50%;
+    background: rgba(16, 18, 18, .78);
+    font-size: 1.15rem;
+    line-height: 1;
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+.gmrt-threshold-marker--party { color: #f2d887; }
+.gmrt-threshold-marker--monster { color: #d79a9a; }
+.gmrt-threshold-marker:focus-visible { outline: 3px solid currentColor; outline-offset: 3px; }

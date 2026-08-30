@@ -25,6 +25,7 @@ final class SceneShelfCleaner
             'gmrt_footstep_trails',
             'gmrt_carried_lights',
             'gmrt_dropped_lights',
+            'gmrt_scene_thresholds',
         ] as $option) {
             $this->forgetScene($option, $tableId, $sceneId);
         }

@@ -16,6 +16,7 @@ $viewer = $state?->viewer() ?? [];
 $scene = $state?->scene();
 $scenes = $state?->scenes() ?? [];
 $preparation = $state?->preparation() ?? [];
+$thresholds = $state?->thresholds() ?? [];
 $isPreparingScene = ! empty($preparation['active']);
 $tokens = $state?->tokens() ?? [];
 $members = $state?->members() ?? [];
@@ -248,6 +249,21 @@ $sceneImage = $scene !== null
                     </p>
                     <span data-atlas-status role="status" aria-live="polite"></span>
                 </div>
+
+                <?php if ($scene !== null) : ?>
+                    <section class="gmrt-threshold-tools" aria-labelledby="gmrt-threshold-tools-title">
+                        <div>
+                            <p class="gmrt-chamber__eyebrow">IV.28D · Threshold Markers</p>
+                            <h3 id="gmrt-threshold-tools-title">Arrival &amp; Deployment</h3>
+                            <p>Choose a marker, then click the map. Party thresholds welcome adventurers who do not already have a remembered token in this Scene. Monster thresholds are reserved for the Keeper's Bestiary.</p>
+                        </div>
+                        <div class="gmrt-threshold-tools__actions">
+                            <button type="button" data-threshold-place="party" data-scene-id="<?php echo esc_attr((string) ($scene['id'] ?? '')); ?>">Place Party Arrival</button>
+                            <button type="button" data-threshold-place="monster" data-scene-id="<?php echo esc_attr((string) ($scene['id'] ?? '')); ?>">Place Monster Deployment</button>
+                        </div>
+                        <small><?php echo esc_html((string) count($thresholds)); ?> marker<?php echo count($thresholds) === 1 ? '' : 's'; ?> on the Scene currently before the Keeper.</small>
+                    </section>
+                <?php endif; ?>
 
                 <?php if ($scenes !== []) : ?>
                     <div class="gmrt-atlas__register" aria-label="Mapped Scenes">
@@ -976,6 +992,28 @@ $sceneImage = $scene !== null
                             y2="0"
                         ></line>
                     </svg>
+
+                    <?php if ($state->isDungeonMaster() && $thresholds !== []) : ?>
+                        <div class="gmrt-threshold-layer" data-threshold-layer aria-label="Dungeon Master Threshold Markers">
+                            <?php foreach ($thresholds as $threshold) :
+                                if (! is_array($threshold)) continue;
+                                $thresholdType = (string) ($threshold['type'] ?? 'party');
+                                $thresholdLabel = $thresholdType === 'monster'
+                                    ? 'Monster Deployment Threshold'
+                                    : 'Party Arrival Threshold';
+                            ?>
+                                <button
+                                    type="button"
+                                    class="gmrt-threshold-marker gmrt-threshold-marker--<?php echo esc_attr($thresholdType); ?>"
+                                    data-threshold-remove="<?php echo esc_attr((string) ($threshold['id'] ?? '')); ?>"
+                                    data-scene-id="<?php echo esc_attr((string) ($threshold['scene_id'] ?? '')); ?>"
+                                    style="--gmrt-threshold-x: <?php echo esc_attr((string) ((float) ($threshold['x'] ?? 0) * 100)); ?>%; --gmrt-threshold-y: <?php echo esc_attr((string) ((float) ($threshold['y'] ?? 0) * 100)); ?>%;"
+                                    aria-label="<?php echo esc_attr($thresholdLabel . '. Click to remove.'); ?>"
+                                    title="<?php echo esc_attr($thresholdLabel . ' · click to remove'); ?>"
+                                ><span aria-hidden="true"><?php echo $thresholdType === 'monster' ? '◆' : '◇'; ?></span></button>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
 
                     <div
                         class="gmrt-board__tokens"

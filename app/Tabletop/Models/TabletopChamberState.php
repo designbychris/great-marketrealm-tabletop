@@ -31,7 +31,8 @@ final class TabletopChamberState
         private array $chamberLog = [],
         private array $footsteps = [],
         private array $scenes = [],
-        private array $preparation = []
+        private array $preparation = [],
+        private array $thresholds = []
     ) {}
 
     /** @return array<string,mixed> */
@@ -112,6 +113,12 @@ final class TabletopChamberState
         return $this->scenes;
     }
 
+    /** @return array<int,array<string,mixed>> */
+    public function thresholds(): array
+    {
+        return $this->thresholds;
+    }
+
     /** @return array<string,mixed> */
     public function preparation(): array
     {
@@ -173,6 +180,7 @@ final class TabletopChamberState
             'footsteps' => $this->footsteps,
             'scenes' => $this->scenes,
             'preparation' => $this->preparation,
+            'thresholds' => $this->thresholds,
         ];
 
         return hash(

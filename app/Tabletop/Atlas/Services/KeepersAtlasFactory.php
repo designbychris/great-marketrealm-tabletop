@@ -9,6 +9,7 @@ defined('ABSPATH') || exit;
 use GreatMarketrealmTabletop\Tables\Memberships\Repositories\WordPressTableMembershipRepository;
 use GreatMarketrealmTabletop\Tables\Scenes\Services\TableSceneManagerFactory;
 use GreatMarketrealmTabletop\Tabletop\Cartography\Services\BattlemapInspector;
+use GreatMarketrealmTabletop\Tabletop\Atlas\Thresholds\Services\ThresholdManagerFactory;
 
 final class KeepersAtlasFactory
 {
@@ -18,7 +19,8 @@ final class KeepersAtlasFactory
             new WordPressTableMembershipRepository(),
             TableSceneManagerFactory::make(),
             new BattlemapInspector(),
-            new SceneShelfCleaner()
+            new SceneShelfCleaner(),
+            ThresholdManagerFactory::make()
         );
     }
 }
