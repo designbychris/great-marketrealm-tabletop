@@ -83,7 +83,8 @@ final class CreaturesInBattleRegressionTest extends TestCase
         self::assertStringContainsString('foreach ($tokens as $token)', $chamber);
         self::assertStringContainsString('$vitality[$tokenId] = $this->vitality', $chamber);
         self::assertStringContainsString('$conditions[$tokenId] = array_map(', $chamber);
-        self::assertStringContainsString('$arsenals[$tokenId] = $this->arsenals', $chamber);
+        self::assertStringContainsString('$currentArsenal = $this->arsenals->forToken(', $chamber);
+        self::assertStringContainsString('$arsenals[$tokenId] = $currentArsenal->toArray();', $chamber);
 
         $view = file_get_contents($this->root('app/Tabletop/Views/chamber.php'));
         self::assertStringContainsString('data-encounter-combatant', $view);
