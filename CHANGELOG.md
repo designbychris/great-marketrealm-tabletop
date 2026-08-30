@@ -1,3 +1,15 @@
+## 0.30.0-alpha.1 — Phase IV.30: Keeper's Cartography Assistant
+
+- Adds a Dungeon-Master-only Cartography Assistant inside Sight Beyond the Door.
+- Analyses the currently loaded battlemap in the browser against the calibrated square grid; no map artwork is uploaded to an external analysis service.
+- Suggests room/wall boundaries and conservative possible-door gaps as a private, dashed draft overlay.
+- Adds Strong / Balanced / Fine detail passes plus a review checklist, Select All / Deselect All, Clear Draft and Apply Selected controls.
+- Existing authoritative vision barriers are excluded from duplicate suggestions.
+- Draft suggestions are never authoritative automatically: the Keeper must explicitly apply reviewed segments.
+- Adds a server-authoritative batch barrier route capped at 200 reviewed suggestions, preserving DM membership and Scene scoping including Behind the Curtain preparation.
+- Applies accepted barriers through the existing vision repository and refreshes Fog exploration once after the batch.
+- Version: `0.30.0-alpha.1`.
+
 ## 0.29.5-alpha.2 — Phase IV.29D.1: Menagerie Filters
 - Adds Keeper-only `All`, `On This Map`, and `Not On This Map` filters above the Bestiary register.
 - Combines deployment filtering with the existing Bestiary text search rather than replacing it.

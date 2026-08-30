@@ -66,6 +66,6 @@ final class KeeperMenagerieRegressionTest extends TestCase
         $roadmap = file_get_contents($this->root('ROADMAP.md'));
         self::assertStringContainsString("[x] **IV.29 — The Keeper's Bestiary**", $roadmap);
         self::assertStringContainsString("[x] **IV.29D — The Keeper's Menagerie**", $roadmap);
-        self::assertStringContainsString("[ ] **Keeper's Cartography Assistant**", $roadmap);
+        self::assertStringContainsString("[x] **IV.30 — Keeper's Cartography Assistant**", $roadmap);
     }
 }

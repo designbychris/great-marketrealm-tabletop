@@ -1069,11 +1069,21 @@
     const visionCancel = document.querySelector('[data-vision-cancel]');
     const visionUndo = document.querySelector('[data-vision-undo]');
     const visionTools = Array.from(document.querySelectorAll('[data-vision-tool]'));
+    const cartographySuggestionLayer = document.querySelector('[data-cartography-suggestion-layer]');
+    const cartographyAssistant = document.querySelector('[data-cartography-assistant]');
+    const cartographyAnalyse = document.querySelector('[data-cartography-assistant-analyse]');
+    const cartographyDetail = document.querySelector('[data-cartography-assistant-detail]');
+    const cartographySelectAll = document.querySelector('[data-cartography-assistant-select-all]');
+    const cartographyApply = document.querySelector('[data-cartography-assistant-apply]');
+    const cartographyClear = document.querySelector('[data-cartography-assistant-clear]');
+    const cartographyAssistantStatus = document.querySelector('[data-cartography-assistant-status]');
+    const cartographyReview = document.querySelector('[data-cartography-assistant-review]');
     let visionBarriers = [];
     let visionTool = null;
     let visionStart = null;
     let selectedVisionBarrier = null;
     let visionPreview = null;
+    let cartographySuggestions = [];
 
     if (visionLayer) {
         try {
@@ -1103,6 +1113,224 @@
             x: grid.offsetX + (Number(column) * grid.size),
             y: grid.offsetY + (Number(row) * grid.size)
         };
+    };
+
+
+    const cartographySuggestionKey = (suggestion) => {
+        const a = `${suggestion.x1},${suggestion.y1}`;
+        const b = `${suggestion.x2},${suggestion.y2}`;
+        return a < b ? `${a}|${b}` : `${b}|${a}`;
+    };
+
+    const renderCartographySuggestions = () => {
+        if (!cartographySuggestionLayer) return;
+        cartographySuggestionLayer.replaceChildren();
+        const fragment = document.createDocumentFragment();
+
+        cartographySuggestions.forEach((suggestion) => {
+            const start = barrierPoint(suggestion.x1, suggestion.y1);
+            const end = barrierPoint(suggestion.x2, suggestion.y2);
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', String(start.x));
+            line.setAttribute('y1', String(start.y));
+            line.setAttribute('x2', String(end.x));
+            line.setAttribute('y2', String(end.y));
+            line.classList.add('gmrt-cartography-suggestion');
+            line.classList.add(suggestion.type === 'door' ? 'is-door' : 'is-wall');
+            if (!suggestion.selected) line.classList.add('is-unselected');
+            fragment.append(line);
+        });
+
+        cartographySuggestionLayer.append(fragment);
+    };
+
+    const updateCartographyDraftControls = () => {
+        const total = cartographySuggestions.length;
+        const selected = cartographySuggestions.filter((item) => item.selected).length;
+        if (cartographySelectAll) {
+            cartographySelectAll.disabled = total === 0;
+            cartographySelectAll.textContent = selected === total && total > 0
+                ? 'Deselect All'
+                : 'Select All';
+        }
+        if (cartographyApply) cartographyApply.disabled = selected === 0;
+        if (cartographyClear) cartographyClear.disabled = total === 0;
+        if (cartographyAssistantStatus && total > 0) {
+            const doors = cartographySuggestions.filter((item) => item.type === 'door').length;
+            cartographyAssistantStatus.textContent = `${total} draft suggestions · ${selected} selected · ${doors} possible doors. Nothing is saved until Apply Selected.`;
+        }
+    };
+
+    const renderCartographyReview = () => {
+        if (!cartographyReview) return;
+        cartographyReview.replaceChildren();
+        const fragment = document.createDocumentFragment();
+        cartographySuggestions.forEach((suggestion, index) => {
+            const label = document.createElement('label');
+            label.className = 'gmrt-cartography-assistant__suggestion';
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = Boolean(suggestion.selected);
+            checkbox.dataset.cartographySuggestionIndex = String(index);
+            const text = document.createElement('span');
+            const confidence = Math.max(0, Math.min(99, Math.round(suggestion.confidence)));
+            text.textContent = `${suggestion.type === 'door' ? 'Possible door' : 'Room / wall boundary'} · (${suggestion.x1},${suggestion.y1}) → (${suggestion.x2},${suggestion.y2}) · ${confidence}%`;
+            label.append(checkbox, text);
+            fragment.append(label);
+        });
+        cartographyReview.append(fragment);
+        updateCartographyDraftControls();
+        renderCartographySuggestions();
+    };
+
+    const clearCartographyDraft = (message = 'Draft cleared. No cartography suggestions were saved.') => {
+        cartographySuggestions = [];
+        if (cartographyReview) cartographyReview.replaceChildren();
+        if (cartographySuggestionLayer) cartographySuggestionLayer.replaceChildren();
+        updateCartographyDraftControls();
+        if (cartographyAssistantStatus) cartographyAssistantStatus.textContent = message;
+    };
+
+    const analyseBattlemapCartography = async () => {
+        const image = document.querySelector('[data-battlemap-image]');
+        if (!image || !board || !cartographyAssistant) {
+            throw new Error('Open a battlemap before asking the Cartography Assistant to inspect it.');
+        }
+        if ((board.dataset.gridType || '') !== 'square') {
+            throw new Error('The Cartography Assistant currently requires a calibrated square grid.');
+        }
+        if (!image.complete) {
+            await new Promise((resolve, reject) => {
+                image.addEventListener('load', resolve, { once: true });
+                image.addEventListener('error', reject, { once: true });
+            });
+        }
+        if (!image.naturalWidth || !image.naturalHeight) {
+            throw new Error('The battlemap artwork is not available for analysis.');
+        }
+
+        const maxDimension = 1100;
+        const scale = Math.min(1, maxDimension / Math.max(image.naturalWidth, image.naturalHeight));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+        canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+        const context = canvas.getContext('2d', { willReadFrequently: true });
+        if (!context) throw new Error('This browser could not prepare the map-analysis canvas.');
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+        let pixels;
+        try {
+            pixels = context.getImageData(0, 0, canvas.width, canvas.height);
+        } catch (error) {
+            throw new Error('The map artwork could not be sampled in this browser. Use same-site Media Library artwork or draw the barriers manually.');
+        }
+
+        const displayWidth = Math.max(1, board.clientWidth);
+        const displayHeight = Math.max(1, board.clientHeight);
+        const toCanvasX = (value) => (value / displayWidth) * canvas.width;
+        const toCanvasY = (value) => (value / displayHeight) * canvas.height;
+        const luminance = (x, y) => {
+            const px = Math.max(0, Math.min(canvas.width - 1, Math.round(x)));
+            const py = Math.max(0, Math.min(canvas.height - 1, Math.round(y)));
+            const offset = ((py * canvas.width) + px) * 4;
+            return (pixels.data[offset] * .2126) + (pixels.data[offset + 1] * .7152) + (pixels.data[offset + 2] * .0722);
+        };
+        const lineAverage = (x1, y1, x2, y2, normalX = 0, normalY = 0) => {
+            let sum = 0;
+            let count = 0;
+            const samples = 13;
+            const bands = [-1, 0, 1];
+            bands.forEach((band) => {
+                for (let i = 1; i < samples - 1; i += 1) {
+                    const t = i / (samples - 1);
+                    const x = x1 + ((x2 - x1) * t) + (normalX * band);
+                    const y = y1 + ((y2 - y1) * t) + (normalY * band);
+                    sum += luminance(x, y);
+                    count += 1;
+                }
+            });
+            return count ? sum / count : 255;
+        };
+        const sectionAverage = (x1, y1, x2, y2, from, to) => {
+            let sum = 0;
+            let count = 0;
+            for (let i = 0; i < 5; i += 1) {
+                const t = from + ((to - from) * (i / 4));
+                sum += luminance(x1 + ((x2 - x1) * t), y1 + ((y2 - y1) * t));
+                count += 1;
+            }
+            return sum / Math.max(1, count);
+        };
+
+        const grid = visionGrid();
+        const columns = Math.max(0, Math.floor((displayWidth - grid.offsetX) / grid.size));
+        const rows = Math.max(0, Math.floor((displayHeight - grid.offsetY) / grid.size));
+        if (columns < 1 || rows < 1 || columns * rows > 6400) {
+            throw new Error('The calibrated grid is too small or too dense for a safe Assistant pass. Adjust the grid and try again.');
+        }
+
+        const candidates = [];
+        const inspectEdge = (x1, y1, x2, y2, gx1, gy1, gx2, gy2, horizontal) => {
+            const cx1 = toCanvasX(x1);
+            const cy1 = toCanvasY(y1);
+            const cx2 = toCanvasX(x2);
+            const cy2 = toCanvasY(y2);
+            const offset = Math.max(2, (horizontal ? Math.abs(cy2 - cy1) + toCanvasY(grid.size) : Math.abs(cx2 - cx1) + toCanvasX(grid.size)) * .16);
+            const line = lineAverage(cx1, cy1, cx2, cy2, horizontal ? 0 : 1, horizontal ? 1 : 0);
+            const sideA = lineAverage(cx1 + (horizontal ? 0 : -offset), cy1 + (horizontal ? -offset : 0), cx2 + (horizontal ? 0 : -offset), cy2 + (horizontal ? -offset : 0));
+            const sideB = lineAverage(cx1 + (horizontal ? 0 : offset), cy1 + (horizontal ? offset : 0), cx2 + (horizontal ? 0 : offset), cy2 + (horizontal ? offset : 0));
+            const surroundings = (sideA + sideB) / 2;
+            const score = surroundings - line;
+            const ends = (sectionAverage(cx1, cy1, cx2, cy2, .05, .28) + sectionAverage(cx1, cy1, cx2, cy2, .72, .95)) / 2;
+            const middle = sectionAverage(cx1, cy1, cx2, cy2, .38, .62);
+            const doorGap = middle - ends;
+            candidates.push({
+                x1: gx1, y1: gy1, x2: gx2, y2: gy2,
+                score,
+                doorGap,
+                line,
+                type: 'wall'
+            });
+        };
+
+        for (let row = 0; row <= rows; row += 1) {
+            for (let column = 0; column < columns; column += 1) {
+                const start = barrierPoint(column, row);
+                const end = barrierPoint(column + 1, row);
+                inspectEdge(start.x, start.y, end.x, end.y, column, row, column + 1, row, true);
+            }
+        }
+        for (let column = 0; column <= columns; column += 1) {
+            for (let row = 0; row < rows; row += 1) {
+                const start = barrierPoint(column, row);
+                const end = barrierPoint(column, row + 1);
+                inspectEdge(start.x, start.y, end.x, end.y, column, row, column, row + 1, false);
+            }
+        }
+
+        const scores = candidates.map((item) => item.score).sort((a, b) => a - b);
+        const detail = cartographyDetail?.value || 'balanced';
+        const percentile = detail === 'strong' ? .92 : detail === 'fine' ? .76 : .85;
+        const floor = detail === 'strong' ? 15 : detail === 'fine' ? 6 : 10;
+        const threshold = Math.max(floor, scores[Math.max(0, Math.floor(scores.length * percentile))] || floor);
+        const existing = new Set(visionBarriers.map(cartographySuggestionKey));
+        const picked = candidates
+            .filter((item) => item.score >= threshold)
+            .map((item) => ({
+                ...item,
+                type: item.doorGap >= 28 && item.line < 205 ? 'door' : 'wall',
+                confidence: Math.min(99, 55 + ((item.score - threshold) * 1.7) + (item.doorGap > 28 ? 5 : 0)),
+                selected: true
+            }))
+            .filter((item) => !existing.has(cartographySuggestionKey(item)))
+            .sort((a, b) => b.confidence - a.confidence)
+            .slice(0, 160);
+
+        cartographySuggestions = picked;
+        renderCartographyReview();
+        if (picked.length === 0 && cartographyAssistantStatus) {
+            cartographyAssistantStatus.textContent = 'No confident boundaries were found at this detail level. Try Fine detail or continue drawing manually.';
+        }
     };
 
     const renderVisionLayer = (barriers = visionBarriers) => {
@@ -1328,8 +1556,72 @@
         }
     });
 
-    window.addEventListener('resize', () => renderVisionLayer());
+    cartographyAnalyse?.addEventListener('click', async () => {
+        cartographyAnalyse.disabled = true;
+        if (cartographyAssistantStatus) cartographyAssistantStatus.textContent = 'Inspecting map artwork…';
+        try {
+            await analyseBattlemapCartography();
+        } catch (error) {
+            clearCartographyDraft(error.message || 'The Cartography Assistant could not inspect this map.');
+        } finally {
+            cartographyAnalyse.disabled = false;
+        }
+    });
+
+    cartographyReview?.addEventListener('change', (event) => {
+        const input = event.target instanceof HTMLInputElement
+            ? event.target
+            : null;
+        if (!input || !input.dataset.cartographySuggestionIndex) return;
+        const index = Number(input.dataset.cartographySuggestionIndex);
+        if (!Number.isInteger(index) || !cartographySuggestions[index]) return;
+        cartographySuggestions[index].selected = input.checked;
+        updateCartographyDraftControls();
+        renderCartographySuggestions();
+    });
+
+    cartographySelectAll?.addEventListener('click', () => {
+        const shouldSelect = cartographySuggestions.some((item) => !item.selected);
+        cartographySuggestions.forEach((item) => { item.selected = shouldSelect; });
+        renderCartographyReview();
+    });
+
+    cartographyClear?.addEventListener('click', () => clearCartographyDraft());
+
+    cartographyApply?.addEventListener('click', async () => {
+        const selectedSuggestions = cartographySuggestions
+            .filter((item) => item.selected)
+            .map((item) => ({
+                type: item.type,
+                x1: item.x1,
+                y1: item.y1,
+                x2: item.x2,
+                y2: item.y2
+            }));
+        if (selectedSuggestions.length === 0) return;
+        cartographyApply.disabled = true;
+        if (cartographyAssistantStatus) cartographyAssistantStatus.textContent = `Applying ${selectedSuggestions.length} reviewed suggestions…`;
+        try {
+            await request('gmrt_apply_cartography_suggestions', {
+                suggestions: JSON.stringify(selectedSuggestions)
+            });
+            const state = await request('gmrt_tabletop_state', {});
+            renderVisionLayer(state.vision_layer || []);
+            renderFog(state.fog || {});
+            clearCartographyDraft(`${selectedSuggestions.length} reviewed suggestions are now authoritative vision barriers.`);
+            if (visionStatus) visionStatus.textContent = 'Cartography Assistant suggestions applied. Review, open doors, remove or redraw any segment as normal.';
+        } catch (error) {
+            if (cartographyAssistantStatus) cartographyAssistantStatus.textContent = error.message || 'The reviewed suggestions could not be applied.';
+            updateCartographyDraftControls();
+        }
+    });
+
+    window.addEventListener('resize', () => {
+        renderVisionLayer();
+        renderCartographySuggestions();
+    });
     renderVisionLayer();
+    renderCartographySuggestions();
 
     const gridViewport = document.querySelector('.gmrt-board__viewport');
     const gridSize = document.querySelector('[data-grid-size]');

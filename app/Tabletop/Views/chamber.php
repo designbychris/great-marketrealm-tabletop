@@ -921,6 +921,32 @@ $sceneImage = $scene !== null
                         <button type="button" data-vision-cancel disabled>Finish / Cancel</button>
                         <span data-vision-status role="status" aria-live="polite">Choose a wall or door, then click two grid intersections.</span>
                         <div class="gmrt-vision-roster" data-vision-roster></div>
+
+                        <details class="gmrt-cartography-assistant" data-cartography-assistant>
+                            <summary>Keeper's Cartography Assistant</summary>
+                            <div class="gmrt-cartography-assistant__body">
+                                <p>
+                                    Let the Assistant inspect this Scene's artwork against the calibrated square grid.
+                                    Suggestions remain a private draft until you review and apply them.
+                                </p>
+                                <div class="gmrt-cartography-assistant__controls">
+                                    <label>
+                                        Detail
+                                        <select data-cartography-assistant-detail>
+                                            <option value="strong">Strong boundaries</option>
+                                            <option value="balanced" selected>Balanced</option>
+                                            <option value="fine">Fine detail</option>
+                                        </select>
+                                    </label>
+                                    <button type="button" data-cartography-assistant-analyse>Analyse Map</button>
+                                    <button type="button" data-cartography-assistant-select-all disabled>Select All</button>
+                                    <button type="button" data-cartography-assistant-apply disabled>Apply Selected</button>
+                                    <button type="button" data-cartography-assistant-clear disabled>Clear Draft</button>
+                                </div>
+                                <span data-cartography-assistant-status role="status" aria-live="polite">No draft suggestions yet.</span>
+                                <div class="gmrt-cartography-assistant__review" data-cartography-assistant-review></div>
+                            </div>
+                        </details>
                     </div>
                 <?php endif; ?>
 
@@ -1048,6 +1074,11 @@ $sceneImage = $scene !== null
                             data-vision-layer
                             data-vision='<?php echo esc_attr(wp_json_encode($visionLayer)); ?>'
                             aria-label="Dungeon Master vision barriers"
+                        ></svg>
+                        <svg
+                            class="gmrt-cartography-suggestion-layer"
+                            data-cartography-suggestion-layer
+                            aria-label="Cartography Assistant draft suggestions"
                         ></svg>
                     <?php endif; ?>
 

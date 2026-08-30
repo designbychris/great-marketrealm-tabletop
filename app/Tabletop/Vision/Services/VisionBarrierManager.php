@@ -18,6 +18,23 @@ final class VisionBarrierManager
 {
     public function __construct(private VisionBarrierRepository $barriers,private TableMembershipRepository $members,private TableSceneRepository $scenes,private ?FogOfWarRepository $fog=null,private ?TableTokenRepository $tokens=null,private ?FogCellMapper $mapper=null){}
     public function add(string $tableId,int $userId,string $type,int $x1,int $y1,int $x2,int $y2,string $sceneId=""):VisionBarrier{$scene=$this->guard($tableId,$userId,$sceneId);$barrier=new VisionBarrier('vision-'.bin2hex(random_bytes(6)),$scene->id(),$type,$x1,$y1,$x2,$y2,false);$this->barriers->save($tableId,$barrier);$this->refreshExploration($tableId,$scene);return $barrier;}
+    /** @param array<int,array<string,mixed>> $suggestions @return array<int,VisionBarrier> */
+    public function addBatch(string $tableId,int $userId,array $suggestions,string $sceneId=""):array
+    {
+        $scene=$this->guard($tableId,$userId,$sceneId);
+        if(count($suggestions)<1||count($suggestions)>200){throw new RuntimeException('Choose between 1 and 200 Cartography Assistant suggestions.');}
+        $created=[];
+        foreach($suggestions as $suggestion){
+            if(!is_array($suggestion)){continue;}
+            $type=sanitize_key((string)($suggestion['type']??''));
+            $x1=(int)($suggestion['x1']??0);$y1=(int)($suggestion['y1']??0);$x2=(int)($suggestion['x2']??0);$y2=(int)($suggestion['y2']??0);
+            $created[]=new VisionBarrier('vision-'.bin2hex(random_bytes(6)),$scene->id(),$type,$x1,$y1,$x2,$y2,false);
+        }
+        if($created===[]){throw new RuntimeException('No valid Cartography Assistant suggestions were selected.');}
+        foreach($created as $barrier){$this->barriers->save($tableId,$barrier);}
+        $this->refreshExploration($tableId,$scene);
+        return $created;
+    }
     public function toggleDoor(string $tableId,int $userId,string $id,string $sceneId=""):VisionBarrier{$scene=$this->guard($tableId,$userId,$sceneId);foreach($this->barriers->forScene($tableId,$scene->id()) as $barrier){if($barrier->id()===$id){$barrier->toggleDoor();$this->barriers->save($tableId,$barrier);$this->refreshExploration($tableId,$scene);return $barrier;}}throw new RuntimeException('That vision door could not be found.');}
     public function remove(string $tableId,int $userId,string $id,string $sceneId=""):void{$scene=$this->guard($tableId,$userId,$sceneId);$this->barriers->delete($tableId,$scene->id(),$id);$this->refreshExploration($tableId,$scene);}
     private function refreshExploration(string $tableId,TableScene $scene):void{if($this->fog===null||$this->tokens===null||$this->mapper===null){return;}$state=$this->fog->forScene($tableId,$scene->id());if(!$state->enabled()){return;}$barriers=$this->barriers->forScene($tableId,$scene->id());foreach($this->tokens->forScene($tableId,$scene->id()) as $token){if($token->type()===TableTokenType::CHARACTER){$state->reveal($this->mapper->visibleAround($scene,$token,$barriers));}}$this->fog->save($tableId,$state);}

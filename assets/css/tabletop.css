@@ -1839,3 +1839,85 @@
 .gmrt-diceworks__damage-roll[hidden] {
     display: none !important;
 }
+
+/* Phase IV.30 — Keeper's Cartography Assistant */
+.gmrt-cartography-assistant {
+    flex-basis: 100%;
+    margin-top: .2rem;
+    border-top: 1px solid rgba(244, 234, 214, .14);
+    padding-top: .45rem;
+}
+.gmrt-cartography-assistant > summary {
+    cursor: pointer;
+    color: #f4ead6;
+    font-weight: 700;
+}
+.gmrt-cartography-assistant__body {
+    display: grid;
+    gap: .55rem;
+    margin-top: .55rem;
+}
+.gmrt-cartography-assistant__body > p {
+    margin: 0;
+    opacity: .78;
+}
+.gmrt-cartography-assistant__controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: .45rem;
+}
+.gmrt-cartography-assistant__controls label {
+    display: grid;
+    gap: .2rem;
+    font-size: .82rem;
+}
+.gmrt-cartography-assistant__controls select {
+    min-height: 2rem;
+    border: 1px solid rgba(244, 234, 214, .28);
+    border-radius: 6px;
+    background: rgba(0, 0, 0, .35);
+    color: inherit;
+    padding: .25rem .4rem;
+}
+.gmrt-cartography-assistant__review {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: .35rem;
+    max-height: 15rem;
+    overflow: auto;
+}
+.gmrt-cartography-assistant__suggestion {
+    display: flex;
+    align-items: flex-start;
+    gap: .4rem;
+    padding: .35rem .45rem;
+    border: 1px solid rgba(244, 234, 214, .14);
+    border-radius: 6px;
+    background: rgba(0, 0, 0, .18);
+    font-size: .78rem;
+}
+.gmrt-cartography-suggestion-layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 8;
+    pointer-events: none;
+    overflow: visible;
+}
+.gmrt-cartography-suggestion {
+    stroke: rgba(255, 148, 232, .96);
+    stroke-width: 3;
+    stroke-dasharray: 5 4;
+    stroke-linecap: square;
+    vector-effect: non-scaling-stroke;
+    filter: drop-shadow(0 0 2px rgba(0, 0, 0, .8));
+}
+.gmrt-cartography-suggestion.is-door {
+    stroke: rgba(122, 226, 255, .98);
+    stroke-dasharray: 3 3;
+}
+.gmrt-cartography-suggestion.is-unselected {
+    opacity: .22;
+}

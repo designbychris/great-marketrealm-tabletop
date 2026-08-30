@@ -23,6 +23,7 @@ use GreatMarketrealmTabletop\Tabletop\Tokens\Services\TableTokenRemoval;
 use GreatMarketrealmTabletop\Tabletop\Http\TestTableAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\TargetingAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\CartographyAjaxController;
+use GreatMarketrealmTabletop\Tabletop\Http\CartographyAssistantAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\FogOfWarAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\VisionBarrierAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\GatheringAjaxController;
@@ -95,6 +96,8 @@ final class TabletopServiceProvider
     private TargetingAjaxController $targetingAjax;
 
     private CartographyAjaxController $cartographyAjax;
+
+    private CartographyAssistantAjaxController $cartographyAssistantAjax;
 
     private FogOfWarAjaxController $fogAjax;
 
@@ -175,6 +178,10 @@ final class TabletopServiceProvider
 
         $this->cartographyAjax = new CartographyAjaxController(
             CartographersTableFactory::make()
+        );
+
+        $this->cartographyAssistantAjax = new CartographyAssistantAjaxController(
+            VisionBarrierFactory::make()
         );
 
         $this->fogAjax = new FogOfWarAjaxController(
@@ -457,6 +464,11 @@ final class TabletopServiceProvider
         add_action(
             'wp_ajax_gmrt_calibrate_grid',
             [$this->cartographyAjax, 'calibrateGrid']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_apply_cartography_suggestions',
+            [$this->cartographyAssistantAjax, 'apply']
         );
 
         add_action(
