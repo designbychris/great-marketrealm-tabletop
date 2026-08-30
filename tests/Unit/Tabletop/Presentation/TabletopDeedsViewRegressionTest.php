@@ -26,7 +26,11 @@ final class TabletopDeedsViewRegressionTest extends TestCase
         }
 
         self::assertStringContainsString(
-            'Battle deeds',
+            'data-combat-dock',
+            $source
+        );
+        self::assertStringContainsString(
+            'Battle actions live with the combatant.',
             $source
         );
     }
