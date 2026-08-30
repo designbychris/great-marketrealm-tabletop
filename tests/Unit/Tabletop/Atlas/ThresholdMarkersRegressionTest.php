@@ -46,6 +46,15 @@ final class ThresholdMarkersRegressionTest extends TestCase
         self::assertStringContainsString('cursor: crosshair !important;', $css);
     }
 
+    public function test_threshold_mode_blocks_map_panning_and_cancel_is_immediate(): void
+    {
+        $js = (string) file_get_contents($this->root('assets/js/tabletop.js'));
+        self::assertStringContainsString('|| thresholdPlacement', $js);
+        self::assertStringContainsString("cancel.addEventListener('pointerdown', cancelPlacement);", $js);
+        self::assertStringContainsString("cancel.addEventListener('click', cancelPlacement);", $js);
+        self::assertStringContainsString('clearThresholdPlacement();', $js);
+    }
+
     public function test_threshold_mutations_are_server_side_dm_guarded(): void
     {
         $manager = (string) file_get_contents($this->root('app/Tabletop/Atlas/Thresholds/Services/ThresholdManager.php'));
@@ -55,22 +64,32 @@ final class ThresholdMarkersRegressionTest extends TestCase
         self::assertStringContainsString('wp_ajax_gmrt_atlas_remove_threshold', $provider);
     }
 
-    public function test_opening_a_scene_welcomes_only_missing_party_characters(): void
+    public function test_opening_a_scene_does_not_copy_the_party_into_it(): void
     {
         $atlas = (string) file_get_contents($this->root('app/Tabletop/Atlas/Services/KeepersAtlas.php'));
+        self::assertStringContainsString('return $this->scenes->activate($tableId, $sceneId);', $atlas);
+        self::assertStringNotContainsString('welcomeParty($tableId, $scene)', $atlas);
+    }
+
+    public function test_each_player_crosses_their_own_threshold_during_live_passage(): void
+    {
         $manager = (string) file_get_contents($this->root('app/Tabletop/Atlas/Thresholds/Services/ThresholdManager.php'));
-        self::assertStringContainsString('$this->thresholds->welcomeParty($tableId, $scene);', $atlas);
-        self::assertStringContainsString('$alreadyPresent = false;', $manager);
-        self::assertStringContainsString('if ($alreadyPresent)', $manager);
-        self::assertStringContainsString('TableMemberRole::PLAYER', $manager);
-        self::assertStringContainsString('TableMemberStatus::ACTIVE', $manager);
+        $provider = (string) file_get_contents($this->root('app/Tabletop/TabletopServiceProvider.php'));
+        $js = (string) file_get_contents($this->root('assets/js/tabletop.js'));
+
+        self::assertStringContainsString('public function welcomeAdventurer(', $manager);
+        self::assertStringContainsString('$this->members->find($tableId, $viewerUserId)', $manager);
+        self::assertStringContainsString('$token->controllerUserId() === $viewerUserId', $manager);
+        self::assertStringContainsString('wp_ajax_gmrt_atlas_arrive_at_threshold', $provider);
+        self::assertStringContainsString("request('gmrt_atlas_arrive_at_threshold'", $js);
+        self::assertStringContainsString("root.dataset.viewerRole === 'player'", $js);
     }
 
     public function test_existing_scene_owned_character_positions_win_over_thresholds(): void
     {
         $manager = (string) file_get_contents($this->root('app/Tabletop/Atlas/Thresholds/Services/ThresholdManager.php'));
         self::assertStringContainsString('$this->tokens->forScene($tableId, $scene->id())', $manager);
-        self::assertStringContainsString('$token->controllerUserId() === $member->userId()', $manager);
+        self::assertStringContainsString('$token->controllerUserId() === $viewerUserId', $manager);
         self::assertStringContainsString('(string) ($token->sourceReference() ?? \'\') === $characterId', $manager);
         self::assertStringNotContainsString('->move(', $manager);
     }

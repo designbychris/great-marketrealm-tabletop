@@ -630,6 +630,7 @@
         if (
             event.button !== 0
             || visionDrafting
+            || thresholdPlacement
             || isLensInteractiveTarget(event.target)
         ) {
             return;
@@ -1537,12 +1538,14 @@
         const cancel = document.createElement('button');
         cancel.type = 'button';
         cancel.textContent = 'Cancel placement';
-        cancel.addEventListener('click', (event) => {
+        const cancelPlacement = (event) => {
             event.preventDefault();
             event.stopPropagation();
             clearThresholdPlacement();
             say('Threshold placement cancelled.');
-        });
+        };
+        cancel.addEventListener('pointerdown', cancelPlacement);
+        cancel.addEventListener('click', cancelPlacement);
 
         notice.append(copy, cancel);
         root.appendChild(notice);
@@ -2245,6 +2248,11 @@
                 !preparationSceneId
                 && incomingSceneId !== projectedSceneId
             ) {
+                if (root.dataset.viewerRole === 'player' && incomingSceneId) {
+                    await request('gmrt_atlas_arrive_at_threshold', {
+                        scene_id: incomingSceneId
+                    });
+                }
                 await replaceChamber(
                     'Passage Between Places — the Table carries you to a new Scene.',
                     null

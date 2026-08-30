@@ -60,9 +60,20 @@ final class KeepersAtlas
         string $sceneId
     ): TableScene {
         $this->assertDungeonMaster($tableId, $viewerUserId);
-        $scene = $this->scenes->activate($tableId, $sceneId);
-        $this->thresholds->welcomeParty($tableId, $scene);
-        return $scene;
+        return $this->scenes->activate($tableId, $sceneId);
+    }
+
+
+    public function arriveAtThreshold(
+        string $tableId,
+        int $viewerUserId,
+        string $sceneId
+    ): ?\GreatMarketrealmTabletop\Tables\Tokens\Models\TableToken {
+        return $this->thresholds->welcomeAdventurer(
+            $tableId,
+            $viewerUserId,
+            $sceneId
+        );
     }
 
 

@@ -48,6 +48,25 @@ final class KeepersAtlasAjaxController
         });
     }
 
+    public function arriveAtThreshold(): void
+    {
+        $this->respond(function (): array {
+            $token = $this->atlas->arriveAtThreshold(
+                $this->tableId(),
+                get_current_user_id(),
+                sanitize_text_field((string) ($_POST['scene_id'] ?? ''))
+            );
+
+            return [
+                'created' => $token !== null,
+                'token' => $token?->toArray(),
+                'message' => $token !== null
+                    ? 'Your adventurer crosses the Party Arrival Threshold.'
+                    : 'The Scene remembers your adventurer already.',
+            ];
+        });
+    }
+
     public function placeThreshold(): void
     {
         $this->respond(function (): array {

@@ -107,73 +107,76 @@ final class ThresholdManager
     }
 
     /**
-     * Forge only missing player-character tokens in the destination Scene.
-     * Existing destination tokens keep their remembered positions.
-     *
-     * @return array<int,\GreatMarketrealmTabletop\Tables\Tokens\Models\TableToken>
+     * Forge only the arriving viewer's missing player-character token.
+     * Opening a Scene never copies the whole party; each connected adventurer
+     * crosses their own Threshold as Passage Between Places carries them in.
      */
-    public function welcomeParty(string $tableId, TableScene $scene): array
-    {
+    public function welcomeAdventurer(
+        string $tableId,
+        int $viewerUserId,
+        string $sceneId
+    ): ?\GreatMarketrealmTabletop\Tables\Tokens\Models\TableToken {
+        $scene = $this->requiredScene($tableId, $sceneId);
+        if (! $scene->isActive()) {
+            throw new AtlasDenied('Adventurers may only cross a Threshold into the live Scene.');
+        }
+
+        $member = $this->members->find($tableId, $viewerUserId);
+        if (
+            $member === null
+            || $member->status() !== TableMemberStatus::ACTIVE
+            || $member->role() !== TableMemberRole::PLAYER
+            || $member->companionCharacterId() === null
+        ) {
+            return null;
+        }
+
         $partyThresholds = array_values(array_filter(
             $this->thresholds->forScene($tableId, $scene->id()),
             static fn (ThresholdMarker $marker): bool => $marker->type() === ThresholdType::PARTY
         ));
         if ($partyThresholds === []) {
-            return [];
+            return null;
         }
 
+        $characterId = (string) $member->companionCharacterId();
         $existing = $this->tokens->forScene($tableId, $scene->id());
-        $created = [];
-        $arrivalIndex = 0;
-
-        foreach ($this->members->forTable($tableId) as $member) {
+        foreach ($existing as $token) {
             if (
-                $member->status() !== TableMemberStatus::ACTIVE
-                || $member->role() !== TableMemberRole::PLAYER
-                || $member->companionCharacterId() === null
+                $token->type() === TableTokenType::CHARACTER
+                && $token->controllerUserId() === $viewerUserId
+                && (string) ($token->sourceReference() ?? '') === $characterId
             ) {
-                continue;
+                return null;
             }
-
-            $characterId = (string) $member->companionCharacterId();
-            $alreadyPresent = false;
-            foreach ($existing as $token) {
-                if (
-                    $token->type() === TableTokenType::CHARACTER
-                    && $token->controllerUserId() === $member->userId()
-                    && (string) ($token->sourceReference() ?? '') === $characterId
-                ) {
-                    $alreadyPresent = true;
-                    break;
-                }
-            }
-            if ($alreadyPresent) {
-                continue;
-            }
-
-            $character = $this->companion->characterForUser($member->userId(), $characterId);
-            if ($character === null) {
-                continue;
-            }
-
-            $marker = $partyThresholds[$arrivalIndex % count($partyThresholds)];
-            $point = $this->arrivalPoint($scene, $marker, intdiv($arrivalIndex, count($partyThresholds)));
-            $token = $this->tokenManager->place(
-                $tableId,
-                $scene->id(),
-                (string) ($character['name'] ?? 'Adventurer'),
-                TableTokenType::CHARACTER,
-                $characterId,
-                $member->userId(),
-                $point['x'],
-                $point['y']
-            );
-            $existing[] = $token;
-            $created[] = $token;
-            ++$arrivalIndex;
         }
 
-        return $created;
+        $character = $this->companion->characterForUser($viewerUserId, $characterId);
+        if ($character === null) {
+            return null;
+        }
+
+        $occupiedCharacterCount = count(array_filter(
+            $existing,
+            static fn ($token): bool => $token->type() === TableTokenType::CHARACTER
+        ));
+        $marker = $partyThresholds[$occupiedCharacterCount % count($partyThresholds)];
+        $point = $this->arrivalPoint(
+            $scene,
+            $marker,
+            intdiv($occupiedCharacterCount, count($partyThresholds))
+        );
+
+        return $this->tokenManager->place(
+            $tableId,
+            $scene->id(),
+            (string) ($character['name'] ?? 'Adventurer'),
+            TableTokenType::CHARACTER,
+            $characterId,
+            $viewerUserId,
+            $point['x'],
+            $point['y']
+        );
     }
 
     /** @return array{x:float,y:float} */
