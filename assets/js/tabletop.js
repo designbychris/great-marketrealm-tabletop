@@ -1820,6 +1820,7 @@
             };
             const isClosedChain = (chain) => chain.length > 2
                 && pointKey(chain[0]) === pointKey(chain[chain.length - 1]);
+            // Tiny hatch/ink loops are suppressed before the review-object budget is allocated.
             const meaningfulChains = contourChains
                 .map((chain) => ({ chain, length: chainLength(chain), closed: isClosedChain(chain) }))
                 .filter((entry) => entry.length >= contourStep * 2.5)
