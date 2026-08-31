@@ -1555,7 +1555,7 @@
                 }
             }
 
-            // Simplify only degree-two orthogonal corners. On the fine mesh this turns
+            // Simplify only a degree-two vertex formed by orthogonal corners. On the fine mesh this turns
             // pixel staircases into short diagonals while leaving branches and openings
             // intact. Coordinates remain fractional gameplay-grid units and are accepted
             // by the Living Veil as precise barrier endpoints.
