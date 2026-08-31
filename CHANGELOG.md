@@ -1,4 +1,11 @@
 ## 0.30.1-alpha.2 — Phase IV.30.1A: Curves & Continuity
+## 0.30.1-alpha.3 — Phase IV.30.1B: The Living Contour
+
+- Added a dedicated **Living Contour · caves** Cartography Assistant mode alongside Structural tracing.
+- Classifies quiet playable floor against hatched/solid rock, traces their shared boundary, filters isolated noise and conservatively simplifies eligible cave corners into diagonal LOS segments.
+- Preserves Keeper-only review, existing-barrier deduplication, the 200-suggestion safety cap and explicit Apply Selected authority boundary.
+- Keeps the regular dungeon, advanced cave and hostile misaligned-grid maps as distinct Cartography benchmark tiers.
+
 
 - Extends Structural Cartography beyond horizontal/vertical runs with 45-degree diagonal tracing passes for cave walls and angled architecture.
 - Adds conservative continuity repair that can bridge one weak structural sample only when the local dark/quiet-side evidence still supports the same boundary, reducing tiny accidental breaks without blindly sealing clear openings.

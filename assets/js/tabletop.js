@@ -1457,8 +1457,128 @@
             return Array.from(wallVotes.values());
         };
 
+        // IV.30.1B — The Living Contour.
+        // Treat the calibrated grid as a scale reference, classify the quiet playable
+        // floor inside each cell, then trace the shared floor/solid boundary. This
+        // complements Structural tracing on cave maps where the wall itself curves
+        // freely through the artwork and hatch texture makes directional ink scans
+        // fragmentary. The result is still only a review-first barrier draft.
+        const livingContourCandidates = () => {
+            const gridCanvasX = Math.max(4, toCanvasX(grid.size));
+            const gridCanvasY = Math.max(4, toCanvasY(grid.size));
+            const originX = toCanvasX(grid.offsetX);
+            const originY = toCanvasY(grid.offsetY);
+            const darkThreshold = 118;
+            const cellDarkness = (column, row) => {
+                const x1 = originX + column * gridCanvasX + gridCanvasX * .18;
+                const y1 = originY + row * gridCanvasY + gridCanvasY * .18;
+                const x2 = originX + (column + 1) * gridCanvasX - gridCanvasX * .18;
+                const y2 = originY + (row + 1) * gridCanvasY - gridCanvasY * .18;
+                const stepX = Math.max(1, Math.round(gridCanvasX / 9));
+                const stepY = Math.max(1, Math.round(gridCanvasY / 9));
+                let dark = 0;
+                let total = 0;
+                for (let y = Math.max(0, Math.round(y1)); y <= Math.min(canvas.height - 1, Math.round(y2)); y += stepY) {
+                    for (let x = Math.max(0, Math.round(x1)); x <= Math.min(canvas.width - 1, Math.round(x2)); x += stepX) {
+                        total += 1;
+                        if (luminance(x, y) <= darkThreshold) dark += 1;
+                    }
+                }
+                return dark / Math.max(1, total);
+            };
+
+            const floor = Array.from({ length: rows }, () => Array(columns).fill(false));
+            const darkness = Array.from({ length: rows }, () => Array(columns).fill(1));
+            for (let row = 0; row < rows; row += 1) {
+                for (let column = 0; column < columns; column += 1) {
+                    const value = cellDarkness(column, row);
+                    darkness[row][column] = value;
+                    // White/gridded floor is substantially quieter than cross-hatched rock.
+                    floor[row][column] = value <= .24;
+                }
+            }
+
+            // Remove isolated one-cell classifications. They are normally labels, rubble,
+            // decorative islands or a hatch gap rather than a traversable chamber.
+            for (let row = 0; row < rows; row += 1) {
+                for (let column = 0; column < columns; column += 1) {
+                    if (!floor[row][column]) continue;
+                    let neighbours = 0;
+                    [[-1,0],[1,0],[0,-1],[0,1]].forEach(([dx,dy]) => {
+                        const x = column + dx; const y = row + dy;
+                        if (x >= 0 && y >= 0 && x < columns && y < rows && floor[y][x]) neighbours += 1;
+                    });
+                    if (neighbours === 0 && darkness[row][column] > .08) floor[row][column] = false;
+                }
+            }
+
+            const suggestions = new Map();
+            const add = (x1, y1, x2, y2, confidence = 84) => {
+                const suggestion = { x1, y1, x2, y2, type: 'wall', confidence, selected: true, contour: true };
+                const key = cartographySuggestionKey(suggestion);
+                if (!suggestions.has(key)) suggestions.set(key, suggestion);
+            };
+            const isFloor = (column, row) => column >= 0 && row >= 0 && column < columns && row < rows && floor[row][column];
+            for (let row = 0; row < rows; row += 1) {
+                for (let column = 0; column < columns; column += 1) {
+                    if (!floor[row][column]) continue;
+                    if (!isFloor(column, row - 1)) add(column, row, column + 1, row);
+                    if (!isFloor(column + 1, row)) add(column + 1, row, column + 1, row + 1);
+                    if (!isFloor(column, row + 1)) add(column, row + 1, column + 1, row + 1);
+                    if (!isFloor(column - 1, row)) add(column, row, column, row + 1);
+                }
+            }
+
+            // Join two orthogonal one-square boundary pieces across a corner into a
+            // diagonal when that removes the characteristic staircase around a cave.
+            // We keep this conservative: only exact L-pairs sharing an otherwise
+            // degree-two vertex are simplified, so doors/openings are not bridged.
+            let values = Array.from(suggestions.values());
+            const endpointKey = (x, y) => `${x},${y}`;
+            const adjacency = new Map();
+            values.forEach((item, index) => {
+                [[item.x1,item.y1],[item.x2,item.y2]].forEach(([x,y]) => {
+                    const key = endpointKey(x,y);
+                    if (!adjacency.has(key)) adjacency.set(key, []);
+                    adjacency.get(key).push(index);
+                });
+            });
+            const consumed = new Set();
+            const diagonals = [];
+            adjacency.forEach((indices) => {
+                if (indices.length !== 2) return;
+                const [aIndex,bIndex] = indices;
+                if (consumed.has(aIndex) || consumed.has(bIndex)) return;
+                const a = values[aIndex], b = values[bIndex];
+                const aHorizontal = a.y1 === a.y2;
+                const bHorizontal = b.y1 === b.y2;
+                if (aHorizontal === bHorizontal) return;
+                const shared = [[a.x1,a.y1],[a.x2,a.y2]].find(([x,y]) => (b.x1 === x && b.y1 === y) || (b.x2 === x && b.y2 === y));
+                if (!shared) return;
+                const aOther = (a.x1 === shared[0] && a.y1 === shared[1]) ? [a.x2,a.y2] : [a.x1,a.y1];
+                const bOther = (b.x1 === shared[0] && b.y1 === shared[1]) ? [b.x2,b.y2] : [b.x1,b.y1];
+                if (Math.abs(aOther[0] - bOther[0]) !== 1 || Math.abs(aOther[1] - bOther[1]) !== 1) return;
+                consumed.add(aIndex); consumed.add(bIndex);
+                diagonals.push({ x1:aOther[0], y1:aOther[1], x2:bOther[0], y2:bOther[1], type:'wall', confidence:88, selected:true, contour:true });
+            });
+            values = values.filter((_, index) => !consumed.has(index)).concat(diagonals);
+            return values;
+        };
+
         const scores = candidates.map((item) => item.score).sort((a, b) => a - b);
         const detail = cartographyDetail?.value || 'balanced';
+        if (detail === 'contour') {
+            const existing = new Set(visionBarriers.map(cartographySuggestionKey));
+            cartographySuggestions = livingContourCandidates()
+                .filter((item) => !existing.has(cartographySuggestionKey(item)))
+                .sort((a, b) => b.confidence - a.confidence)
+                .slice(0, 200);
+            renderCartographyReview();
+            if (cartographySuggestions.length === 0 && cartographyAssistantStatus) {
+                cartographyAssistantStatus.textContent = 'No playable floor contour was confident enough. Check grid calibration or try Structural tracing.';
+            }
+            return;
+        }
         if (detail === 'structural') {
             const existing = new Set(visionBarriers.map(cartographySuggestionKey));
             cartographySuggestions = structuralCartographyCandidates()
