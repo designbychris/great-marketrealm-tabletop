@@ -1,3 +1,12 @@
+## 0.30.1-alpha.4 — Phase IV.30.1B.1: Fine Contour Sampling
+
+- Decouples Living Contour analysis resolution from the calibrated gameplay grid with an adaptive temporary subdivision mesh.
+- Uses up to 6×6 analysis cells per gameplay square while reducing subdivision automatically to keep browser work bounded.
+- Preserves fractional barrier endpoints so accepted cave contours can follow artwork more closely than whole-grid intersections.
+- Keeps noise cleanup, the 200-suggestion cap, Keeper review and explicit Apply Selected authority unchanged.
+- Leaves the hostile misaligned-grid benchmark for later grid-registration work rather than altering gameplay calibration.
+- Version: `0.30.1-alpha.4`.
+
 ## 0.30.1-alpha.2 — Phase IV.30.1A: Curves & Continuity
 ## 0.30.1-alpha.3 — Phase IV.30.1B: The Living Contour
 

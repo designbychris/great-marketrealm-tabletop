@@ -17,7 +17,7 @@ defined('ABSPATH') || exit;
 final class VisionBarrierManager
 {
     public function __construct(private VisionBarrierRepository $barriers,private TableMembershipRepository $members,private TableSceneRepository $scenes,private ?FogOfWarRepository $fog=null,private ?TableTokenRepository $tokens=null,private ?FogCellMapper $mapper=null){}
-    public function add(string $tableId,int $userId,string $type,int $x1,int $y1,int $x2,int $y2,string $sceneId=""):VisionBarrier{$scene=$this->guard($tableId,$userId,$sceneId);$barrier=new VisionBarrier('vision-'.bin2hex(random_bytes(6)),$scene->id(),$type,$x1,$y1,$x2,$y2,false);$this->barriers->save($tableId,$barrier);$this->refreshExploration($tableId,$scene);return $barrier;}
+    public function add(string $tableId,int $userId,string $type,float $x1,float $y1,float $x2,float $y2,string $sceneId=""):VisionBarrier{$scene=$this->guard($tableId,$userId,$sceneId);$barrier=new VisionBarrier('vision-'.bin2hex(random_bytes(6)),$scene->id(),$type,$x1,$y1,$x2,$y2,false);$this->barriers->save($tableId,$barrier);$this->refreshExploration($tableId,$scene);return $barrier;}
     /** @param array<int,array<string,mixed>> $suggestions @return array<int,VisionBarrier> */
     public function addBatch(string $tableId,int $userId,array $suggestions,string $sceneId=""):array
     {
@@ -27,7 +27,7 @@ final class VisionBarrierManager
         foreach($suggestions as $suggestion){
             if(!is_array($suggestion)){continue;}
             $type=sanitize_key((string)($suggestion['type']??''));
-            $x1=(int)($suggestion['x1']??0);$y1=(int)($suggestion['y1']??0);$x2=(int)($suggestion['x2']??0);$y2=(int)($suggestion['y2']??0);
+            $x1=(float)($suggestion['x1']??0);$y1=(float)($suggestion['y1']??0);$x2=(float)($suggestion['x2']??0);$y2=(float)($suggestion['y2']??0);
             $created[]=new VisionBarrier('vision-'.bin2hex(random_bytes(6)),$scene->id(),$type,$x1,$y1,$x2,$y2,false);
         }
         if($created===[]){throw new RuntimeException('No valid Cartography Assistant suggestions were selected.');}
