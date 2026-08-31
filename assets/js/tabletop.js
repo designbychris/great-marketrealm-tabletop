@@ -1653,6 +1653,47 @@
                 return Math.hypot(point[0] - (start[0] + t * dx), point[1] - (start[1] + t * dy));
             };
 
+            // IV.30.1B.3A — Contour Topology Guard.
+            // Adaptive budgeting is allowed to remove fine ink wiggles, but it must
+            // never turn a winding cave perimeter into a giant cross-room chord. Keep
+            // every replacement local to the gameplay scale and close to the ordered
+            // boundary span it replaces. Long straight runs are split deliberately,
+            // rather than being collapsed merely because their perpendicular error is 0.
+            const maximumTopologyChord = 6;
+            const maximumTopologyDeviation = .8;
+            const maximumContourDetourRatio = 1.75;
+            const topologySafeSpan = (points) => {
+                if (points.length <= 2) return true;
+                const start = points[0];
+                const end = points[points.length - 1];
+                const chordLength = Math.hypot(end[0] - start[0], end[1] - start[1]);
+                if (chordLength < .000001 || chordLength > maximumTopologyChord) return false;
+
+                // All contour coordinates are gameplay-grid-relative. Reject any
+                // simplification endpoint that escaped the analysed grid envelope.
+                const inBounds = (point) => point[0] >= -contourStep && point[1] >= -contourStep
+                    && point[0] <= columns + contourStep && point[1] <= rows + contourStep;
+                if (!inBounds(start) || !inBounds(end)) return false;
+
+                let travelled = 0;
+                let furthestDeviation = 0;
+                for (let index = 0; index < points.length; index += 1) {
+                    if (index > 0) {
+                        travelled += Math.hypot(
+                            points[index][0] - points[index - 1][0],
+                            points[index][1] - points[index - 1][1]
+                        );
+                    }
+                    furthestDeviation = Math.max(
+                        furthestDeviation,
+                        pointLineDistance(points[index], start, end)
+                    );
+                }
+                const contourDetourRatio = travelled / chordLength;
+                return furthestDeviation <= maximumTopologyDeviation
+                    && contourDetourRatio <= maximumContourDetourRatio;
+            };
+
             const simplifyOpenPath = (points, tolerance) => {
                 if (points.length <= 2) return points.slice();
                 let furthestDistance = 0;
@@ -1664,8 +1705,13 @@
                         furthestIndex = index;
                     }
                 }
-                if (furthestIndex < 0 || furthestDistance <= tolerance) {
+                if (topologySafeSpan(points) && (furthestIndex < 0 || furthestDistance <= tolerance)) {
                     return [points[0], points[points.length - 1]];
+                }
+                // A perfectly straight but over-long span has no furthest point. Split
+                // it at the midpoint so the topology chord limit still applies.
+                if (furthestIndex < 1 || furthestIndex >= points.length - 1) {
+                    furthestIndex = Math.floor(points.length / 2);
                 }
                 const left = simplifyOpenPath(points.slice(0, furthestIndex + 1), tolerance);
                 const right = simplifyOpenPath(points.slice(furthestIndex), tolerance);

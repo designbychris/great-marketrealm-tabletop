@@ -1,3 +1,12 @@
+## 0.30.1-alpha.7 — Phase IV.30.1B.3A: Contour Topology Guard
+
+- Guards Adaptive Contour Reduction against giant cross-room/cross-map replacement chords.
+- Caps automatic cave simplification chords to six gameplay-grid units and rejects spans whose local deviation or travelled-path detour would distort the ordered contour.
+- Forces perfectly straight but over-long contour runs to split at a midpoint, closing the zero-deviation loophole that could collapse an entire long boundary into one stroke.
+- Keeps the 200-suggestion review ceiling, full-boundary budgeting, fractional endpoints and review-first authority unchanged.
+- Adds regression coverage for local topology limits, detour/deviation guards, long-straight splitting and roadmap/version identity.
+- Version: `0.30.1-alpha.7`.
+
 ## 0.30.1-alpha.6 — Phase IV.30.1B.3: The Cartographer's Economy / Adaptive Contour Reduction
 
 - Replaces Living Contour's normal one-size-fits-all simplification tolerance with a whole-dungeon 200-segment budget allocator.
