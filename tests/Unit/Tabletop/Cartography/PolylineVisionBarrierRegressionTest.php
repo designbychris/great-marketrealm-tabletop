@@ -43,7 +43,7 @@ final class PolylineVisionBarrierRegressionTest extends TestCase
         $resolver = new SightLineResolver();
 
         self::assertFalse($resolver->canSee(0, 0, 2, 0, [$barrier]));
-        self::assertFalse($resolver->canSee(2, 1, 2, 2, [$barrier]));
+        self::assertFalse($resolver->canSee(2, 1, 2, 3, [$barrier]));
     }
 
     public function test_doors_cannot_become_multi_vertex_paths(): void
@@ -67,6 +67,8 @@ final class PolylineVisionBarrierRegressionTest extends TestCase
         self::assertStringContainsString("return { type: 'wall', points: item.points }", $js);
         self::assertStringContainsString('MAX_PATH_POINTS = 256', $manager);
         self::assertStringContainsString('MAX_BATCH_POINTS = 6000', $manager);
+        self::assertStringContainsString('row > 0 && !isFloor(column, row - 1)', $js);
+        self::assertStringContainsString('column < contourColumns - 1 && !isFloor(column + 1, row)', $js);
     }
 
     public function test_phase_keeps_review_first_authority_and_grid_registration_separate(): void

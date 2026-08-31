@@ -1570,10 +1570,14 @@
                     const right = (column + 1) * contourStep;
                     const top = row * contourStep;
                     const bottom = (row + 1) * contourStep;
-                    if (!isFloor(column, row - 1)) add(left, top, right, top);
-                    if (!isFloor(column + 1, row)) add(right, top, right, bottom);
-                    if (!isFloor(column, row + 1)) add(left, bottom, right, bottom);
-                    if (!isFloor(column - 1, row)) add(left, top, left, bottom);
+                    // The finite analysis envelope is not cave rock. Only emit a
+                    // contour when both cells exist inside the sampled map and the
+                    // neighbouring cell is classified as solid. This prevents false
+                    // wall paths from hugging the bottom/right (or any outer) edge.
+                    if (row > 0 && !isFloor(column, row - 1)) add(left, top, right, top);
+                    if (column < contourColumns - 1 && !isFloor(column + 1, row)) add(right, top, right, bottom);
+                    if (row < contourRows - 1 && !isFloor(column, row + 1)) add(left, bottom, right, bottom);
+                    if (column > 0 && !isFloor(column - 1, row)) add(left, top, left, bottom);
                 }
             }
 

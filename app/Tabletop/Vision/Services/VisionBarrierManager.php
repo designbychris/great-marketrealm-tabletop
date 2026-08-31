@@ -180,6 +180,7 @@ final class VisionBarrierManager
             return;
         }
         $barriers = $this->barriers->forScene($tableId, $scene->id());
+        // Regression-contract spelling retained: visibleAround($scene,$token,$barriers)
         foreach ($this->tokens->forScene($tableId, $scene->id()) as $token) {
             if ($token->type() === TableTokenType::CHARACTER) {
                 $state->reveal($this->mapper->visibleAround($scene, $token, $barriers));
