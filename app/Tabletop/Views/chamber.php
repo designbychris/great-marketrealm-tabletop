@@ -927,7 +927,7 @@ $sceneImage = $scene !== null
                             <div class="gmrt-cartography-assistant__body">
                                 <p>
                                     Let the Assistant inspect this Scene's artwork against the calibrated square grid.
-                                    Suggestions remain a private draft until you review and apply them. Structural tracing is designed for thick inked dungeon walls, hatch-textured stone, offsets and irregular rooms.
+                                    Suggestions remain a private draft until you review and apply them. Structural tracing follows thick inked dungeon walls, including diagonals and curved/organic boundaries approximated through short connected segments, while resisting hatch-textured stone.
                                 </p>
                                 <div class="gmrt-cartography-assistant__controls">
                                     <label>

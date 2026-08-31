@@ -31,9 +31,9 @@ final class StructuralCartographyRegressionTest extends TestCase
     public function test_structural_pass_suppresses_hatch_texture_by_comparing_across_the_trace(): void
     {
         $script = (string) file_get_contents($this->root('assets/js/tabletop.js'));
-        self::assertStringContainsString('Math.min(above, below) <= .16', $script);
-        self::assertStringContainsString('Math.min(left, right) <= .16', $script);
-        self::assertStringContainsString('center >= Math.max(above, below) * 1.25', $script);
+        self::assertStringContainsString('const quietSide = Math.min(sideA, sideB)', $script);
+        self::assertStringContainsString('quietSide <= .16', $script);
+        self::assertStringContainsString('center >= loudSide * 1.25', $script);
     }
 
     public function test_structural_traces_are_segmented_back_into_existing_grid_barriers(): void

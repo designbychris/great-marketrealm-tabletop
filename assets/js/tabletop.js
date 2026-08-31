@@ -1364,41 +1364,88 @@
             };
 
             const traces = [];
-            for (let y = traceStep; y < canvas.height - traceStep; y += traceStep) {
-                let runStart = null;
-                for (let x = traceStep; x < canvas.width - traceStep; x += traceStep) {
-                    const center = densityAt(x, y);
-                    const above = densityAt(x, y - (gridCanvas * .23));
-                    const below = densityAt(x, y + (gridCanvas * .23));
-                    const structural = center >= .18 && Math.min(above, below) <= .16 && center >= Math.max(above, below) * 1.25;
-                    if (structural && runStart === null) runStart = x;
-                    if ((!structural || x + traceStep >= canvas.width - traceStep) && runStart !== null) {
-                        const runEnd = structural ? x : x - traceStep;
-                        if (runEnd - runStart >= minimumRun) traces.push({ x1: runStart, y1: y, x2: runEnd, y2: y, confidence: Math.min(97, 68 + ((runEnd - runStart) / gridCanvas) * 8) });
-                        runStart = null;
+            const structuralScore = (x, y, normalX, normalY) => {
+                const center = densityAt(x, y);
+                const sideOffset = gridCanvas * .23;
+                const sideA = densityAt(x + (normalX * sideOffset), y + (normalY * sideOffset));
+                const sideB = densityAt(x - (normalX * sideOffset), y - (normalY * sideOffset));
+                const quietSide = Math.min(sideA, sideB);
+                const loudSide = Math.max(sideA, sideB);
+                return {
+                    center,
+                    quietSide,
+                    loudSide,
+                    structural: center >= .18 && quietSide <= .16 && center >= loudSide * 1.25,
+                    continuity: center >= .10 && quietSide <= .20 && center >= loudSide * 1.05
+                };
+            };
+
+            const traceDirectional = (starts, directionX, directionY, normalX, normalY) => {
+                starts.forEach((start) => {
+                    let runStart = null;
+                    let previous = null;
+                    let gapBudget = 1;
+                    let x = start.x;
+                    let y = start.y;
+                    while (x >= traceStep && y >= traceStep && x < canvas.width - traceStep && y < canvas.height - traceStep) {
+                        const score = structuralScore(x, y, normalX, normalY);
+                        if (score.structural) {
+                            if (runStart === null) runStart = { x, y };
+                            previous = { x, y };
+                            gapBudget = 1;
+                        } else if (runStart !== null && score.continuity && gapBudget > 0) {
+                            previous = { x, y };
+                            gapBudget -= 1;
+                        } else if (runStart !== null) {
+                            const runEnd = previous || runStart;
+                            const length = Math.hypot(runEnd.x - runStart.x, runEnd.y - runStart.y);
+                            if (length >= minimumRun) {
+                                traces.push({
+                                    x1: runStart.x, y1: runStart.y, x2: runEnd.x, y2: runEnd.y,
+                                    confidence: Math.min(97, 68 + (length / gridCanvas) * 8)
+                                });
+                            }
+                            runStart = null;
+                            previous = null;
+                            gapBudget = 1;
+                        }
+                        x += directionX * traceStep;
+                        y += directionY * traceStep;
                     }
-                }
-            }
-            for (let x = traceStep; x < canvas.width - traceStep; x += traceStep) {
-                let runStart = null;
-                for (let y = traceStep; y < canvas.height - traceStep; y += traceStep) {
-                    const center = densityAt(x, y);
-                    const left = densityAt(x - (gridCanvas * .23), y);
-                    const right = densityAt(x + (gridCanvas * .23), y);
-                    const structural = center >= .18 && Math.min(left, right) <= .16 && center >= Math.max(left, right) * 1.25;
-                    if (structural && runStart === null) runStart = y;
-                    if ((!structural || y + traceStep >= canvas.height - traceStep) && runStart !== null) {
-                        const runEnd = structural ? y : y - traceStep;
-                        if (runEnd - runStart >= minimumRun) traces.push({ x1: x, y1: runStart, x2: x, y2: runEnd, confidence: Math.min(97, 68 + ((runEnd - runStart) / gridCanvas) * 8) });
-                        runStart = null;
+                    if (runStart !== null && previous !== null) {
+                        const length = Math.hypot(previous.x - runStart.x, previous.y - runStart.y);
+                        if (length >= minimumRun) {
+                            traces.push({
+                                x1: runStart.x, y1: runStart.y, x2: previous.x, y2: previous.y,
+                                confidence: Math.min(97, 68 + (length / gridCanvas) * 8)
+                            });
+                        }
                     }
-                }
-            }
+                });
+            };
+
+            const horizontalStarts = [];
+            for (let y = traceStep; y < canvas.height - traceStep; y += traceStep) horizontalStarts.push({ x: traceStep, y });
+            traceDirectional(horizontalStarts, 1, 0, 0, 1);
+
+            const verticalStarts = [];
+            for (let x = traceStep; x < canvas.width - traceStep; x += traceStep) verticalStarts.push({ x, y: traceStep });
+            traceDirectional(verticalStarts, 0, 1, 1, 0);
+
+            const diagonalDownStarts = [];
+            for (let x = traceStep; x < canvas.width - traceStep; x += traceStep) diagonalDownStarts.push({ x, y: traceStep });
+            for (let y = traceStep * 2; y < canvas.height - traceStep; y += traceStep) diagonalDownStarts.push({ x: traceStep, y });
+            traceDirectional(diagonalDownStarts, 1, 1, Math.SQRT1_2, -Math.SQRT1_2);
+
+            const diagonalUpStarts = [];
+            for (let x = traceStep; x < canvas.width - traceStep; x += traceStep) diagonalUpStarts.push({ x, y: canvas.height - traceStep * 1.01 });
+            for (let y = canvas.height - traceStep * 2; y > traceStep; y -= traceStep) diagonalUpStarts.push({ x: traceStep, y });
+            traceDirectional(diagonalUpStarts, 1, -1, Math.SQRT1_2, Math.SQRT1_2);
 
             traces.forEach((trace) => {
                 const dx = trace.x2 - trace.x1;
                 const dy = trace.y2 - trace.y1;
-                const distance = Math.max(Math.abs(dx), Math.abs(dy));
+                const distance = Math.hypot(dx, dy);
                 const pieces = Math.max(1, Math.ceil(distance / gridCanvas));
                 for (let i = 0; i < pieces; i += 1) {
                     const from = i / pieces;

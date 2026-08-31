@@ -1,3 +1,13 @@
+## 0.30.1-alpha.2 — Phase IV.30.1A: Curves & Continuity
+
+- Extends Structural Cartography beyond horizontal/vertical runs with 45-degree diagonal tracing passes for cave walls and angled architecture.
+- Adds conservative continuity repair that can bridge one weak structural sample only when the local dark/quiet-side evidence still supports the same boundary, reducing tiny accidental breaks without blindly sealing clear openings.
+- Keeps artwork tracing independent of exact grid-line placement, then simplifies accepted traces into the existing neighbouring-grid-intersection barrier vocabulary for authoritative Sight Beyond the Door geometry.
+- Approximates curved/organic boundaries as short connected wall segments rather than forcing the analysis itself to be orthogonal.
+- Preserves the IV.30 review-first contract, 200-suggestion cap, existing-barrier deduplication, and local-only artwork analysis.
+- Records three benchmark tiers: regular orthogonal control, complex cave advanced benchmark, and the retained misaligned-grid hostile benchmark reserved for future grid-registration work.
+- Version: `0.30.1-alpha.2`.
+
 ## 0.30.1-alpha.1 — Phase IV.30.1: Structural Cartography
 
 - Adds a Structural tracing mode to the Keeper's Cartography Assistant for common thick-ink, cross-hatched dungeon maps.
