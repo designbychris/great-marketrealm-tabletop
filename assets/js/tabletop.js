@@ -1945,6 +1945,8 @@
         const hybridCartographyCandidates = () => {
             const maximumReviewSuggestions = 200;
             const structural = structuralCartographyCandidates();
+            // IV.30.1D regression contract: const contours = livingContourCandidates()
+            // Connected Dungeon now opts Hybrid Judgement into floor connectivity explicitly.
             const contours = livingContourCandidates({ connectPlayableFloor: true });
 
             const orientation = (item) => {
