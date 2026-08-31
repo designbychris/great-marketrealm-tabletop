@@ -1,3 +1,12 @@
+## 0.30.1-alpha.6 — Phase IV.30.1B.3: The Cartographer's Economy / Adaptive Contour Reduction
+
+- Replaces Living Contour's normal one-size-fits-all simplification tolerance with a whole-dungeon 200-segment budget allocator.
+- Measures complete contour perimeters, suppresses tiny fine-mesh hatch/ink loops, reserves a minimum representation for retained boundaries, and distributes remaining fidelity by square-root perimeter weighting.
+- Binary-searches a separate simplification tolerance for each contour so large cave walls receive useful detail without starving smaller pillars and islands.
+- Retains the previous complete-boundary global simplifier only as a defensive fallback; raw scan-order truncation remains forbidden.
+- Preserves Fine Contour Sampling, fractional endpoints, Keeper review, explicit Apply Selected authority, and the later misaligned-grid registration roadmap.
+- Version: `0.30.1-alpha.6`.
+
 ## 0.30.1-alpha.5 — Phase IV.30.1B.2: Contour Simplification & Full-Boundary Tracing
 
 - Traces complete connected Living Contour chains and closed cycles before the review budget is applied, so lower-map cave boundaries are no longer discarded merely because the scanner reached 200 fine strokes near the top first.

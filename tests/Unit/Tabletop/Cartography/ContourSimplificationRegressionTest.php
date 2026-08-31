@@ -36,7 +36,8 @@ final class ContourSimplificationRegressionTest extends TestCase
         $js = (string) file_get_contents($this->root('assets/js/tabletop.js'));
         self::assertStringContainsString('maximumReviewSuggestions = 200', $js);
         self::assertStringContainsString('simplificationTolerance *= 1.35', $js);
-        self::assertStringContainsString('if (simplifiedValues.length > maximumReviewSuggestions) return []', $js);
+        self::assertStringContainsString('budgetedChains', $js);
+        self::assertStringContainsString('if (fallbackValues.length > maximumReviewSuggestions) return []', $js);
 
         $contourBranchStart = strpos($js, "if (detail === 'contour')");
         $structuralBranchStart = strpos($js, "if (detail === 'structural')", $contourBranchStart ?: 0);

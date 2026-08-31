@@ -1728,20 +1728,112 @@
                 return simplified;
             };
 
-            // Adapt the simplification tolerance before imposing the server's review
-            // ceiling. The complete set of contour chains therefore participates in
-            // every pass instead of later rows being discarded by scan order.
+            // IV.30.1B.3 — The Cartographer's Economy / Adaptive Contour Reduction.
+            // Spend the review budget across the *whole* cave instead of applying one
+            // global tolerance to every contour. Long/important boundaries receive a
+            // proportionate share, while tiny hatch/ink loops are suppressed before
+            // they can consume the Keeper's finite LOS-barrier budget.
             const maximumReviewSuggestions = 200;
-            let simplificationTolerance = Math.max(contourStep * 1.1, .12);
-            let simplifiedValues = buildSimplifiedSuggestions(simplificationTolerance);
-            while (simplifiedValues.length > maximumReviewSuggestions && simplificationTolerance < 1.5) {
-                simplificationTolerance *= 1.35;
-                simplifiedValues = buildSimplifiedSuggestions(simplificationTolerance);
+            const chainLength = (chain) => {
+                let length = 0;
+                for (let index = 0; index < chain.length - 1; index += 1) {
+                    length += Math.hypot(
+                        chain[index + 1][0] - chain[index][0],
+                        chain[index + 1][1] - chain[index][1]
+                    );
+                }
+                return length;
+            };
+            const isClosedChain = (chain) => chain.length > 2
+                && pointKey(chain[0]) === pointKey(chain[chain.length - 1]);
+            const meaningfulChains = contourChains
+                .map((chain) => ({ chain, length: chainLength(chain), closed: isClosedChain(chain) }))
+                .filter((entry) => entry.length >= contourStep * 2.5)
+                .sort((a, b) => b.length - a.length);
+
+            if (meaningfulChains.length === 0) return [];
+
+            // Closed loops need at least three sides to remain meaningful; open chains
+            // need one. If pathological artwork contains more independent structures
+            // than the whole budget can represent, retain the longest structures first
+            // rather than returning an arbitrary scan-order prefix.
+            let minimumCost = 0;
+            const budgetedChains = [];
+            meaningfulChains.forEach((entry) => {
+                const minimum = entry.closed ? 3 : 1;
+                if (minimumCost + minimum > maximumReviewSuggestions) return;
+                minimumCost += minimum;
+                budgetedChains.push({ ...entry, minimum, target: minimum });
+            });
+            if (budgetedChains.length === 0) return [];
+
+            // Allocate the remaining strokes by sqrt(perimeter): large cave boundaries
+            // get more fidelity, but cannot starve small pillars/islands completely.
+            let remainingBudget = maximumReviewSuggestions - minimumCost;
+            const totalWeight = budgetedChains.reduce((sum, entry) => sum + Math.sqrt(entry.length), 0);
+            budgetedChains.forEach((entry) => {
+                if (remainingBudget <= 0 || totalWeight <= 0) return;
+                const extra = Math.floor(remainingBudget * (Math.sqrt(entry.length) / totalWeight));
+                entry.target += extra;
+            });
+            let allocated = budgetedChains.reduce((sum, entry) => sum + entry.target, 0);
+            for (let index = 0; allocated < maximumReviewSuggestions && index < budgetedChains.length; index = (index + 1) % budgetedChains.length) {
+                budgetedChains[index].target += 1;
+                allocated += 1;
             }
 
-            // If an exceptionally fragmented artwork still cannot fit the review cap,
-            // fail closed rather than silently returning only the top of the map.
-            if (simplifiedValues.length > maximumReviewSuggestions) return [];
+            const simplifyChainToTarget = (entry) => {
+                const startingTolerance = Math.max(contourStep * .85, .08);
+                let low = startingTolerance;
+                let high = Math.max(2, entry.length);
+                let best = simplifyContourPath(entry.chain, high);
+                const segmentCount = (path) => Math.max(0, path.length - 1);
+
+                // Binary-search a per-contour tolerance that uses as much of this
+                // contour's allocation as practical without exceeding it.
+                for (let pass = 0; pass < 14; pass += 1) {
+                    const tolerance = (low + high) / 2;
+                    const candidate = simplifyContourPath(entry.chain, tolerance);
+                    if (segmentCount(candidate) > entry.target) {
+                        low = tolerance;
+                    } else {
+                        best = candidate;
+                        high = tolerance;
+                    }
+                }
+                return best;
+            };
+
+            const simplifiedValues = [];
+            budgetedChains.forEach((entry) => {
+                const path = simplifyChainToTarget(entry);
+                for (let index = 0; index < path.length - 1; index += 1) {
+                    const start = path[index];
+                    const end = path[index + 1];
+                    if (pointKey(start) === pointKey(end)) continue;
+                    simplifiedValues.push({
+                        x1: roundContourCoordinate(start[0]), y1: roundContourCoordinate(start[1]),
+                        x2: roundContourCoordinate(end[0]), y2: roundContourCoordinate(end[1]),
+                        type: 'wall', confidence: 92, selected: true,
+                        contour: true, fineContour: true, fullBoundary: true, adaptiveBudget: true
+                    });
+                }
+            });
+
+            // Defensive compatibility fallback. The adaptive allocator should already
+            // fit the ceiling; if numerical edge cases overshoot, compact the complete
+            // contour set globally rather than truncating it. Keep the historical
+            // simplificationTolerance *= 1.35 behaviour as the final fail-safe.
+            if (simplifiedValues.length > maximumReviewSuggestions) {
+                let simplificationTolerance = Math.max(contourStep * 1.1, .12);
+                let fallbackValues = buildSimplifiedSuggestions(simplificationTolerance);
+                while (fallbackValues.length > maximumReviewSuggestions && simplificationTolerance < 8) {
+                    simplificationTolerance *= 1.35;
+                    fallbackValues = buildSimplifiedSuggestions(simplificationTolerance);
+                }
+                if (fallbackValues.length > maximumReviewSuggestions) return [];
+                return fallbackValues;
+            }
             return simplifiedValues;
         };
 
