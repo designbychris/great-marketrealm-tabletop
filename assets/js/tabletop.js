@@ -1589,7 +1589,160 @@
                 diagonals.push({ x1:aOther[0], y1:aOther[1], x2:bOther[0], y2:bOther[1], type:'wall', confidence:88, selected:true, contour:true, fineContour:true });
             });
             values = values.filter((_, index) => !consumed.has(index)).concat(diagonals);
-            return values;
+
+            // IV.30.1B.2 — Contour Simplification & Full-Boundary Tracing.
+            // Fine sampling can produce thousands of tiny boundary strokes. Trace every
+            // connected boundary first, then simplify each complete chain/cycle before
+            // the 200-suggestion review budget is considered. This avoids the old
+            // top-of-map truncation caused by slicing raw fine-mesh strokes.
+            const pointKey = (point) => `${point[0]},${point[1]}`;
+            const edgeEndpoints = (edge) => [[edge.x1, edge.y1], [edge.x2, edge.y2]];
+            const edgeAdjacency = new Map();
+            values.forEach((edge, index) => {
+                edgeEndpoints(edge).forEach((point) => {
+                    const key = pointKey(point);
+                    if (!edgeAdjacency.has(key)) edgeAdjacency.set(key, []);
+                    edgeAdjacency.get(key).push(index);
+                });
+            });
+
+            const visitedEdges = new Set();
+            const contourChains = [];
+            const traceChain = (startEdgeIndex, startPoint) => {
+                const points = [startPoint];
+                let edgeIndex = startEdgeIndex;
+                let currentPoint = startPoint;
+                while (!visitedEdges.has(edgeIndex)) {
+                    visitedEdges.add(edgeIndex);
+                    const edge = values[edgeIndex];
+                    const [first, second] = edgeEndpoints(edge);
+                    const nextPoint = pointKey(first) === pointKey(currentPoint) ? second : first;
+                    points.push(nextPoint);
+                    const nextKey = pointKey(nextPoint);
+                    const nextEdges = (edgeAdjacency.get(nextKey) || []).filter((candidate) => !visitedEdges.has(candidate));
+                    if (nextEdges.length !== 1) break;
+                    currentPoint = nextPoint;
+                    edgeIndex = nextEdges[0];
+                }
+                return points;
+            };
+
+            // Start open/branching chains at non-degree-two vertices so every branch is
+            // represented once. Any edges left afterwards form closed contour cycles.
+            edgeAdjacency.forEach((indices, key) => {
+                if (indices.length === 2) return;
+                const [x, y] = key.split(',').map(Number);
+                indices.forEach((edgeIndex) => {
+                    if (!visitedEdges.has(edgeIndex)) contourChains.push(traceChain(edgeIndex, [x, y]));
+                });
+            });
+            values.forEach((edge, edgeIndex) => {
+                if (visitedEdges.has(edgeIndex)) return;
+                contourChains.push(traceChain(edgeIndex, [edge.x1, edge.y1]));
+            });
+
+            const pointLineDistance = (point, start, end) => {
+                const dx = end[0] - start[0];
+                const dy = end[1] - start[1];
+                if (Math.abs(dx) < .000001 && Math.abs(dy) < .000001) {
+                    return Math.hypot(point[0] - start[0], point[1] - start[1]);
+                }
+                const t = Math.max(0, Math.min(1,
+                    ((point[0] - start[0]) * dx + (point[1] - start[1]) * dy) / (dx * dx + dy * dy)
+                ));
+                return Math.hypot(point[0] - (start[0] + t * dx), point[1] - (start[1] + t * dy));
+            };
+
+            const simplifyOpenPath = (points, tolerance) => {
+                if (points.length <= 2) return points.slice();
+                let furthestDistance = 0;
+                let furthestIndex = -1;
+                for (let index = 1; index < points.length - 1; index += 1) {
+                    const distance = pointLineDistance(points[index], points[0], points[points.length - 1]);
+                    if (distance > furthestDistance) {
+                        furthestDistance = distance;
+                        furthestIndex = index;
+                    }
+                }
+                if (furthestIndex < 0 || furthestDistance <= tolerance) {
+                    return [points[0], points[points.length - 1]];
+                }
+                const left = simplifyOpenPath(points.slice(0, furthestIndex + 1), tolerance);
+                const right = simplifyOpenPath(points.slice(furthestIndex), tolerance);
+                return left.slice(0, -1).concat(right);
+            };
+
+            const simplifyContourPath = (points, tolerance) => {
+                if (points.length <= 2) return points.slice();
+                const isClosed = pointKey(points[0]) === pointKey(points[points.length - 1]);
+                if (!isClosed) return simplifyOpenPath(points, tolerance);
+
+                // A closed path has identical endpoints, so split it across its most
+                // distant pair before Douglas-Peucker simplification and rejoin it.
+                const ring = points.slice(0, -1);
+                if (ring.length <= 3) return points.slice();
+                const farthestFrom = (anchorIndex) => {
+                    let farthestIndex = anchorIndex === 0 ? 1 : 0;
+                    let farthestDistance = -1;
+                    for (let index = 0; index < ring.length; index += 1) {
+                        if (index === anchorIndex) continue;
+                        const distance = Math.hypot(
+                            ring[index][0] - ring[anchorIndex][0],
+                            ring[index][1] - ring[anchorIndex][1]
+                        );
+                        if (distance > farthestDistance) {
+                            farthestDistance = distance;
+                            farthestIndex = index;
+                        }
+                    }
+                    return farthestIndex;
+                };
+                let anchorA = farthestFrom(0);
+                let anchorB = farthestFrom(anchorA);
+                if (anchorA > anchorB) [anchorA, anchorB] = [anchorB, anchorA];
+                const arcOne = ring.slice(anchorA, anchorB + 1);
+                const arcTwo = ring.slice(anchorB).concat(ring.slice(0, anchorA + 1));
+                const first = simplifyOpenPath(arcOne, tolerance);
+                const second = simplifyOpenPath(arcTwo, tolerance);
+                const joined = first.slice(0, -1).concat(second.slice(0, -1));
+                joined.push(joined[0]);
+                return joined;
+            };
+
+            const buildSimplifiedSuggestions = (tolerance) => {
+                const simplified = [];
+                contourChains.forEach((chain) => {
+                    const path = simplifyContourPath(chain, tolerance);
+                    for (let index = 0; index < path.length - 1; index += 1) {
+                        const start = path[index];
+                        const end = path[index + 1];
+                        if (pointKey(start) === pointKey(end)) continue;
+                        simplified.push({
+                            x1: roundContourCoordinate(start[0]), y1: roundContourCoordinate(start[1]),
+                            x2: roundContourCoordinate(end[0]), y2: roundContourCoordinate(end[1]),
+                            type: 'wall', confidence: 90, selected: true,
+                            contour: true, fineContour: true, fullBoundary: true
+                        });
+                    }
+                });
+                return simplified;
+            };
+
+            // Adapt the simplification tolerance before imposing the server's review
+            // ceiling. The complete set of contour chains therefore participates in
+            // every pass instead of later rows being discarded by scan order.
+            const maximumReviewSuggestions = 200;
+            let simplificationTolerance = Math.max(contourStep * 1.1, .12);
+            let simplifiedValues = buildSimplifiedSuggestions(simplificationTolerance);
+            while (simplifiedValues.length > maximumReviewSuggestions && simplificationTolerance < 1.5) {
+                simplificationTolerance *= 1.35;
+                simplifiedValues = buildSimplifiedSuggestions(simplificationTolerance);
+            }
+
+            // If an exceptionally fragmented artwork still cannot fit the review cap,
+            // fail closed rather than silently returning only the top of the map.
+            if (simplifiedValues.length > maximumReviewSuggestions) return [];
+            return simplifiedValues;
         };
 
         const scores = candidates.map((item) => item.score).sort((a, b) => a - b);
@@ -1598,11 +1751,10 @@
             const existing = new Set(visionBarriers.map(cartographySuggestionKey));
             cartographySuggestions = livingContourCandidates()
                 .filter((item) => !existing.has(cartographySuggestionKey(item)))
-                .sort((a, b) => b.confidence - a.confidence)
-                .slice(0, 200);
+                .sort((a, b) => b.confidence - a.confidence);
             renderCartographyReview();
             if (cartographySuggestions.length === 0 && cartographyAssistantStatus) {
-                cartographyAssistantStatus.textContent = 'No playable floor contour was confident enough. Check grid calibration or try Structural tracing.';
+                cartographyAssistantStatus.textContent = 'No complete playable floor contour fit the safe review budget. Check grid calibration or try Structural tracing.';
             }
             return;
         }

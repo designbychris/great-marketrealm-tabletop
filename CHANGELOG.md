@@ -1,3 +1,12 @@
+## 0.30.1-alpha.5 — Phase IV.30.1B.2: Contour Simplification & Full-Boundary Tracing
+
+- Traces complete connected Living Contour chains and closed cycles before the review budget is applied, so lower-map cave boundaries are no longer discarded merely because the scanner reached 200 fine strokes near the top first.
+- Simplifies full contour paths with a bounded Douglas-Peucker-style pass, preserving meaningful cave bends while collapsing many tiny fine-mesh strokes into fewer authoritative LOS segments.
+- Adapts simplification tolerance against the existing 200-suggestion server safety ceiling; every connected contour participates in each pass instead of using scan-order truncation.
+- Fails closed on exceptionally fragmented artwork that still cannot fit the safe review budget rather than silently returning an incomplete top-of-map contour.
+- Keeps Fine Contour Sampling, fractional barrier endpoints, Keeper review, explicit Apply Selected authority and the later misaligned-grid registration roadmap unchanged.
+- Version: `0.30.1-alpha.5`.
+
 ## 0.30.1-alpha.4 — Phase IV.30.1B.1: Fine Contour Sampling
 
 - Decouples Living Contour analysis resolution from the calibrated gameplay grid with an adaptive temporary subdivision mesh.
