@@ -1,3 +1,12 @@
+## 0.30.1-alpha.10 — Phase IV.30.1D.1: The Connected Dungeon
+
+- Added a playable-floor connectivity pass to Hybrid Judgement before structural and organic linework are merged.
+- Conservatively heals one fine-analysis-cell seams only when quiet floor exists on opposite sides and the seam is below the strong-rock threshold.
+- Builds orthogonally connected floor components and suppresses tiny disconnected white pockets caused by hatch gaps, handwriting and decoration.
+- Keeps standalone Living Contour unchanged; connectivity healing is requested only by Hybrid Judgement.
+- Genuine constructed walls remain recoverable through Structural tracing, while ambiguous openings remain review-first and are never auto-saved.
+- Version: `0.30.1-alpha.10`.
+
 ## 0.30.1-alpha.9 — Phase IV.30.1D: The Cartographer's Judgement / Hybrid Structural & Living Contour Analysis
 
 - Added a new Keeper-only `Judgement · hybrid map` Cartography Assistant mode for mixed constructed/organic dungeon artwork.

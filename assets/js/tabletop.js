@@ -1488,7 +1488,7 @@
         // complements Structural tracing on cave maps where the wall itself curves
         // freely through the artwork and hatch texture makes directional ink scans
         // fragmentary. The result is still only a review-first barrier draft.
-        const livingContourCandidates = () => {
+        const livingContourCandidates = (options = {}) => {
             const gridCanvasX = Math.max(4, toCanvasX(grid.size));
             const gridCanvasY = Math.max(4, toCanvasY(grid.size));
             const originX = toCanvasX(grid.offsetX);
@@ -1551,6 +1551,53 @@
                         if (x >= 0 && y >= 0 && x < contourColumns && y < contourRows && floor[y][x]) neighbours += 1;
                     });
                     if (neighbours === 0 || (neighbours === 1 && darkness[row][column] > .10)) floor[row][column] = false;
+                }
+            }
+
+            // IV.30.1D.1 — The Connected Dungeon.
+            // Hybrid Judgement may heal only very thin, low-confidence ink/grid seams
+            // when quiet playable floor exists directly on both sides. This builds a
+            // connected-floor region graph before linework is merged, without teaching
+            // standalone Living Contour to erase real cave walls. Strong structural
+            // evidence is still allowed to restore genuine constructed walls later.
+            if (options.connectPlayableFloor === true) {
+                const bridgeCandidates = [];
+                for (let row = 1; row < contourRows - 1; row += 1) {
+                    for (let column = 1; column < contourColumns - 1; column += 1) {
+                        if (floor[row][column] || darkness[row][column] > .38) continue;
+                        const horizontalPortal = floor[row][column - 1] && floor[row][column + 1];
+                        const verticalPortal = floor[row - 1][column] && floor[row + 1][column];
+                        if (horizontalPortal !== verticalPortal) bridgeCandidates.push([column, row]);
+                    }
+                }
+                bridgeCandidates.forEach(([column, row]) => { floor[row][column] = true; });
+
+                const component = Array.from({ length: contourRows }, () => Array(contourColumns).fill(-1));
+                const componentSizes = [];
+                let componentId = 0;
+                for (let row = 0; row < contourRows; row += 1) {
+                    for (let column = 0; column < contourColumns; column += 1) {
+                        if (!floor[row][column] || component[row][column] !== -1) continue;
+                        const queue = [[column, row]];
+                        component[row][column] = componentId;
+                        let size = 0;
+                        for (let cursor = 0; cursor < queue.length; cursor += 1) {
+                            const [x, y] = queue[cursor]; size += 1;
+                            [[-1,0],[1,0],[0,-1],[0,1]].forEach(([dx,dy]) => {
+                                const nx=x+dx, ny=y+dy;
+                                if (nx < 0 || ny < 0 || nx >= contourColumns || ny >= contourRows) return;
+                                if (!floor[ny][nx] || component[ny][nx] !== -1) return;
+                                component[ny][nx] = componentId; queue.push([nx,ny]);
+                            });
+                        }
+                        componentSizes.push(size); componentId += 1;
+                    }
+                }
+                const meaningfulFloor = new Set(componentSizes.map((size, id) => size >= Math.max(6, contourSubdivisions) ? id : -1).filter((id) => id >= 0));
+                for (let row = 0; row < contourRows; row += 1) {
+                    for (let column = 0; column < contourColumns; column += 1) {
+                        if (floor[row][column] && !meaningfulFloor.has(component[row][column])) floor[row][column] = false;
+                    }
                 }
             }
 
@@ -1898,7 +1945,7 @@
         const hybridCartographyCandidates = () => {
             const maximumReviewSuggestions = 200;
             const structural = structuralCartographyCandidates();
-            const contours = livingContourCandidates();
+            const contours = livingContourCandidates({ connectPlayableFloor: true });
 
             const orientation = (item) => {
                 const dx = Math.abs(Number(item.x2) - Number(item.x1));
