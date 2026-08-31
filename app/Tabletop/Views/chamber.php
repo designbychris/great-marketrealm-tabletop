@@ -927,7 +927,7 @@ $sceneImage = $scene !== null
                             <div class="gmrt-cartography-assistant__body">
                                 <p>
                                     Let the Assistant inspect this Scene's artwork against the calibrated square grid.
-                                    Suggestions remain a private draft until you review and apply them. Structural tracing follows thick inked dungeon walls, including diagonals and curved/organic boundaries approximated with short connected segments. Living Contour instead classifies quiet playable floor against hatched/solid rock, traces their shared boundary continuously, and simplifies cave corners into playable line-of-sight segments.
+                                    Suggestions remain a private draft until you review and apply them. Structural tracing follows thick inked dungeon walls, including diagonals and curved/organic boundaries approximated with short connected segments. Living Contour instead classifies quiet playable floor against hatched/solid rock, traces their shared boundary continuously, and simplifies cave corners into playable line-of-sight segments. The Cartographer's Judgement can combine both readers locally: constructed regions favour repeated structural linework, organic regions keep Living Contour paths, and ambiguous overlaps are left conservative rather than bridged.
                                 </p>
                                 <div class="gmrt-cartography-assistant__controls">
                                     <label>
@@ -938,6 +938,7 @@ $sceneImage = $scene !== null
                                             <option value="fine">Fine detail</option>
                                             <option value="structural">Structural tracing</option>
                                             <option value="contour">Living Contour · caves</option>
+                                            <option value="hybrid">Judgement · hybrid map</option>
                                         </select>
                                     </label>
                                     <button type="button" data-cartography-assistant-analyse>Analyse Map</button>

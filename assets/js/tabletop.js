@@ -1194,9 +1194,12 @@
             const text = document.createElement('span');
             const confidence = Math.max(0, Math.min(99, Math.round(suggestion.confidence)));
             const pathVertices = Array.isArray(suggestion.points) ? suggestion.points.length : 0;
+            const hybridPrefix = suggestion.hybridJudgement
+                ? (suggestion.hybridRegion === 'organic' ? 'Hybrid · organic' : 'Hybrid · structural')
+                : '';
             text.textContent = pathVertices > 2
-                ? `Living wall path · ${pathVertices - 1} connected spans · ${confidence}%`
-                : `${suggestion.type === 'door' ? 'Possible door' : 'Room / wall boundary'} · (${suggestion.x1},${suggestion.y1}) → (${suggestion.x2},${suggestion.y2}) · ${confidence}%`;
+                ? `${hybridPrefix ? `${hybridPrefix} · ` : ''}Living wall path · ${pathVertices - 1} connected spans · ${confidence}%`
+                : `${hybridPrefix ? `${hybridPrefix} · ` : ''}${suggestion.type === 'door' ? 'Possible door' : 'Room / wall boundary'} · (${suggestion.x1},${suggestion.y1}) → (${suggestion.x2},${suggestion.y2}) · ${confidence}%`;
             label.append(checkbox, text);
             fragment.append(label);
         });
@@ -1886,8 +1889,138 @@
             return pathSuggestions;
         };
 
+        // IV.30.1D — The Cartographer's Judgement / Hybrid Structural & Living Contour Analysis.
+        // Run both specialist readers, then decide locally which linework deserves
+        // authority in the private review draft. Repeated straight/right-angle
+        // structure is favoured for constructed rooms and corridors; Living Contour
+        // paths remain responsible for irregular cave and rock boundaries. Ambiguous
+        // overlaps are suppressed rather than bridged so genuine openings survive.
+        const hybridCartographyCandidates = () => {
+            const maximumReviewSuggestions = 200;
+            const structural = structuralCartographyCandidates();
+            const contours = livingContourCandidates();
+
+            const orientation = (item) => {
+                const dx = Math.abs(Number(item.x2) - Number(item.x1));
+                const dy = Math.abs(Number(item.y2) - Number(item.y1));
+                if (dx <= .0001) return 'vertical';
+                if (dy <= .0001) return 'horizontal';
+                return 'diagonal';
+            };
+            const midpoint = (item) => ({
+                x: (Number(item.x1) + Number(item.x2)) / 2,
+                y: (Number(item.y1) + Number(item.y2)) / 2
+            });
+            const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+            const structuralSupport = (item) => {
+                const itemOrientation = orientation(item);
+                const center = midpoint(item);
+                return structural.reduce((support, candidate) => {
+                    if (candidate === item || orientation(candidate) !== itemOrientation) return support;
+                    return support + (distance(center, midpoint(candidate)) <= 1.6 ? 1 : 0);
+                }, 0);
+            };
+
+            // A single straight-looking fleck can be handwriting, stairs or hatch.
+            // Require neighbouring parallel evidence unless the original structural
+            // confidence is exceptionally strong. This is the local judgement step.
+            const strongStructural = structural
+                .map((item) => ({ ...item, localStructuralSupport: structuralSupport(item) }))
+                .filter((item) => item.localStructuralSupport >= 2 || item.confidence >= 94)
+                .map((item) => ({ ...item, hybridJudgement: true, hybridRegion: 'structural' }));
+
+            const pointToSegmentDistance = (point, start, end) => {
+                const dx = end.x - start.x;
+                const dy = end.y - start.y;
+                const lengthSquared = (dx * dx) + (dy * dy);
+                if (lengthSquared <= .000001) return Math.hypot(point.x - start.x, point.y - start.y);
+                const t = Math.max(0, Math.min(1, (((point.x - start.x) * dx) + ((point.y - start.y) * dy)) / lengthSquared));
+                return Math.hypot(point.x - (start.x + (t * dx)), point.y - (start.y + (t * dy)));
+            };
+            const contourSpanCoveredByStructure = (a, b) => {
+                const spanDx = Math.abs(b.x - a.x);
+                const spanDy = Math.abs(b.y - a.y);
+                const spanOrientation = spanDx <= .0001 ? 'vertical' : spanDy <= .0001 ? 'horizontal' : 'organic';
+                if (spanOrientation === 'organic') return false;
+                const center = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+                return strongStructural.some((item) => {
+                    if (orientation(item) !== spanOrientation) return false;
+                    return pointToSegmentDistance(
+                        center,
+                        { x: Number(item.x1), y: Number(item.y1) },
+                        { x: Number(item.x2), y: Number(item.y2) }
+                    ) <= .55;
+                });
+            };
+
+            // Split a Living Contour path only where strong structural evidence already
+            // represents the same local wall. The remaining organic runs stay ordered
+            // polylines; we never join across a removed span or doorway.
+            const organicPaths = [];
+            contours.forEach((item) => {
+                const points = Array.isArray(item.points) ? item.points : [];
+                if (points.length < 2) return;
+                let run = [];
+                const flush = () => {
+                    if (run.length >= 2) {
+                        const clean = run.filter((point, index) => index === 0 || point.x !== run[index - 1].x || point.y !== run[index - 1].y);
+                        if (clean.length >= 2) {
+                            organicPaths.push({
+                                ...item, points: clean,
+                                x1: clean[0].x, y1: clean[0].y,
+                                x2: clean[clean.length - 1].x, y2: clean[clean.length - 1].y,
+                                confidence: Math.max(88, Number(item.confidence) || 0),
+                                hybridJudgement: true, hybridRegion: 'organic'
+                            });
+                        }
+                    }
+                    run = [];
+                };
+                for (let index = 0; index < points.length - 1; index += 1) {
+                    const a = points[index];
+                    const b = points[index + 1];
+                    if (contourSpanCoveredByStructure(a, b)) {
+                        flush();
+                        continue;
+                    }
+                    if (run.length === 0) run.push(a);
+                    run.push(b);
+                }
+                flush();
+            });
+
+            const unique = new Map();
+            organicPaths.concat(strongStructural).forEach((item) => {
+                const key = cartographySuggestionKey(item);
+                const previous = unique.get(key);
+                if (!previous || Number(previous.confidence) < Number(item.confidence)) unique.set(key, item);
+            });
+
+            const organic = Array.from(unique.values()).filter((item) => item.hybridRegion === 'organic');
+            const built = Array.from(unique.values())
+                .filter((item) => item.hybridRegion === 'structural')
+                .sort((a, b) => (b.localStructuralSupport - a.localStructuralSupport) || (b.confidence - a.confidence));
+
+            // Polyline paths represent much more geometry per review object, so keep
+            // every safe organic path first and spend the remaining object budget on
+            // the strongest locally-supported constructed linework. No scan-order cut.
+            if (organic.length > maximumReviewSuggestions) return [];
+            const remaining = maximumReviewSuggestions - organic.length;
+            return organic.concat(built.slice(0, remaining));
+        };
+
         const scores = candidates.map((item) => item.score).sort((a, b) => a - b);
         const detail = cartographyDetail?.value || 'balanced';
+        if (detail === 'hybrid') {
+            const existing = new Set(visionBarriers.map(cartographySuggestionKey));
+            cartographySuggestions = hybridCartographyCandidates()
+                .filter((item) => !existing.has(cartographySuggestionKey(item)));
+            renderCartographyReview();
+            if (cartographySuggestions.length === 0 && cartographyAssistantStatus) {
+                cartographyAssistantStatus.textContent = 'No safe hybrid draft could be prepared. Check grid calibration, or review Structural tracing and Living Contour separately.';
+            }
+            return;
+        }
         if (detail === 'contour') {
             const existing = new Set(visionBarriers.map(cartographySuggestionKey));
             cartographySuggestions = livingContourCandidates()

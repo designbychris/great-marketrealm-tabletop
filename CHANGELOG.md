@@ -1,3 +1,13 @@
+## 0.30.1-alpha.9 — Phase IV.30.1D: The Cartographer's Judgement / Hybrid Structural & Living Contour Analysis
+
+- Added a new Keeper-only `Judgement · hybrid map` Cartography Assistant mode for mixed constructed/organic dungeon artwork.
+- Runs Structural tracing and Living Contour together, then scores repeated nearby parallel structural evidence to distinguish deliberate rooms/corridors from isolated handwriting, stair and hatch flecks.
+- Suppresses Living Contour spans only where strong local structural evidence already represents that same wall; remaining organic runs stay ordered polyline paths and are never rejoined across an opening.
+- Preserves the 200-object review ceiling, prioritising information-dense organic paths before spending the remaining budget on strongest locally-supported constructed linework.
+- Review labels identify Hybrid · structural and Hybrid · organic suggestions so Keepers can see Pippin's local judgement before applying anything.
+- Keeps the existing review-first authority model, Scene scoping, polyline LOS, fractional coordinates and separate future grid-registration benchmark intact.
+- Version: `0.30.1-alpha.9`.
+
 ## 0.30.1-alpha.8 — Phase IV.30.1C: The Cartographer's Linework / Polyline Vision Barriers
 
 - Adds backward-compatible authoritative polyline wall barriers: legacy two-point walls and doors remain valid, while wall paths may persist an ordered `points` collection.
