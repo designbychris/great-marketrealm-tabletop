@@ -927,7 +927,7 @@ $sceneImage = $scene !== null
                             <div class="gmrt-cartography-assistant__body">
                                 <p>
                                     Let the Assistant inspect this Scene's artwork against the calibrated square grid.
-                                    Suggestions remain a private draft until you review and apply them. Structural tracing follows constructed dungeon walls. Living Contour instead classifies quiet playable floor against hatched/solid rock, traces their shared boundary continuously, and simplifies cave corners into playable line-of-sight segments.
+                                    Suggestions remain a private draft until you review and apply them. Structural tracing follows thick inked dungeon walls, including diagonals and curved/organic boundaries approximated with short connected segments. Living Contour instead classifies quiet playable floor against hatched/solid rock, traces their shared boundary continuously, and simplifies cave corners into playable line-of-sight segments.
                                 </p>
                                 <div class="gmrt-cartography-assistant__controls">
                                     <label>
