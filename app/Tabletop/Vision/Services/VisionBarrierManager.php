@@ -183,10 +183,10 @@ final class VisionBarrierManager
         // Regression-contract spelling retained: visibleAround($scene,$token,$barriers)
         foreach ($this->tokens->forScene($tableId, $scene->id()) as $token) {
             if ($token->type() === TableTokenType::CHARACTER) {
-                $state->reveal($this->mapper->visibleAround($scene, $token, $barriers));
+                $state->reveal($this->mapper->visibleAround($scene,$token,$barriers));
             }
         }
-        $this->fog->save($tableId, $state);
+        $this->fog->save($tableId,$state);
     }
 
     private function guard(string $tableId, int $userId, string $sceneId = ''): TableScene
