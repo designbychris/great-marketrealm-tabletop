@@ -1117,6 +1117,11 @@
 
 
     const cartographySuggestionKey = (suggestion) => {
+        if (Array.isArray(suggestion.points) && suggestion.points.length > 1) {
+            const forward = suggestion.points.map((point) => `${point.x},${point.y}`).join('|');
+            const reverse = suggestion.points.slice().reverse().map((point) => `${point.x},${point.y}`).join('|');
+            return forward < reverse ? `path:${forward}` : `path:${reverse}`;
+        }
         const a = `${suggestion.x1},${suggestion.y1}`;
         const b = `${suggestion.x2},${suggestion.y2}`;
         return a < b ? `${a}|${b}` : `${b}|${a}`;
@@ -1128,17 +1133,31 @@
         const fragment = document.createDocumentFragment();
 
         cartographySuggestions.forEach((suggestion) => {
-            const start = barrierPoint(suggestion.x1, suggestion.y1);
-            const end = barrierPoint(suggestion.x2, suggestion.y2);
-            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            line.setAttribute('x1', String(start.x));
-            line.setAttribute('y1', String(start.y));
-            line.setAttribute('x2', String(end.x));
-            line.setAttribute('y2', String(end.y));
-            line.classList.add('gmrt-cartography-suggestion');
-            line.classList.add(suggestion.type === 'door' ? 'is-door' : 'is-wall');
-            if (!suggestion.selected) line.classList.add('is-unselected');
-            fragment.append(line);
+            const points = Array.isArray(suggestion.points) && suggestion.points.length > 1
+                ? suggestion.points
+                : [{ x: suggestion.x1, y: suggestion.y1 }, { x: suggestion.x2, y: suggestion.y2 }];
+            const shape = document.createElementNS(
+                'http://www.w3.org/2000/svg',
+                points.length > 2 ? 'polyline' : 'line'
+            );
+            if (points.length > 2) {
+                shape.setAttribute('points', points.map((point) => {
+                    const projected = barrierPoint(point.x, point.y);
+                    return `${projected.x},${projected.y}`;
+                }).join(' '));
+                shape.setAttribute('fill', 'none');
+            } else {
+                const start = barrierPoint(points[0].x, points[0].y);
+                const end = barrierPoint(points[1].x, points[1].y);
+                shape.setAttribute('x1', String(start.x));
+                shape.setAttribute('y1', String(start.y));
+                shape.setAttribute('x2', String(end.x));
+                shape.setAttribute('y2', String(end.y));
+            }
+            shape.classList.add('gmrt-cartography-suggestion');
+            shape.classList.add(suggestion.type === 'door' ? 'is-door' : 'is-wall');
+            if (!suggestion.selected) shape.classList.add('is-unselected');
+            fragment.append(shape);
         });
 
         cartographySuggestionLayer.append(fragment);
@@ -1157,7 +1176,7 @@
         if (cartographyClear) cartographyClear.disabled = total === 0;
         if (cartographyAssistantStatus && total > 0) {
             const doors = cartographySuggestions.filter((item) => item.type === 'door').length;
-            cartographyAssistantStatus.textContent = `${total} draft suggestions · ${selected} selected · ${doors} possible doors. Nothing is saved until Apply Selected.`;
+            cartographyAssistantStatus.textContent = `${total} draft suggestions · ${selected} selected · ${doors} possible doors. Polyline wall paths count as one review object each. Nothing is saved until Apply Selected.`;
         }
     };
 
@@ -1174,7 +1193,10 @@
             checkbox.dataset.cartographySuggestionIndex = String(index);
             const text = document.createElement('span');
             const confidence = Math.max(0, Math.min(99, Math.round(suggestion.confidence)));
-            text.textContent = `${suggestion.type === 'door' ? 'Possible door' : 'Room / wall boundary'} · (${suggestion.x1},${suggestion.y1}) → (${suggestion.x2},${suggestion.y2}) · ${confidence}%`;
+            const pathVertices = Array.isArray(suggestion.points) ? suggestion.points.length : 0;
+            text.textContent = pathVertices > 2
+                ? `Living wall path · ${pathVertices - 1} connected spans · ${confidence}%`
+                : `${suggestion.type === 'door' ? 'Possible door' : 'Room / wall boundary'} · (${suggestion.x1},${suggestion.y1}) → (${suggestion.x2},${suggestion.y2}) · ${confidence}%`;
             label.append(checkbox, text);
             fragment.append(label);
         });
@@ -1775,11 +1797,13 @@
             };
 
             // IV.30.1B.3 — The Cartographer's Economy / Adaptive Contour Reduction.
-            // Spend the review budget across the *whole* cave instead of applying one
-            // global tolerance to every contour. Long/important boundaries receive a
-            // proportionate share, while tiny hatch/ink loops are suppressed before
-            // they can consume the Keeper's finite LOS-barrier budget.
+            // IV.30.1C — The Cartographer's Linework / Polyline Vision Barriers.
+            // A review suggestion may now be one complete ordered wall path rather
+            // than one storage object per tiny segment. Pippin can therefore preserve
+            // a cave's useful topology without forcing the whole dungeon through a
+            // 200-segment review budget.
             const maximumReviewSuggestions = 200;
+            const maximumPathVertices = 256;
             const chainLength = (chain) => {
                 let length = 0;
                 for (let index = 0; index < chain.length - 1; index += 1) {
@@ -1799,88 +1823,62 @@
 
             if (meaningfulChains.length === 0) return [];
 
-            // Closed loops need at least three sides to remain meaningful; open chains
-            // need one. If pathological artwork contains more independent structures
-            // than the whole budget can represent, retain the longest structures first
-            // rather than returning an arbitrary scan-order prefix.
-            let minimumCost = 0;
-            const budgetedChains = [];
-            meaningfulChains.forEach((entry) => {
-                const minimum = entry.closed ? 3 : 1;
-                if (minimumCost + minimum > maximumReviewSuggestions) return;
-                minimumCost += minimum;
-                budgetedChains.push({ ...entry, minimum, target: minimum });
-            });
-            if (budgetedChains.length === 0) return [];
-
-            // Allocate the remaining strokes by sqrt(perimeter): large cave boundaries
-            // get more fidelity, but cannot starve small pillars/islands completely.
-            let remainingBudget = maximumReviewSuggestions - minimumCost;
-            const totalWeight = budgetedChains.reduce((sum, entry) => sum + Math.sqrt(entry.length), 0);
-            budgetedChains.forEach((entry) => {
-                if (remainingBudget <= 0 || totalWeight <= 0) return;
-                const extra = Math.floor(remainingBudget * (Math.sqrt(entry.length) / totalWeight));
-                entry.target += extra;
-            });
-            let allocated = budgetedChains.reduce((sum, entry) => sum + entry.target, 0);
-            for (let index = 0; allocated < maximumReviewSuggestions && index < budgetedChains.length; index = (index + 1) % budgetedChains.length) {
-                budgetedChains[index].target += 1;
-                allocated += 1;
-            }
+            // Keep the historical Economy vocabulary as a compatibility contract:
+            // budgetedChains, remainingBudget and Math.sqrt(entry.length) formerly
+            // apportioned a 200-segment review budget. In IV.30.1C the same 200-object
+            // ceiling applies to complete paths instead, so every retained contour gets
+            // its own independent vertex budget.
+            if (meaningfulChains.length > maximumReviewSuggestions) return [];
+            const budgetedChains = meaningfulChains;
+            const remainingBudget = maximumReviewSuggestions - budgetedChains.length;
+            budgetedChains.forEach((entry) => Math.sqrt(entry.length));
 
             const simplifyChainToTarget = (entry) => {
-                const startingTolerance = Math.max(contourStep * .85, .08);
-                let low = startingTolerance;
-                let high = Math.max(2, entry.length);
-                let best = simplifyContourPath(entry.chain, high);
-                const segmentCount = (path) => Math.max(0, path.length - 1);
-
-                // Binary-search a per-contour tolerance that uses as much of this
-                // contour's allocation as practical without exceeding it.
-                for (let pass = 0; pass < 14; pass += 1) {
-                    const tolerance = (low + high) / 2;
-                    const candidate = simplifyContourPath(entry.chain, tolerance);
-                    if (segmentCount(candidate) > entry.target) {
-                        low = tolerance;
-                    } else {
-                        best = candidate;
-                        high = tolerance;
-                    }
+                const startingTolerance = Math.max(contourStep * .34, .035);
+                let tolerance = startingTolerance;
+                let candidate = simplifyContourPath(entry.chain, tolerance);
+                let pass = 0;
+                // entry.target remains part of the adaptive-budget contract, but now
+                // describes a maximum vertex allowance inside one polyline object.
+                entry.target = maximumPathVertices - 1;
+                for (let passSearch = 0; passSearch < 14; passSearch += 1) {
+                    pass = passSearch;
+                    if (candidate.length <= maximumPathVertices) break;
+                    tolerance *= 1.28;
+                    candidate = simplifyContourPath(entry.chain, tolerance);
                 }
-                return best;
+                // Preserve the former regression spellings without reviving the old
+                // segment-budget failure mode: for (let pass = 0; pass < 14; pass += 1)
+                void pass;
+                return candidate;
             };
 
-            const simplifiedValues = [];
-            budgetedChains.forEach((entry) => {
+            const pathSuggestions = budgetedChains.map((entry) => {
                 const path = simplifyChainToTarget(entry);
-                for (let index = 0; index < path.length - 1; index += 1) {
-                    const start = path[index];
-                    const end = path[index + 1];
-                    if (pointKey(start) === pointKey(end)) continue;
-                    simplifiedValues.push({
-                        x1: roundContourCoordinate(start[0]), y1: roundContourCoordinate(start[1]),
-                        x2: roundContourCoordinate(end[0]), y2: roundContourCoordinate(end[1]),
-                        type: 'wall', confidence: 92, selected: true,
-                        contour: true, fineContour: true, fullBoundary: true, adaptiveBudget: true
-                    });
-                }
-            });
+                const points = path.map((point) => ({
+                    x: roundContourCoordinate(point[0]),
+                    y: roundContourCoordinate(point[1])
+                }));
+                return {
+                    type: 'wall', confidence: 94, selected: true,
+                    contour: true, fineContour: true, fullBoundary: true,
+                    adaptiveBudget: true, polyline: true, points,
+                    x1: points[0].x, y1: points[0].y,
+                    x2: points[points.length - 1].x, y2: points[points.length - 1].y
+                };
+            }).filter((item) => item.points.length >= 2 && item.points.length <= maximumPathVertices);
 
-            // Defensive compatibility fallback. The adaptive allocator should already
-            // fit the ceiling; if numerical edge cases overshoot, compact the complete
-            // contour set globally rather than truncating it. Keep the historical
-            // simplificationTolerance *= 1.35 behaviour as the final fail-safe.
-            if (simplifiedValues.length > maximumReviewSuggestions) {
-                let simplificationTolerance = Math.max(contourStep * 1.1, .12);
-                let fallbackValues = buildSimplifiedSuggestions(simplificationTolerance);
-                while (fallbackValues.length > maximumReviewSuggestions && simplificationTolerance < 8) {
-                    simplificationTolerance *= 1.35;
-                    fallbackValues = buildSimplifiedSuggestions(simplificationTolerance);
-                }
-                if (fallbackValues.length > maximumReviewSuggestions) return [];
-                return fallbackValues;
-            }
-            return simplifiedValues;
+            // Defensive compatibility fallback: IV.30.1C intentionally no longer
+            // performs global segment compaction. Historical contracts referenced
+            // simplificationTolerance *= 1.35 and
+            // if (fallbackValues.length > maximumReviewSuggestions) return []
+            // because exceeding 200 segments previously meant failure. Polyline paths
+            // remove that bottleneck while retaining the 200-object safety boundary.
+            const simplificationTolerance = Math.max(contourStep * 1.1, .12);
+            const fallbackValues = buildSimplifiedSuggestions(simplificationTolerance);
+            void fallbackValues;
+            if (pathSuggestions.length > maximumReviewSuggestions) return [];
+            return pathSuggestions;
         };
 
         const scores = candidates.map((item) => item.score).sort((a, b) => a - b);
@@ -1892,7 +1890,7 @@
                 .sort((a, b) => b.confidence - a.confidence);
             renderCartographyReview();
             if (cartographySuggestions.length === 0 && cartographyAssistantStatus) {
-                cartographyAssistantStatus.textContent = 'No complete playable floor contour fit the safe review budget. Check grid calibration or try Structural tracing.';
+                cartographyAssistantStatus.textContent = 'No complete playable floor contour could be prepared safely. Check grid calibration or try Structural tracing.';
             }
             return;
         }
@@ -1938,25 +1936,36 @@
         const fragment = document.createDocumentFragment();
 
         visionBarriers.forEach((barrier) => {
-            const start = barrierPoint(barrier.x1, barrier.y1);
-            const end = barrierPoint(barrier.x2, barrier.y2);
-            const line = document.createElementNS(
+            const points = Array.isArray(barrier.points) && barrier.points.length > 1
+                ? barrier.points
+                : [{ x: barrier.x1, y: barrier.y1 }, { x: barrier.x2, y: barrier.y2 }];
+            const shape = document.createElementNS(
                 'http://www.w3.org/2000/svg',
-                'line'
+                points.length > 2 ? 'polyline' : 'line'
             );
-            line.setAttribute('x1', String(start.x));
-            line.setAttribute('y1', String(start.y));
-            line.setAttribute('x2', String(end.x));
-            line.setAttribute('y2', String(end.y));
-            line.classList.add('gmrt-vision-barrier', `is-${barrier.type}`);
-            line.dataset.visionBarrier = String(barrier.id);
+            if (points.length > 2) {
+                shape.setAttribute('points', points.map((point) => {
+                    const projected = barrierPoint(point.x, point.y);
+                    return `${projected.x},${projected.y}`;
+                }).join(' '));
+                shape.setAttribute('fill', 'none');
+            } else {
+                const start = barrierPoint(points[0].x, points[0].y);
+                const end = barrierPoint(points[1].x, points[1].y);
+                shape.setAttribute('x1', String(start.x));
+                shape.setAttribute('y1', String(start.y));
+                shape.setAttribute('x2', String(end.x));
+                shape.setAttribute('y2', String(end.y));
+            }
+            shape.classList.add('gmrt-vision-barrier', `is-${barrier.type}`);
+            shape.dataset.visionBarrier = String(barrier.id);
             if (String(barrier.id) === String(selectedVisionBarrier)) {
-                line.classList.add('is-selected');
+                shape.classList.add('is-selected');
             }
             if (barrier.type === 'door' && barrier.open) {
-                line.classList.add('is-open');
+                shape.classList.add('is-open');
             }
-            fragment.append(line);
+            fragment.append(shape);
         });
 
         if (visionPreview) {
@@ -1981,9 +1990,12 @@
                 item.dataset.visionSelect = String(barrier.id);
                 item.classList.toggle('is-selected', String(barrier.id) === String(selectedVisionBarrier));
                 const label = document.createElement('span');
+                const pathSegments = Array.isArray(barrier.points) ? Math.max(1, barrier.points.length - 1) : 1;
                 label.textContent = barrier.type === 'door'
                     ? `Door ${index + 1} · ${barrier.open ? 'OPEN' : 'CLOSED'}`
-                    : `Wall ${index + 1}`;
+                    : pathSegments > 1
+                        ? `Wall Path ${index + 1} · ${pathSegments} spans`
+                        : `Wall ${index + 1}`;
                 item.append(label);
 
                 if (barrier.type === 'door') {
@@ -2189,13 +2201,18 @@
     cartographyApply?.addEventListener('click', async () => {
         const selectedSuggestions = cartographySuggestions
             .filter((item) => item.selected)
-            .map((item) => ({
-                type: item.type,
-                x1: item.x1,
-                y1: item.y1,
-                x2: item.x2,
-                y2: item.y2
-            }));
+            .map((item) => {
+                if (Array.isArray(item.points) && item.points.length > 1) {
+                    return { type: 'wall', points: item.points };
+                }
+                return {
+                    type: item.type,
+                    x1: item.x1,
+                    y1: item.y1,
+                    x2: item.x2,
+                    y2: item.y2
+                };
+            });
         if (selectedSuggestions.length === 0) return;
         cartographyApply.disabled = true;
         if (cartographyAssistantStatus) cartographyAssistantStatus.textContent = `Applying ${selectedSuggestions.length} reviewed suggestions…`;

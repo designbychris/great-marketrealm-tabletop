@@ -1,3 +1,13 @@
+## 0.30.1-alpha.8 — Phase IV.30.1C: The Cartographer's Linework / Polyline Vision Barriers
+
+- Adds backward-compatible authoritative polyline wall barriers: legacy two-point walls and doors remain valid, while wall paths may persist an ordered `points` collection.
+- Extends sight-line resolution so every consecutive span of a polyline blocks vision exactly like an ordinary wall segment; doors deliberately remain two-point barriers.
+- Updates Keeper rendering and roster presentation to draw/select one SVG polyline as one wall-path object while preserving existing manual segment workflows.
+- Changes Living Contour review output from segment-budget compression to complete path suggestions, with up to 256 vertices per path and the existing 200-object review ceiling.
+- Adds server-side path validation and a 6,000-point batch ceiling so richer geometry cannot turn one Assistant apply into unbounded work.
+- Keeps Fine Contour Sampling, full-boundary tracing, topology guards, review-first authority, Behind-the-Curtain Scene scope and future grid-registration work intact.
+- Version: `0.30.1-alpha.8`.
+
 ## 0.30.1-alpha.7 — Phase IV.30.1B.3A: Contour Topology Guard
 
 - Guards Adaptive Contour Reduction against giant cross-room/cross-map replacement chords.
