@@ -1308,8 +1308,122 @@
             }
         }
 
+        const structuralCartographyCandidates = () => {
+            const darkThreshold = 92;
+            const sampleStep = Math.max(1, Math.round(Math.min(canvas.width, canvas.height) / 900));
+            const dark = new Uint8Array(canvas.width * canvas.height);
+            for (let y = 0; y < canvas.height; y += sampleStep) {
+                for (let x = 0; x < canvas.width; x += sampleStep) {
+                    let darkSamples = 0;
+                    let totalSamples = 0;
+                    for (let yy = y; yy < Math.min(canvas.height, y + sampleStep); yy += 1) {
+                        for (let xx = x; xx < Math.min(canvas.width, x + sampleStep); xx += 1) {
+                            totalSamples += 1;
+                            if (luminance(xx, yy) <= darkThreshold) darkSamples += 1;
+                        }
+                    }
+                    if (darkSamples / Math.max(1, totalSamples) >= .45) {
+                        for (let yy = y; yy < Math.min(canvas.height, y + sampleStep); yy += 1) {
+                            for (let xx = x; xx < Math.min(canvas.width, x + sampleStep); xx += 1) dark[(yy * canvas.width) + xx] = 1;
+                        }
+                    }
+                }
+            }
+
+            const gridCanvas = Math.max(4, toCanvasX(grid.size));
+            const traceStep = Math.max(2, gridCanvas / 5);
+            const traceRadius = Math.max(2, gridCanvas * .11);
+            const minimumRun = Math.max(2, Math.round(gridCanvas * .28));
+            const wallVotes = new Map();
+            const vote = (x1, y1, x2, y2, confidence) => {
+                const gx1 = Math.round((x1 - toCanvasX(grid.offsetX)) / gridCanvas);
+                const gy1 = Math.round((y1 - toCanvasY(grid.offsetY)) / gridCanvas);
+                const gx2 = Math.round((x2 - toCanvasX(grid.offsetX)) / gridCanvas);
+                const gy2 = Math.round((y2 - toCanvasY(grid.offsetY)) / gridCanvas);
+                if (gx1 < 0 || gy1 < 0 || gx2 < 0 || gy2 < 0 || gx1 > columns || gx2 > columns || gy1 > rows || gy2 > rows) return;
+                if (gx1 === gx2 && gy1 === gy2) return;
+                const dx = Math.abs(gx2 - gx1);
+                const dy = Math.abs(gy2 - gy1);
+                if (dx > 1 || dy > 1) return;
+                const suggestion = { x1: gx1, y1: gy1, x2: gx2, y2: gy2, type: 'wall', confidence, selected: true, structural: true };
+                const key = cartographySuggestionKey(suggestion);
+                const previous = wallVotes.get(key);
+                if (!previous || previous.confidence < confidence) wallVotes.set(key, suggestion);
+            };
+
+            const densityAt = (x, y) => {
+                let hits = 0;
+                let total = 0;
+                const radius = Math.max(1, Math.round(traceRadius));
+                for (let yy = Math.max(0, Math.round(y) - radius); yy <= Math.min(canvas.height - 1, Math.round(y) + radius); yy += 1) {
+                    for (let xx = Math.max(0, Math.round(x) - radius); xx <= Math.min(canvas.width - 1, Math.round(x) + radius); xx += 1) {
+                        total += 1; hits += dark[(yy * canvas.width) + xx];
+                    }
+                }
+                return hits / Math.max(1, total);
+            };
+
+            const traces = [];
+            for (let y = traceStep; y < canvas.height - traceStep; y += traceStep) {
+                let runStart = null;
+                for (let x = traceStep; x < canvas.width - traceStep; x += traceStep) {
+                    const center = densityAt(x, y);
+                    const above = densityAt(x, y - (gridCanvas * .23));
+                    const below = densityAt(x, y + (gridCanvas * .23));
+                    const structural = center >= .18 && Math.min(above, below) <= .16 && center >= Math.max(above, below) * 1.25;
+                    if (structural && runStart === null) runStart = x;
+                    if ((!structural || x + traceStep >= canvas.width - traceStep) && runStart !== null) {
+                        const runEnd = structural ? x : x - traceStep;
+                        if (runEnd - runStart >= minimumRun) traces.push({ x1: runStart, y1: y, x2: runEnd, y2: y, confidence: Math.min(97, 68 + ((runEnd - runStart) / gridCanvas) * 8) });
+                        runStart = null;
+                    }
+                }
+            }
+            for (let x = traceStep; x < canvas.width - traceStep; x += traceStep) {
+                let runStart = null;
+                for (let y = traceStep; y < canvas.height - traceStep; y += traceStep) {
+                    const center = densityAt(x, y);
+                    const left = densityAt(x - (gridCanvas * .23), y);
+                    const right = densityAt(x + (gridCanvas * .23), y);
+                    const structural = center >= .18 && Math.min(left, right) <= .16 && center >= Math.max(left, right) * 1.25;
+                    if (structural && runStart === null) runStart = y;
+                    if ((!structural || y + traceStep >= canvas.height - traceStep) && runStart !== null) {
+                        const runEnd = structural ? y : y - traceStep;
+                        if (runEnd - runStart >= minimumRun) traces.push({ x1: x, y1: runStart, x2: x, y2: runEnd, confidence: Math.min(97, 68 + ((runEnd - runStart) / gridCanvas) * 8) });
+                        runStart = null;
+                    }
+                }
+            }
+
+            traces.forEach((trace) => {
+                const dx = trace.x2 - trace.x1;
+                const dy = trace.y2 - trace.y1;
+                const distance = Math.max(Math.abs(dx), Math.abs(dy));
+                const pieces = Math.max(1, Math.ceil(distance / gridCanvas));
+                for (let i = 0; i < pieces; i += 1) {
+                    const from = i / pieces;
+                    const to = (i + 1) / pieces;
+                    vote(trace.x1 + dx * from, trace.y1 + dy * from, trace.x1 + dx * to, trace.y1 + dy * to, trace.confidence);
+                }
+            });
+
+            return Array.from(wallVotes.values());
+        };
+
         const scores = candidates.map((item) => item.score).sort((a, b) => a - b);
         const detail = cartographyDetail?.value || 'balanced';
+        if (detail === 'structural') {
+            const existing = new Set(visionBarriers.map(cartographySuggestionKey));
+            cartographySuggestions = structuralCartographyCandidates()
+                .filter((item) => !existing.has(cartographySuggestionKey(item)))
+                .sort((a, b) => b.confidence - a.confidence)
+                .slice(0, 200);
+            renderCartographyReview();
+            if (cartographySuggestions.length === 0 && cartographyAssistantStatus) {
+                cartographyAssistantStatus.textContent = 'No structural wall traces were confident enough. Check grid calibration or try Fine detail.';
+            }
+            return;
+        }
         const percentile = detail === 'strong' ? .92 : detail === 'fine' ? .76 : .85;
         const floor = detail === 'strong' ? 15 : detail === 'fine' ? 6 : 10;
         const threshold = Math.max(floor, scores[Math.max(0, Math.floor(scores.length * percentile))] || floor);

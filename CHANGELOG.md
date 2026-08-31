@@ -1,3 +1,12 @@
+## 0.30.1-alpha.1 — Phase IV.30.1: Structural Cartography
+
+- Adds a Structural tracing mode to the Keeper's Cartography Assistant for common thick-ink, cross-hatched dungeon maps.
+- Builds a local dark-pixel mask and favours sustained boundaries whose opposite sides are quieter, reducing false positives from repetitive stone hatching.
+- Traces horizontal and vertical architectural runs independently of exact grid-line placement, then converts useful runs back into existing calibrated grid barrier segments.
+- Keeps the IV.30 review-first contract: structural results are a private draft, deduplicated against saved barriers, capped at 200, and never saved until explicitly applied.
+- Records the retained cross-hatched dungeon map as the browser benchmark for this phase.
+- Version: `0.30.1-alpha.1`.
+
 ## 0.30.0-alpha.1 — Phase IV.30: Keeper's Cartography Assistant
 
 - Adds a Dungeon-Master-only Cartography Assistant inside Sight Beyond the Door.

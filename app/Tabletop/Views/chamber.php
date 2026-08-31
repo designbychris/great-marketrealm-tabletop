@@ -927,7 +927,7 @@ $sceneImage = $scene !== null
                             <div class="gmrt-cartography-assistant__body">
                                 <p>
                                     Let the Assistant inspect this Scene's artwork against the calibrated square grid.
-                                    Suggestions remain a private draft until you review and apply them.
+                                    Suggestions remain a private draft until you review and apply them. Structural tracing is designed for thick inked dungeon walls, hatch-textured stone, offsets and irregular rooms.
                                 </p>
                                 <div class="gmrt-cartography-assistant__controls">
                                     <label>
@@ -936,6 +936,7 @@ $sceneImage = $scene !== null
                                             <option value="strong">Strong boundaries</option>
                                             <option value="balanced" selected>Balanced</option>
                                             <option value="fine">Fine detail</option>
+                                            <option value="structural">Structural tracing</option>
                                         </select>
                                     </label>
                                     <button type="button" data-cartography-assistant-analyse>Analyse Map</button>
