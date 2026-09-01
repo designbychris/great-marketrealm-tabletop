@@ -2525,9 +2525,14 @@
         const line = (x1, y1, x2, y2, className) => forgeSvg('line', { x1, y1, x2, y2, class: className });
         const circle = (cx, cy, r, className) => forgeSvg('circle', { cx, cy, r, class: className });
 
+        const outdoorScene = ['forest', 'village'].includes(String(plan.scene_type || 'dungeon'));
         plan.floor.forEach((cell) => {
             const x = Number(cell.x); const y = Number(cell.y);
             const n = decorationChance(x, y, 'floor');
+            if (outdoorScene) {
+                if (n < .055) decorate.appendChild(circle(x+.28, y+.68, .035, 'is-outdoor-speck'));
+                return;
+            }
             if (plan.theme === 'pantry-stone') {
                 if (n < .34) decorate.appendChild(path(`M ${x+.16} ${y+.72} l .16 -.12 l .13 .06 l .18 -.17`, 'is-crack'));
                 if (n > .82) decorate.appendChild(circle(x+.72, y+.28, .055, 'is-pit'));
@@ -2564,6 +2569,19 @@
         dungeonForgeLayer.appendChild(decorate);
 
         const featureGroup = forgeSvg('g', { class: 'gmrt-forge-features' });
+        const organicCanopy = (feature) => {
+            const x=Number(feature.x||0), y=Number(feature.y||0), w=Math.max(.2,Number(feature.w||1)), h=Math.max(.2,Number(feature.h||1));
+            const canopy=forgeSvg('g', { class:`is-${String(feature.kind)} is-organic-canopy` });
+            const blobs=Math.max(4, Math.min(9, Math.round((w+h)*1.25)));
+            for(let i=0;i<blobs;i+=1){
+                const n=decorationChance(x+i,y,'canopy'); const m=decorationChance(x,y+i,'canopy-y');
+                const cx=x+.25+(n*(w-.5)); const cy=y+.25+(m*(h-.5));
+                const r=Math.max(.42, Math.min(1.15, .48+decorationChance(i,x+y,'canopy-r')*.65));
+                canopy.appendChild(circle(cx,cy,r,'is-canopy-blob'));
+            }
+            canopy.appendChild(circle(x+w/2,y+h/2,.18,'is-tree-trunk'));
+            return canopy;
+        };
         (plan.features || []).forEach((feature) => {
             const kind = String(feature.kind || 'feature');
             if (kind === 'trail' && Array.isArray(feature.points) && feature.points.length > 1) {
@@ -2571,12 +2589,24 @@
                 return;
             }
             const x=Number(feature.x||0), y=Number(feature.y||0), w=Math.max(.2,Number(feature.w||1)), h=Math.max(.2,Number(feature.h||1));
-            featureGroup.appendChild(forgeSvg('rect', { x, y, width:w, height:h, rx:kind.includes('tree')?.7:kind==='well'?.5:.12, class:`is-${kind}` }));
+            if (kind === 'tree-cluster' || kind === 'village-tree') { featureGroup.appendChild(organicCanopy(feature)); return; }
+            if (kind === 'rock-cluster') {
+                const rocks=forgeSvg('g',{class:'is-rock-cluster is-organic-rocks'});
+                [[.22,.58,.28],[.48,.38,.34],[.72,.6,.3]].forEach(([px,py,pr])=>rocks.appendChild(circle(x+w*px,y+h*py,Math.min(w,h)*pr,'is-rock')));
+                featureGroup.appendChild(rocks); return;
+            }
+            if (['house','cottage','workshop','inn'].includes(kind)) {
+                const building=forgeSvg('g',{class:`is-${kind} is-village-building`});
+                building.appendChild(forgeSvg('rect',{x,y,width:w,height:h,rx:.08,class:'is-building-body'}));
+                building.appendChild(path(`M ${x-.12} ${y+.35} L ${x+w/2} ${y-.18} L ${x+w+.12} ${y+.35} L ${x+w-.12} ${y+.72} L ${x+.12} ${y+.72} Z`,'is-building-roof'));
+                featureGroup.appendChild(building); return;
+            }
+            featureGroup.appendChild(forgeSvg('rect', { x, y, width:w, height:h, rx:kind==='well'?.5:.12, class:`is-${kind}` }));
         });
         dungeonForgeLayer.appendChild(featureGroup);
 
         const lineGroup = forgeSvg('g', { class: 'gmrt-forge-ink' });
-        plan.floor.forEach((cell) => {
+        if (!outdoorScene) plan.floor.forEach((cell) => {
             const x = Number(cell.x); const y = Number(cell.y);
             if (!floorSet.has(forgeFloorKey(x, y - 1))) lineGroup.appendChild(forgeSvg('line', { x1:x, y1:y, x2:x+1, y2:y }));
             if (!floorSet.has(forgeFloorKey(x + 1, y))) lineGroup.appendChild(forgeSvg('line', { x1:x+1, y1:y, x2:x+1, y2:y+1 }));
