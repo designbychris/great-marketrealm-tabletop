@@ -1,4 +1,6 @@
 
+
+- IV.30.2A.1A Corner Tile Forensic Pass IV — The Wider Search: expands the generated-corner diagnostic beyond the battlefield subtree, inventorying whole-document overlapping elements, Range-based text/emoji glyphs, image/SVG-image sources, pseudo content, and accessible stylesheet background/content rules.
 ## 0.32.0-alpha.7 — IV.30.2A.1A Corner Tile Forensics III
 
 - Extends the generated-scene corner probe beyond `elementsFromPoint()` so `pointer-events:none` battlefield descendants can no longer evade inspection.

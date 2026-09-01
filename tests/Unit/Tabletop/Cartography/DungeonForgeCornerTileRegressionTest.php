@@ -19,6 +19,18 @@ final class DungeonForgeCornerTileRegressionTest extends TestCase
     {
         $plugin = file_get_contents(dirname(__DIR__, 4) . '/great-marketrealm-tabletop.php');
         self::assertIsString($plugin);
-        self::assertStringContainsString('0.32.0-alpha.7', $plugin);
+        self::assertStringContainsString('0.32.0-alpha.8', $plugin);
     }
+    public function test_wider_corner_forensics_searches_document_text_images_and_stylesheets(): void
+    {
+        $script = file_get_contents(dirname(__DIR__, 4) . '/assets/js/tabletop.js');
+        self::assertIsString($script);
+        self::assertStringContainsString('Corner trace IV:', $script);
+        self::assertStringContainsString("document.querySelectorAll('body *')", $script);
+        self::assertStringContainsString('document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT)', $script);
+        self::assertStringContainsString("value.includes('🗺')", $script);
+        self::assertStringContainsString('document.styleSheets', $script);
+        self::assertStringContainsString('document.elementsFromPoint', $script);
+    }
+
 }

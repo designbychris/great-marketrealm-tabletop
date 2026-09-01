@@ -742,3 +742,7 @@ DM-placeable Scene lighting through the existing Living Veil illumination machin
 - The trace now reports token/light IDs, labels, image filenames and token X/Y CSS coordinates and repeats after asynchronous rendering.
 
 **Status:** Forensic pass III implemented in `0.32.0-alpha.7`; root-cause browser certification pending.
+
+
+### IV.30.2A.1A — Corner Tile Forensic Pass IV: The Wider Search
+Diagnostic corrective: widen the corner investigation to the complete live document so runtime/theme/Elementor-injected text, images, pseudo content, or CSS backgrounds can be identified by their actual owner.

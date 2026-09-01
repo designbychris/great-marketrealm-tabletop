@@ -243,3 +243,7 @@ The Keeper's Atlas can now create a complete generated dungeon Scene without sel
 
 ### Phase IV.30.2A.1 — Pippin Decorates the Place
 Dungeon Forge themes now paint deterministic procedural detail directly into generated SVG surfaces. Pantry Stone, Butcher Cellar, Rootland Cavern, Frostreem Vault, Bakery Crypt and Mushroom Grotto each receive their own floor/rock language without changing the authoritative generated topology.
+
+
+### Corner Tile Forensic Pass IV — The Wider Search
+Generated Scenes temporarily expose a Keeper-only diagnostic that searches outside the battlefield subtree for origin-overlapping elements, text/emoji glyphs, images, pseudo-elements, and stylesheet-generated visuals. This is diagnostic only and does not hide or mutate Scene content.

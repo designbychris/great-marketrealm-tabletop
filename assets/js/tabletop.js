@@ -2830,98 +2830,129 @@
 
     renderDungeonForgePlan(builtDungeonForgePlan, false);
 
-    // IV.30.2A.1A corrective — The Mystery of the Corner Tile, forensic pass III.
-    // The corner artefact has survived hit-testing and broad overlap scans. This pass
-    // records the actual painter geometry/styles for every relevant node in the
-    // battlefield's first 48px, including pseudo-elements and SVG descendants.
+    // IV.30.2A.1A corrective — The Mystery of the Corner Tile, forensic pass IV.
+    // The artefact is not explained by battlefield descendants alone. Search the
+    // wider document for text glyphs, images, pseudo content, backgrounds and any
+    // element whose rendered rectangle intersects the generated board origin.
     const cornerForensics = document.querySelector('[data-corner-forensics]');
     const traceGeneratedCorner = () => {
         if (!cornerForensics || !board.classList.contains('is-generated-surface')) return;
         const boardRect = board.getBoundingClientRect();
-        const probeSize = 48;
+        const probeSize = 52;
         const probe = {
             left: boardRect.left,
             top: boardRect.top,
             right: Math.min(boardRect.right, boardRect.left + probeSize),
             bottom: Math.min(boardRect.bottom, boardRect.top + probeSize)
         };
-        const tidy = (value, max = 72) => String(value || '').replace(/\s+/g, ' ').trim().slice(0, max);
+        const tidy = (value, max = 88) => String(value || '').replace(/\s+/g, ' ').trim().slice(0, max);
         const rel = (value, origin) => Math.round((value - origin) * 10) / 10;
-        const overlapsProbe = (el) => {
-            const box = el.getBoundingClientRect();
-            return box.width > 0 && box.height > 0
-                && box.right > probe.left && box.left < probe.right
-                && box.bottom > probe.top && box.top < probe.bottom;
-        };
+        const intersects = (box) => box && box.width > 0 && box.height > 0
+            && box.right > probe.left && box.left < probe.right
+            && box.bottom > probe.top && box.top < probe.bottom;
         const selectorName = (el) => {
-            const tag = String(el.tagName || '').toLowerCase();
-            const id = el.id ? `#${el.id}` : '';
-            const cls = Array.from(el.classList || []).slice(0, 4).join('.');
+            const tag = String(el?.tagName || '').toLowerCase() || 'node';
+            const id = el?.id ? `#${el.id}` : '';
+            const cls = Array.from(el?.classList || []).slice(0, 5).join('.');
             return `${tag}${id}${cls ? '.' + cls : ''}`;
         };
-        const pseudo = (el, name) => {
-            const style = window.getComputedStyle(el, name);
-            const content = tidy(style.content, 36);
-            const background = tidy(style.backgroundImage !== 'none' ? style.backgroundImage : style.backgroundColor, 42);
-            if ((!content || content === 'none' || content === 'normal' || content === '""')
-                && (!background || background === 'rgba(0, 0, 0, 0)')) return '';
-            return `${name}{content=${content || '-'},bg=${background || '-'},pos=${style.position},z=${style.zIndex}}`;
-        };
-        const describePainter = (el) => {
+        const describeElement = (el) => {
             const box = el.getBoundingClientRect();
             const style = window.getComputedStyle(el);
+            const before = window.getComputedStyle(el, '::before');
+            const after = window.getComputedStyle(el, '::after');
             const src = el instanceof HTMLImageElement ? (el.currentSrc || el.src || '') : '';
             const href = el instanceof SVGImageElement ? (el.getAttribute('href') || el.getAttributeNS('http://www.w3.org/1999/xlink', 'href') || '') : '';
-            const background = tidy(style.backgroundImage !== 'none' ? style.backgroundImage : style.backgroundColor, 56);
-            const fill = tidy(style.fill, 28);
-            const stroke = tidy(style.stroke, 28);
-            const before = pseudo(el, '::before');
-            const after = pseudo(el, '::after');
+            const bg = style.backgroundImage !== 'none' ? style.backgroundImage : style.backgroundColor;
+            const pseudo = [
+                before.content && !['none','normal','""'].includes(before.content) ? `before=${tidy(before.content, 38)}` : '',
+                after.content && !['none','normal','""'].includes(after.content) ? `after=${tidy(after.content, 38)}` : ''
+            ].filter(Boolean).join(',');
             return `${selectorName(el)}@${rel(box.left, boardRect.left)},${rel(box.top, boardRect.top)},${Math.round(box.width)}x${Math.round(box.height)}`
-                + `[pos=${style.position};z=${style.zIndex};pe=${style.pointerEvents};display=${style.display};op=${style.opacity}`
-                + `;bg=${background || '-'};fill=${fill || '-'};stroke=${stroke || '-'};shadow=${tidy(style.boxShadow, 36) || '-'};filter=${tidy(style.filter, 30) || '-'};transform=${tidy(style.transform, 38) || '-'};clip=${tidy(style.clipPath, 24) || '-'}]`
-                + `${src ? '[img=' + tidy(src.split('/').pop(), 42) + ']' : ''}`
-                + `${href ? '[svgimg=' + tidy(href.split('/').pop(), 42) + ']' : ''}`
-                + `${before ? '[' + before + ']' : ''}${after ? '[' + after + ']' : ''}`;
+                + `[z=${style.zIndex};pos=${style.position};pe=${style.pointerEvents};bg=${tidy(bg, 54)}${pseudo ? ';' + pseudo : ''}]`
+                + `${src ? '[img=' + tidy(src.split('/').pop(), 48) + ']' : ''}`
+                + `${href ? '[svgimg=' + tidy(href.split('/').pop(), 48) + ']' : ''}`;
         };
 
-        const points = [[6,6],[18,6],[30,6],[42,6],[6,18],[18,18],[30,18],[42,18],[6,30],[18,30],[30,30],[42,30],[6,42],[18,42],[30,42],[42,42]];
-        const hitNames = [];
-        points.forEach(([dx, dy]) => {
-            const x = Math.min(boardRect.right - 1, boardRect.left + dx);
-            const y = Math.min(boardRect.bottom - 1, boardRect.top + dy);
-            const top = document.elementFromPoint(x, y);
-            const name = top ? selectorName(top) : 'none';
-            if (!hitNames.includes(name)) hitNames.push(name);
-        });
-
-        const painters = [board, ...Array.from(board.querySelectorAll('*'))]
-            .filter(overlapsProbe)
+        // Wider element search: not just descendants of the board.
+        const overlapping = Array.from(document.querySelectorAll('body *'))
+            .filter((el) => {
+                try { return intersects(el.getBoundingClientRect()); } catch (e) { return false; }
+            })
             .filter((el) => {
                 const style = window.getComputedStyle(el);
                 const before = window.getComputedStyle(el, '::before');
                 const after = window.getComputedStyle(el, '::after');
-                const hasPseudo = [before, after].some((ps) => ps.content && ps.content !== 'none' && ps.content !== 'normal' && ps.content !== '""');
-                const hasVisual = style.backgroundImage !== 'none'
+                const hasPseudo = [before, after].some((ps) => ps.content && !['none','normal','""'].includes(ps.content));
+                return el instanceof HTMLImageElement
+                    || el instanceof SVGImageElement
+                    || style.backgroundImage !== 'none'
                     || style.backgroundColor !== 'rgba(0, 0, 0, 0)'
                     || style.boxShadow !== 'none'
-                    || (style.fill && style.fill !== 'none' && style.fill !== 'rgba(0, 0, 0, 0)')
-                    || (style.stroke && style.stroke !== 'none' && style.stroke !== 'rgba(0, 0, 0, 0)')
-                    || el instanceof HTMLImageElement
-                    || el instanceof SVGImageElement
-                    || hasPseudo;
-                return hasVisual || el.matches('svg, g, rect, path, line, circle, text, [data-token-id], [data-light-id]');
+                    || hasPseudo
+                    || el.matches('svg,canvas,video,iframe,[style],[class]');
             })
-            .slice(0, 24);
+            .slice(0, 40)
+            .map(describeElement);
 
-        const direct = Array.from(board.children).map((el) => describePainter(el)).slice(0, 12);
-        cornerForensics.textContent = `Corner trace III: hits=${hitNames.join(' | ')} · painters=${painters.length ? painters.map(describePainter).join(' || ') : 'none'} · children=${direct.join(' || ')}`;
+        // Text-node search using Range rectangles catches emoji/text even when the
+        // owning element spans far beyond the corner or pointer hit-testing ignores it.
+        const textHits = [];
+        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+        let node;
+        while ((node = walker.nextNode())) {
+            const value = String(node.nodeValue || '').trim();
+            if (!value) continue;
+            const range = document.createRange();
+            range.selectNodeContents(node);
+            const rects = Array.from(range.getClientRects());
+            if (!rects.some(intersects)) continue;
+            const owner = node.parentElement;
+            textHits.push(`${selectorName(owner)}="${tidy(value, 54)}"`);
+            if (textHits.length >= 20) break;
+        }
+
+        // Explicitly inventory emoji-like map glyphs anywhere in the live DOM, even
+        // when they are currently outside the corner probe.
+        const mapGlyphOwners = [];
+        const glyphWalker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+        while ((node = glyphWalker.nextNode())) {
+            const value = String(node.nodeValue || '');
+            if (!value.includes('🗺')) continue;
+            const owner = node.parentElement;
+            const box = owner ? owner.getBoundingClientRect() : null;
+            mapGlyphOwners.push(`${selectorName(owner)}@${box ? rel(box.left, boardRect.left) : '?'},${box ? rel(box.top, boardRect.top) : '?'}="${tidy(value, 54)}"`);
+            if (mapGlyphOwners.length >= 12) break;
+        }
+
+        // Search accessible stylesheet rules for generated content/background URLs.
+        const cssSuspects = [];
+        Array.from(document.styleSheets || []).forEach((sheet) => {
+            let rules;
+            try { rules = Array.from(sheet.cssRules || []); } catch (e) { return; }
+            const scan = (items) => items.forEach((rule) => {
+                if (rule.cssRules) return scan(Array.from(rule.cssRules));
+                const text = String(rule.cssText || '');
+                if (/content\s*:|background(?:-image)?\s*:/i.test(text) && (text.includes('🗺') || /url\(/i.test(text))) {
+                    cssSuspects.push(tidy(text, 130));
+                }
+            });
+            scan(rules);
+        });
+
+        const hits = [];
+        [[6,6],[18,6],[30,6],[42,6],[6,18],[18,18],[30,18],[42,18],[6,30],[18,30],[30,30],[42,30],[6,42],[18,42],[30,42],[42,42]].forEach(([dx,dy]) => {
+            const stack = document.elementsFromPoint(boardRect.left + dx, boardRect.top + dy).slice(0, 8).map(selectorName).join('>');
+            if (stack && !hits.includes(stack)) hits.push(stack);
+        });
+
+        cornerForensics.textContent = `Corner trace IV: stacks=${hits.join(' || ')} · overlap=${overlapping.join(' || ') || 'none'} · text=${textHits.join(' || ') || 'none'} · mapGlyph=${mapGlyphOwners.join(' || ') || 'none'} · css=${cssSuspects.join(' || ') || 'none'}`;
         root.dataset.cornerTrace = cornerForensics.textContent;
     };
-    [300, 1000, 2000].forEach((delay) => window.setTimeout(traceGeneratedCorner, delay));
+    [250, 750, 1500, 3000].forEach((delay) => window.setTimeout(traceGeneratedCorner, delay));
     if (window.MutationObserver) {
-        const cornerObserver = new MutationObserver(() => window.setTimeout(traceGeneratedCorner, 0));
-        cornerObserver.observe(board, { childList: true, subtree: true, attributes: true });
+        const cornerObserver = new MutationObserver(() => window.setTimeout(traceGeneratedCorner, 25));
+        cornerObserver.observe(document.body, { childList: true, subtree: true, attributes: true, characterData: true });
     }
 
 
