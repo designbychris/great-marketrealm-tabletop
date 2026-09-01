@@ -78,6 +78,7 @@
     let visionDrafting = false;
     let thresholdPlacement = null;
     let bestiaryPlacement = null;
+    let keeperLightPlacement = null;
 
     function say(message) {
         if (status) {
@@ -749,8 +750,14 @@
         (Array.isArray(projection?.light_sources) ? projection.light_sources : []).forEach((source) => {
             const glow = document.createElement('span');
             const sourceKind = String(source.source_kind || 'carried');
-            glow.className = 'gmrt-carried-light' + (sourceKind === 'dropped' ? ' is-dropped' : '') + (sourceKind === 'magical' ? ' is-magical' : '');
-            if (sourceKind === 'dropped') {
+            glow.className = 'gmrt-carried-light' + (sourceKind === 'dropped' ? ' is-dropped' : '') + (sourceKind === 'magical' ? ' is-magical' : '') + (sourceKind === 'environmental' ? ' is-environmental is-' + String(source.environmental_kind || 'torch') + (source.lit === false ? ' is-doused' : '') : '');
+            if (sourceKind === 'environmental') {
+                const marker = document.createElement('i');
+                marker.className = 'gmrt-keeper-light-marker';
+                marker.textContent = ({torch:'🔥',lantern:'🏮',brazier:'♨',candle:'🕯',magical:'✦'})[String(source.environmental_kind || 'torch')] || '✦';
+                glow.appendChild(marker);
+                glow.setAttribute('aria-label', String(source.label || 'Keeper light source'));
+            } else if (sourceKind === 'dropped') {
                 const flame = document.createElement('i');
                 flame.className = 'gmrt-pixel-flame';
                 flame.setAttribute('aria-hidden', 'true');
@@ -802,6 +809,7 @@
 
         fogProjection = projection || {};
         renderLightSources(fogProjection);
+        renderKeeperLightRoster(fogProjection);
         fogLayer.replaceChildren();
 
         const enabled = Boolean(fogProjection.enabled);
@@ -2257,6 +2265,20 @@
     });
 
     board.addEventListener('click', async (event) => {
+        if (keeperLightPlacement) {
+            event.stopImmediatePropagation();
+            const point = coordinatesFromPointer(event);
+            const kind = keeperLightPlacement;
+            keeperLightPlacement = null;
+            keeperLightButtons.forEach((button) => button.classList.remove('is-active'));
+            if (keeperLightCancel) keeperLightCancel.disabled = true;
+            try {
+                const data = await request('gmrt_tend_environmental_light', { light_action:'place', kind, x:point.x, y:point.y, scene_id:preparationSceneId||projectedSceneId });
+                if (keeperLightStatus) keeperLightStatus.textContent = data.message || 'Light placed.';
+                await replaceChamber(data.message || 'Light placed.', preparationSceneId || null);
+            } catch (error) { if (keeperLightStatus) keeperLightStatus.textContent = error.message || 'The light could not be placed.'; }
+            return;
+        }
         if (!visionDrafting || !visionTool) return;
         event.preventDefault();
         event.stopPropagation();
@@ -3783,6 +3805,42 @@
         } finally {
             removeSelectedTokenButton.disabled = false;
         }
+    });
+
+    const lanternRack = document.querySelector('[data-lantern-rack]');
+    const keeperLightButtons = Array.from(document.querySelectorAll('[data-keeper-light-kind]'));
+    const keeperLightCancel = document.querySelector('[data-keeper-light-cancel]');
+    const keeperLightStatus = document.querySelector('[data-keeper-light-status]');
+    const keeperLightRoster = document.querySelector('[data-keeper-light-roster]');
+    const keeperLightLabels = {torch:'Torch',lantern:'Lantern',brazier:'Brazier',candle:'Candle',magical:'Magical Light'};
+
+    function renderKeeperLightRoster(projection = fogProjection) {
+        if (!keeperLightRoster) return;
+        keeperLightRoster.replaceChildren();
+        const lights = (Array.isArray(projection?.light_sources) ? projection.light_sources : []).filter((source) => String(source.source_kind || '') === 'environmental');
+        if (!lights.length) { const empty=document.createElement('small'); empty.textContent='No Keeper lights on this Scene yet.'; keeperLightRoster.appendChild(empty); return; }
+        lights.forEach((source) => {
+            const row=document.createElement('div'); row.className='gmrt-lantern-rack__row';
+            const label=document.createElement('span'); label.textContent=String(source.label || 'Light'); row.appendChild(label);
+            const douse=document.createElement('button'); douse.type='button'; douse.textContent=source.lit === false ? 'Light' : 'Douse'; douse.dataset.keeperLightToggle=String(source.token_id || ''); row.appendChild(douse);
+            const remove=document.createElement('button'); remove.type='button'; remove.textContent='Remove'; remove.dataset.keeperLightRemove=String(source.token_id || ''); row.appendChild(remove);
+            keeperLightRoster.appendChild(row);
+        });
+    }
+
+    keeperLightButtons.forEach((button) => button.addEventListener('click', () => {
+        keeperLightPlacement=String(button.dataset.keeperLightKind || 'torch');
+        keeperLightButtons.forEach((candidate)=>candidate.classList.toggle('is-active',candidate===button));
+        if (keeperLightCancel) keeperLightCancel.disabled=false;
+        if (keeperLightStatus) keeperLightStatus.textContent=`${keeperLightLabels[keeperLightPlacement] || 'Light'} selected — click the map to place it.`;
+    }));
+    keeperLightCancel?.addEventListener('click',()=>{keeperLightPlacement=null;keeperLightButtons.forEach((button)=>button.classList.remove('is-active'));keeperLightCancel.disabled=true;if(keeperLightStatus)keeperLightStatus.textContent='Placement finished.';});
+    keeperLightRoster?.addEventListener('click', async (event) => {
+        const button=event.target.closest('button'); if(!button)return;
+        const lightId=String(button.dataset.keeperLightToggle || button.dataset.keeperLightRemove || ''); if(!lightId)return;
+        button.disabled=true;
+        try { const action=button.dataset.keeperLightRemove?'remove':'toggle'; const data=await request('gmrt_tend_environmental_light',{light_action:action,light_id:lightId,scene_id:preparationSceneId||projectedSceneId}); if(keeperLightStatus)keeperLightStatus.textContent=data.message||'Lantern Rack updated.'; await replaceChamber(data.message||'Lantern Rack updated.', preparationSceneId || null); }
+        catch(error){if(keeperLightStatus)keeperLightStatus.textContent=error.message||'The light could not be tended.';button.disabled=false;}
     });
 
     function coordinatesFromPointer(event) {

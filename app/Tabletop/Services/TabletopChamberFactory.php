@@ -28,6 +28,7 @@ use GreatMarketrealmTabletop\Tabletop\Footsteps\Presentation\FootstepTrailProjec
 use GreatMarketrealmTabletop\Tabletop\Light\Repositories\WordPressCarriedLightRepository;
 use GreatMarketrealmTabletop\Tabletop\Light\Repositories\WordPressDroppedLightRepository;
 use GreatMarketrealmTabletop\Tabletop\Light\Repositories\WordPressMagicalLightRepository;
+use GreatMarketrealmTabletop\Tabletop\Light\Repositories\WordPressEnvironmentalLightRepository;
 use GreatMarketrealmTabletop\Tabletop\Atlas\Thresholds\Repositories\WordPressThresholdRepository;
 use GreatMarketrealmTabletop\Tabletop\Bestiary\Services\BestiaryRepositoryFactory;
 
@@ -63,7 +64,8 @@ final class TabletopChamberFactory
             new WordPressDroppedLightRepository(),
             new WordPressMagicalLightRepository(),
             new WordPressThresholdRepository(),
-            BestiaryRepositoryFactory::make()
+            BestiaryRepositoryFactory::make(),
+            new WordPressEnvironmentalLightRepository()
         );
     }
 }

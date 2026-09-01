@@ -33,6 +33,7 @@ use GreatMarketrealmTabletop\Tabletop\Footsteps\Presentation\FootstepTrailProjec
 use GreatMarketrealmTabletop\Tabletop\Light\Contracts\CarriedLightRepository;
 use GreatMarketrealmTabletop\Tabletop\Light\Contracts\DroppedLightRepository;
 use GreatMarketrealmTabletop\Tabletop\Light\Contracts\MagicalLightRepository;
+use GreatMarketrealmTabletop\Tabletop\Light\Contracts\EnvironmentalLightRepository;
 use GreatMarketrealmTabletop\Tables\Scenes\Contracts\TableSceneRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Contracts\TableTokenRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Models\TableToken;
@@ -71,7 +72,8 @@ final class TabletopChamber
         private ?DroppedLightRepository $droppedLights = null,
         private ?MagicalLightRepository $magicalLights = null,
         private ?ThresholdRepository $thresholds = null,
-        private ?BestiaryRepository $bestiary = null
+        private ?BestiaryRepository $bestiary = null,
+        private ?EnvironmentalLightRepository $environmentalLights = null
     ) {}
 
     public function state(
@@ -206,6 +208,12 @@ final class TabletopChamber
         if ($activeScene !== null && $this->droppedLights !== null) {
             foreach ($this->droppedLights->forScene($tableId, $activeScene->id()) as $droppedLight) {
                 $worldLightSourceModels[] = $droppedLight;
+            }
+        }
+
+        if ($activeScene !== null && $this->environmentalLights !== null) {
+            foreach ($this->environmentalLights->forScene($tableId, $activeScene->id()) as $environmentalLight) {
+$worldLightSourceModels[] = $environmentalLight;
             }
         }
 

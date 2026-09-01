@@ -907,6 +907,21 @@ $sceneImage = $scene !== null
                         <span data-fog-status role="status" aria-live="polite"></span>
                     </div>
 
+                    <div class="gmrt-lantern-rack" data-lantern-rack>
+                        <strong>The Keeper's Lantern Rack</strong>
+                        <span>Choose a light, then click the battlemap to place it. Scene-owned lights may be prepared Behind the Curtain.</span>
+                        <div class="gmrt-lantern-rack__tools">
+                            <button type="button" data-keeper-light-kind="torch">🔥 Torch</button>
+                            <button type="button" data-keeper-light-kind="lantern">🏮 Lantern</button>
+                            <button type="button" data-keeper-light-kind="brazier">♨ Brazier</button>
+                            <button type="button" data-keeper-light-kind="candle">🕯 Candle</button>
+                            <button type="button" data-keeper-light-kind="magical">✦ Magical Light</button>
+                            <button type="button" data-keeper-light-cancel disabled>Finish / Cancel</button>
+                        </div>
+                        <span data-keeper-light-status role="status" aria-live="polite">Choose a light source to begin.</span>
+                        <div class="gmrt-lantern-rack__roster" data-keeper-light-roster></div>
+                    </div>
+
                     <div class="gmrt-vision-controls" data-vision-controls>
                         <strong>Sight Beyond the Door</strong>
                         <span>Teach the Veil where sight must stop.</span>

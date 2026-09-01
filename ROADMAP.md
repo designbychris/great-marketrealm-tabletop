@@ -722,3 +722,7 @@ Correct the final forged-token presentation boundary so Companion-generated port
 - [x] **IV.30.1E — The Cartographer's Lens Controls** — places Zoom In, Zoom Out, live zoom percentage, Fit and Reset directly over the battlemap while reusing the existing Cartographer's Lens transform/pan state and preserving client-only authority.
 - [x] **IV.30.1F — The Cartographer's Registration / Printed-Grid Registration & Calibration Intelligence** — analyses repeated horizontal/vertical artwork linework in the Keeper's browser, previews a suggested square size and X/Y phase against the existing live grid controls, and requires explicit Save Grid authority before persistence.
 - [x] **IV.30.1F.1 — The Surveyor Learns the Difference Between a Grid and a Wall** — biases printed-grid registration toward thin pale linework inside quiet floor, rejects heavy architectural ink, requires repeated evidence on both axes, and resolves supported room-size harmonics back to the smaller fundamental artwork grid.
+
+
+### Phase IV.31 — The Keeper's Lantern Rack ✅ IMPLEMENTED
+DM-placeable Scene lighting through the existing Living Veil illumination machinery; browser certification pending.

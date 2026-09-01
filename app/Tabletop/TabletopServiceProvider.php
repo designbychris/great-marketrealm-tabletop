@@ -36,6 +36,7 @@ use GreatMarketrealmTabletop\Tabletop\Http\TableColourAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\CarriedLightAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\DroppedLightAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\MagicalLightAjaxController;
+use GreatMarketrealmTabletop\Tabletop\Http\EnvironmentalLightAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\KeepersAtlasAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\BestiaryAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Atlas\Services\KeepersAtlasFactory;
@@ -43,6 +44,7 @@ use GreatMarketrealmTabletop\Tabletop\Bestiary\Services\BestiaryDeploymentManage
 use GreatMarketrealmTabletop\Tabletop\Light\Repositories\WordPressCarriedLightRepository;
 use GreatMarketrealmTabletop\Tabletop\Light\Repositories\WordPressDroppedLightRepository;
 use GreatMarketrealmTabletop\Tabletop\Light\Repositories\WordPressMagicalLightRepository;
+use GreatMarketrealmTabletop\Tabletop\Light\Repositories\WordPressEnvironmentalLightRepository;
 use GreatMarketrealmTabletop\Tabletop\Satchel\Services\QuickHandsRoller;
 use GreatMarketrealmTabletop\Tabletop\Satchel\Services\WeaponHandsRoller;
 use GreatMarketrealmTabletop\Tabletop\Satchel\Services\SpellPouchRoller;
@@ -123,6 +125,8 @@ final class TabletopServiceProvider
     private DroppedLightAjaxController $droppedLightAjax;
 
     private MagicalLightAjaxController $magicalLightAjax;
+
+    private EnvironmentalLightAjaxController $environmentalLightAjax;
 
     private KeepersAtlasAjaxController $keepersAtlasAjax;
 
@@ -246,6 +250,12 @@ final class TabletopServiceProvider
 
         $this->bestiaryAjax = new BestiaryAjaxController(
             BestiaryDeploymentManagerFactory::make()
+        );
+
+        $this->environmentalLightAjax = new EnvironmentalLightAjaxController(
+            new WordPressTableMembershipRepository(),
+            new WordPressTableSceneRepository(),
+            new WordPressEnvironmentalLightRepository()
         );
 
         $this->magicalLightAjax = new MagicalLightAjaxController(
@@ -524,6 +534,11 @@ final class TabletopServiceProvider
         add_action(
             'wp_ajax_gmrt_tend_dropped_light',
             [$this->droppedLightAjax, 'tend']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_tend_environmental_light',
+            [$this->environmentalLightAjax, 'tend']
         );
 
         add_action(

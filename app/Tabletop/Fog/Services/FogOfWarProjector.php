@@ -9,6 +9,7 @@ use GreatMarketrealmTabletop\Tables\Tokens\Models\TableTokenType;
 use GreatMarketrealmTabletop\Tabletop\Fog\Models\FogOfWarState;
 use GreatMarketrealmTabletop\Tabletop\Light\Models\DroppedLight;
 use GreatMarketrealmTabletop\Tabletop\Light\Models\MagicalLight;
+use GreatMarketrealmTabletop\Tabletop\Light\Models\EnvironmentalLight;
 use DateTimeImmutable;
 
 defined('ABSPATH') || exit;
@@ -88,7 +89,24 @@ final class FogOfWarProjector
             $sourceKind = 'carried';
             $brightFeet = 20;
             $dimFeet = 20;
-            if ($lightSource instanceof DroppedLight) {
+            if ($lightSource instanceof EnvironmentalLight) {
+                if (! $lightSource->lit()) {
+                    if ($dungeonMaster) {
+                        $safeLightSources[] = ['x'=>$lightSource->x(),'y'=>$lightSource->y(),'token_id'=>$lightSource->id(),'range_feet'=>0,'bright_light_feet'=>0,'dim_light_feet'=>0,'shared'=>false,'source_kind'=>'environmental','environmental_kind'=>$lightSource->kind(),'label'=>$lightSource->label(),'lit'=>false];
+                    }
+                    continue;
+                }
+                $sourceKind = 'environmental';
+                $brightFeet = $lightSource->brightFeet();
+                $dimFeet = $lightSource->dimFeet();
+                $environmentalKind = $lightSource->kind();
+                $environmentalLabel = $lightSource->label();
+                $lightSource = TableToken::create(
+                    $lightSource->id(), $lightSource->tableId(), $lightSource->sceneId(),
+                    $environmentalLabel, TableTokenType::OBJECT, 'keeper-light-' . $environmentalKind, null,
+                    $lightSource->x(), $lightSource->y(), 1, 1, 'visible', new DateTimeImmutable()
+                );
+            } elseif ($lightSource instanceof DroppedLight) {
                 $sourceKind = 'dropped';
                 $lightSource = TableToken::create(
                     $lightSource->id(), $lightSource->tableId(), $lightSource->sceneId(),
@@ -128,6 +146,9 @@ final class FogOfWarProjector
                     'dim_light_feet' => $dimFeet,
                     'shared' => true,
                     'source_kind' => $sourceKind,
+                    'environmental_kind' => $environmentalKind ?? '',
+                    'label' => $environmentalLabel ?? '',
+                    'lit' => true,
                 ];
             }
         }

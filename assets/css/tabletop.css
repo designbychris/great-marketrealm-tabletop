@@ -1979,3 +1979,10 @@
 .gmrt-cartography-suggestion.is-unselected {
     opacity: .22;
 }
+
+
+/* Phase IV.31 — The Keeper's Lantern Rack */
+.gmrt-lantern-rack{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;margin:.7rem 0;padding:.65rem .75rem;border:1px solid rgba(244,234,214,.18);border-radius:8px;background:rgba(28,20,10,.68)}
+.gmrt-lantern-rack>strong{color:#f4ead6}.gmrt-lantern-rack>span{opacity:.78}.gmrt-lantern-rack__tools{display:flex;flex-wrap:wrap;gap:.4rem}.gmrt-lantern-rack button{border:1px solid rgba(244,234,214,.35);border-radius:6px;padding:.38rem .55rem;background:rgba(0,0,0,.3);color:inherit;cursor:pointer}.gmrt-lantern-rack button.is-active{outline:2px solid rgba(255,196,88,.95);outline-offset:2px}.gmrt-lantern-rack__roster{flex-basis:100%;display:grid;gap:.35rem}.gmrt-lantern-rack__row{display:flex;align-items:center;gap:.4rem;padding:.3rem .4rem;border:1px solid rgba(244,234,214,.12);border-radius:6px}.gmrt-lantern-rack__row span{margin-right:auto}.gmrt-carried-light.is-environmental{display:grid;place-items:center;filter:none;pointer-events:none}.gmrt-keeper-light-marker{font-style:normal;font-size:1.05rem;filter:drop-shadow(0 1px 2px #000)}.gmrt-carried-light.is-environmental.is-candle{width:10%}.gmrt-carried-light.is-environmental.is-brazier{width:24%}.gmrt-carried-light.is-environmental.is-magical{background:radial-gradient(circle,rgba(224,247,255,.3) 0 18%,rgba(158,211,255,.16) 19% 50%,rgba(120,190,255,0) 72%)}
+
+.gmrt-carried-light.is-environmental.is-doused{background:none;opacity:.55}.gmrt-carried-light.is-environmental.is-doused .gmrt-keeper-light-marker{filter:grayscale(1) drop-shadow(0 1px 2px #000)}

@@ -267,6 +267,12 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - Preserves server-authoritative membership changes and opaque Companion character references.
 # Changelog
 
+## 0.31.0-alpha.1 — Phase IV.31: The Keeper's Lantern Rack
+- Adds DM-owned Scene lighting with Torch, Lantern, Brazier, Candle and Magical Light presets.
+- Reuses Living Veil LOS/illumination, including wall blocking and player-safe projection.
+- Supports Behind-the-Curtain preparation plus douse/remove controls.
+
+
 ## 0.22.2-alpha.2 — Phase IV.22B.1: The Keeper's Cartography
 
 - Added continuous grid-snapped wall tracing for faster room and corridor authoring.
