@@ -1,11 +1,18 @@
-## 0.32.0-alpha.3 — Phase IV.30.2A.1: Pippin Decorates the Place
+## 0.32.0-alpha.4 — Phase IV.30.2A.1A: The Mystery of the Corner Tile
+
+- Identified the mysterious generated-map corner tile as the colourful `🗺️` emoji used by the fixed Keeper's Atlas drawer toggle, not dungeon geometry, artwork, Fog, or a leaked battlemap image.
+- Removed the platform-rendered emoji from the Atlas toggle and retained a clean vertical `Atlas` control, preventing the operating system/browser emoji glyph from presenting as a stray map tile over the battlefield.
+- Added a regression contract protecting generated battlefields from reintroducing that colourful corner-map glyph.
+- Version: `0.32.0-alpha.4`.
+
+## 0.32.0-alpha.4 — Phase IV.30.2A.1: Pippin Decorates the Place
 
 - Turns Dungeon Forge themes into deterministic procedural surface treatments rather than palette-only recolours.
 - Adds theme-specific floor marks: stone cracks, butcher-cellar mortar/drains, Rootland roots/pebbles, Frostreem ice fractures, Bakery brickwork/crumbs, and Mushroom Grotto fungal details/spores.
 - Adds deterministic rock-face accents along playable boundaries while leaving gameplay topology untouched.
 - Keeps theme decoration presentation-only: floor cells, walls, doors, grid registration, Fog and Keeper light coordinates remain authoritative and unchanged.
 - Hardens generated Scenes against stale image presentation by suppressing battlemap image layers on generated surfaces.
-- Version: `0.32.0-alpha.3`.
+- Version: `0.32.0-alpha.4`.
 
 ## 0.32.0-alpha.2 — Phase IV.30.2A: The Forge Creates Worlds
 

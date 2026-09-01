@@ -233,7 +233,7 @@ each other when both apply.
 
 
 
-Current development milestone: **0.32.0-alpha.3 — Phase IV.30.2A.1, Pippin Decorates the Place**.
+Current development milestone: **0.32.0-alpha.4 — Phase IV.30.2A.1A, The Mystery of the Corner Tile**.
 
 
 ### Phase IV.30.2A — The Forge Creates Worlds
