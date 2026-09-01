@@ -907,3 +907,10 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - Requires repeated comb evidence on both axes so sparse room dimensions cannot masquerade as a square grid.
 - Resolves strongly supported 2–6x room-size harmonics back toward the smaller fundamental printed-grid spacing instead of simply choosing the strongest large rectangle cadence.
 - Keeps detection browser-local and preview-only; the existing Save Grid action remains the sole authoritative persistence boundary.
+
+## 0.31.1-alpha.1 — Phase IV.31.1: The Keeper Strikes a Match
+- Places every Keeper environmental source lit by default and keeps douse/relight as a reversible persisted state rather than removal.
+- Shows Lit/Doused state and the source radius directly in the Lantern Rack roster.
+- Certifies bright-light radii of Torch 20 ft, Lantern 30 ft, Brazier 60 ft, Candle 10 ft, and Magical Light 40 ft, each with an equal dim-light band.
+- Sizes environmental battlefield glows from authoritative projected range plus calibrated grid geometry so every source visibly represents its illumination footprint.
+- Keeps Living Veil projection, Scene ownership, wall occlusion and Behind-the-Curtain preparation authoritative.

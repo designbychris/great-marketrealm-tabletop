@@ -726,3 +726,5 @@ Correct the final forged-token presentation boundary so Companion-generated port
 
 ### Phase IV.31 — The Keeper's Lantern Rack ✅ IMPLEMENTED
 DM-placeable Scene lighting through the existing Living Veil illumination machinery; browser certification pending.
+
+- [x] **IV.31.1 — The Keeper Strikes a Match** — places every Keeper source lit by default, exposes Lit/Doused state with inverse Douse/Light controls, certifies Torch 20 ft / Lantern 30 ft / Brazier 60 ft / Candle 10 ft / Magical Light 40 ft bright radii, and sizes battlefield glows from the authoritative projected range.

@@ -777,6 +777,16 @@
             }
             glow.style.setProperty('--gmrt-light-x', (Number(source.x || 0) * 100) + '%');
             glow.style.setProperty('--gmrt-light-y', (Number(source.y || 0) * 100) + '%');
+            if (sourceKind === 'environmental') {
+                const rangeFeet = Math.max(0, Number(source.range_feet || 0));
+                const gridSize = Math.max(0, Number(projection?.grid_size || 0));
+                const referenceWidth = Math.max(0, Number(projection?.reference_width || 0));
+                if (rangeFeet > 0 && gridSize > 0 && referenceWidth > 0) {
+                    const radiusSquares = rangeFeet / 5;
+                    const diameterPercent = Math.max(2, (radiusSquares * gridSize * 2 / referenceWidth) * 100);
+                    glow.style.setProperty('--gmrt-light-diameter', `${diameterPercent}%`);
+                }
+            }
             lightLayer.appendChild(glow);
         });
     };
@@ -3809,8 +3819,11 @@
         if (!lights.length) { const empty=document.createElement('small'); empty.textContent='No Keeper lights on this Scene yet.'; keeperLightRoster.appendChild(empty); return; }
         lights.forEach((source) => {
             const row=document.createElement('div'); row.className='gmrt-lantern-rack__row';
-            const label=document.createElement('span'); label.textContent=String(source.label || 'Light'); row.appendChild(label);
-            const douse=document.createElement('button'); douse.type='button'; douse.textContent=source.lit === false ? 'Light' : 'Douse'; douse.dataset.keeperLightToggle=String(source.token_id || ''); row.appendChild(douse);
+            const identity=document.createElement('span'); identity.className='gmrt-lantern-rack__identity';
+            const label=document.createElement('strong'); label.textContent=String(source.label || 'Light'); identity.appendChild(label);
+            const radius=document.createElement('small'); const brightFeet=Math.max(0,Number(source.bright_light_feet || 0)); radius.textContent=brightFeet ? `${brightFeet} ft radius` : 'No illumination'; identity.appendChild(radius); row.appendChild(identity);
+            const state=document.createElement('span'); const isLit=source.lit !== false; state.className='gmrt-lantern-rack__state ' + (isLit ? 'is-lit' : 'is-doused'); state.textContent=isLit ? '● Lit' : '○ Doused'; row.appendChild(state);
+            const douse=document.createElement('button'); douse.type='button'; douse.textContent=isLit ? 'Douse' : 'Light'; douse.setAttribute('aria-label',(isLit ? 'Douse ' : 'Light ') + String(source.label || 'light')); douse.dataset.keeperLightToggle=String(source.token_id || ''); douse.dataset.keeperLightAction=isLit ? 'douse' : 'light'; row.appendChild(douse);
             const remove=document.createElement('button'); remove.type='button'; remove.textContent='Remove'; remove.dataset.keeperLightRemove=String(source.token_id || ''); row.appendChild(remove);
             keeperLightRoster.appendChild(row);
         });
@@ -3860,7 +3873,7 @@
         const button=event.target.closest('button'); if(!button)return;
         const lightId=String(button.dataset.keeperLightToggle || button.dataset.keeperLightRemove || ''); if(!lightId)return;
         button.disabled=true;
-        try { const action=button.dataset.keeperLightRemove?'remove':'toggle'; const data=await request('gmrt_tend_environmental_light',{light_action:action,light_id:lightId,scene_id:preparationSceneId||projectedSceneId}); if(keeperLightStatus)keeperLightStatus.textContent=data.message||'Lantern Rack updated.'; await replaceChamber(data.message||'Lantern Rack updated.', preparationSceneId || null); }
+        try { const action=button.dataset.keeperLightRemove?'remove':String(button.dataset.keeperLightAction || 'toggle'); const data=await request('gmrt_tend_environmental_light',{light_action:action,light_id:lightId,scene_id:preparationSceneId||projectedSceneId}); if(keeperLightStatus)keeperLightStatus.textContent=data.message||'Lantern Rack updated.'; await replaceChamber(data.message||'Lantern Rack updated.', preparationSceneId || null); }
         catch(error){if(keeperLightStatus)keeperLightStatus.textContent=error.message||'The light could not be tended.';button.disabled=false;}
     });
 
