@@ -39,7 +39,7 @@ final class KeepersStrikeAMatchRegressionTest extends TestCase
         self::assertStringContainsString("state.textContent=isLit ? '● Lit' : '○ Doused'", $source);
         self::assertStringContainsString("douse.textContent=isLit ? 'Douse' : 'Light'", $source);
         self::assertStringContainsString("douse.dataset.keeperLightAction=isLit ? 'douse' : 'light'", $source);
-        self::assertStringContainsString("`${brightFeet} ft radius`", $source);
+        self::assertStringContainsString('`${brightFeet} ft radius`', $source);
     }
 
     public function test_keeper_uses_explicit_light_and_douse_actions(): void
@@ -47,7 +47,7 @@ final class KeepersStrikeAMatchRegressionTest extends TestCase
         $controller = $this->source('app/Tabletop/Http/EnvironmentalLightAjaxController.php');
         $js = $this->source('assets/js/tabletop.js');
 
-        self::assertStringContainsString("in_array($action,['light','douse','toggle'],true)", $controller);
+        self::assertStringContainsString("in_array(\$action,['light','douse','toggle'],true)", $controller);
         self::assertStringContainsString("button.dataset.keeperLightAction || 'toggle'", $js);
     }
 
