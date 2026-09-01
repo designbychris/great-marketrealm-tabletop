@@ -741,4 +741,4 @@ DM-placeable Scene lighting through the existing Living Veil illumination machin
 - Forensic pass II inspects real bounding-box overlaps, including `pointer-events:none` token/effect descendants that `elementsFromPoint()` cannot see.
 - The trace now reports token/light IDs, labels, image filenames and token X/Y CSS coordinates and repeats after asynchronous rendering.
 
-**Status:** Forensic pass II implemented in `0.32.0-alpha.6`; root-cause browser certification pending.
+**Status:** Forensic pass III implemented in `0.32.0-alpha.7`; root-cause browser certification pending.

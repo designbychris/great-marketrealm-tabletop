@@ -78,7 +78,7 @@ final class DungeonForgeCreatesWorldsRegressionTest extends TestCase
         $roadmap = $this->source('ROADMAP.md');
         $phase = $this->source('docs/Roadmap/PHASE-IV.30.2A.md');
 
-        self::assertStringContainsString('0.32.0-alpha.6', $plugin);
+        self::assertStringContainsString('0.32.0-alpha.7', $plugin);
         self::assertStringContainsString('IV.30.2A — The Forge Creates Worlds', $roadmap);
         self::assertStringContainsString('Atlas → Generate Dungeon', $phase);
         self::assertStringContainsString('Behind the Curtain', $phase);

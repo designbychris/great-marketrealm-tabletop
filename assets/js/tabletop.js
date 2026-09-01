@@ -2830,73 +2830,98 @@
 
     renderDungeonForgePlan(builtDungeonForgePlan, false);
 
-    // IV.30.2A.1A corrective — The Mystery of the Corner Tile, forensic pass II.
-    // elementsFromPoint() deliberately ignores pointer-events:none descendants. The
-    // token and visual-effect layers use that rule, so inspect every battlefield
-    // descendant whose real bounding box overlaps the origin probe as well.
+    // IV.30.2A.1A corrective — The Mystery of the Corner Tile, forensic pass III.
+    // The corner artefact has survived hit-testing and broad overlap scans. This pass
+    // records the actual painter geometry/styles for every relevant node in the
+    // battlefield's first 48px, including pseudo-elements and SVG descendants.
     const cornerForensics = document.querySelector('[data-corner-forensics]');
     const traceGeneratedCorner = () => {
         if (!cornerForensics || !board.classList.contains('is-generated-surface')) return;
-        const rect = board.getBoundingClientRect();
-        const x = Math.min(rect.right - 2, rect.left + 14);
-        const y = Math.min(rect.bottom - 2, rect.top + 14);
-        const stack = document.elementsFromPoint(x, y).slice(0, 6);
-        const describe = (el) => {
-            const tag = String(el.tagName || '').toLowerCase();
-            const cls = Array.from(el.classList || []).slice(0, 3).join('.');
-            const src = el instanceof HTMLImageElement ? (el.currentSrc || el.src || '') : '';
-            const style = window.getComputedStyle(el);
-            const bg = style.backgroundImage && style.backgroundImage !== 'none' ? style.backgroundImage : '';
-            const before = window.getComputedStyle(el, '::before').content;
-            const after = window.getComputedStyle(el, '::after').content;
-            const tokenId = el.dataset && el.dataset.tokenId ? String(el.dataset.tokenId) : '';
-            const lightId = el.dataset && el.dataset.lightId ? String(el.dataset.lightId) : '';
-            const tokenX = style.getPropertyValue('--gmrt-token-x').trim();
-            const tokenY = style.getPropertyValue('--gmrt-token-y').trim();
-            const title = String(el.getAttribute && (el.getAttribute('title') || el.getAttribute('aria-label')) || '').trim().slice(0, 36);
-            return `${tag}${cls ? '.' + cls : ''}${tokenId ? '[token=' + tokenId + ']' : ''}${lightId ? '[light=' + lightId + ']' : ''}${tokenX || tokenY ? '[xy=' + (tokenX || '?') + ',' + (tokenY || '?') + ']' : ''}${src ? '[img=' + src.split('/').pop() + ']' : ''}${bg ? '[bg]' : ''}${title ? '[label=' + title + ']' : ''}${before && before !== 'none' && before !== 'normal' ? '[before=' + before + ']' : ''}${after && after !== 'none' && after !== 'normal' ? '[after=' + after + ']' : ''}`;
-        };
-
+        const boardRect = board.getBoundingClientRect();
+        const probeSize = 48;
         const probe = {
-            left: rect.left,
-            top: rect.top,
-            right: Math.min(rect.right, rect.left + 40),
-            bottom: Math.min(rect.bottom, rect.top + 40)
+            left: boardRect.left,
+            top: boardRect.top,
+            right: Math.min(boardRect.right, boardRect.left + probeSize),
+            bottom: Math.min(boardRect.bottom, boardRect.top + probeSize)
         };
+        const tidy = (value, max = 72) => String(value || '').replace(/\s+/g, ' ').trim().slice(0, max);
+        const rel = (value, origin) => Math.round((value - origin) * 10) / 10;
         const overlapsProbe = (el) => {
             const box = el.getBoundingClientRect();
             return box.width > 0 && box.height > 0
                 && box.right > probe.left && box.left < probe.right
                 && box.bottom > probe.top && box.top < probe.bottom;
         };
-        const overlap = Array.from(board.querySelectorAll('*'))
+        const selectorName = (el) => {
+            const tag = String(el.tagName || '').toLowerCase();
+            const id = el.id ? `#${el.id}` : '';
+            const cls = Array.from(el.classList || []).slice(0, 4).join('.');
+            return `${tag}${id}${cls ? '.' + cls : ''}`;
+        };
+        const pseudo = (el, name) => {
+            const style = window.getComputedStyle(el, name);
+            const content = tidy(style.content, 36);
+            const background = tidy(style.backgroundImage !== 'none' ? style.backgroundImage : style.backgroundColor, 42);
+            if ((!content || content === 'none' || content === 'normal' || content === '""')
+                && (!background || background === 'rgba(0, 0, 0, 0)')) return '';
+            return `${name}{content=${content || '-'},bg=${background || '-'},pos=${style.position},z=${style.zIndex}}`;
+        };
+        const describePainter = (el) => {
+            const box = el.getBoundingClientRect();
+            const style = window.getComputedStyle(el);
+            const src = el instanceof HTMLImageElement ? (el.currentSrc || el.src || '') : '';
+            const href = el instanceof SVGImageElement ? (el.getAttribute('href') || el.getAttributeNS('http://www.w3.org/1999/xlink', 'href') || '') : '';
+            const background = tidy(style.backgroundImage !== 'none' ? style.backgroundImage : style.backgroundColor, 56);
+            const fill = tidy(style.fill, 28);
+            const stroke = tidy(style.stroke, 28);
+            const before = pseudo(el, '::before');
+            const after = pseudo(el, '::after');
+            return `${selectorName(el)}@${rel(box.left, boardRect.left)},${rel(box.top, boardRect.top)},${Math.round(box.width)}x${Math.round(box.height)}`
+                + `[pos=${style.position};z=${style.zIndex};pe=${style.pointerEvents};display=${style.display};op=${style.opacity}`
+                + `;bg=${background || '-'};fill=${fill || '-'};stroke=${stroke || '-'};shadow=${tidy(style.boxShadow, 36) || '-'};filter=${tidy(style.filter, 30) || '-'};transform=${tidy(style.transform, 38) || '-'};clip=${tidy(style.clipPath, 24) || '-'}]`
+                + `${src ? '[img=' + tidy(src.split('/').pop(), 42) + ']' : ''}`
+                + `${href ? '[svgimg=' + tidy(href.split('/').pop(), 42) + ']' : ''}`
+                + `${before ? '[' + before + ']' : ''}${after ? '[' + after + ']' : ''}`;
+        };
+
+        const points = [[6,6],[18,6],[30,6],[42,6],[6,18],[18,18],[30,18],[42,18],[6,30],[18,30],[30,30],[42,30],[6,42],[18,42],[30,42],[42,42]];
+        const hitNames = [];
+        points.forEach(([dx, dy]) => {
+            const x = Math.min(boardRect.right - 1, boardRect.left + dx);
+            const y = Math.min(boardRect.bottom - 1, boardRect.top + dy);
+            const top = document.elementFromPoint(x, y);
+            const name = top ? selectorName(top) : 'none';
+            if (!hitNames.includes(name)) hitNames.push(name);
+        });
+
+        const painters = [board, ...Array.from(board.querySelectorAll('*'))]
             .filter(overlapsProbe)
             .filter((el) => {
                 const style = window.getComputedStyle(el);
-                const interesting = el.matches('[data-token-id], img, [data-light-id], .gmrt-token__face, .gmrt-carried-light, .gmrt-dropped-light, .gmrt-magical-light');
-                return interesting || style.pointerEvents === 'none';
+                const before = window.getComputedStyle(el, '::before');
+                const after = window.getComputedStyle(el, '::after');
+                const hasPseudo = [before, after].some((ps) => ps.content && ps.content !== 'none' && ps.content !== 'normal' && ps.content !== '""');
+                const hasVisual = style.backgroundImage !== 'none'
+                    || style.backgroundColor !== 'rgba(0, 0, 0, 0)'
+                    || style.boxShadow !== 'none'
+                    || (style.fill && style.fill !== 'none' && style.fill !== 'rgba(0, 0, 0, 0)')
+                    || (style.stroke && style.stroke !== 'none' && style.stroke !== 'rgba(0, 0, 0, 0)')
+                    || el instanceof HTMLImageElement
+                    || el instanceof SVGImageElement
+                    || hasPseudo;
+                return hasVisual || el.matches('svg, g, rect, path, line, circle, text, [data-token-id], [data-light-id]');
             })
-            .slice(0, 12);
+            .slice(0, 24);
 
-        let textOwner = '';
-        try {
-            const range = document.caretRangeFromPoint ? document.caretRangeFromPoint(x, y) : null;
-            const node = range && range.startContainer;
-            if (node && node.nodeType === Node.TEXT_NODE && node.parentElement) {
-                const text = String(node.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 24);
-                if (text) textOwner = ` · text “${text}” in ${describe(node.parentElement)}`;
-            }
-        } catch (error) {}
-        const hitTrace = stack.map(describe).join(' > ');
-        const overlapTrace = overlap.length ? overlap.map(describe).join(' | ') : 'none';
-        cornerForensics.textContent = `Corner trace: hit=${hitTrace}${textOwner} · overlap=${overlapTrace}`;
+        const direct = Array.from(board.children).map((el) => describePainter(el)).slice(0, 12);
+        cornerForensics.textContent = `Corner trace III: hits=${hitNames.join(' | ')} · painters=${painters.length ? painters.map(describePainter).join(' || ') : 'none'} · children=${direct.join(' || ')}`;
         root.dataset.cornerTrace = cornerForensics.textContent;
     };
     [300, 1000, 2000].forEach((delay) => window.setTimeout(traceGeneratedCorner, delay));
-    const cornerTokenLayer = board.querySelector('.gmrt-board__tokens');
-    if (cornerTokenLayer && window.MutationObserver) {
+    if (window.MutationObserver) {
         const cornerObserver = new MutationObserver(() => window.setTimeout(traceGeneratedCorner, 0));
-        cornerObserver.observe(cornerTokenLayer, { childList: true, subtree: true, attributes: true });
+        cornerObserver.observe(board, { childList: true, subtree: true, attributes: true });
     }
 
 

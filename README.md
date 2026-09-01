@@ -233,7 +233,7 @@ each other when both apply.
 
 
 
-Current development milestone: **0.32.0-alpha.6 — Phase IV.30.2A.1A, The Mystery of the Corner Tile — forensic pass II**.
+Current development milestone: **0.32.0-alpha.7 — Phase IV.30.2A.1A, The Mystery of the Corner Tile — forensic pass III**.
 
 
 ### Phase IV.30.2A — The Forge Creates Worlds
