@@ -1122,12 +1122,6 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                     </p>
                 <?php endif; ?>
 
-                <?php if ($state->isDungeonMaster() && $sceneIsGenerated) : ?>
-                    <p class="gmrt-corner-forensics" data-corner-forensics role="status" aria-live="polite">
-                        Corner trace armed — checking the generated battlefield origin…
-                    </p>
-                <?php endif; ?>
-
                 <div class="gmrt-board__lens-stage" data-lens-stage>
                     <nav
                         class="gmrt-board__lens-controls"

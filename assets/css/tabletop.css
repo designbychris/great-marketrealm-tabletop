@@ -2163,4 +2163,3 @@
 .gmrt-board__viewport.is-generated-surface .gmrt-board__map { display:none !important; }
 
 /* IV.30.2A.1A forensic corrective — generated battlefield origin provenance. */
-.gmrt-corner-forensics { margin:.35rem 0 .55rem; padding:.45rem .6rem; border:1px dashed rgba(244,214,136,.32); border-radius:6px; background:rgba(0,0,0,.16); font:600 .72rem/1.35 system-ui,sans-serif; color:rgba(244,234,214,.78); overflow-wrap:anywhere; }

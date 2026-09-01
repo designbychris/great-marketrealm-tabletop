@@ -265,10 +265,14 @@ final class DungeonForgeAjaxController
             if (! in_array($type, ['wall', 'door'], true)) continue;
             $barriers[] = [
                 'type' => $type,
-                'x1' => $this->clamp((float) ($barrier['x1'] ?? 0)),
-                'y1' => $this->clamp((float) ($barrier['y1'] ?? 0)),
-                'x2' => $this->clamp((float) ($barrier['x2'] ?? 0)),
-                'y2' => $this->clamp((float) ($barrier['y2'] ?? 0)),
+                // Forge drafts use normalised surface coordinates, while the shared
+                // Vision system stores barrier vertices in rules-grid coordinates.
+                // Convert at the boundary so generated walls occupy the full dungeon
+                // instead of collapsing into the first grid square at (0, 0).
+                'x1' => $this->clamp((float) ($barrier['x1'] ?? 0)) * $cols,
+                'y1' => $this->clamp((float) ($barrier['y1'] ?? 0)) * $rows,
+                'x2' => $this->clamp((float) ($barrier['x2'] ?? 0)) * $cols,
+                'y2' => $this->clamp((float) ($barrier['y2'] ?? 0)) * $rows,
             ];
             if (count($barriers) > 200) {
                 throw new RuntimeException('That Dungeon Forge draft contains more than 200 reviewable wall/door objects.');
