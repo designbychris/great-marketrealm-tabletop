@@ -12,15 +12,15 @@ final class DungeonForgeCornerForensicsRegressionTest extends TestCase
         $js = file_get_contents(dirname(__DIR__, 4) . '/assets/js/tabletop.js');
         self::assertStringContainsString('data-corner-forensics', $view);
         self::assertStringContainsString('Corner trace IV:', $js);
-        self::assertStringContainsString("board.querySelectorAll('*')", $js);
+        self::assertStringContainsString("document.querySelectorAll('body *')", $js);
         self::assertStringContainsString('getBoundingClientRect()', $js);
         self::assertStringContainsString("window.getComputedStyle(el, '::before')", $js);
         self::assertStringContainsString('style.backgroundImage', $js);
         self::assertStringContainsString('style.boxShadow', $js);
-        self::assertStringContainsString('style.clipPath', $js);
+        self::assertStringContainsString('document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT)', $js);
         self::assertStringContainsString('SVGImageElement', $js);
-        self::assertStringContainsString('document.elementFromPoint(x, y)', $js);
-                                self::assertStringContainsString('MutationObserver', $js);
-                self::assertStringContainsString('root.dataset.cornerTrace', $js);
+        self::assertStringContainsString('document.elementsFromPoint(boardRect.left + dx, boardRect.top + dy)', $js);
+        self::assertStringContainsString('MutationObserver', $js);
+        self::assertStringContainsString('root.dataset.cornerTrace', $js);
     }
 }
