@@ -3608,6 +3608,22 @@
     const atlasForgeReroll = document.querySelector('[data-atlas-forge-reroll]');
     const atlasForgeCreate = document.querySelector('[data-atlas-forge-create]');
     const atlasForgeStatus = document.querySelector('[data-atlas-forge-status]');
+    const pippinFieldNote = document.querySelector('[data-pippin-field-note]');
+    const pippinFieldNoteCopy = document.querySelector('[data-pippin-field-note-copy]');
+    const pippinNotes = {
+        dungeon: 'Walls are walls. Unless they are Mimics. Further testing advised.',
+        forest: 'I have personally confirmed that trees are not rooms. Grass remains under investigation.',
+        village: 'Buildings confirmed to be rooms. This has now been independently verified.'
+    };
+    const updatePippinFieldNote = (sceneType, message = '') => {
+        if (!pippinFieldNoteCopy) return;
+        pippinFieldNoteCopy.textContent = message || pippinNotes[sceneType] || 'Same seed, Scene Type and scale means the same terrain. Cartographical integrity!';
+        if (pippinFieldNote) {
+            pippinFieldNote.classList.remove('is-speaking');
+            window.requestAnimationFrame(() => pippinFieldNote.classList.add('is-speaking'));
+        }
+    };
+    atlasForgeSceneType?.addEventListener('change', () => updatePippinFieldNote(String(atlasForgeSceneType.value || 'dungeon')));
     const setAtlasOpen = (open) => {
         if (!atlasDrawer || !atlasToggle) return;
         if (open) {
@@ -3626,6 +3642,7 @@
         if (!atlasForgeSeed) return;
         atlasForgeSeed.value = `Peppercorn-${Math.random().toString(36).slice(2,8).toUpperCase()}`;
         if (atlasForgeStatus) atlasForgeStatus.textContent = 'A fresh deterministic seed is ready for Pippin.';
+        updatePippinFieldNote(String(atlasForgeSceneType?.value || 'dungeon'), 'Fresh seed recorded. Same seed, same terrain. I have written this down twice.');
     });
 
     atlasForgeCreate?.addEventListener('click', async () => {
@@ -3657,6 +3674,7 @@
         const previousLabel = atlasForgeCreate.textContent;
         atlasForgeCreate.textContent = 'Forging World…';
         if (atlasForgeStatus) atlasForgeStatus.textContent = `Forging ${sceneName} from nothing…`;
+        updatePippinFieldNote(sceneType, `Surveying ${sceneName}… please refrain from moving any hills while I measure them.`);
         try {
             const data = await request('gmrt_forge_dungeon_world', {
                 scene_name: sceneName,

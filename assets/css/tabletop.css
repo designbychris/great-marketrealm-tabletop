@@ -3048,3 +3048,128 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* Phase IV.32.2A — Pippin's Field Notes. */
+.gmrt-pippin-desk {
+    margin: .65rem 0;
+    border: 2px solid var(--gmrt-pixel-gold-low);
+    background: #15110d;
+    box-shadow: inset 2px 2px 0 rgba(255,255,255,.025), 4px 4px 0 #080604;
+}
+
+.gmrt-pippin-desk > summary {
+    cursor: pointer;
+    padding: .55rem .65rem;
+    color: var(--gmrt-pixel-gold-hi);
+    font-family: ui-monospace, "Courier New", monospace;
+    font-weight: 800;
+    letter-spacing: .035em;
+    text-transform: uppercase;
+    list-style: none;
+}
+
+.gmrt-pippin-desk > summary::-webkit-details-marker { display: none; }
+.gmrt-pippin-desk > summary::before { content: "▶"; margin-right: .45rem; }
+.gmrt-pippin-desk[open] > summary::before { content: "▼"; }
+
+.gmrt-pippin-desk__portrait {
+    margin: 0 .6rem;
+    border: 2px solid #8d6a35;
+    background: #090806;
+    overflow: hidden;
+    box-shadow: inset 0 0 0 2px #241a10;
+}
+
+.gmrt-pippin-desk__portrait img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.gmrt-pippin-desk__copy {
+    display: grid;
+    gap: .15rem;
+    padding: .6rem .7rem .75rem;
+    font-family: ui-monospace, "Courier New", monospace;
+}
+
+.gmrt-pippin-desk__copy strong { color: #ffe39a; font-size: 1rem; }
+.gmrt-pippin-desk__copy span { color: #b9d58b; font-size: .76rem; text-transform: uppercase; letter-spacing: .06em; }
+.gmrt-pippin-desk__copy p { margin: .35rem 0 0; color: #d7c6a3; line-height: 1.45; }
+
+.gmrt-pippin-note {
+    position: relative;
+    display: grid;
+    grid-template-columns: 84px minmax(0, 1fr);
+    align-items: end;
+    gap: 6px;
+    margin: .75rem 0 .9rem;
+    min-height: 92px;
+}
+
+.gmrt-pippin-note__portrait {
+    position: relative;
+    z-index: 2;
+    display: block;
+    width: 96px;
+    max-width: none;
+    margin: 0 -10px -2px 0;
+    image-rendering: pixelated;
+    filter: drop-shadow(3px 3px 0 rgba(0,0,0,.75));
+}
+
+.gmrt-pippin-note__bubble {
+    position: relative;
+    min-height: 76px;
+    padding: .55rem .65rem .6rem .8rem;
+    border: 3px solid #9b753a;
+    background: #211910;
+    color: #e8d7b3;
+    font-family: ui-monospace, "Courier New", monospace;
+    box-shadow: inset 2px 2px 0 #49371f, inset -2px -2px 0 #0d0a07, 4px 4px 0 #080604;
+}
+
+.gmrt-pippin-note__bubble::before {
+    content: "";
+    position: absolute;
+    left: -9px;
+    bottom: 19px;
+    width: 12px;
+    height: 12px;
+    border-left: 3px solid #9b753a;
+    border-bottom: 3px solid #9b753a;
+    background: #211910;
+    transform: rotate(45deg);
+}
+
+.gmrt-pippin-note__label {
+    display: block;
+    margin-bottom: .25rem;
+    color: #ffe39a;
+    font-size: .72rem;
+    font-weight: 900;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    text-shadow: 1px 1px 0 #000;
+}
+
+.gmrt-pippin-note__bubble p {
+    margin: 0;
+    color: inherit;
+    font-size: .78rem;
+    line-height: 1.45;
+}
+
+.gmrt-pippin-note.is-speaking .gmrt-pippin-note__bubble {
+    outline: 2px solid rgba(255,227,154,.3);
+    outline-offset: 2px;
+}
+
+@media (max-width: 520px) {
+    .gmrt-pippin-note { grid-template-columns: 66px minmax(0, 1fr); }
+    .gmrt-pippin-note__portrait { width: 78px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gmrt-pippin-note.is-speaking .gmrt-pippin-note__bubble { outline-offset: 0; }
+}

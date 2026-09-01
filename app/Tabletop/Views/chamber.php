@@ -343,6 +343,27 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                     <summary><span aria-hidden="true">⚒</span> Generate Scene</summary>
                     <div class="gmrt-atlas-forge__body">
                         <p>Pippin can create a complete playable Scene from nothing. No background image is required. Scene Type chooses the topology; Theme chooses its Great Marketrealm surface treatment. Grid, vision, Fog and Keeper lights remain Tabletop-native.</p>
+
+                        <details class="gmrt-pippin-desk">
+                            <summary>Meet the Wandering Cartographer</summary>
+                            <div class="gmrt-pippin-desk__portrait">
+                                <img src="<?php echo esc_url(GMRT_URL . 'assets/images/pippin-peppercorn-cartographer.png'); ?>" alt="Pippin Peppercorn surveying a dungeon while a Milk Mimic lurks behind him." loading="lazy">
+                            </div>
+                            <div class="gmrt-pippin-desk__copy">
+                                <strong>Pippin Peppercorn</strong>
+                                <span>The Wandering Cartographer</span>
+                                <p>Surveyor of dungeons, forests, villages and anything else that stays still long enough to be measured. Pippin remains professionally suspicious of grass.</p>
+                            </div>
+                        </details>
+
+                        <aside class="gmrt-pippin-note" data-pippin-field-note aria-label="Pippin's Field Note">
+                            <img class="gmrt-pippin-note__portrait" src="<?php echo esc_url(GMRT_URL . 'assets/images/pippin-peppercorn-pixel.png'); ?>" alt="" aria-hidden="true">
+                            <div class="gmrt-pippin-note__bubble">
+                                <span class="gmrt-pippin-note__label">Pippin's Field Note</span>
+                                <p data-pippin-field-note-copy>Same seed, Scene Type and scale means the same terrain. Change the Theme and I shall redecorate without moving the walls. Cartographical integrity!</p>
+                            </div>
+                        </aside>
+
                         <div class="gmrt-atlas-forge__controls">
                             <label>
                                 Scene name
