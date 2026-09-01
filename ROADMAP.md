@@ -751,3 +751,8 @@ Diagnostic corrective: widen the corner investigation to the complete live docum
 
 - [x] **IV.30.2B.1 — Pippin Discovers That Trees Aren't Rooms** — outdoor Forge presentation separates organic scenery from authoritative rules geometry.
 - **IV.30.2B.2 — Pippin Learns to Colour Inside the Lines** — hides Forge-owned environmental LOS geometry at rest while preserving its rules behaviour, and adds a richer deterministic visual vocabulary for trees, rocks, logs, village buildings, wells and gardens.
+
+### Phase IV.32 — The Table Becomes Pixel
+A staged SNES-era presentation pass for the Tabletop. Pixel styling remains a skin over the existing certified rules engine so visual work cannot silently change geometry or encounter behaviour.
+
+- [x] **IV.32.1 — The Keeper Finds the Pixel Chisel** — establishes reusable pixel design tokens and applies the first stepped-border, hard-shadow, square-control treatment to the chamber shell, battlefield frame, common controls and Keeper tool strips while preserving focus, disabled and reduced-motion states.

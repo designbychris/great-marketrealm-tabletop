@@ -2322,3 +2322,258 @@
     stroke: rgba(188, 155, 94, .72);
     stroke-width: 1.25;
 }
+
+/* Phase IV.32.1 — The Keeper Finds the Pixel Chisel.
+ * Presentation-only foundation for the Tabletop's SNES-era interface.
+ * Rules geometry, positioning and interaction state remain untouched.
+ */
+.gmrt-chamber {
+    --gmrt-pixel-ink: #17120d;
+    --gmrt-pixel-ink-soft: #2a2118;
+    --gmrt-pixel-panel: #2f281f;
+    --gmrt-pixel-panel-high: #3c3226;
+    --gmrt-pixel-panel-low: #211b16;
+    --gmrt-pixel-parchment: #ead9b5;
+    --gmrt-pixel-gold: #d7b86e;
+    --gmrt-pixel-gold-hi: #f1d58b;
+    --gmrt-pixel-gold-low: #806438;
+    --gmrt-pixel-green: #778b50;
+    --gmrt-pixel-red: #874632;
+    --gmrt-pixel-focus: #f7de8e;
+    --gmrt-pixel-unit: 2px;
+    --gmrt-pixel-shadow: 4px 4px 0 rgba(0, 0, 0, .52);
+    --gmrt-pixel-inset:
+        inset 2px 2px 0 rgba(255, 242, 199, .08),
+        inset -2px -2px 0 rgba(0, 0, 0, .34);
+    background:
+        linear-gradient(rgba(255,255,255,.012) 50%, transparent 50%) 0 0 / 100% 4px,
+        #17140f;
+}
+
+.gmrt-chamber__masthead {
+    padding: .85rem 1rem;
+    border: 2px solid var(--gmrt-pixel-gold-low);
+    border-top-color: var(--gmrt-pixel-gold);
+    border-left-color: var(--gmrt-pixel-gold);
+    border-radius: 2px;
+    background: var(--gmrt-pixel-panel-low);
+    box-shadow: var(--gmrt-pixel-inset), var(--gmrt-pixel-shadow);
+}
+
+.gmrt-chamber__eyebrow,
+.gmrt-chamber__viewer,
+.gmrt-board__tools,
+.gmrt-chamber__status,
+.gmrt-encounter-strip__state {
+    font-family: ui-monospace, "Courier New", monospace;
+}
+
+.gmrt-chamber__masthead h1,
+.gmrt-board__heading h2,
+.gmrt-party h2,
+.gmrt-chamber__notice h2 {
+    font-family: ui-monospace, "Courier New", monospace;
+    letter-spacing: .025em;
+    text-shadow: 2px 2px 0 rgba(0, 0, 0, .58);
+}
+
+.gmrt-chamber__eyebrow {
+    color: var(--gmrt-pixel-gold-hi);
+    opacity: .82;
+    letter-spacing: .16em;
+}
+
+.gmrt-board,
+.gmrt-party,
+.gmrt-chamber__notice {
+    border: 2px solid var(--gmrt-pixel-gold-low);
+    border-top-color: var(--gmrt-pixel-gold);
+    border-left-color: var(--gmrt-pixel-gold);
+    border-radius: 2px;
+    background:
+        linear-gradient(135deg, rgba(255,255,255,.035), transparent 38%),
+        var(--gmrt-pixel-panel);
+    box-shadow: var(--gmrt-pixel-inset), var(--gmrt-pixel-shadow);
+}
+
+.gmrt-board {
+    padding: .9rem;
+}
+
+.gmrt-board__heading {
+    padding: .25rem .25rem .75rem;
+    border-bottom: 2px solid rgba(215, 184, 110, .26);
+}
+
+.gmrt-board__heading > span,
+.gmrt-board__tools > span {
+    font: 800 .7rem/1.2 ui-monospace, "Courier New", monospace;
+    letter-spacing: .04em;
+    color: rgba(234, 217, 181, .78);
+}
+
+.gmrt-board__lens-stage {
+    border: 2px solid var(--gmrt-pixel-gold-low);
+    border-top-color: var(--gmrt-pixel-gold);
+    border-left-color: var(--gmrt-pixel-gold);
+    border-radius: 2px;
+    box-shadow:
+        inset 2px 2px 0 rgba(255,255,255,.08),
+        inset -2px -2px 0 rgba(0,0,0,.58),
+        4px 4px 0 rgba(0,0,0,.42);
+}
+
+.gmrt-board__viewport {
+    border-radius: 0;
+}
+
+.gmrt-cartographers-lens,
+.gmrt-fog-controls,
+.gmrt-vision-controls,
+.gmrt-lantern-rack,
+.gmrt-grid-calibrator,
+.gmrt-exploration-strip,
+.gmrt-encounter-strip {
+    border: 2px solid rgba(128, 100, 56, .88);
+    border-top-color: rgba(215, 184, 110, .72);
+    border-left-color: rgba(215, 184, 110, .72);
+    border-radius: 2px;
+    background: var(--gmrt-pixel-panel-low);
+    box-shadow: var(--gmrt-pixel-inset), 3px 3px 0 rgba(0,0,0,.34);
+}
+
+.gmrt-exploration-strip {
+    background: #263020;
+}
+
+.gmrt-encounter-strip {
+    background: #42251f;
+}
+
+.gmrt-chamber button:not(.gmrt-token),
+.gmrt-chamber select,
+.gmrt-chamber input[type="text"],
+.gmrt-chamber input[type="number"],
+.gmrt-chamber input[type="search"] {
+    border: 2px solid #6f5835;
+    border-top-color: #d4b56d;
+    border-left-color: #d4b56d;
+    border-radius: 1px;
+    background: #211b16;
+    color: #f2e5c8;
+    box-shadow:
+        inset 2px 2px 0 rgba(255,255,255,.045),
+        inset -2px -2px 0 rgba(0,0,0,.42),
+        2px 2px 0 rgba(0,0,0,.34);
+    font-family: ui-monospace, "Courier New", monospace;
+    font-weight: 800;
+}
+
+.gmrt-chamber button:not(.gmrt-token) {
+    cursor: pointer;
+    transition: transform 80ms steps(1, end), background-color 80ms steps(1, end), border-color 80ms steps(1, end);
+}
+
+.gmrt-chamber button:not(.gmrt-token):hover:not(:disabled) {
+    background: #352a1f;
+    border-top-color: var(--gmrt-pixel-gold-hi);
+    border-left-color: var(--gmrt-pixel-gold-hi);
+}
+
+.gmrt-chamber button:not(.gmrt-token):active:not(:disabled) {
+    transform: translate(2px, 2px);
+    box-shadow:
+        inset 2px 2px 0 rgba(0,0,0,.36),
+        inset -2px -2px 0 rgba(255,255,255,.035);
+}
+
+.gmrt-chamber button:not(.gmrt-token):focus-visible,
+.gmrt-chamber select:focus-visible,
+.gmrt-chamber input:focus-visible,
+.gmrt-chamber summary:focus-visible {
+    outline: 2px solid var(--gmrt-pixel-focus);
+    outline-offset: 3px;
+}
+
+.gmrt-chamber button:not(.gmrt-token):disabled {
+    opacity: .48;
+    filter: grayscale(.28);
+    cursor: not-allowed;
+}
+
+.gmrt-chamber input[type="checkbox"] {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 0;
+    accent-color: var(--gmrt-pixel-gold);
+}
+
+.gmrt-board__lens-controls {
+    gap: 4px;
+    padding: 5px;
+    border: 2px solid var(--gmrt-pixel-gold-low);
+    border-top-color: var(--gmrt-pixel-gold-hi);
+    border-left-color: var(--gmrt-pixel-gold-hi);
+    border-radius: 2px;
+    background: #17130f;
+    box-shadow:
+        inset 2px 2px 0 rgba(255,255,255,.055),
+        inset -2px -2px 0 rgba(0,0,0,.52),
+        4px 4px 0 rgba(0,0,0,.58);
+    backdrop-filter: none;
+}
+
+.gmrt-board__lens-controls button {
+    min-width: 2.7rem;
+    min-height: 2.45rem;
+    border-radius: 0;
+    text-shadow: 1px 1px 0 #000;
+}
+
+.gmrt-board__lens-controls output {
+    padding: .3rem .2rem;
+    border-top: 2px solid rgba(215,184,110,.24);
+    border-bottom: 2px solid rgba(0,0,0,.35);
+    color: var(--gmrt-pixel-gold-hi);
+    font: 900 .68rem/1 ui-monospace, "Courier New", monospace;
+}
+
+.gmrt-party > ul > li,
+.gmrt-battle-log li,
+.gmrt-lantern-rack__row,
+.gmrt-death-saves {
+    border: 2px solid rgba(128,100,56,.46);
+    border-radius: 1px;
+    background: rgba(18, 14, 11, .38);
+    box-shadow: inset 2px 2px 0 rgba(255,255,255,.025);
+}
+
+.gmrt-party > ul > li > span,
+.gmrt-token__state-badge,
+.gmrt-condition,
+.gmrt-target-range {
+    border-radius: 0;
+}
+
+.gmrt-party > ul > li > span {
+    border: 2px solid rgba(215,184,110,.36);
+    background: #241d16;
+    box-shadow: inset 2px 2px 0 rgba(255,255,255,.035);
+}
+
+.gmrt-hp__track {
+    height: .6rem;
+    border: 2px solid rgba(128,100,56,.58);
+    border-radius: 0;
+    background: #100d0a;
+}
+
+.gmrt-hp__fill {
+    image-rendering: pixelated;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gmrt-chamber button:not(.gmrt-token) {
+        transition: none;
+    }
+}
