@@ -2577,3 +2577,474 @@
         transition: none;
     }
 }
+
+/* Phase IV.32.2 — The Atlas Gets a 16-Bit Makeover.
+ * Presentation-only treatment for the Keeper's Atlas, Scene register,
+ * Scene Forge, cartography tools, threshold tools and Lantern Rack.
+ */
+.gmrt-atlas-drawer {
+    filter: none;
+}
+
+.gmrt-atlas-drawer__toggle {
+    width: 3.35rem;
+    min-height: 7.4rem;
+    padding: .65rem .35rem;
+    border: 2px solid var(--gmrt-pixel-gold-low);
+    border-top-color: var(--gmrt-pixel-gold-hi);
+    border-left-color: var(--gmrt-pixel-gold-hi);
+    border-right: 0;
+    border-radius: 2px 0 0 2px;
+    background:
+        linear-gradient(90deg, rgba(255,255,255,.045), transparent 35%),
+        #261e17;
+    color: var(--gmrt-pixel-parchment);
+    box-shadow:
+        inset 2px 2px 0 rgba(255,255,255,.055),
+        inset 0 -2px 0 rgba(0,0,0,.46),
+        -4px 4px 0 rgba(0,0,0,.48);
+    font-family: ui-monospace, "Courier New", monospace;
+    text-shadow: 1px 1px 0 #000;
+}
+
+.gmrt-atlas-drawer__toggle::before {
+    content: "◆";
+    color: var(--gmrt-pixel-gold-hi);
+    font-size: .8rem;
+    line-height: 1;
+}
+
+.gmrt-atlas-drawer__toggle span {
+    font-weight: 900;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.gmrt-atlas-drawer[data-open="true"] .gmrt-atlas-drawer__toggle {
+    background: #35291d;
+    color: var(--gmrt-pixel-gold-hi);
+}
+
+.gmrt-atlas-drawer__panel {
+    width: min(520px, calc(100vw - 4rem));
+    padding: 1rem;
+    border: 2px solid var(--gmrt-pixel-gold-low);
+    border-top-color: var(--gmrt-pixel-gold);
+    border-left-color: var(--gmrt-pixel-gold);
+    border-right: 0;
+    border-radius: 2px 0 0 2px;
+    background:
+        linear-gradient(rgba(255,255,255,.018) 50%, transparent 50%) 0 0 / 100% 4px,
+        #1b1712;
+    color: var(--gmrt-pixel-parchment);
+    box-shadow:
+        inset 2px 2px 0 rgba(255,255,255,.045),
+        inset -2px -2px 0 rgba(0,0,0,.42),
+        -6px 6px 0 rgba(0,0,0,.54);
+    scrollbar-color: var(--gmrt-pixel-gold-low) #17120d;
+    scrollbar-width: thin;
+}
+
+.gmrt-atlas-drawer__panel::-webkit-scrollbar { width: 12px; }
+.gmrt-atlas-drawer__panel::-webkit-scrollbar-track { background: #17120d; }
+.gmrt-atlas-drawer__panel::-webkit-scrollbar-thumb {
+    border: 2px solid #17120d;
+    border-radius: 0;
+    background: var(--gmrt-pixel-gold-low);
+}
+
+.gmrt-atlas__header {
+    top: -1rem;
+    margin: -1rem -1rem .9rem;
+    padding: .85rem 1rem .8rem;
+    border-bottom: 2px solid var(--gmrt-pixel-gold-low);
+    background:
+        linear-gradient(90deg, rgba(215,184,110,.08), transparent 44%),
+        #211b16;
+    box-shadow: 0 3px 0 rgba(0,0,0,.34);
+}
+
+.gmrt-atlas__header::after {
+    content: "";
+    position: absolute;
+    left: 1rem;
+    right: 4rem;
+    bottom: -2px;
+    height: 2px;
+    background: repeating-linear-gradient(90deg, var(--gmrt-pixel-gold) 0 8px, transparent 8px 14px);
+    opacity: .42;
+    pointer-events: none;
+}
+
+.gmrt-atlas__header h2 {
+    margin: .1rem 0;
+    color: var(--gmrt-pixel-gold-hi);
+    font-family: ui-monospace, "Courier New", monospace;
+    letter-spacing: .035em;
+    text-shadow: 2px 2px 0 #000;
+}
+
+.gmrt-atlas__header small,
+.gmrt-atlas__introduction,
+.gmrt-atlas-card__copy small,
+.gmrt-atlas-forge__body > p,
+.gmrt-threshold-tools p,
+.gmrt-threshold-tools small,
+.gmrt-cartography-assistant__body > p,
+.gmrt-lantern-rack > span {
+    color: rgba(234,217,181,.72);
+}
+
+.gmrt-atlas__header [data-atlas-close] {
+    width: 2.35rem;
+    height: 2.35rem;
+    padding: 0;
+    display: grid;
+    place-items: center;
+    font: 900 1.25rem/1 ui-monospace, "Courier New", monospace;
+}
+
+.gmrt-atlas__introduction {
+    align-items: center;
+    margin-bottom: .9rem;
+    padding: .6rem .7rem;
+    border-left: 4px solid var(--gmrt-pixel-gold-low);
+    background: rgba(215,184,110,.055);
+    font-family: ui-monospace, "Courier New", monospace;
+    font-size: .78rem;
+}
+
+.gmrt-atlas__introduction [data-atlas-status]:not(:empty),
+.gmrt-atlas-forge [role="status"]:not(:empty),
+.gmrt-cartography-assistant [role="status"]:not(:empty) {
+    padding: .35rem .45rem;
+    border: 2px solid rgba(128,100,56,.62);
+    background: #17130f;
+    color: var(--gmrt-pixel-gold-hi);
+    font: 800 .72rem/1.35 ui-monospace, "Courier New", monospace;
+}
+
+.gmrt-atlas__register {
+    gap: .65rem;
+}
+
+.gmrt-atlas-card {
+    position: relative;
+    grid-template-columns: 76px minmax(0, 1fr);
+    gap: .7rem;
+    padding: .7rem;
+    border: 2px solid #604b2f;
+    border-top-color: #9b7c48;
+    border-left-color: #9b7c48;
+    border-radius: 1px;
+    background:
+        linear-gradient(135deg, rgba(255,255,255,.035), transparent 34%),
+        #282118;
+    color: var(--gmrt-pixel-parchment);
+    box-shadow:
+        inset 2px 2px 0 rgba(255,255,255,.035),
+        inset -2px -2px 0 rgba(0,0,0,.46),
+        3px 3px 0 rgba(0,0,0,.38);
+}
+
+.gmrt-atlas-card::before {
+    content: "";
+    position: absolute;
+    left: -2px;
+    top: 10px;
+    width: 4px;
+    height: 22px;
+    background: #665137;
+}
+
+.gmrt-atlas-card.is-active {
+    outline: 2px solid var(--gmrt-pixel-green);
+    outline-offset: 2px;
+    border-top-color: #aebf79;
+    border-left-color: #aebf79;
+    background:
+        linear-gradient(135deg, rgba(174,191,121,.085), transparent 42%),
+        #293020;
+}
+
+.gmrt-atlas-card.is-active::before {
+    background: #aebf79;
+}
+
+.gmrt-atlas-card.is-forged-world::after {
+    content: "FORGED";
+    position: absolute;
+    right: 6px;
+    top: 6px;
+    padding: 2px 4px;
+    border: 1px solid rgba(215,184,110,.62);
+    background: #17130f;
+    color: var(--gmrt-pixel-gold-hi);
+    font: 900 .52rem/1 ui-monospace, "Courier New", monospace;
+    letter-spacing: .08em;
+}
+
+.gmrt-atlas-card__image {
+    width: 76px;
+    border: 2px solid #5f4b31;
+    border-top-color: #b08d55;
+    border-left-color: #b08d55;
+    border-radius: 0;
+    background:
+        linear-gradient(45deg, rgba(215,184,110,.08) 25%, transparent 25% 75%, rgba(215,184,110,.08) 75%) 0 0 / 8px 8px,
+        #16130f;
+    box-shadow: inset 2px 2px 0 rgba(255,255,255,.035);
+    image-rendering: pixelated;
+}
+
+.gmrt-atlas-card__image img {
+    image-rendering: pixelated;
+}
+
+.gmrt-atlas-card__forge-sigil {
+    color: var(--gmrt-pixel-gold-hi);
+    font-size: 1.45rem;
+    filter: grayscale(.15) sepia(.25);
+    text-shadow: 2px 2px 0 #000;
+}
+
+.gmrt-atlas-card__copy strong {
+    padding-right: 3.4rem;
+    color: #f0dfbc;
+    font-family: ui-monospace, "Courier New", monospace;
+    font-size: .84rem;
+    line-height: 1.25;
+    letter-spacing: .025em;
+}
+
+.gmrt-atlas-card__active {
+    color: #c8dda1;
+    font: 900 .68rem/1.2 ui-monospace, "Courier New", monospace;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+}
+
+.gmrt-atlas-card__actions {
+    gap: 4px;
+    padding-top: .35rem;
+    border-top: 2px solid rgba(128,100,56,.3);
+}
+
+.gmrt-atlas-card__actions button {
+    min-height: 2.25rem;
+    font-size: .7rem;
+}
+
+.gmrt-atlas-card__remove {
+    color: #d9a894 !important;
+}
+
+.gmrt-atlas__add,
+.gmrt-atlas-forge,
+.gmrt-threshold-tools,
+.gmrt-cartography-assistant,
+.gmrt-lantern-rack,
+.gmrt-dungeon-forge {
+    border: 2px solid rgba(128,100,56,.72);
+    border-top-color: rgba(215,184,110,.58);
+    border-left-color: rgba(215,184,110,.58);
+    border-radius: 1px;
+    background: #201a15;
+    box-shadow:
+        inset 2px 2px 0 rgba(255,255,255,.025),
+        inset -2px -2px 0 rgba(0,0,0,.38),
+        3px 3px 0 rgba(0,0,0,.3);
+}
+
+.gmrt-atlas__add {
+    margin-top: .85rem;
+    padding: .75rem;
+}
+
+.gmrt-atlas__add > small {
+    color: rgba(234,217,181,.66);
+    font-family: ui-monospace, "Courier New", monospace;
+}
+
+.gmrt-atlas-forge,
+.gmrt-threshold-tools {
+    margin: .9rem 0 0;
+    padding: .75rem;
+}
+
+.gmrt-atlas-forge > summary,
+.gmrt-cartography-assistant > summary,
+.gmrt-dungeon-forge > summary {
+    position: relative;
+    padding: .2rem .2rem .2rem 1.25rem;
+    color: var(--gmrt-pixel-gold-hi);
+    font-family: ui-monospace, "Courier New", monospace;
+    letter-spacing: .025em;
+    list-style: none;
+}
+
+.gmrt-atlas-forge > summary::-webkit-details-marker,
+.gmrt-cartography-assistant > summary::-webkit-details-marker,
+.gmrt-dungeon-forge > summary::-webkit-details-marker {
+    display: none;
+}
+
+.gmrt-atlas-forge > summary::before,
+.gmrt-cartography-assistant > summary::before,
+.gmrt-dungeon-forge > summary::before {
+    content: "▶";
+    position: absolute;
+    left: .1rem;
+    top: .25rem;
+    color: var(--gmrt-pixel-gold);
+    font-size: .72rem;
+}
+
+.gmrt-atlas-forge[open] > summary::before,
+.gmrt-cartography-assistant[open] > summary::before,
+.gmrt-dungeon-forge[open] > summary::before {
+    content: "▼";
+}
+
+.gmrt-atlas-forge__body,
+.gmrt-cartography-assistant__body,
+.gmrt-dungeon-forge__body {
+    margin-top: .55rem;
+    padding: .65rem;
+    border-top: 2px solid rgba(128,100,56,.34);
+    background: rgba(0,0,0,.12);
+}
+
+.gmrt-atlas-forge__controls,
+.gmrt-cartography-assistant__controls,
+.gmrt-dungeon-forge__controls {
+    gap: .55rem;
+}
+
+.gmrt-atlas-forge__controls label,
+.gmrt-cartography-assistant__controls label,
+.gmrt-dungeon-forge__controls label,
+.gmrt-atlas__add label {
+    color: #d9c69e;
+    font-family: ui-monospace, "Courier New", monospace;
+    font-size: .7rem;
+    letter-spacing: .035em;
+    text-transform: uppercase;
+}
+
+.gmrt-threshold-tools h3 {
+    color: var(--gmrt-pixel-gold-hi);
+    font-family: ui-monospace, "Courier New", monospace;
+    text-shadow: 1px 1px 0 #000;
+}
+
+.gmrt-threshold-tools__actions {
+    gap: 4px;
+}
+
+.gmrt-lantern-rack {
+    align-items: center;
+    gap: .55rem;
+    margin: .75rem 0;
+    padding: .7rem;
+}
+
+.gmrt-lantern-rack > strong {
+    color: var(--gmrt-pixel-gold-hi);
+    font-family: ui-monospace, "Courier New", monospace;
+    letter-spacing: .025em;
+    text-shadow: 1px 1px 0 #000;
+}
+
+.gmrt-lantern-rack__tools {
+    gap: 4px;
+}
+
+.gmrt-lantern-rack button.is-active {
+    outline: 2px solid #f0c75d;
+    outline-offset: 2px;
+    background: #49351b;
+    color: #fff0b0;
+}
+
+.gmrt-lantern-rack__roster {
+    gap: 4px;
+    padding-top: .4rem;
+    border-top: 2px solid rgba(128,100,56,.34);
+}
+
+.gmrt-lantern-rack__row {
+    min-height: 2.8rem;
+    padding: .42rem .5rem;
+    border-color: rgba(128,100,56,.54);
+    background: #18140f;
+}
+
+.gmrt-lantern-rack__identity strong,
+.gmrt-lantern-rack__state {
+    font-family: ui-monospace, "Courier New", monospace;
+}
+
+.gmrt-lantern-rack__state.is-lit {
+    color: #bedc88;
+    text-shadow: 1px 1px 0 #000;
+}
+
+.gmrt-lantern-rack__state.is-doused {
+    color: #aaa49a;
+}
+
+.gmrt-cartography-assistant__review {
+    gap: 4px;
+    padding-right: 2px;
+    scrollbar-color: var(--gmrt-pixel-gold-low) #17120d;
+}
+
+.gmrt-cartography-assistant__suggestion {
+    padding: .45rem .5rem;
+    border: 2px solid rgba(128,100,56,.44);
+    border-radius: 0;
+    background: #18140f;
+    color: #ddcba7;
+    font-family: ui-monospace, "Courier New", monospace;
+    box-shadow: inset 2px 2px 0 rgba(255,255,255,.02);
+}
+
+.gmrt-dungeon-forge__legend {
+    gap: .45rem;
+    padding: .45rem .5rem;
+    border: 2px solid rgba(128,100,56,.36);
+    background: #18140f;
+    font-family: ui-monospace, "Courier New", monospace;
+    opacity: .9;
+}
+
+.gmrt-dungeon-forge__legend span {
+    padding-right: .35rem;
+}
+
+.gmrt-dungeon-forge__legend i {
+    width: .7rem;
+    height: .7rem;
+    border: 2px solid currentColor;
+    border-radius: 0 !important;
+    image-rendering: pixelated;
+}
+
+@media (max-width: 700px) {
+    .gmrt-atlas-drawer__panel {
+        width: calc(100vw - 4rem);
+    }
+
+    .gmrt-atlas-card {
+        grid-template-columns: 64px minmax(0, 1fr);
+    }
+
+    .gmrt-atlas-card__image {
+        width: 64px;
+    }
+
+    .gmrt-atlas-forge__controls {
+        grid-template-columns: 1fr;
+    }
+}

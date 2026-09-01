@@ -756,3 +756,4 @@ Diagnostic corrective: widen the corner investigation to the complete live docum
 A staged SNES-era presentation pass for the Tabletop. Pixel styling remains a skin over the existing certified rules engine so visual work cannot silently change geometry or encounter behaviour.
 
 - [x] **IV.32.1 — The Keeper Finds the Pixel Chisel** — establishes reusable pixel design tokens and applies the first stepped-border, hard-shadow, square-control treatment to the chamber shell, battlefield frame, common controls and Keeper tool strips while preserving focus, disabled and reduced-motion states.
+- [x] **IV.32.2 — The Atlas Gets a 16-Bit Makeover** — extends the Pixel Chisel into the Keeper's Atlas, Scene register, Forge, Threshold, Cartography and Lantern Rack surfaces with stepped drawer framing, pixel Scene records, explicit generated/active states, compact disclosure markers and unified workbench styling while leaving all authority and behaviour unchanged.
