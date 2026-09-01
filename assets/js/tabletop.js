@@ -2513,6 +2513,53 @@
         dungeonForgeLayer.appendChild(floors);
 
         const floorSet = new Set(plan.floor.map((cell) => forgeFloorKey(Number(cell.x), Number(cell.y))));
+
+        // IV.30.2A.1 — Pippin Decorates the Place.
+        // Themes are deterministic surface treatments only: they never alter floor
+        // topology, LOS walls, doors, grid registration or Keeper light positions.
+        const decorate = forgeSvg('g', { class: 'gmrt-forge-decoration' });
+        const decorationChance = (x, y, salt = '') => forgeHash(`${plan.seed}|${plan.theme}|${x}|${y}|${salt}`) / 0xffffffff;
+        const path = (d, className) => forgeSvg('path', { d, class: className });
+        const line = (x1, y1, x2, y2, className) => forgeSvg('line', { x1, y1, x2, y2, class: className });
+        const circle = (cx, cy, r, className) => forgeSvg('circle', { cx, cy, r, class: className });
+
+        plan.floor.forEach((cell) => {
+            const x = Number(cell.x); const y = Number(cell.y);
+            const n = decorationChance(x, y, 'floor');
+            if (plan.theme === 'pantry-stone') {
+                if (n < .34) decorate.appendChild(path(`M ${x+.16} ${y+.72} l .16 -.12 l .13 .06 l .18 -.17`, 'is-crack'));
+                if (n > .82) decorate.appendChild(circle(x+.72, y+.28, .055, 'is-pit'));
+            } else if (plan.theme === 'butcher-cellar') {
+                decorate.appendChild(line(x+.08, y+.5, x+.92, y+.5, 'is-mortar'));
+                if ((x+y)%2===0) decorate.appendChild(line(x+.5, y+.08, x+.5, y+.5, 'is-mortar'));
+                if (n < .12) decorate.appendChild(circle(x+.5, y+.5, .16, 'is-drain'));
+            } else if (plan.theme === 'rootland-cavern') {
+                if (n < .48) decorate.appendChild(path(`M ${x+.05} ${y+.78} Q ${x+.38} ${y+.46} ${x+.92} ${y+.22}`, 'is-root'));
+                if (n > .82) decorate.appendChild(circle(x+.28, y+.64, .09, 'is-pebble'));
+            } else if (plan.theme === 'frostreem-vault') {
+                if (n < .58) decorate.appendChild(path(`M ${x+.18} ${y+.2} l .2 .24 l -.09 .18 l .26 .19 l .22 -.16`, 'is-ice-crack'));
+                if (n > .82) decorate.appendChild(path(`M ${x+.62} ${y+.16} l .12 .12 l -.12 .12 l -.12 -.12 z`, 'is-frost-chip'));
+            } else if (plan.theme === 'bakery-crypt') {
+                decorate.appendChild(line(x+.06, y+.48, x+.94, y+.48, 'is-brick'));
+                decorate.appendChild(line(x+(y%2?.28:.62), y+.06, x+(y%2?.28:.62), y+.48, 'is-brick'));
+                if (n < .16) decorate.appendChild(circle(x+.74, y+.72, .045, 'is-crumb'));
+            } else if (plan.theme === 'mushroom-grotto') {
+                if (n < .28) {
+                    decorate.appendChild(path(`M ${x+.3} ${y+.65} q .18 -.25 .36 0 z`, 'is-mushroom-cap'));
+                    decorate.appendChild(line(x+.48, y+.65, x+.48, y+.82, 'is-mushroom-stem'));
+                } else if (n > .76) decorate.appendChild(circle(x+.3, y+.3, .055, 'is-spore'));
+            }
+        });
+
+        for (let y = 0; y < rows; y += 1) {
+            for (let x = 0; x < cols; x += 1) {
+                if (floorSet.has(forgeFloorKey(x, y))) continue;
+                const nearFloor = floorSet.has(forgeFloorKey(x-1,y)) || floorSet.has(forgeFloorKey(x+1,y)) || floorSet.has(forgeFloorKey(x,y-1)) || floorSet.has(forgeFloorKey(x,y+1));
+                if (!nearFloor || decorationChance(x,y,'rock') > .42) continue;
+                decorate.appendChild(path(`M ${x+.12} ${y+.75} q .22 -.42 .42 -.08 q .2 -.3 .36 .08`, 'is-rock-face'));
+            }
+        }
+        dungeonForgeLayer.appendChild(decorate);
         const lineGroup = forgeSvg('g', { class: 'gmrt-forge-ink' });
         plan.floor.forEach((cell) => {
             const x = Number(cell.x); const y = Number(cell.y);

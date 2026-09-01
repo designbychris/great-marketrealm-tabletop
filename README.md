@@ -233,9 +233,13 @@ each other when both apply.
 
 
 
-Current development milestone: **0.32.0-alpha.2 — Phase IV.30.2A, The Forge Creates Worlds**.
+Current development milestone: **0.32.0-alpha.3 — Phase IV.30.2A.1, Pippin Decorates the Place**.
 
 
 ### Phase IV.30.2A — The Forge Creates Worlds
 
 The Keeper's Atlas can now create a complete generated dungeon Scene without selecting a background image. A deterministic seed and scale produce the same geometry-first dungeon foundation used by IV.30.2, while a separate Stone & Floor theme repaints the native SVG surface. The new Scene receives its square grid, vision walls, closed doors, Fog and Keeper lights immediately, then opens Behind the Curtain for private inspection before the Keeper chooses to make it live.
+
+
+### Phase IV.30.2A.1 — Pippin Decorates the Place
+Dungeon Forge themes now paint deterministic procedural detail directly into generated SVG surfaces. Pantry Stone, Butcher Cellar, Rootland Cavern, Frostreem Vault, Bakery Crypt and Mushroom Grotto each receive their own floor/rock language without changing the authoritative generated topology.

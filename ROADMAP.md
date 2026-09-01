@@ -726,6 +726,8 @@ Correct the final forged-token presentation boundary so Companion-generated port
 - [x] **IV.30.2 — The Cartographer's Dungeon Forge** — deterministic geometry-first dungeon drafting and Keeper-authoritative build: connected rooms/corridors become persistent native artwork, calibrated grid, walls, closed doors, Keeper lights and a freshly enabled Living Veil. Drafts remain local until Build Dungeon.
 - [x] **IV.30.2A — The Forge Creates Worlds** — adds Atlas → Generate Dungeon so the Keeper can forge a brand-new generated-surface Scene without a background image, choose a deterministic scale/seed and Great Marketrealm floor/rock theme, then inspect the fully built grid/walls/doors/Fog/lights Behind the Curtain before opening it to Players.
 
+- [x] **IV.30.2A.1 — Pippin Decorates the Place** — upgrades Forge themes from palette swaps to deterministic procedural floor/rock treatments while preserving identical geometry, walls, doors, Fog and lights; generated surfaces also suppress stale image presentation.
+
 
 ### Phase IV.31 — The Keeper's Lantern Rack ✅ IMPLEMENTED
 DM-placeable Scene lighting through the existing Living Veil illumination machinery; browser certification pending.

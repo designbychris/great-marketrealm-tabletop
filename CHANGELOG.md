@@ -1,3 +1,12 @@
+## 0.32.0-alpha.3 — Phase IV.30.2A.1: Pippin Decorates the Place
+
+- Turns Dungeon Forge themes into deterministic procedural surface treatments rather than palette-only recolours.
+- Adds theme-specific floor marks: stone cracks, butcher-cellar mortar/drains, Rootland roots/pebbles, Frostreem ice fractures, Bakery brickwork/crumbs, and Mushroom Grotto fungal details/spores.
+- Adds deterministic rock-face accents along playable boundaries while leaving gameplay topology untouched.
+- Keeps theme decoration presentation-only: floor cells, walls, doors, grid registration, Fog and Keeper light coordinates remain authoritative and unchanged.
+- Hardens generated Scenes against stale image presentation by suppressing battlemap image layers on generated surfaces.
+- Version: `0.32.0-alpha.3`.
+
 ## 0.32.0-alpha.2 — Phase IV.30.2A: The Forge Creates Worlds
 
 - Adds **Generate Dungeon** directly to the Keeper's Atlas; no WordPress Media background image is required.

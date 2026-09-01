@@ -2128,3 +2128,36 @@
 @media (max-width: 700px) {
     .gmrt-atlas-forge__controls { grid-template-columns: 1fr; }
 }
+
+/* Phase IV.30.2A.1 — Pippin Decorates the Place */
+.gmrt-dungeon-forge-layer .gmrt-forge-decoration { pointer-events:none; }
+.gmrt-dungeon-forge-layer .gmrt-forge-decoration * { vector-effect:non-scaling-stroke; fill:none; stroke-linecap:square; stroke-linejoin:miter; }
+.gmrt-dungeon-forge-layer .gmrt-forge-decoration .is-crack { stroke:#5d5138; stroke-width:.045; opacity:.78; }
+.gmrt-dungeon-forge-layer .gmrt-forge-decoration .is-pit { fill:#665a40; stroke:#d2bd86; stroke-width:.025; opacity:.58; }
+.gmrt-dungeon-forge-layer[data-forge-theme="pantry-stone"] .gmrt-forge-floor rect:nth-child(3n) { fill:#ad9c70; }
+.gmrt-dungeon-forge-layer[data-forge-theme="pantry-stone"] .gmrt-forge-floor rect:nth-child(5n) { fill:#9d8d63; }
+
+.gmrt-dungeon-forge-layer .gmrt-forge-decoration .is-mortar,
+.gmrt-dungeon-forge-layer .gmrt-forge-decoration .is-brick { stroke:rgba(57,33,25,.55); stroke-width:.045; }
+.gmrt-dungeon-forge-layer .gmrt-forge-decoration .is-drain { fill:#342624; stroke:#b58b77; stroke-width:.035; opacity:.9; }
+.gmrt-dungeon-forge-layer[data-forge-theme="butcher-cellar"] .gmrt-forge-floor rect:nth-child(4n) { fill:#855b52; }
+
+.gmrt-dungeon-forge-layer .gmrt-forge-decoration .is-root { stroke:#443520; stroke-width:.085; opacity:.82; }
+.gmrt-dungeon-forge-layer .gmrt-forge-decoration .is-pebble { fill:#514934; stroke:#99866a; stroke-width:.03; }
+.gmrt-dungeon-forge-layer[data-forge-theme="rootland-cavern"] .gmrt-forge-floor rect:nth-child(4n) { fill:#706044; }
+
+.gmrt-dungeon-forge-layer .gmrt-forge-decoration .is-ice-crack { stroke:#d2edf2; stroke-width:.04; opacity:.76; }
+.gmrt-dungeon-forge-layer .gmrt-forge-decoration .is-frost-chip { fill:#bfdce2; stroke:#eefcff; stroke-width:.025; opacity:.7; }
+.gmrt-dungeon-forge-layer[data-forge-theme="frostreem-vault"] .gmrt-forge-floor rect:nth-child(3n) { fill:#789ba5; }
+.gmrt-dungeon-forge-layer[data-forge-theme="frostreem-vault"] .gmrt-forge-rock { fill:#101c23; }
+
+.gmrt-dungeon-forge-layer .gmrt-forge-decoration .is-crumb { fill:#d7b47f; stroke:#6b472b; stroke-width:.02; }
+.gmrt-dungeon-forge-layer[data-forge-theme="bakery-crypt"] .gmrt-forge-floor rect:nth-child(3n) { fill:#a77f58; }
+
+.gmrt-dungeon-forge-layer .gmrt-forge-decoration .is-mushroom-cap { fill:#79648a; stroke:#c5a8d2; stroke-width:.035; }
+.gmrt-dungeon-forge-layer .gmrt-forge-decoration .is-mushroom-stem { stroke:#c9b8a4; stroke-width:.055; }
+.gmrt-dungeon-forge-layer .gmrt-forge-decoration .is-spore { fill:#b9a7c7; stroke:none; opacity:.65; }
+.gmrt-dungeon-forge-layer[data-forge-theme="mushroom-grotto"] .gmrt-forge-floor rect:nth-child(4n) { fill:#6f6078; }
+
+.gmrt-dungeon-forge-layer .gmrt-forge-decoration .is-rock-face { stroke:rgba(230,215,184,.13); stroke-width:.065; opacity:.75; }
+.gmrt-board__viewport.is-generated-surface .gmrt-board__map { display:none !important; }
