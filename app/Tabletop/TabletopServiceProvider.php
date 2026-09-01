@@ -24,6 +24,7 @@ use GreatMarketrealmTabletop\Tabletop\Http\TestTableAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\TargetingAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\CartographyAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\CartographyAssistantAjaxController;
+use GreatMarketrealmTabletop\Tabletop\Http\DungeonForgeAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\FogOfWarAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\VisionBarrierAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\GatheringAjaxController;
@@ -66,6 +67,7 @@ use GreatMarketrealmTabletop\Tables\Repositories\WordPressTableRepository;
 use GreatMarketrealmTabletop\Tabletop\Fog\Services\FogOfWarFactory;
 use GreatMarketrealmTabletop\Tabletop\Vision\Services\VisionBarrierFactory;
 use GreatMarketrealmTabletop\Tabletop\Cartography\Services\CartographersTableFactory;
+use GreatMarketrealmTabletop\Tabletop\Cartography\Repositories\WordPressDungeonForgeRepository;
 use GreatMarketrealmTabletop\Tabletop\Battlefield\Services\TargetingServiceFactory;
 use GreatMarketrealmTabletop\Tabletop\Testing\TestTableProvisioner;
 use GreatMarketrealmTabletop\Tabletop\Movement\Services\TabletopMovementFactory;
@@ -100,6 +102,8 @@ final class TabletopServiceProvider
     private CartographyAjaxController $cartographyAjax;
 
     private CartographyAssistantAjaxController $cartographyAssistantAjax;
+
+    private DungeonForgeAjaxController $dungeonForgeAjax;
 
     private FogOfWarAjaxController $fogAjax;
 
@@ -186,6 +190,15 @@ final class TabletopServiceProvider
 
         $this->cartographyAssistantAjax = new CartographyAssistantAjaxController(
             VisionBarrierFactory::make()
+        );
+
+        $this->dungeonForgeAjax = new DungeonForgeAjaxController(
+            new WordPressTableMembershipRepository(),
+            new WordPressTableSceneRepository(),
+            new WordPressDungeonForgeRepository(),
+            VisionBarrierFactory::make(),
+            new WordPressEnvironmentalLightRepository(),
+            FogOfWarFactory::make()
         );
 
         $this->fogAjax = new FogOfWarAjaxController(
@@ -479,6 +492,11 @@ final class TabletopServiceProvider
         add_action(
             'wp_ajax_gmrt_apply_cartography_suggestions',
             [$this->cartographyAssistantAjax, 'apply']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_build_dungeon_forge',
+            [$this->dungeonForgeAjax, 'build']
         );
 
         add_action(

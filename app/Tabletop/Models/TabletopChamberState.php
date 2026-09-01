@@ -188,6 +188,7 @@ final class TabletopChamberState
             'scenes' => $this->scenes,
             'preparation' => $this->preparation,
             'thresholds' => $this->thresholds,
+            'dungeon_forge' => $this->integrations['dungeon_forge'] ?? [],
         ];
 
         return hash(

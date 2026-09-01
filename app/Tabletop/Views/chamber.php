@@ -33,6 +33,7 @@ $arsenals = $state?->arsenals() ?? [];
 $fog = $state?->fog() ?? [];
 $visionLayer = $state?->visionLayer() ?? [];
 $integrations = $state?->integrations() ?? [];
+$dungeonForge = is_array($integrations['dungeon_forge'] ?? null) ? $integrations['dungeon_forge'] : [];
 $companion = is_array($integrations['companion'] ?? null)
     ? $integrations['companion']
     : [];
@@ -960,6 +961,46 @@ $sceneImage = $scene !== null
                                 <div class="gmrt-cartography-assistant__review" data-cartography-assistant-review></div>
                             </div>
                         </details>
+
+                        <details class="gmrt-dungeon-forge" data-dungeon-forge>
+                            <summary>The Cartographer's Dungeon Forge</summary>
+                            <div class="gmrt-dungeon-forge__body">
+                                <p>
+                                    Forge a deterministic, Tabletop-native dungeon directly onto this Scene.
+                                    Pippin drafts connected rooms and corridors first, then derives walls, doors,
+                                    Keeper lights and a fresh Veil. Nothing becomes authoritative until Build Dungeon.
+                                </p>
+                                <div class="gmrt-dungeon-forge__controls">
+                                    <label>
+                                        Seed
+                                        <input type="text" maxlength="80" value="Peppercorn-01" data-dungeon-forge-seed>
+                                    </label>
+                                    <label>
+                                        Scale
+                                        <select data-dungeon-forge-style>
+                                            <option value="compact">Compact</option>
+                                            <option value="standard" selected>Standard</option>
+                                            <option value="grand">Grand</option>
+                                        </select>
+                                    </label>
+                                    <button type="button" data-dungeon-forge-generate>Forge Draft</button>
+                                    <button type="button" data-dungeon-forge-reroll>New Seed</button>
+                                    <button type="button" data-dungeon-forge-build disabled>Build Dungeon</button>
+                                    <button type="button" data-dungeon-forge-clear disabled>Clear Draft</button>
+                                </div>
+                                <span data-dungeon-forge-status role="status" aria-live="polite">
+                                    <?php echo $dungeonForge !== []
+                                        ? 'This Scene contains a forged dungeon.'
+                                        : 'The Forge is cold. Prepare a draft when ready.'; ?>
+                                </span>
+                                <div class="gmrt-dungeon-forge__legend" aria-label="Dungeon Forge draft legend">
+                                    <span><i class="is-floor"></i> Playable floor</span>
+                                    <span><i class="is-wall"></i> Vision wall</span>
+                                    <span><i class="is-door"></i> Door</span>
+                                    <span><i class="is-light"></i> Suggested light</span>
+                                </div>
+                            </div>
+                        </details>
                     </div>
                 <?php endif; ?>
 
@@ -1083,6 +1124,13 @@ $sceneImage = $scene !== null
                             Battlemap artwork is unavailable.
                         </div>
                     <?php endif; ?>
+
+                    <svg
+                        class="gmrt-dungeon-forge-layer<?php echo $dungeonForge !== [] ? ' is-built' : ''; ?>"
+                        data-dungeon-forge-layer
+                        data-dungeon-forge-plan="<?php echo esc_attr(wp_json_encode($dungeonForge)); ?>"
+                        aria-hidden="true"
+                    ></svg>
 
                     <?php if (
                         ($scene['grid_type'] ?? '')

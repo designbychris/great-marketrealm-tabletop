@@ -2452,6 +2452,330 @@
     renderVisionLayer();
     renderCartographySuggestions();
 
+    // Phase IV.30.2 — The Cartographer's Dungeon Forge.
+    // Geometry comes first: a deterministic seed carves connected floor, then the
+    // Forge derives authoritative vision barriers, doors, Keeper lights and Fog.
+    // The generated artwork is a persistent Tabletop-native SVG projection rather
+    // than an external image-generation dependency.
+    const dungeonForge = document.querySelector('[data-dungeon-forge]');
+    const dungeonForgeLayer = document.querySelector('[data-dungeon-forge-layer]');
+    const dungeonForgeSeed = document.querySelector('[data-dungeon-forge-seed]');
+    const dungeonForgeStyle = document.querySelector('[data-dungeon-forge-style]');
+    const dungeonForgeGenerate = document.querySelector('[data-dungeon-forge-generate]');
+    const dungeonForgeReroll = document.querySelector('[data-dungeon-forge-reroll]');
+    const dungeonForgeBuild = document.querySelector('[data-dungeon-forge-build]');
+    const dungeonForgeClear = document.querySelector('[data-dungeon-forge-clear]');
+    const dungeonForgeStatus = document.querySelector('[data-dungeon-forge-status]');
+    let dungeonForgeDraft = null;
+    let builtDungeonForgePlan = null;
+
+    if (dungeonForgeLayer) {
+        try {
+            const parsed = JSON.parse(dungeonForgeLayer.dataset.dungeonForgePlan || '{}');
+            builtDungeonForgePlan = parsed && Array.isArray(parsed.floor) && parsed.floor.length > 0 ? parsed : null;
+        } catch (error) {
+            builtDungeonForgePlan = null;
+        }
+    }
+
+    const forgeSvg = (name, attributes = {}) => {
+        const node = document.createElementNS('http://www.w3.org/2000/svg', name);
+        Object.entries(attributes).forEach(([key, value]) => node.setAttribute(key, String(value)));
+        return node;
+    };
+
+    const forgeFloorKey = (x, y) => `${x}:${y}`;
+
+    const renderDungeonForgePlan = (plan, draft = false) => {
+        if (!dungeonForgeLayer) return;
+        dungeonForgeLayer.replaceChildren();
+        if (!plan || !Array.isArray(plan.floor) || plan.floor.length === 0) {
+            dungeonForgeLayer.classList.remove('has-plan', 'is-draft');
+            return;
+        }
+
+        const cols = Math.max(1, Number(plan.cols || 1));
+        const rows = Math.max(1, Number(plan.rows || 1));
+        dungeonForgeLayer.setAttribute('viewBox', `0 0 ${cols} ${rows}`);
+        dungeonForgeLayer.setAttribute('preserveAspectRatio', 'none');
+        dungeonForgeLayer.classList.add('has-plan');
+        dungeonForgeLayer.classList.toggle('is-draft', draft);
+
+        const rock = forgeSvg('rect', { x: 0, y: 0, width: cols, height: rows, class: 'gmrt-forge-rock' });
+        dungeonForgeLayer.appendChild(rock);
+
+        const floors = forgeSvg('g', { class: 'gmrt-forge-floor' });
+        plan.floor.forEach((cell) => {
+            floors.appendChild(forgeSvg('rect', { x: Number(cell.x), y: Number(cell.y), width: 1, height: 1 }));
+        });
+        dungeonForgeLayer.appendChild(floors);
+
+        const floorSet = new Set(plan.floor.map((cell) => forgeFloorKey(Number(cell.x), Number(cell.y))));
+        const lineGroup = forgeSvg('g', { class: 'gmrt-forge-ink' });
+        plan.floor.forEach((cell) => {
+            const x = Number(cell.x); const y = Number(cell.y);
+            if (!floorSet.has(forgeFloorKey(x, y - 1))) lineGroup.appendChild(forgeSvg('line', { x1:x, y1:y, x2:x+1, y2:y }));
+            if (!floorSet.has(forgeFloorKey(x + 1, y))) lineGroup.appendChild(forgeSvg('line', { x1:x+1, y1:y, x2:x+1, y2:y+1 }));
+            if (!floorSet.has(forgeFloorKey(x, y + 1))) lineGroup.appendChild(forgeSvg('line', { x1:x, y1:y+1, x2:x+1, y2:y+1 }));
+            if (!floorSet.has(forgeFloorKey(x - 1, y))) lineGroup.appendChild(forgeSvg('line', { x1:x, y1:y, x2:x, y2:y+1 }));
+        });
+        dungeonForgeLayer.appendChild(lineGroup);
+
+        const doorGroup = forgeSvg('g', { class: 'gmrt-forge-doors' });
+        (plan.doors || []).forEach((door) => {
+            doorGroup.appendChild(forgeSvg('line', {
+                x1: Number(door.x1) * cols,
+                y1: Number(door.y1) * rows,
+                x2: Number(door.x2) * cols,
+                y2: Number(door.y2) * rows
+            }));
+        });
+        dungeonForgeLayer.appendChild(doorGroup);
+
+        if (draft) {
+            const lightGroup = forgeSvg('g', { class: 'gmrt-forge-lights' });
+            (plan.lights || []).forEach((light) => {
+                const marker = forgeSvg('text', {
+                    x: Number(light.x) * cols,
+                    y: Number(light.y) * rows,
+                    'text-anchor': 'middle',
+                    'dominant-baseline': 'central'
+                });
+                marker.textContent = ({torch:'🔥',lantern:'🏮',brazier:'♨',candle:'🕯',magical:'✦'})[light.kind] || '✦';
+                lightGroup.appendChild(marker);
+            });
+            dungeonForgeLayer.appendChild(lightGroup);
+        }
+    };
+
+    const forgeHash = (value) => {
+        let hash = 2166136261;
+        for (let i = 0; i < value.length; i += 1) {
+            hash ^= value.charCodeAt(i);
+            hash = Math.imul(hash, 16777619);
+        }
+        return hash >>> 0;
+    };
+
+    const forgeRandom = (seed) => {
+        let state = forgeHash(seed) || 0x9e3779b9;
+        return () => {
+            state += 0x6D2B79F5;
+            let t = state;
+            t = Math.imul(t ^ (t >>> 15), t | 1);
+            t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+            return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+    };
+
+    const forgeDoorAt = (room, target, cols, rows, travelAxis = 'auto') => {
+        const cx = room.x + (room.w / 2);
+        const cy = room.y + (room.h / 2);
+        const dx = target.x - cx;
+        const dy = target.y - cy;
+        if (travelAxis === 'horizontal' || (travelAxis === 'auto' && Math.abs(dx) >= Math.abs(dy))) {
+            const x = dx >= 0 ? room.x + room.w : room.x;
+            const y = Math.max(room.y, Math.min(room.y + room.h - 1, Math.floor(cy)));
+            return { x1:x/cols, y1:y/rows, x2:x/cols, y2:(y+1)/rows };
+        }
+        const y = dy >= 0 ? room.y + room.h : room.y;
+        const x = Math.max(room.x, Math.min(room.x + room.w - 1, Math.floor(cx)));
+        return { x1:x/cols, y1:y/rows, x2:(x+1)/cols, y2:y/rows };
+    };
+
+    const generateDungeonForgePlan = (seed, style) => {
+        const presets = {
+            compact: { cols:24, rooms:6, min:3, max:6 },
+            standard: { cols:32, rooms:9, min:4, max:7 },
+            grand: { cols:40, rooms:12, min:4, max:8 }
+        };
+        const preset = presets[style] || presets.standard;
+        const cols = preset.cols;
+        const boardAspect = Math.max(.5, Math.min(2, board.clientHeight / Math.max(1, board.clientWidth)));
+        const rows = Math.max(12, Math.min(36, Math.round(cols * boardAspect)));
+        const random = forgeRandom(`${seed}|${style}`);
+        const integer = (min, max) => min + Math.floor(random() * ((max - min) + 1));
+        const rooms = [];
+
+        for (let attempt = 0; attempt < 500 && rooms.length < preset.rooms; attempt += 1) {
+            const w = integer(preset.min, preset.max);
+            const h = integer(3, Math.max(4, preset.max - 1));
+            const x = integer(1, Math.max(1, cols - w - 2));
+            const y = integer(1, Math.max(1, rows - h - 2));
+            const collides = rooms.some((room) => !(
+                x + w + 1 < room.x || room.x + room.w + 1 < x ||
+                y + h + 1 < room.y || room.y + room.h + 1 < y
+            ));
+            if (!collides) rooms.push({ x, y, w, h });
+        }
+        if (rooms.length < 3) throw new Error('The Forge could not fit enough chambers on this draft. Try a new seed.');
+
+        const floor = new Map();
+        const carve = (x, y) => {
+            if (x >= 0 && x < cols && y >= 0 && y < rows) floor.set(forgeFloorKey(x,y), {x,y});
+        };
+        rooms.forEach((room) => {
+            for (let y = room.y; y < room.y + room.h; y += 1) {
+                for (let x = room.x; x < room.x + room.w; x += 1) carve(x,y);
+            }
+        });
+
+        const center = (room) => ({ x:Math.floor(room.x + room.w/2), y:Math.floor(room.y + room.h/2) });
+        const ordered = [rooms[0]];
+        const remaining = rooms.slice(1);
+        while (remaining.length) {
+            const from = center(ordered[ordered.length - 1]);
+            remaining.sort((a,b) => {
+                const ca=center(a), cb=center(b);
+                return (Math.abs(ca.x-from.x)+Math.abs(ca.y-from.y)) - (Math.abs(cb.x-from.x)+Math.abs(cb.y-from.y));
+            });
+            ordered.push(remaining.shift());
+        }
+
+        const doors = [];
+        for (let i = 1; i < ordered.length; i += 1) {
+            const previous = ordered[i-1]; const next = ordered[i];
+            const a = center(previous); const b = center(next);
+            const horizontalFirst = random() >= .5;
+            if (horizontalFirst) {
+                const step = a.x <= b.x ? 1 : -1;
+                for (let x=a.x; x !== b.x + step; x += step) carve(x,a.y);
+                const vstep = a.y <= b.y ? 1 : -1;
+                for (let y=a.y; y !== b.y + vstep; y += vstep) carve(b.x,y);
+            } else {
+                const vstep = a.y <= b.y ? 1 : -1;
+                for (let y=a.y; y !== b.y + vstep; y += vstep) carve(a.x,y);
+                const step = a.x <= b.x ? 1 : -1;
+                for (let x=a.x; x !== b.x + step; x += step) carve(x,b.y);
+            }
+            doors.push(forgeDoorAt(previous, b, cols, rows, horizontalFirst ? 'horizontal' : 'vertical'));
+            doors.push(forgeDoorAt(next, a, cols, rows, horizontalFirst ? 'vertical' : 'horizontal'));
+        }
+
+        // Merge contiguous exterior edges into long wall objects so the Forge remains
+        // comfortably inside the existing 200-object Cartography safety budget.
+        const floorSet = new Set(floor.keys());
+        const horizontal = new Map(); const vertical = new Map();
+        const addEdge = (map, axis, start) => {
+            if (!map.has(axis)) map.set(axis, []);
+            map.get(axis).push(start);
+        };
+        floor.forEach((cell) => {
+            const {x,y}=cell;
+            if (!floorSet.has(forgeFloorKey(x,y-1))) addEdge(horizontal,y,x);
+            if (!floorSet.has(forgeFloorKey(x,y+1))) addEdge(horizontal,y+1,x);
+            if (!floorSet.has(forgeFloorKey(x-1,y))) addEdge(vertical,x,y);
+            if (!floorSet.has(forgeFloorKey(x+1,y))) addEdge(vertical,x+1,y);
+        });
+        const barriers = [];
+        const mergeEdges = (map, isHorizontal) => {
+            map.forEach((starts, axis) => {
+                const unique = [...new Set(starts)].sort((a,b)=>a-b);
+                let runStart = null; let previous = null;
+                const flush = () => {
+                    if (runStart === null || previous === null) return;
+                    if (isHorizontal) barriers.push({type:'wall',x1:runStart/cols,y1:axis/rows,x2:(previous+1)/cols,y2:axis/rows});
+                    else barriers.push({type:'wall',x1:axis/cols,y1:runStart/rows,x2:axis/cols,y2:(previous+1)/rows});
+                };
+                unique.forEach((value) => {
+                    if (runStart === null) { runStart=value; previous=value; return; }
+                    if (value === previous + 1) { previous=value; return; }
+                    flush(); runStart=value; previous=value;
+                });
+                flush();
+            });
+        };
+        mergeEdges(horizontal,true); mergeEdges(vertical,false);
+        doors.forEach((door) => barriers.push({type:'door',...door}));
+        if (barriers.length > 200) throw new Error('This draft is too intricate for one safe build. Try a more compact seed.');
+
+        const byArea = [...rooms].sort((a,b)=>(b.w*b.h)-(a.w*a.h));
+        const lights = [];
+        if (byArea[0]) { const c=center(byArea[0]); lights.push({kind:'brazier',x:(c.x+.5)/cols,y:(c.y+.5)/rows}); }
+        ordered.slice(1).forEach((room,index) => {
+            if (index % 2 !== 0 && style !== 'grand') return;
+            const c=center(room);
+            const kind = index === ordered.length - 2 ? 'magical' : (index % 3 === 0 ? 'lantern' : 'torch');
+            lights.push({kind,x:(c.x+.5)/cols,y:(c.y+.5)/rows});
+        });
+
+        return {
+            version:1, seed, style, cols, rows,
+            floor:[...floor.values()], rooms, doors, barriers, lights
+        };
+    };
+
+    const setForgeStatus = (message) => {
+        if (dungeonForgeStatus) dungeonForgeStatus.textContent = message;
+        say(message);
+    };
+
+    const prepareForgeDraft = () => {
+        if (builtDungeonForgePlan) {
+            setForgeStatus('This Scene already contains a forged dungeon. Prepare another Scene to forge a new one.');
+            return;
+        }
+        const seed = String(dungeonForgeSeed?.value || '').trim() || 'Peppercorn-01';
+        const style = String(dungeonForgeStyle?.value || 'standard');
+        dungeonForgeDraft = generateDungeonForgePlan(seed, style);
+        renderDungeonForgePlan(dungeonForgeDraft, true);
+        if (dungeonForgeBuild) dungeonForgeBuild.disabled = false;
+        if (dungeonForgeClear) dungeonForgeClear.disabled = false;
+        setForgeStatus(`${dungeonForgeDraft.rooms.length} rooms · ${dungeonForgeDraft.barriers.length} walls/doors · ${dungeonForgeDraft.doors.length} doors · ${dungeonForgeDraft.lights.length} suggested lights · preview only.`);
+    };
+
+    dungeonForgeGenerate?.addEventListener('click', () => {
+        try { prepareForgeDraft(); } catch (error) { setForgeStatus(error?.message || 'The Dungeon Forge could not prepare that draft.'); }
+    });
+
+    dungeonForgeReroll?.addEventListener('click', () => {
+        if (!dungeonForgeSeed) return;
+        dungeonForgeSeed.value = `Peppercorn-${Math.random().toString(36).slice(2,8).toUpperCase()}`;
+        try { prepareForgeDraft(); } catch (error) { setForgeStatus(error?.message || 'The Dungeon Forge could not prepare that draft.'); }
+    });
+
+    dungeonForgeClear?.addEventListener('click', () => {
+        dungeonForgeDraft = null;
+        renderDungeonForgePlan(builtDungeonForgePlan, false);
+        if (dungeonForgeBuild) dungeonForgeBuild.disabled = true;
+        dungeonForgeClear.disabled = true;
+        setForgeStatus('Forge draft cleared. Nothing was saved.');
+    });
+
+    dungeonForgeBuild?.addEventListener('click', async () => {
+        if (!dungeonForgeDraft || builtDungeonForgePlan) return;
+        dungeonForgeBuild.disabled = true;
+        const previous = dungeonForgeBuild.textContent;
+        dungeonForgeBuild.textContent = 'Forging…';
+        try {
+            const gridPixels = Math.max(8, Math.round(board.clientWidth / Math.max(1, dungeonForgeDraft.cols)));
+            const existingOpacity = document.querySelector('[data-grid-opacity]')?.value || '22';
+            await request('gmrt_calibrate_grid', {
+                grid_size: String(gridPixels),
+                grid_offset_x: '0',
+                grid_offset_y: '0',
+                grid_opacity: existingOpacity,
+                grid_visible: '1',
+                grid_reference_width: String(Math.max(1, Math.round(board.clientWidth)))
+            });
+            const data = await request('gmrt_build_dungeon_forge', {
+                scene_id: preparationSceneId || projectedSceneId,
+                plan: JSON.stringify(dungeonForgeDraft)
+            });
+            builtDungeonForgePlan = data.forge || dungeonForgeDraft;
+            dungeonForgeDraft = null;
+            setForgeStatus(data.message || 'Dungeon forged. Walls, doors, lights, grid and Fog are now authoritative.');
+            await replaceChamber(data.message || 'Dungeon forged.', preparationSceneId || null);
+        } catch (error) {
+            dungeonForgeBuild.disabled = false;
+            setForgeStatus(error?.message || 'The Dungeon Forge could not complete this build.');
+        } finally {
+            dungeonForgeBuild.textContent = previous;
+        }
+    });
+
+    renderDungeonForgePlan(builtDungeonForgePlan, false);
+
     const gridViewport = document.querySelector('.gmrt-board__viewport');
     const gridSize = document.querySelector('[data-grid-size]');
     const gridOffsetX = document.querySelector('[data-grid-offset-x]');

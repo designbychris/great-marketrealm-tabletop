@@ -1,3 +1,15 @@
+## 0.32.0-alpha.1 — Phase IV.30.2: The Cartographer's Dungeon Forge
+
+- Adds a Keeper-only deterministic Dungeon Forge that turns a seed into connected rooms and corridors directly inside the current Scene.
+- Renders the forged dungeon as persistent Tabletop-native SVG artwork layered beneath the authoritative gameplay grid; no external image-generation service is required.
+- Derives bounded wall and closed-door vision barriers from the generated floor topology and applies them through the existing authoritative Vision Barrier pipeline.
+- Calibrates the existing square gameplay grid to the forge cells before build, rather than creating a second grid system.
+- Suggests and places canonical Keeper lights using the Lantern Rack radii, with a brazier in the principal chamber and additional torch/lantern/magical sources through the route.
+- Enables and resets the Scene's existing Living Veil Fog when the Keeper explicitly chooses **Build Dungeon**.
+- Keeps **Forge Draft**, **New Seed**, and **Clear Draft** entirely preview-only; nothing persists until Build Dungeon.
+- Persists the accepted forge plan per Scene so Players and Keepers see the same generated dungeon after refresh and through Behind-the-Curtain preparation.
+- Version: `0.32.0-alpha.1`.
+
 ## 0.30.1-alpha.12 — Phase IV.30.1F: The Cartographer's Registration
 
 - Adds Keeper-only **Find Printed Grid** intelligence to the existing Calibrate Grid panel.

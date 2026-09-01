@@ -26,6 +26,7 @@ final class SceneShelfCleaner
             'gmrt_carried_lights',
             'gmrt_dropped_lights',
             'gmrt_environmental_lights',
+            'gmrt_dungeon_forge_plans',
             'gmrt_scene_thresholds',
         ] as $option) {
             $this->forgetScene($option, $tableId, $sceneId);

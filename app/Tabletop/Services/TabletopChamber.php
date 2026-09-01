@@ -40,6 +40,7 @@ use GreatMarketrealmTabletop\Tables\Tokens\Models\TableToken;
 use GreatMarketrealmTabletop\Tables\Tokens\Models\TableTokenType;
 use GreatMarketrealmTabletop\Tabletop\Atlas\Thresholds\Contracts\ThresholdRepository;
 use GreatMarketrealmTabletop\Tabletop\Bestiary\Contracts\BestiaryRepository;
+use GreatMarketrealmTabletop\Tabletop\Cartography\Contracts\DungeonForgeRepository;
 use RuntimeException;
 
 defined('ABSPATH') || exit;
@@ -73,7 +74,8 @@ final class TabletopChamber
         private ?MagicalLightRepository $magicalLights = null,
         private ?ThresholdRepository $thresholds = null,
         private ?BestiaryRepository $bestiary = null,
-        private ?EnvironmentalLightRepository $environmentalLights = null
+        private ?EnvironmentalLightRepository $environmentalLights = null,
+        private ?DungeonForgeRepository $dungeonForge = null
     ) {}
 
     public function state(
@@ -500,6 +502,9 @@ $worldLightSourceModels[] = $environmentalLight;
             $fog,
             $visionLayer,
             [
+                'dungeon_forge' => $activeScene !== null && $this->dungeonForge !== null
+                    ? ($this->dungeonForge->forScene($tableId, $activeScene->id()) ?? [])
+                    : [],
                 'companion' => [
                     'available' => $this->companion?->available() ?? false,
                     'version' => $this->companion?->version(),

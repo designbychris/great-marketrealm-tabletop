@@ -31,6 +31,7 @@ use GreatMarketrealmTabletop\Tabletop\Light\Repositories\WordPressMagicalLightRe
 use GreatMarketrealmTabletop\Tabletop\Light\Repositories\WordPressEnvironmentalLightRepository;
 use GreatMarketrealmTabletop\Tabletop\Atlas\Thresholds\Repositories\WordPressThresholdRepository;
 use GreatMarketrealmTabletop\Tabletop\Bestiary\Services\BestiaryRepositoryFactory;
+use GreatMarketrealmTabletop\Tabletop\Cartography\Repositories\WordPressDungeonForgeRepository;
 
 defined('ABSPATH') || exit;
 
@@ -65,7 +66,8 @@ final class TabletopChamberFactory
             new WordPressMagicalLightRepository(),
             new WordPressThresholdRepository(),
             BestiaryRepositoryFactory::make(),
-            new WordPressEnvironmentalLightRepository()
+            new WordPressEnvironmentalLightRepository(),
+            new WordPressDungeonForgeRepository()
         );
     }
 }

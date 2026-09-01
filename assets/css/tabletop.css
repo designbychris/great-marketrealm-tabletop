@@ -1992,3 +1992,58 @@
 .gmrt-board__viewport.is-keeper-light-placing * {
     cursor: crosshair !important;
 }
+
+/* Phase IV.30.2 — The Cartographer's Dungeon Forge */
+.gmrt-dungeon-forge {
+    flex-basis: 100%;
+    margin-top: .75rem;
+    border-top: 1px solid rgba(244, 234, 214, .16);
+    padding-top: .55rem;
+}
+.gmrt-dungeon-forge > summary { cursor: pointer; font-weight: 800; }
+.gmrt-dungeon-forge__body { display: grid; gap: .65rem; padding-top: .7rem; }
+.gmrt-dungeon-forge__body > p { margin: 0; max-width: 80ch; opacity: .8; line-height: 1.45; }
+.gmrt-dungeon-forge__controls { display: flex; flex-wrap: wrap; align-items: end; gap: .5rem; }
+.gmrt-dungeon-forge__controls label { display: grid; gap: .2rem; font-size: .78rem; font-weight: 800; }
+.gmrt-dungeon-forge__controls input,
+.gmrt-dungeon-forge__controls select {
+    min-height: 2.25rem;
+    padding: .35rem .5rem;
+    border: 1px solid rgba(244, 234, 214, .3);
+    border-radius: 6px;
+    background: rgba(0,0,0,.35);
+    color: inherit;
+}
+.gmrt-dungeon-forge__legend { display: flex; flex-wrap: wrap; gap: .75rem; font-size: .75rem; opacity: .75; }
+.gmrt-dungeon-forge__legend span { display: inline-flex; align-items: center; gap: .3rem; }
+.gmrt-dungeon-forge__legend i { width: .8rem; height: .8rem; border: 1px solid currentColor; display: inline-block; }
+.gmrt-dungeon-forge__legend .is-floor { background: #b9a77d; }
+.gmrt-dungeon-forge__legend .is-wall { background: #16130f; }
+.gmrt-dungeon-forge__legend .is-door { background: #b86f36; }
+.gmrt-dungeon-forge__legend .is-light { background: #e5c05c; border-radius: 50%; }
+
+.gmrt-dungeon-forge-layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+    overflow: hidden;
+    opacity: 0;
+}
+.gmrt-dungeon-forge-layer.has-plan { opacity: 1; }
+.gmrt-dungeon-forge-layer.is-draft { opacity: .82; filter: saturate(.8); }
+.gmrt-dungeon-forge-layer .gmrt-forge-rock { fill: #17140f; }
+.gmrt-dungeon-forge-layer .gmrt-forge-floor rect { fill: #a9966b; stroke: rgba(255,245,218,.055); stroke-width: .035; }
+.gmrt-dungeon-forge-layer .gmrt-forge-ink line {
+    stroke: #080706;
+    stroke-width: .16;
+    stroke-linecap: square;
+}
+.gmrt-dungeon-forge-layer .gmrt-forge-doors line {
+    stroke: #b86f36;
+    stroke-width: .24;
+    stroke-linecap: square;
+}
+.gmrt-dungeon-forge-layer .gmrt-forge-lights text { font-size: .72px; paint-order: stroke; stroke: rgba(0,0,0,.8); stroke-width: .08px; }
