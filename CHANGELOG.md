@@ -1,3 +1,10 @@
+
+## 0.32.0-alpha.6 — IV.30.2A.1A Corner Tile Forensics II
+
+- Extends the generated-scene corner probe beyond `elementsFromPoint()` so `pointer-events:none` battlefield descendants can no longer evade inspection.
+- Reports overlapping token/light/image elements, token IDs, labels, image filenames, and authoritative token X/Y CSS coordinates.
+- Re-runs the probe after asynchronous chamber rendering and watches the token layer for mutations, making late-rendered origin artefacts visible to the trace.
+
 - IV.30.2A.1A forensic corrective: generated Scenes now expose a DM-only corner provenance trace that reports the real DOM/image/background/pseudo/text owner at the battlefield origin, so the persistent corner tile can be identified from browser evidence rather than another visual guess.
 ## 0.32.0-alpha.4 — Phase IV.30.2A.1A: The Mystery of the Corner Tile
 

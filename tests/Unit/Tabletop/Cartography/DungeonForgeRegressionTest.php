@@ -80,7 +80,7 @@ final class DungeonForgeRegressionTest extends TestCase
         $phase = $this->source('docs/Roadmap/PHASE-IV.30.2.md');
 
         self::assertStringContainsString("wp_ajax_gmrt_build_dungeon_forge", $provider);
-        self::assertStringContainsString('0.32.0-alpha.5', $plugin);
+        self::assertStringContainsString('0.32.0-alpha.6', $plugin);
         self::assertStringContainsString("IV.30.2 — The Cartographer's Dungeon Forge", $roadmap);
         self::assertStringContainsString('geometry first', $phase);
         self::assertStringContainsString('Behind the Curtain', $phase);

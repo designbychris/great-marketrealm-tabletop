@@ -50,6 +50,6 @@ final class GridRegistrationIntelligenceRegressionTest extends TestCase
         self::assertStringContainsString('IV.30.1F — The Cartographer\'s Registration', $roadmap);
         self::assertStringContainsString('Hostile misaligned-grid benchmark', $phase);
         self::assertStringContainsString('preview-only', $phase);
-        self::assertStringContainsString('0.32.0-alpha.5', $plugin);
+        self::assertStringContainsString('0.32.0-alpha.6', $plugin);
     }
 }

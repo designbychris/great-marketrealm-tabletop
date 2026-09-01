@@ -737,7 +737,8 @@ DM-placeable Scene lighting through the existing Living Veil illumination machin
 
 ### Phase IV.30.2A.1A — The Mystery of the Corner Tile
 - Trace and remove the stray top-left generated-battlefield artefact.
-- Root cause: the platform-coloured map emoji in the fixed Keeper's Atlas toggle, not Forge geometry or a stale image surface.
-- Keep the Atlas control text-only so browser/OS emoji rendering cannot masquerade as a battlefield tile.
+- The initial Atlas-emoji hypothesis was disproved by browser certification: the artefact survives with the emoji removed.
+- Forensic pass II inspects real bounding-box overlaps, including `pointer-events:none` token/effect descendants that `elementsFromPoint()` cannot see.
+- The trace now reports token/light IDs, labels, image filenames and token X/Y CSS coordinates and repeats after asynchronous rendering.
 
-**Status:** Implemented in `0.32.0-alpha.4`.
+**Status:** Forensic pass II implemented in `0.32.0-alpha.6`; root-cause browser certification pending.

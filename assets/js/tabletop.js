@@ -2830,9 +2830,10 @@
 
     renderDungeonForgePlan(builtDungeonForgePlan, false);
 
-    // IV.30.2A.1A corrective — The Mystery of the Corner Tile, forensic pass.
-    // Report the actual DOM/text/image/pseudo-element provenance at the generated
-    // battlefield origin instead of guessing from the platform-rendered pixels.
+    // IV.30.2A.1A corrective — The Mystery of the Corner Tile, forensic pass II.
+    // elementsFromPoint() deliberately ignores pointer-events:none descendants. The
+    // token and visual-effect layers use that rule, so inspect every battlefield
+    // descendant whose real bounding box overlaps the origin probe as well.
     const cornerForensics = document.querySelector('[data-corner-forensics]');
     const traceGeneratedCorner = () => {
         if (!cornerForensics || !board.classList.contains('is-generated-surface')) return;
@@ -2848,8 +2849,35 @@
             const bg = style.backgroundImage && style.backgroundImage !== 'none' ? style.backgroundImage : '';
             const before = window.getComputedStyle(el, '::before').content;
             const after = window.getComputedStyle(el, '::after').content;
-            return `${tag}${cls ? '.' + cls : ''}${src ? '[img=' + src.split('/').pop() + ']' : ''}${bg ? '[bg]' : ''}${before && before !== 'none' && before !== 'normal' ? '[before=' + before + ']' : ''}${after && after !== 'none' && after !== 'normal' ? '[after=' + after + ']' : ''}`;
+            const tokenId = el.dataset && el.dataset.tokenId ? String(el.dataset.tokenId) : '';
+            const lightId = el.dataset && el.dataset.lightId ? String(el.dataset.lightId) : '';
+            const tokenX = style.getPropertyValue('--gmrt-token-x').trim();
+            const tokenY = style.getPropertyValue('--gmrt-token-y').trim();
+            const title = String(el.getAttribute && (el.getAttribute('title') || el.getAttribute('aria-label')) || '').trim().slice(0, 36);
+            return `${tag}${cls ? '.' + cls : ''}${tokenId ? '[token=' + tokenId + ']' : ''}${lightId ? '[light=' + lightId + ']' : ''}${tokenX || tokenY ? '[xy=' + (tokenX || '?') + ',' + (tokenY || '?') + ']' : ''}${src ? '[img=' + src.split('/').pop() + ']' : ''}${bg ? '[bg]' : ''}${title ? '[label=' + title + ']' : ''}${before && before !== 'none' && before !== 'normal' ? '[before=' + before + ']' : ''}${after && after !== 'none' && after !== 'normal' ? '[after=' + after + ']' : ''}`;
         };
+
+        const probe = {
+            left: rect.left,
+            top: rect.top,
+            right: Math.min(rect.right, rect.left + 40),
+            bottom: Math.min(rect.bottom, rect.top + 40)
+        };
+        const overlapsProbe = (el) => {
+            const box = el.getBoundingClientRect();
+            return box.width > 0 && box.height > 0
+                && box.right > probe.left && box.left < probe.right
+                && box.bottom > probe.top && box.top < probe.bottom;
+        };
+        const overlap = Array.from(board.querySelectorAll('*'))
+            .filter(overlapsProbe)
+            .filter((el) => {
+                const style = window.getComputedStyle(el);
+                const interesting = el.matches('[data-token-id], img, [data-light-id], .gmrt-token__face, .gmrt-carried-light, .gmrt-dropped-light, .gmrt-magical-light');
+                return interesting || style.pointerEvents === 'none';
+            })
+            .slice(0, 12);
+
         let textOwner = '';
         try {
             const range = document.caretRangeFromPoint ? document.caretRangeFromPoint(x, y) : null;
@@ -2859,10 +2887,17 @@
                 if (text) textOwner = ` · text “${text}” in ${describe(node.parentElement)}`;
             }
         } catch (error) {}
-        cornerForensics.textContent = `Corner trace: ${stack.map(describe).join(' > ')}${textOwner}`;
+        const hitTrace = stack.map(describe).join(' > ');
+        const overlapTrace = overlap.length ? overlap.map(describe).join(' | ') : 'none';
+        cornerForensics.textContent = `Corner trace: hit=${hitTrace}${textOwner} · overlap=${overlapTrace}`;
         root.dataset.cornerTrace = cornerForensics.textContent;
     };
-    window.setTimeout(traceGeneratedCorner, 300);
+    [300, 1000, 2000].forEach((delay) => window.setTimeout(traceGeneratedCorner, delay));
+    const cornerTokenLayer = board.querySelector('.gmrt-board__tokens');
+    if (cornerTokenLayer && window.MutationObserver) {
+        const cornerObserver = new MutationObserver(() => window.setTimeout(traceGeneratedCorner, 0));
+        cornerObserver.observe(cornerTokenLayer, { childList: true, subtree: true, attributes: true });
+    }
 
 
     const gridViewport = document.querySelector('.gmrt-board__viewport');
