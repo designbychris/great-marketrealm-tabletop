@@ -1,3 +1,14 @@
+## 0.32.0-alpha.2 — Phase IV.30.2A: The Forge Creates Worlds
+
+- Adds **Generate Dungeon** directly to the Keeper's Atlas; no WordPress Media background image is required.
+- Introduces explicit generated Scene surfaces while preserving image-backed Scene validation and backwards-compatible old records.
+- Creates the new Scene, grid, forged SVG artwork, vision walls, closed doors, Living Veil Fog and Keeper lights as one Atlas workflow.
+- Opens successful forged worlds Behind the Curtain for private preparation instead of changing the live Player Scene.
+- Cleans up the newly created Scene if the authoritative Forge build fails, avoiding half-built Atlas entries.
+- Adds six visual stone/floor treatments: Pantry Stone, Butcher Cellar, Rootland Cavern, Frostreem Vault, Bakery Crypt and Mushroom Grotto. Themes repaint only the generated SVG; gameplay geometry remains authoritative and deterministic.
+- Extends the existing in-Scene Dungeon Forge with the same Stone & Floor selector.
+- Version: `0.32.0-alpha.2`.
+
 ## 0.32.0-alpha.1 — Phase IV.30.2: The Cartographer's Dungeon Forge
 
 - Adds a Keeper-only deterministic Dungeon Forge that turns a seed into connected rooms and corridors directly inside the current Scene.

@@ -64,6 +64,28 @@ final class TableSceneTest extends TestCase
         );
     }
 
+    public function testGeneratedSurfaceDoesNotRequireMediaAttachment(): void
+    {
+        $scene = TableScene::create(
+            'scene-forged', 'table-1', 'Pippin\'s Vault', 0, 2048, 1408,
+            GridType::SQUARE, 64, new DateTimeImmutable(), 'generated'
+        );
+
+        self::assertSame(0, $scene->mapAttachmentId());
+        self::assertSame('generated', $scene->surfaceKind());
+        self::assertTrue($scene->isGeneratedSurface());
+        self::assertSame('generated', $scene->toArray()['surface_kind']);
+    }
+
+    public function testImageSurfaceStillRequiresMediaAttachment(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        TableScene::create(
+            'scene-image', 'table-1', 'Missing Map', 0, 1000, 800,
+            GridType::SQUARE, 64, new DateTimeImmutable(), 'image'
+        );
+    }
+
     public function testSceneRoundTripsThroughRecord(): void
     {
         $scene = TableScene::create(

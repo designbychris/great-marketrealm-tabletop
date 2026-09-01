@@ -25,6 +25,7 @@ final class TableScene
         private int $gridOpacity,
         private bool $gridVisible,
         private int $gridReferenceWidth,
+        private string $surfaceKind,
         private bool $active,
         private DateTimeImmutable $createdAt
     ) {}
@@ -38,10 +39,12 @@ final class TableScene
         int $height,
         string $gridType,
         int $gridSize,
-        DateTimeImmutable $createdAt
+        DateTimeImmutable $createdAt,
+        string $surfaceKind = 'image'
     ): self {
         self::assertIdentity($id, $tableId, $name);
-        self::assertSurface($mapAttachmentId, $width, $height);
+        $surfaceKind = self::assertSurfaceKind($surfaceKind);
+        self::assertSurface($mapAttachmentId, $width, $height, $surfaceKind);
         $gridType = GridType::assert($gridType);
         self::assertGrid($gridType, $gridSize);
 
@@ -59,6 +62,7 @@ final class TableScene
             13,
             true,
             0,
+            $surfaceKind,
             false,
             $createdAt
         );
@@ -76,7 +80,8 @@ final class TableScene
             (int) ($record['height'] ?? 0),
             (string) ($record['grid_type'] ?? ''),
             (int) ($record['grid_size'] ?? 0),
-            new DateTimeImmutable((string) ($record['created_at'] ?? 'now'))
+            new DateTimeImmutable((string) ($record['created_at'] ?? 'now')),
+            (string) ($record['surface_kind'] ?? 'image')
         );
 
         $scene->calibrateGrid(
@@ -111,8 +116,11 @@ final class TableScene
         self::assertSurface(
             $mapAttachmentId,
             $width,
-            $height
+            $height,
+            'image'
         );
+
+        $this->surfaceKind = 'image';
 
         $this->mapAttachmentId = $mapAttachmentId;
         $this->width = $width;
@@ -159,6 +167,8 @@ final class TableScene
     public function gridOpacity(): int { return $this->gridOpacity; }
     public function gridVisible(): bool { return $this->gridVisible; }
     public function gridReferenceWidth(): int { return $this->gridReferenceWidth; }
+    public function surfaceKind(): string { return $this->surfaceKind; }
+    public function isGeneratedSurface(): bool { return $this->surfaceKind === 'generated'; }
     public function isActive(): bool { return $this->active; }
     public function createdAt(): DateTimeImmutable { return $this->createdAt; }
 
@@ -195,6 +205,7 @@ final class TableScene
             'grid_opacity' => $this->gridOpacity,
             'grid_visible' => $this->gridVisible,
             'grid_reference_width' => $this->gridReferenceWidth,
+            'surface_kind' => $this->surfaceKind,
             'active' => $this->active,
             'created_at' => $this->createdAt->format(DATE_ATOM),
         ];
@@ -215,11 +226,17 @@ final class TableScene
     private static function assertSurface(
         int $attachmentId,
         int $width,
-        int $height
+        int $height,
+        string $surfaceKind
     ): void {
-        if ($attachmentId < 1) {
+        if ($surfaceKind === 'image' && $attachmentId < 1) {
             throw new InvalidArgumentException(
                 'A battlemap requires a WordPress Media attachment ID.'
+            );
+        }
+        if ($surfaceKind === 'generated' && $attachmentId !== 0) {
+            throw new InvalidArgumentException(
+                'A generated battlemap surface must not depend on a Media attachment.'
             );
         }
         if ($width < 1 || $height < 1) {
@@ -227,6 +244,15 @@ final class TableScene
                 'A battlemap requires positive surface dimensions.'
             );
         }
+    }
+
+    private static function assertSurfaceKind(string $surfaceKind): string
+    {
+        $surfaceKind = trim($surfaceKind);
+        if (! in_array($surfaceKind, ['image', 'generated'], true)) {
+            throw new InvalidArgumentException('A battlemap surface must be image or generated.');
+        }
+        return $surfaceKind;
     }
 
     private static function assertGrid(string $type, int $size): void

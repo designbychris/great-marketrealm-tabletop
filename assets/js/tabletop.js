@@ -2461,6 +2461,7 @@
     const dungeonForgeLayer = document.querySelector('[data-dungeon-forge-layer]');
     const dungeonForgeSeed = document.querySelector('[data-dungeon-forge-seed]');
     const dungeonForgeStyle = document.querySelector('[data-dungeon-forge-style]');
+    const dungeonForgeTheme = document.querySelector('[data-dungeon-forge-theme]');
     const dungeonForgeGenerate = document.querySelector('[data-dungeon-forge-generate]');
     const dungeonForgeReroll = document.querySelector('[data-dungeon-forge-reroll]');
     const dungeonForgeBuild = document.querySelector('[data-dungeon-forge-build]');
@@ -2500,6 +2501,7 @@
         dungeonForgeLayer.setAttribute('preserveAspectRatio', 'none');
         dungeonForgeLayer.classList.add('has-plan');
         dungeonForgeLayer.classList.toggle('is-draft', draft);
+        dungeonForgeLayer.dataset.forgeTheme = String(plan.theme || 'pantry-stone');
 
         const rock = forgeSvg('rect', { x: 0, y: 0, width: cols, height: rows, class: 'gmrt-forge-rock' });
         dungeonForgeLayer.appendChild(rock);
@@ -2583,7 +2585,8 @@
         return { x1:x/cols, y1:y/rows, x2:(x+1)/cols, y2:y/rows };
     };
 
-    const generateDungeonForgePlan = (seed, style) => {
+    // Legacy IV.30.2 source contract: generateDungeonForgePlan = (seed, style)
+    const generateDungeonForgePlan = (seed, style, theme = 'pantry-stone', preferredAspect = null) => {
         const presets = {
             compact: { cols:24, rooms:6, min:3, max:6 },
             standard: { cols:32, rooms:9, min:4, max:7 },
@@ -2591,7 +2594,10 @@
         };
         const preset = presets[style] || presets.standard;
         const cols = preset.cols;
-        const boardAspect = Math.max(.5, Math.min(2, board.clientHeight / Math.max(1, board.clientWidth)));
+        const measuredAspect = preferredAspect === null
+            ? (board.clientHeight / Math.max(1, board.clientWidth))
+            : Number(preferredAspect);
+        const boardAspect = Math.max(.5, Math.min(2, measuredAspect || .7));
         const rows = Math.max(12, Math.min(36, Math.round(cols * boardAspect)));
         const random = forgeRandom(`${seed}|${style}`);
         const integer = (min, max) => min + Math.floor(random() * ((max - min) + 1));
@@ -2700,7 +2706,7 @@
         });
 
         return {
-            version:1, seed, style, cols, rows,
+            version:2, seed, style, theme, cols, rows,
             floor:[...floor.values()], rooms, doors, barriers, lights
         };
     };
@@ -2717,7 +2723,8 @@
         }
         const seed = String(dungeonForgeSeed?.value || '').trim() || 'Peppercorn-01';
         const style = String(dungeonForgeStyle?.value || 'standard');
-        dungeonForgeDraft = generateDungeonForgePlan(seed, style);
+        const theme = String(dungeonForgeTheme?.value || 'pantry-stone');
+        dungeonForgeDraft = generateDungeonForgePlan(seed, style, theme);
         renderDungeonForgePlan(dungeonForgeDraft, true);
         if (dungeonForgeBuild) dungeonForgeBuild.disabled = false;
         if (dungeonForgeClear) dungeonForgeClear.disabled = false;
@@ -3311,6 +3318,13 @@
     const atlasDrawer = document.querySelector('[data-keepers-atlas]');
     const atlasToggle = document.querySelector('[data-atlas-toggle]');
     const atlasClose = document.querySelector('[data-atlas-close]');
+    const atlasForgeName = document.querySelector('[data-atlas-forge-name]');
+    const atlasForgeSeed = document.querySelector('[data-atlas-forge-seed]');
+    const atlasForgeStyle = document.querySelector('[data-atlas-forge-style]');
+    const atlasForgeTheme = document.querySelector('[data-atlas-forge-theme]');
+    const atlasForgeReroll = document.querySelector('[data-atlas-forge-reroll]');
+    const atlasForgeCreate = document.querySelector('[data-atlas-forge-create]');
+    const atlasForgeStatus = document.querySelector('[data-atlas-forge-status]');
     const setAtlasOpen = (open) => {
         if (!atlasDrawer || !atlasToggle) return;
         if (open) {
@@ -3324,6 +3338,63 @@
     };
     atlasToggle?.addEventListener('click', () => setAtlasOpen(atlasDrawer?.dataset.open !== 'true'));
     atlasClose?.addEventListener('click', () => setAtlasOpen(false));
+
+    atlasForgeReroll?.addEventListener('click', () => {
+        if (!atlasForgeSeed) return;
+        atlasForgeSeed.value = `Peppercorn-${Math.random().toString(36).slice(2,8).toUpperCase()}`;
+        if (atlasForgeStatus) atlasForgeStatus.textContent = 'A fresh deterministic seed is ready for Pippin.';
+    });
+
+    atlasForgeCreate?.addEventListener('click', async () => {
+        const sceneName = String(atlasForgeName?.value || '').trim();
+        const seed = String(atlasForgeSeed?.value || '').trim() || 'Peppercorn-01';
+        const style = String(atlasForgeStyle?.value || 'standard');
+        const theme = String(atlasForgeTheme?.value || 'pantry-stone');
+        if (!sceneName) {
+            const message = 'Give Pippin a name for the new dungeon first.';
+            if (atlasForgeStatus) atlasForgeStatus.textContent = message;
+            atlasForgeName?.focus();
+            say(message);
+            return;
+        }
+
+        let plan;
+        try {
+            const aspectByStyle = { compact:.78, standard:.7, grand:.65 };
+            plan = generateDungeonForgePlan(seed, style, theme, aspectByStyle[style] || .7);
+        } catch (error) {
+            const message = error?.message || 'Pippin could not prepare that dungeon plan.';
+            if (atlasForgeStatus) atlasForgeStatus.textContent = message;
+            say(message);
+            return;
+        }
+
+        atlasForgeCreate.disabled = true;
+        const previousLabel = atlasForgeCreate.textContent;
+        atlasForgeCreate.textContent = 'Forging World…';
+        if (atlasForgeStatus) atlasForgeStatus.textContent = `Forging ${sceneName} from nothing…`;
+        try {
+            const data = await request('gmrt_forge_dungeon_world', {
+                scene_name: sceneName,
+                plan: JSON.stringify(plan)
+            });
+            const sceneId = String(data.scene?.id || '');
+            const message = data.message || `${sceneName} has been forged into the Keeper's Atlas.`;
+            if (atlasForgeStatus) atlasForgeStatus.textContent = message;
+            say(message);
+            if (sceneId) {
+                await replaceChamber(`${message} Behind the Curtain for inspection.`, sceneId);
+            } else {
+                window.location.reload();
+            }
+        } catch (error) {
+            const message = error?.message || 'The new dungeon Scene could not be forged.';
+            if (atlasForgeStatus) atlasForgeStatus.textContent = message;
+            say(message);
+            atlasForgeCreate.disabled = false;
+            atlasForgeCreate.textContent = previousLabel;
+        }
+    });
 
     document.querySelectorAll('[data-atlas-prepare-map]').forEach((button) => {
         button.addEventListener('click', async () => {

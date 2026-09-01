@@ -198,7 +198,9 @@ final class TabletopServiceProvider
             new WordPressDungeonForgeRepository(),
             VisionBarrierFactory::make(),
             new WordPressEnvironmentalLightRepository(),
-            FogOfWarFactory::make()
+            FogOfWarFactory::make(),
+            \GreatMarketrealmTabletop\Tables\Scenes\Services\TableSceneManagerFactory::make(),
+            new \GreatMarketrealmTabletop\Tabletop\Atlas\Services\SceneShelfCleaner()
         );
 
         $this->fogAjax = new FogOfWarAjaxController(
@@ -497,6 +499,11 @@ final class TabletopServiceProvider
         add_action(
             'wp_ajax_gmrt_build_dungeon_forge',
             [$this->dungeonForgeAjax, 'build']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_forge_dungeon_world',
+            [$this->dungeonForgeAjax, 'createWorld']
         );
 
         add_action(

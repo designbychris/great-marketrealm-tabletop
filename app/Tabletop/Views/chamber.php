@@ -62,7 +62,9 @@ $currentArsenal = $currentTokenId !== ''
     ? ($arsenals[$currentTokenId]['attacks'] ?? [])
     : [];
 
-$sceneImage = $scene !== null
+$sceneSurfaceKind = (string) ($scene['surface_kind'] ?? 'image');
+$sceneIsGenerated = $scene !== null && $sceneSurfaceKind === 'generated';
+$sceneImage = ($scene !== null && ! $sceneIsGenerated)
     ? wp_get_attachment_image_url(
         (int) ($scene['map_attachment_id'] ?? 0),
         'full'
@@ -284,16 +286,19 @@ $sceneImage = $scene !== null
                     <div class="gmrt-atlas__register" aria-label="Mapped Scenes">
                         <?php foreach ($scenes as $atlasScene) :
                             if (! is_array($atlasScene)) continue;
-                            $atlasImage = wp_get_attachment_image_url(
+                            $atlasGenerated = (string) ($atlasScene['surface_kind'] ?? 'image') === 'generated';
+                            $atlasImage = $atlasGenerated ? false : wp_get_attachment_image_url(
                                 (int) ($atlasScene['map_attachment_id'] ?? 0),
                                 'medium'
                             );
                             $atlasActive = ! empty($atlasScene['active']);
                         ?>
-                            <article class="gmrt-atlas-card<?php echo $atlasActive ? ' is-active' : ''; ?>" data-atlas-scene="<?php echo esc_attr((string) ($atlasScene['id'] ?? '')); ?>">
+                            <article class="gmrt-atlas-card<?php echo $atlasActive ? ' is-active' : ''; ?><?php echo $atlasGenerated ? ' is-forged-world' : ''; ?>" data-atlas-scene="<?php echo esc_attr((string) ($atlasScene['id'] ?? '')); ?>">
                                 <div class="gmrt-atlas-card__image">
                                     <?php if (is_string($atlasImage) && $atlasImage !== '') : ?>
                                         <img src="<?php echo esc_url($atlasImage); ?>" alt="" loading="lazy">
+                                    <?php elseif ($atlasGenerated) : ?>
+                                        <span class="gmrt-atlas-card__forge-sigil" aria-hidden="true">⚒</span>
                                     <?php else : ?>
                                         <span aria-hidden="true">◇</span>
                                     <?php endif; ?>
@@ -303,7 +308,7 @@ $sceneImage = $scene !== null
                                     <small>
                                         <?php echo esc_html((string) ((int) ($atlasScene['width'] ?? 0))); ?> ×
                                         <?php echo esc_html((string) ((int) ($atlasScene['height'] ?? 0))); ?> ·
-                                        <?php echo esc_html((string) ($atlasScene['grid_type'] ?? 'gridless')); ?>
+                                        <?php echo esc_html((string) ($atlasScene['grid_type'] ?? 'gridless')); ?><?php echo $atlasGenerated ? ' · Forged World' : ''; ?>
                                     </small>
                                 </div>
                                 <?php if ($atlasActive) : ?>
@@ -332,6 +337,45 @@ $sceneImage = $scene !== null
                     <button type="button" data-atlas-add-map>Add Map to Atlas</button>
                     <small>The new map is added safely in the background. It does not become active until you open it.</small>
                 </div>
+
+                <details class="gmrt-atlas-forge" data-atlas-dungeon-forge>
+                    <summary><span aria-hidden="true">⚒</span> Generate Dungeon</summary>
+                    <div class="gmrt-atlas-forge__body">
+                        <p>Pippin can create a complete Scene from nothing: dungeon artwork, square grid, walls, closed doors, Fog and Keeper lights. No background image is required.</p>
+                        <div class="gmrt-atlas-forge__controls">
+                            <label>
+                                Dungeon name
+                                <input type="text" maxlength="120" value="Pippin's Forgotten Cellar" data-atlas-forge-name>
+                            </label>
+                            <label>
+                                Seed
+                                <input type="text" maxlength="80" value="Peppercorn-01" data-atlas-forge-seed>
+                            </label>
+                            <label>
+                                Scale
+                                <select data-atlas-forge-style>
+                                    <option value="compact">Compact</option>
+                                    <option value="standard" selected>Standard</option>
+                                    <option value="grand">Grand</option>
+                                </select>
+                            </label>
+                            <label>
+                                Stone &amp; floor
+                                <select data-atlas-forge-theme>
+                                    <option value="pantry-stone" selected>Pantry Stone</option>
+                                    <option value="butcher-cellar">Butcher Cellar</option>
+                                    <option value="rootland-cavern">Rootland Cavern</option>
+                                    <option value="frostreem-vault">Frostreem Vault</option>
+                                    <option value="bakery-crypt">Bakery Crypt</option>
+                                    <option value="mushroom-grotto">Mushroom Grotto</option>
+                                </select>
+                            </label>
+                            <button type="button" data-atlas-forge-reroll>New Seed</button>
+                            <button type="button" data-atlas-forge-create>Forge New Scene</button>
+                        </div>
+                        <small data-atlas-forge-status role="status" aria-live="polite">The Forge will add a new Scene to the Atlas and open it Behind the Curtain for inspection.</small>
+                    </div>
+                </details>
             </div>
             </div>
         </aside>
@@ -983,6 +1027,17 @@ $sceneImage = $scene !== null
                                             <option value="grand">Grand</option>
                                         </select>
                                     </label>
+                                    <label>
+                                        Stone &amp; floor
+                                        <select data-dungeon-forge-theme>
+                                            <option value="pantry-stone" selected>Pantry Stone</option>
+                                            <option value="butcher-cellar">Butcher Cellar</option>
+                                            <option value="rootland-cavern">Rootland Cavern</option>
+                                            <option value="frostreem-vault">Frostreem Vault</option>
+                                            <option value="bakery-crypt">Bakery Crypt</option>
+                                            <option value="mushroom-grotto">Mushroom Grotto</option>
+                                        </select>
+                                    </label>
                                     <button type="button" data-dungeon-forge-generate>Forge Draft</button>
                                     <button type="button" data-dungeon-forge-reroll>New Seed</button>
                                     <button type="button" data-dungeon-forge-build disabled>Build Dungeon</button>
@@ -1080,7 +1135,7 @@ $sceneImage = $scene !== null
                         <button type="button" data-lens-reset aria-label="Reset battlefield view to 100 percent" title="Reset view to 100%">Reset</button>
                     </nav>
                     <div
-                    class="gmrt-board__viewport"
+                    class="gmrt-board__viewport<?php echo $sceneIsGenerated ? ' is-generated-surface' : ''; ?>"
                     data-grid-type="<?php echo esc_attr(
                         (string) $scene['grid_type']
                     ); ?>"
@@ -1090,15 +1145,9 @@ $sceneImage = $scene !== null
                             ?? 0
                         ))
                     ); ?>"
-                    style="--gmrt-grid-size: <?php echo esc_attr(
-                        (string) max(
-                            1,
-                            (int) (
-                                $scene['grid_size']
-                                ?? 1
-                            )
-                        )
-                    ); ?>px; --gmrt-grid-offset-x: <?php echo esc_attr((string) ((int) ($scene['grid_offset_x'] ?? 0))); ?>px; --gmrt-grid-offset-y: <?php echo esc_attr((string) ((int) ($scene['grid_offset_y'] ?? 0))); ?>px; --gmrt-grid-opacity: <?php echo esc_attr((string) ((int) ($scene['grid_opacity'] ?? 13) / 100)); ?>; --gmrt-grid-display: <?php echo ! array_key_exists('grid_visible', $scene) || ! empty($scene['grid_visible']) ? 'block' : 'none'; ?>;"
+                    style="--gmrt-grid-size: <?php echo $sceneIsGenerated && ! empty($dungeonForge['cols'])
+                        ? 'calc(100% / ' . esc_attr((string) max(1, (int) $dungeonForge['cols'])) . ')'
+                        : esc_attr((string) max(1, (int) ($scene['grid_size'] ?? 1))) . 'px'; ?>; --gmrt-grid-offset-x: <?php echo esc_attr((string) ((int) ($scene['grid_offset_x'] ?? 0))); ?>px; --gmrt-grid-offset-y: <?php echo esc_attr((string) ((int) ($scene['grid_offset_y'] ?? 0))); ?>px; --gmrt-grid-opacity: <?php echo esc_attr((string) ((int) ($scene['grid_opacity'] ?? 13) / 100)); ?>; --gmrt-grid-display: <?php echo ! array_key_exists('grid_visible', $scene) || ! empty($scene['grid_visible']) ? 'block' : 'none'; ?>; --gmrt-generated-aspect: <?php echo esc_attr((string) max(1, (int) ($scene['width'] ?? 1))); ?> / <?php echo esc_attr((string) max(1, (int) ($scene['height'] ?? 1))); ?>;"
                 >
                     <?php if ($sceneImage !== false) : ?>
                         <img
@@ -1116,7 +1165,7 @@ $sceneImage = $scene !== null
                                 (string) $scene['height']
                             ); ?>"
                         >
-                    <?php else : ?>
+                    <?php elseif (! $sceneIsGenerated) : ?>
                         <div
                             class="gmrt-board__missing-map"
                             role="status"
@@ -1129,6 +1178,7 @@ $sceneImage = $scene !== null
                         class="gmrt-dungeon-forge-layer<?php echo $dungeonForge !== [] ? ' is-built' : ''; ?>"
                         data-dungeon-forge-layer
                         data-dungeon-forge-plan="<?php echo esc_attr(wp_json_encode($dungeonForge)); ?>"
+                        data-forge-theme="<?php echo esc_attr((string) ($dungeonForge['theme'] ?? 'pantry-stone')); ?>"
                         aria-hidden="true"
                     ></svg>
 

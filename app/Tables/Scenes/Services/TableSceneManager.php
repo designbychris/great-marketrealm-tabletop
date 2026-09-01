@@ -51,6 +51,34 @@ final class TableSceneManager
         return $scene;
     }
 
+    public function createGenerated(
+        string $tableId,
+        string $name,
+        int $width,
+        int $height,
+        string $gridType,
+        int $gridSize
+    ): TableScene {
+        $this->openTable($tableId);
+
+        $scene = TableScene::create(
+            $this->ids->generate(),
+            $tableId,
+            $name,
+            0,
+            $width,
+            $height,
+            $gridType,
+            $gridSize,
+            $this->clock->now(),
+            'generated'
+        );
+        $scene->calibrateGrid($gridSize, 0, 0, 13, true, $width);
+
+        $this->scenes->save($scene);
+        return $scene;
+    }
+
     public function activate(string $tableId, string $sceneId): TableScene
     {
         $this->openTable($tableId);

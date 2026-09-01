@@ -49,6 +49,6 @@ final class GridRegistrationSignalDiscriminationRegressionTest extends TestCase
         self::assertStringContainsString('IV.30.1F.1 — The Surveyor Learns the Difference Between a Grid and a Wall', $roadmap);
         self::assertStringContainsString('faint small-square printed grid', $phase);
         self::assertStringContainsString('preview-only', $phase);
-        self::assertStringContainsString('0.32.0-alpha.1', $plugin);
+        self::assertStringContainsString('0.32.0-alpha.2', $plugin);
     }
 }

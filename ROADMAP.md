@@ -724,6 +724,7 @@ Correct the final forged-token presentation boundary so Companion-generated port
 - [x] **IV.30.1F.1 — The Surveyor Learns the Difference Between a Grid and a Wall** — biases printed-grid registration toward thin pale linework inside quiet floor, rejects heavy architectural ink, requires repeated evidence on both axes, and resolves supported room-size harmonics back to the smaller fundamental artwork grid.
 
 - [x] **IV.30.2 — The Cartographer's Dungeon Forge** — deterministic geometry-first dungeon drafting and Keeper-authoritative build: connected rooms/corridors become persistent native artwork, calibrated grid, walls, closed doors, Keeper lights and a freshly enabled Living Veil. Drafts remain local until Build Dungeon.
+- [x] **IV.30.2A — The Forge Creates Worlds** — adds Atlas → Generate Dungeon so the Keeper can forge a brand-new generated-surface Scene without a background image, choose a deterministic scale/seed and Great Marketrealm floor/rock theme, then inspect the fully built grid/walls/doors/Fog/lights Behind the Curtain before opening it to Players.
 
 
 ### Phase IV.31 — The Keeper's Lantern Rack ✅ IMPLEMENTED

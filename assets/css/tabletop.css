@@ -2047,3 +2047,84 @@
     stroke-linecap: square;
 }
 .gmrt-dungeon-forge-layer .gmrt-forge-lights text { font-size: .72px; paint-order: stroke; stroke: rgba(0,0,0,.8); stroke-width: .08px; }
+
+/* Phase IV.30.2A — The Forge Creates Worlds */
+.gmrt-board__viewport.is-generated-surface {
+    min-height: 0;
+    aspect-ratio: var(--gmrt-generated-aspect, 4 / 3);
+}
+
+.gmrt-atlas-forge {
+    margin-top: .9rem;
+    padding-top: .9rem;
+    border-top: 1px solid rgba(86, 68, 44, .28);
+}
+.gmrt-atlas-forge > summary {
+    cursor: pointer;
+    font-weight: 900;
+}
+.gmrt-atlas-forge__body {
+    display: grid;
+    gap: .7rem;
+    padding-top: .7rem;
+}
+.gmrt-atlas-forge__body > p {
+    margin: 0;
+    line-height: 1.45;
+    opacity: .82;
+}
+.gmrt-atlas-forge__controls {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .55rem;
+}
+.gmrt-atlas-forge__controls label {
+    display: grid;
+    gap: .25rem;
+    font-size: .78rem;
+    font-weight: 800;
+}
+.gmrt-atlas-forge__controls input,
+.gmrt-atlas-forge__controls select {
+    width: 100%;
+    min-width: 0;
+}
+.gmrt-atlas-forge__controls button {
+    align-self: end;
+}
+.gmrt-atlas-card.is-forged-world .gmrt-atlas-card__image {
+    background:
+        linear-gradient(135deg, rgba(169,150,107,.34), rgba(23,20,15,.82)),
+        repeating-linear-gradient(0deg, rgba(255,255,255,.06) 0 1px, transparent 1px 12px),
+        repeating-linear-gradient(90deg, rgba(255,255,255,.06) 0 1px, transparent 1px 12px);
+}
+.gmrt-atlas-card__forge-sigil { font-size: 1.75rem; filter: drop-shadow(0 2px 2px rgba(0,0,0,.35)); }
+
+/* The geometry stays authoritative; themes only repaint the generated SVG surface. */
+.gmrt-dungeon-forge-layer[data-forge-theme="pantry-stone"] .gmrt-forge-rock { fill: #17140f; }
+.gmrt-dungeon-forge-layer[data-forge-theme="pantry-stone"] .gmrt-forge-floor rect { fill: #a9966b; }
+.gmrt-dungeon-forge-layer[data-forge-theme="pantry-stone"] .gmrt-forge-ink line { stroke: #080706; }
+
+.gmrt-dungeon-forge-layer[data-forge-theme="butcher-cellar"] .gmrt-forge-rock { fill: #1d1110; }
+.gmrt-dungeon-forge-layer[data-forge-theme="butcher-cellar"] .gmrt-forge-floor rect { fill: #8f6559; }
+.gmrt-dungeon-forge-layer[data-forge-theme="butcher-cellar"] .gmrt-forge-ink line { stroke: #100706; }
+
+.gmrt-dungeon-forge-layer[data-forge-theme="rootland-cavern"] .gmrt-forge-rock { fill: #17140e; }
+.gmrt-dungeon-forge-layer[data-forge-theme="rootland-cavern"] .gmrt-forge-floor rect { fill: #78684d; }
+.gmrt-dungeon-forge-layer[data-forge-theme="rootland-cavern"] .gmrt-forge-ink line { stroke: #090806; }
+
+.gmrt-dungeon-forge-layer[data-forge-theme="frostreem-vault"] .gmrt-forge-rock { fill: #142027; }
+.gmrt-dungeon-forge-layer[data-forge-theme="frostreem-vault"] .gmrt-forge-floor rect { fill: #8aa6ad; }
+.gmrt-dungeon-forge-layer[data-forge-theme="frostreem-vault"] .gmrt-forge-ink line { stroke: #081117; }
+
+.gmrt-dungeon-forge-layer[data-forge-theme="bakery-crypt"] .gmrt-forge-rock { fill: #211812; }
+.gmrt-dungeon-forge-layer[data-forge-theme="bakery-crypt"] .gmrt-forge-floor rect { fill: #b69169; }
+.gmrt-dungeon-forge-layer[data-forge-theme="bakery-crypt"] .gmrt-forge-ink line { stroke: #120b08; }
+
+.gmrt-dungeon-forge-layer[data-forge-theme="mushroom-grotto"] .gmrt-forge-rock { fill: #16131b; }
+.gmrt-dungeon-forge-layer[data-forge-theme="mushroom-grotto"] .gmrt-forge-floor rect { fill: #786b82; }
+.gmrt-dungeon-forge-layer[data-forge-theme="mushroom-grotto"] .gmrt-forge-ink line { stroke: #0c0910; }
+
+@media (max-width: 700px) {
+    .gmrt-atlas-forge__controls { grid-template-columns: 1fr; }
+}

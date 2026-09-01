@@ -233,4 +233,9 @@ each other when both apply.
 
 
 
-Current development milestone: **0.32.0-alpha.1 — Phase IV.30.2, The Cartographer's Dungeon Forge**.
+Current development milestone: **0.32.0-alpha.2 — Phase IV.30.2A, The Forge Creates Worlds**.
+
+
+### Phase IV.30.2A — The Forge Creates Worlds
+
+The Keeper's Atlas can now create a complete generated dungeon Scene without selecting a background image. A deterministic seed and scale produce the same geometry-first dungeon foundation used by IV.30.2, while a separate Stone & Floor theme repaints the native SVG surface. The new Scene receives its square grid, vision walls, closed doors, Fog and Keeper lights immediately, then opens Behind the Curtain for private inspection before the Keeper chooses to make it live.
