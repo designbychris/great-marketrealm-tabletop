@@ -893,3 +893,11 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - Bridge Companion-certified equipped weapon attacks into the active character token Combat Arsenal for authoritative Player battlefield targeting and attacks.
 - Make denied Guild Diceworks rolls visibly halt rather than appearing permanently in-progress.
 - Clarify Turn of Battle target status and add conspicuous Player-turn beacons to the Satchel and shared combat guidance.
+
+## 0.30.1-alpha.13 — Phase IV.30.1F.1: The Surveyor Learns the Difference Between a Grid and a Wall
+
+- Corrects Printed Grid registration after the hostile benchmark showed strong room walls could outscore the faint baked-in artwork grid.
+- Treats thick dark architectural ink as negative registration evidence and favours thin pale strokes that recover quickly into quiet floor.
+- Requires repeated comb evidence on both axes so sparse room dimensions cannot masquerade as a square grid.
+- Resolves strongly supported 2–6x room-size harmonics back toward the smaller fundamental printed-grid spacing instead of simply choosing the strongest large rectangle cadence.
+- Keeps detection browser-local and preview-only; the existing Save Grid action remains the sole authoritative persistence boundary.

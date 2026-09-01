@@ -2531,27 +2531,53 @@
             const offset = ((py * canvas.width) + px) * 4;
             return (pixels.data[offset] * .2126) + (pixels.data[offset + 1] * .7152) + (pixels.data[offset + 2] * .0722);
         };
+
+        // Phase IV.30.1F.1 — The Surveyor Learns the Difference Between a Grid and a Wall.
+        // Printed grids are usually thin, pale, periodic marks inside otherwise quiet
+        // floor areas. Heavy architectural ink is deliberately negative evidence here:
+        // Pippin should prefer a faint line that quickly returns to white on both flanks
+        // over a thick wall simply because the wall has stronger contrast.
         const axisResponse = (vertical) => {
             const length = vertical ? canvas.width : canvas.height;
             const cross = vertical ? canvas.height : canvas.width;
             const response = new Float32Array(length);
             const crossStep = Math.max(2, Math.floor(cross / 260));
-            const flank = 2.5;
-            for (let position = 2; position < length - 2; position += 1) {
+            const near = 1.25;
+            const flank = 3.75;
+            for (let position = 4; position < length - 4; position += 1) {
                 let evidence = 0;
                 let support = 0;
-                let samples = 0;
-                for (let across = 1; across < cross - 1; across += crossStep) {
+                let eligible = 0;
+                for (let across = 2; across < cross - 2; across += crossStep) {
                     const center = vertical ? luminance(position, across) : luminance(across, position);
-                    const a = vertical ? luminance(position - flank, across) : luminance(across, position - flank);
-                    const b = vertical ? luminance(position + flank, across) : luminance(across, position + flank);
-                    const contrast = ((a + b) / 2) - center;
-                    if (contrast > 4) evidence += Math.min(36, contrast);
-                    if (contrast > 9) support += 1;
-                    samples += 1;
+                    const nearA = vertical ? luminance(position - near, across) : luminance(across, position - near);
+                    const nearB = vertical ? luminance(position + near, across) : luminance(across, position + near);
+                    const flankA = vertical ? luminance(position - flank, across) : luminance(across, position - flank);
+                    const flankB = vertical ? luminance(position + flank, across) : luminance(across, position + flank);
+                    const flankLight = (flankA + flankB) / 2;
+                    const nearLight = (nearA + nearB) / 2;
+                    const contrast = flankLight - center;
+
+                    // Quiet-floor gating rejects hatch beds and the black cores of walls.
+                    // A printed grid may be faint, but its surrounding paper/floor should
+                    // remain light and the stroke itself should not look like heavy ink.
+                    if (flankLight < 205 || center < 120) continue;
+                    eligible += 1;
+                    if (contrast <= 2.5 || contrast >= 72) continue;
+
+                    // Thin-line recovery is the key discriminator. One pixel away from a
+                    // printed line we should already be heading back toward the floor tone;
+                    // a thick dungeon wall stays dark and therefore receives little credit.
+                    const recovery = Math.max(0, nearLight - center);
+                    const thinness = .62 + Math.min(.78, recovery / 18);
+                    const paleBias = .55 + (Math.min(255, center) / 255) * .45;
+                    evidence += Math.min(24, contrast) * thinness * paleBias;
+                    if (contrast > 5 && recovery > 1.5) support += 1;
                 }
-                const supportRatio = support / Math.max(1, samples);
-                response[position] = (evidence / Math.max(1, samples)) * (.35 + Math.min(.65, supportRatio * 3.2));
+                const supportRatio = support / Math.max(1, eligible);
+                response[position] = eligible >= 4
+                    ? (evidence / eligible) * (.25 + Math.min(.75, supportRatio * 4))
+                    : 0;
             }
             return response;
         };
@@ -2567,40 +2593,81 @@
             return Number(response[index] || 0);
         };
         const axisComb = (response, spacingCanvas) => {
-            if (spacingCanvas < 4) return { score: 0, phase: 0 };
+            if (spacingCanvas < 4) return { score: 0, phase: 0, count: 0, coverage: 0 };
             const phaseSteps = Math.max(8, Math.min(96, Math.round(spacingCanvas)));
             let bestScore = 0;
             let bestPhase = 0;
+            let bestCount = 0;
+            let bestCoverage = 0;
             for (let step = 0; step < phaseSteps; step += 1) {
                 const phase = (step / phaseSteps) * spacingCanvas;
                 let score = 0;
+                let supported = 0;
                 let count = 0;
                 for (let position = phase; position < response.length; position += spacingCanvas) {
-                    score += sampleResponse(response, position);
+                    const value = sampleResponse(response, position);
+                    score += value;
+                    if (value > .14) supported += 1;
                     count += 1;
                 }
+                const coverage = supported / Math.max(1, count);
                 const average = count >= 4 ? score / count : 0;
-                if (average > bestScore) {
-                    bestScore = average;
+                const weighted = average * (.55 + (.45 * coverage));
+                if (weighted > bestScore) {
+                    bestScore = weighted;
                     bestPhase = phase;
+                    bestCount = count;
+                    bestCoverage = coverage;
                 }
             }
-            return { score: bestScore, phase: bestPhase };
+            return { score: bestScore, phase: bestPhase, count: bestCount, coverage: bestCoverage };
         };
 
         const minSize = 8;
         const maxSize = Math.max(minSize, Math.min(192, Math.floor(Math.min(displayWidth, displayHeight) / 3)));
-        let best = null;
+        const candidates = [];
         for (let size = minSize; size <= maxSize; size += 1) {
             const x = axisComb(xResponse, size * xScale);
             const y = axisComb(yResponse, size * yScale);
+
+            // A printed grid must repeat often enough on both axes to distinguish it from
+            // room dimensions. Sparse combs are exactly how large rectangular walls fooled
+            // the first Registration pass, so fewer than eight crossings is not sufficient.
+            if (Math.min(x.count, y.count) < 8) continue;
             const balanced = Math.min(x.score, y.score);
             const combined = (x.score + y.score) / 2;
-            const score = (balanced * .7) + (combined * .3);
-            if (!best || score > best.score) best = { size, score, x, y };
+            const coverage = Math.min(x.coverage, y.coverage);
+            const score = ((balanced * .7) + (combined * .3)) * (.72 + (.28 * coverage));
+            candidates.push({ size, score, x, y });
         }
-        if (!best || best.score < 1.15) {
-            throw new Error('Pippin could not find a reliable repeated square grid in this artwork. Keep the current calibration or adjust it manually.');
+        candidates.sort((a, b) => b.score - a.score);
+        let best = candidates[0] || null;
+
+        // Room walls often recur every 2–6 printed squares. If a smaller harmonic keeps
+        // meaningful evidence on BOTH axes, prefer that fundamental spacing rather than
+        // mistaking a room width for the artwork grid. This is deliberately bounded: weak
+        // sub-harmonics are ignored instead of manufacturing a tiny grid from noise.
+        const fundamentalCandidate = (candidate) => {
+            if (!candidate) return null;
+            let fundamental = candidate;
+            for (let divisor = 6; divisor >= 2; divisor -= 1) {
+                const target = candidate.size / divisor;
+                if (target < minSize) continue;
+                const nearby = candidates
+                    .filter((item) => Math.abs(item.size - target) <= 1)
+                    .sort((a, b) => Math.abs(a.size - target) - Math.abs(b.size - target) || b.score - a.score)[0];
+                if (!nearby) continue;
+                const keepsX = nearby.x.score >= candidate.x.score * .42;
+                const keepsY = nearby.y.score >= candidate.y.score * .42;
+                const repeatsEnough = Math.min(nearby.x.count, nearby.y.count) >= 12;
+                if (keepsX && keepsY && repeatsEnough) fundamental = nearby;
+            }
+            return fundamental;
+        };
+        best = fundamentalCandidate(best);
+
+        if (!best || best.score < .72 || Math.min(best.x.coverage, best.y.coverage) < .28) {
+            throw new Error('Pippin could not find a reliable faint printed square grid in this artwork. Keep the current calibration or adjust it manually.');
         }
 
         const xPhaseDisplay = best.x.phase / xScale;

@@ -38,8 +38,8 @@ final class GridRegistrationIntelligenceRegressionTest extends TestCase
     {
         $js = (string) file_get_contents(dirname(__DIR__, 4) . '/assets/js/tabletop.js');
         self::assertStringContainsString('nearestEquivalentOffset', $js);
-        self::assertStringContainsString('best.score < 1.15', $js);
-        self::assertStringContainsString('could not find a reliable repeated square grid', $js);
+        self::assertStringContainsString('best.score < .72', $js);
+        self::assertStringContainsString('could not find a reliable faint printed square grid', $js);
     }
 
     public function testPhaseIsDocumentedAndVersioned(): void
@@ -50,6 +50,6 @@ final class GridRegistrationIntelligenceRegressionTest extends TestCase
         self::assertStringContainsString('IV.30.1F — The Cartographer\'s Registration', $roadmap);
         self::assertStringContainsString('Hostile misaligned-grid benchmark', $phase);
         self::assertStringContainsString('preview-only', $phase);
-        self::assertStringContainsString('0.30.1-alpha.12', $plugin);
+        self::assertStringContainsString('0.30.1-alpha.13', $plugin);
     }
 }
