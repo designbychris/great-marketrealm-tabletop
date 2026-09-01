@@ -11,7 +11,7 @@ final class DungeonForgeCornerForensicsRegressionTest extends TestCase
         $view = file_get_contents(dirname(__DIR__, 4) . '/app/Tabletop/Views/chamber.php');
         $js = file_get_contents(dirname(__DIR__, 4) . '/assets/js/tabletop.js');
         self::assertStringContainsString('data-corner-forensics', $view);
-        self::assertStringContainsString('Corner trace III:', $js);
+        self::assertStringContainsString('Corner trace IV:', $js);
         self::assertStringContainsString("board.querySelectorAll('*')", $js);
         self::assertStringContainsString('getBoundingClientRect()', $js);
         self::assertStringContainsString("window.getComputedStyle(el, '::before')", $js);
