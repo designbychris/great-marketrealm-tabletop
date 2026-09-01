@@ -3173,3 +3173,236 @@
 @media (prefers-reduced-motion: reduce) {
     .gmrt-pippin-note.is-speaking .gmrt-pippin-note__bubble { outline-offset: 0; }
 }
+
+/* Phase IV.32.2B — Pippin Demands a Bigger Office.
+ * Responsive workspace proportions for the Keeper drawers and Gathering rail.
+ * Presentation only: no Scene, creature, party, HP, Fog or encounter authority changes.
+ */
+.gmrt-chamber {
+    --gmrt-keeper-drawer-width: 700px;
+    --gmrt-party-rail-width: 370px;
+}
+
+.gmrt-chamber__layout {
+    max-width: 1650px;
+    grid-template-columns: minmax(0, 1fr) minmax(340px, var(--gmrt-party-rail-width));
+}
+
+.gmrt-atlas-drawer__panel,
+.gmrt-bestiary-drawer__panel {
+    width: min(var(--gmrt-keeper-drawer-width), calc(100vw - 4rem));
+}
+
+.gmrt-atlas__register,
+.gmrt-bestiary__register {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: .8rem;
+}
+
+.gmrt-atlas-card {
+    grid-template-columns: 92px minmax(0, 1fr);
+    align-content: start;
+    min-width: 0;
+}
+
+.gmrt-atlas-card__image {
+    width: 92px;
+}
+
+.gmrt-atlas-card__copy strong {
+    padding-right: 3.75rem;
+    overflow-wrap: break-word;
+    word-break: normal;
+    hyphens: auto;
+}
+
+.gmrt-atlas-card__actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.gmrt-atlas-card__actions button:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+}
+
+.gmrt-bestiary-card {
+    min-width: 0;
+    align-content: start;
+}
+
+.gmrt-bestiary-card > header > div:last-child {
+    min-width: 0;
+}
+
+.gmrt-bestiary-card > header strong,
+.gmrt-bestiary-card > header small {
+    overflow-wrap: break-word;
+    word-break: normal;
+}
+
+.gmrt-pippin-note {
+    grid-template-columns: 124px minmax(0, 1fr);
+    min-height: 132px;
+    gap: 10px;
+}
+
+.gmrt-pippin-note__portrait {
+    width: 142px;
+    margin: 0 -14px -4px 0;
+}
+
+.gmrt-pippin-note__bubble {
+    min-height: 98px;
+    padding: .7rem .8rem .72rem 1rem;
+}
+
+.gmrt-pippin-note__bubble p {
+    font-size: .82rem;
+    line-height: 1.5;
+}
+
+.gmrt-pippin-desk__portrait {
+    margin: 0 .8rem;
+}
+
+.gmrt-party {
+    padding: 1rem;
+}
+
+.gmrt-party > ul {
+    gap: .7rem;
+}
+
+.gmrt-party__member,
+.gmrt-party > ul > li.gmrt-party__member {
+    grid-template-columns: 54px minmax(0, 1fr) auto;
+    grid-auto-rows: auto;
+    gap: .35rem .65rem;
+    align-items: center;
+    padding: .75rem;
+}
+
+.gmrt-party__avatar,
+.gmrt-party > ul > li > .gmrt-party__avatar {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    width: 50px;
+    height: 50px;
+    border-radius: 1px;
+    image-rendering: pixelated;
+}
+
+.gmrt-party__avatar img {
+    image-rendering: pixelated;
+}
+
+.gmrt-party__member > strong {
+    grid-column: 2;
+    grid-row: 1;
+    min-width: 0;
+    overflow-wrap: break-word;
+    color: #f0dfbc;
+    font-family: ui-monospace, "Courier New", monospace;
+    font-size: .94rem;
+    line-height: 1.2;
+}
+
+.gmrt-party__role {
+    grid-column: 3;
+    grid-row: 1;
+    justify-self: end;
+    align-self: start;
+    white-space: nowrap;
+}
+
+.gmrt-party__remove {
+    grid-column: 2 / -1;
+    grid-row: 2;
+    justify-self: stretch;
+    width: 100%;
+    min-height: 2rem;
+    padding: .35rem .5rem;
+    font-size: .66rem;
+}
+
+.gmrt-party__member > .gmrt-hp {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    width: 100%;
+    margin-top: .15rem;
+}
+
+.gmrt-party__member > .gmrt-hp small {
+    font-family: ui-monospace, "Courier New", monospace;
+    font-size: .68rem;
+    color: rgba(234,217,181,.76);
+}
+
+.gmrt-fellowship-colour {
+    padding: .65rem .7rem;
+    border-radius: 1px;
+}
+
+.gmrt-fellowship-colour > span {
+    font-family: ui-monospace, "Courier New", monospace;
+}
+
+.gmrt-fellowship-colour__swatches {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 6px;
+}
+
+.gmrt-fellowship-colour__swatches button {
+    width: 100%;
+    min-width: 0;
+    aspect-ratio: 1;
+    height: auto;
+    border-radius: 0;
+}
+
+@media (max-width: 1180px) and (min-width: 901px) {
+    .gmrt-chamber {
+        --gmrt-party-rail-width: 330px;
+        --gmrt-keeper-drawer-width: 640px;
+    }
+}
+
+@media (max-width: 900px) {
+    .gmrt-chamber__layout {
+        grid-template-columns: 1fr;
+    }
+
+    .gmrt-party {
+        width: auto;
+    }
+}
+
+@media (max-width: 760px) {
+    .gmrt-atlas-drawer__panel,
+    .gmrt-bestiary-drawer__panel {
+        width: calc(100vw - 4rem);
+    }
+
+    .gmrt-atlas__register,
+    .gmrt-bestiary__register {
+        grid-template-columns: 1fr;
+    }
+
+    .gmrt-atlas-card {
+        grid-template-columns: 72px minmax(0, 1fr);
+    }
+
+    .gmrt-atlas-card__image {
+        width: 72px;
+    }
+
+    .gmrt-pippin-note {
+        grid-template-columns: 92px minmax(0, 1fr);
+        min-height: 104px;
+    }
+
+    .gmrt-pippin-note__portrait {
+        width: 108px;
+    }
+}
