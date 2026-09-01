@@ -2830,6 +2830,41 @@
 
     renderDungeonForgePlan(builtDungeonForgePlan, false);
 
+    // IV.30.2A.1A corrective — The Mystery of the Corner Tile, forensic pass.
+    // Report the actual DOM/text/image/pseudo-element provenance at the generated
+    // battlefield origin instead of guessing from the platform-rendered pixels.
+    const cornerForensics = document.querySelector('[data-corner-forensics]');
+    const traceGeneratedCorner = () => {
+        if (!cornerForensics || !board.classList.contains('is-generated-surface')) return;
+        const rect = board.getBoundingClientRect();
+        const x = Math.min(rect.right - 2, rect.left + 14);
+        const y = Math.min(rect.bottom - 2, rect.top + 14);
+        const stack = document.elementsFromPoint(x, y).slice(0, 6);
+        const describe = (el) => {
+            const tag = String(el.tagName || '').toLowerCase();
+            const cls = Array.from(el.classList || []).slice(0, 3).join('.');
+            const src = el instanceof HTMLImageElement ? (el.currentSrc || el.src || '') : '';
+            const style = window.getComputedStyle(el);
+            const bg = style.backgroundImage && style.backgroundImage !== 'none' ? style.backgroundImage : '';
+            const before = window.getComputedStyle(el, '::before').content;
+            const after = window.getComputedStyle(el, '::after').content;
+            return `${tag}${cls ? '.' + cls : ''}${src ? '[img=' + src.split('/').pop() + ']' : ''}${bg ? '[bg]' : ''}${before && before !== 'none' && before !== 'normal' ? '[before=' + before + ']' : ''}${after && after !== 'none' && after !== 'normal' ? '[after=' + after + ']' : ''}`;
+        };
+        let textOwner = '';
+        try {
+            const range = document.caretRangeFromPoint ? document.caretRangeFromPoint(x, y) : null;
+            const node = range && range.startContainer;
+            if (node && node.nodeType === Node.TEXT_NODE && node.parentElement) {
+                const text = String(node.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 24);
+                if (text) textOwner = ` · text “${text}” in ${describe(node.parentElement)}`;
+            }
+        } catch (error) {}
+        cornerForensics.textContent = `Corner trace: ${stack.map(describe).join(' > ')}${textOwner}`;
+        root.dataset.cornerTrace = cornerForensics.textContent;
+    };
+    window.setTimeout(traceGeneratedCorner, 300);
+
+
     const gridViewport = document.querySelector('.gmrt-board__viewport');
     const gridSize = document.querySelector('[data-grid-size]');
     const gridOffsetX = document.querySelector('[data-grid-offset-x]');

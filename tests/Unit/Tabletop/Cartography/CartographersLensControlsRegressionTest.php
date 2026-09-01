@@ -63,6 +63,6 @@ final class CartographersLensControlsRegressionTest extends TestCase
         self::assertStringNotContainsString('gmrt_save_lens', $js);
         self::assertStringContainsString("IV.30.1E — The Cartographer's Lens Controls", $roadmap);
         self::assertStringContainsString('no server mutation route', $phase);
-        self::assertStringContainsString('0.32.0-alpha.4', $plugin);
+        self::assertStringContainsString('0.32.0-alpha.5', $plugin);
     }
 }

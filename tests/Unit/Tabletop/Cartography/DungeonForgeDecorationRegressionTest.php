@@ -55,7 +55,7 @@ final class DungeonForgeDecorationRegressionTest extends TestCase
         $roadmap = $this->source('ROADMAP.md');
         $phase = $this->source('docs/Roadmap/PHASE-IV.30.2A.1.md');
 
-        self::assertStringContainsString('0.32.0-alpha.4', $plugin);
+        self::assertStringContainsString('0.32.0-alpha.5', $plugin);
         self::assertStringContainsString('IV.30.2A.1 — Pippin Decorates the Place', $roadmap);
         self::assertStringContainsString('presentation-only', $phase);
     }

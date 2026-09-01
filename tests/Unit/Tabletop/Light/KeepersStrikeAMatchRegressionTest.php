@@ -67,7 +67,7 @@ final class KeepersStrikeAMatchRegressionTest extends TestCase
         $roadmap = $this->source('ROADMAP.md');
         $phase = $this->source('docs/Roadmap/PHASE-IV.31.1.md');
 
-        self::assertStringContainsString('0.32.0-alpha.4', $plugin);
+        self::assertStringContainsString('0.32.0-alpha.5', $plugin);
         self::assertStringContainsString("IV.31.1 — The Keeper Strikes a Match", $roadmap);
         self::assertStringContainsString('placed lit by default', $phase);
     }

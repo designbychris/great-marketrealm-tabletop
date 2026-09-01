@@ -1,3 +1,4 @@
+- IV.30.2A.1A forensic corrective: generated Scenes now expose a DM-only corner provenance trace that reports the real DOM/image/background/pseudo/text owner at the battlefield origin, so the persistent corner tile can be identified from browser evidence rather than another visual guess.
 ## 0.32.0-alpha.4 — Phase IV.30.2A.1A: The Mystery of the Corner Tile
 
 - Identified the mysterious generated-map corner tile as the colourful `🗺️` emoji used by the fixed Keeper's Atlas drawer toggle, not dungeon geometry, artwork, Fog, or a leaked battlemap image.
