@@ -79,6 +79,9 @@
     let thresholdPlacement = null;
     let bestiaryPlacement = null;
     let keeperLightPlacement = null;
+    // The fog renderer runs during boot before the Lantern Rack event bindings are
+    // installed, so the roster reference must exist before that first render.
+    const keeperLightRoster = document.querySelector('[data-keeper-light-roster]');
 
     function say(message) {
         if (status) {
@@ -3811,7 +3814,6 @@
     const keeperLightButtons = Array.from(document.querySelectorAll('[data-keeper-light-kind]'));
     const keeperLightCancel = document.querySelector('[data-keeper-light-cancel]');
     const keeperLightStatus = document.querySelector('[data-keeper-light-status]');
-    const keeperLightRoster = document.querySelector('[data-keeper-light-roster]');
     const keeperLightLabels = {torch:'Torch',lantern:'Lantern',brazier:'Brazier',candle:'Candle',magical:'Magical Light'};
 
     function renderKeeperLightRoster(projection = fogProjection) {
