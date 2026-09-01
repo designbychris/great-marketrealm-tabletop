@@ -2204,3 +2204,121 @@
 .gmrt-dungeon-forge-layer .gmrt-forge-features .is-clearing { fill:rgba(174,160,96,.38); stroke:none; }
 .gmrt-dungeon-forge-layer .gmrt-forge-features .is-road { fill:rgba(147,116,72,.78); }
 .gmrt-dungeon-forge-layer .gmrt-forge-features .is-village-square { fill:rgba(166,143,94,.78); stroke:rgba(220,194,131,.45); }
+
+/* Phase IV.30.2B.2 — Pippin Learns to Colour Inside the Lines. */
+.gmrt-vision-barrier.is-forge-environmental:not(.is-selected) {
+    opacity: 0;
+}
+.gmrt-vision-barrier.is-forge-environmental.is-selected {
+    opacity: .78;
+    stroke-dasharray: 6 5;
+}
+.gmrt-dungeon-forge-layer .is-organic-canopy .is-canopy-highlight {
+    fill: rgba(136, 158, 88, .24);
+    stroke: none;
+}
+.gmrt-dungeon-forge-layer .is-organic-canopy .is-tree-root {
+    fill: none;
+    stroke: rgba(83, 60, 39, .72);
+    stroke-width: .07;
+    stroke-linecap: round;
+}
+.gmrt-dungeon-forge-layer .is-organic-rocks .is-rock-highlight {
+    fill: none;
+    stroke: rgba(216, 205, 173, .34);
+    stroke-width: .08;
+    stroke-linecap: round;
+}
+.gmrt-dungeon-forge-layer .is-village-building .is-building-shadow {
+    fill: rgba(24, 18, 12, .25);
+    stroke: none;
+    transform: translate(.13px, .15px);
+}
+.gmrt-dungeon-forge-layer .is-village-building .is-building-body {
+    fill: #95613f;
+    stroke: rgba(231, 188, 116, .78);
+    stroke-width: .08;
+}
+.gmrt-dungeon-forge-layer .is-village-building .is-building-roof {
+    fill: #75452d;
+    stroke: rgba(232, 190, 118, .78);
+    stroke-width: .08;
+}
+.gmrt-dungeon-forge-layer .is-village-building .is-roof-right,
+.gmrt-dungeon-forge-layer .is-village-building .is-roof-bottom {
+    fill: #68402b;
+}
+.gmrt-dungeon-forge-layer .is-village-building .is-roof-ridge {
+    stroke: rgba(247, 212, 146, .72);
+    stroke-width: .08;
+    stroke-linecap: round;
+}
+.gmrt-dungeon-forge-layer .is-village-building .is-building-door {
+    fill: #4d3022;
+    stroke: rgba(238, 192, 111, .82);
+    stroke-width: .06;
+}
+.gmrt-dungeon-forge-layer .is-village-building .is-building-window {
+    fill: rgba(168, 218, 218, .72);
+    stroke: rgba(242, 210, 138, .78);
+    stroke-width: .055;
+}
+.gmrt-dungeon-forge-layer .is-village-building .is-building-chimney {
+    fill: #5a4233;
+    stroke: rgba(225, 181, 113, .65);
+    stroke-width: .05;
+}
+.gmrt-dungeon-forge-layer .is-detailed-log .is-log-body {
+    fill: #76502f;
+    stroke: #b17d49;
+    stroke-width: .08;
+}
+.gmrt-dungeon-forge-layer .is-detailed-log .is-log-end {
+    fill: #a77b4d;
+    stroke: #563820;
+    stroke-width: .07;
+}
+.gmrt-dungeon-forge-layer .is-detailed-log .is-log-bark {
+    stroke: rgba(64, 39, 22, .55);
+    stroke-width: .055;
+    stroke-linecap: round;
+}
+.gmrt-dungeon-forge-layer .is-detailed-well .is-well-rim {
+    fill: #77786f;
+    stroke: #c5bda4;
+    stroke-width: .1;
+}
+.gmrt-dungeon-forge-layer .is-detailed-well .is-well-water {
+    fill: #405f67;
+    stroke: rgba(186, 215, 211, .64);
+    stroke-width: .07;
+}
+.gmrt-dungeon-forge-layer .is-detailed-well .is-well-post,
+.gmrt-dungeon-forge-layer .is-detailed-well .is-well-beam {
+    stroke: #6d4b2c;
+    stroke-width: .1;
+    stroke-linecap: round;
+}
+.gmrt-dungeon-forge-layer .is-detailed-garden .is-garden-soil {
+    fill: rgba(91, 73, 43, .7);
+    stroke: none;
+}
+.gmrt-dungeon-forge-layer .is-detailed-garden .is-garden-row {
+    stroke: rgba(111, 145, 68, .9);
+    stroke-width: .18;
+    stroke-linecap: round;
+}
+.gmrt-dungeon-forge-layer .is-detailed-garden .is-garden-fence {
+    fill: none;
+    stroke: rgba(177, 145, 84, .95);
+    stroke-width: .12;
+    stroke-dasharray: .34 .2;
+}
+.gmrt-dungeon-forge-layer .gmrt-forge-features .is-trail-underlay {
+    stroke: rgba(95, 71, 43, .34);
+    stroke-width: 1.75;
+}
+.gmrt-dungeon-forge-layer .gmrt-forge-features .is-trail-track {
+    stroke: rgba(188, 155, 94, .72);
+    stroke-width: 1.25;
+}

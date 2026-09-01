@@ -749,4 +749,5 @@ DM-placeable Scene lighting through the existing Living Veil illumination machin
 ### IV.30.2A.1A — Corner Tile Forensic Pass IV: The Wider Search
 Diagnostic corrective: widen the corner investigation to the complete live document so runtime/theme/Elementor-injected text, images, pseudo content, or CSS backgrounds can be identified by their actual owner.
 
-- **IV.30.2B.1 — Pippin Discovers That Trees Aren't Rooms** — outdoor Forge presentation separates organic scenery from authoritative rules geometry.
+- [x] **IV.30.2B.1 — Pippin Discovers That Trees Aren't Rooms** — outdoor Forge presentation separates organic scenery from authoritative rules geometry.
+- **IV.30.2B.2 — Pippin Learns to Colour Inside the Lines** — hides Forge-owned environmental LOS geometry at rest while preserving its rules behaviour, and adds a richer deterministic visual vocabulary for trees, rocks, logs, village buildings, wells and gardens.
