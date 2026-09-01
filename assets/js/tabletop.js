@@ -2437,6 +2437,8 @@
     const gridOffsetY = document.querySelector('[data-grid-offset-y]');
     const gridOpacity = document.querySelector('[data-grid-opacity]');
     const gridVisible = document.querySelector('[data-grid-visible]');
+    const detectGrid = document.querySelector('[data-detect-grid]');
+    const gridRegistrationStatus = document.querySelector('[data-grid-registration-status]');
     const saveGrid = document.querySelector('[data-save-grid]');
     const resetGrid = document.querySelector('[data-reset-grid]');
 
@@ -2482,8 +2484,165 @@
             gridOpacity.value = originalGrid.opacity;
             gridVisible.checked = originalGrid.visible;
             previewGrid();
+            if (gridRegistrationStatus) {
+                gridRegistrationStatus.textContent = 'Preview reset to the last saved calibration.';
+            }
         });
     }
+
+    const detectPrintedGrid = async () => {
+        const image = document.querySelector('[data-battlemap-image]');
+        if (!image || !gridViewport || !gridSize || !gridOffsetX || !gridOffsetY) {
+            throw new Error('Open a square-grid battlemap before asking Pippin to find its printed grid.');
+        }
+        if (!image.complete) {
+            await new Promise((resolve, reject) => {
+                image.addEventListener('load', resolve, { once: true });
+                image.addEventListener('error', reject, { once: true });
+            });
+        }
+        if (!image.naturalWidth || !image.naturalHeight) {
+            throw new Error('The battlemap artwork is not available for grid registration.');
+        }
+
+        // Phase IV.30.1F — Grid Registration Intelligence.
+        // Analyse the artwork's repeated thin horizontal/vertical strokes without
+        // changing the authoritative gameplay grid. A detected registration is
+        // preview-only until the Keeper explicitly presses Save Grid.
+        const maxDimension = 1200;
+        const analysisScale = Math.min(1, maxDimension / Math.max(image.naturalWidth, image.naturalHeight));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.max(1, Math.round(image.naturalWidth * analysisScale));
+        canvas.height = Math.max(1, Math.round(image.naturalHeight * analysisScale));
+        const context = canvas.getContext('2d', { willReadFrequently: true });
+        if (!context) throw new Error('This browser could not prepare the grid-registration canvas.');
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+        let pixels;
+        try {
+            pixels = context.getImageData(0, 0, canvas.width, canvas.height);
+        } catch (error) {
+            throw new Error('The map artwork could not be sampled in this browser. Use same-site Media Library artwork or calibrate the grid manually.');
+        }
+
+        const luminance = (x, y) => {
+            const px = Math.max(0, Math.min(canvas.width - 1, Math.round(x)));
+            const py = Math.max(0, Math.min(canvas.height - 1, Math.round(y)));
+            const offset = ((py * canvas.width) + px) * 4;
+            return (pixels.data[offset] * .2126) + (pixels.data[offset + 1] * .7152) + (pixels.data[offset + 2] * .0722);
+        };
+        const axisResponse = (vertical) => {
+            const length = vertical ? canvas.width : canvas.height;
+            const cross = vertical ? canvas.height : canvas.width;
+            const response = new Float32Array(length);
+            const crossStep = Math.max(2, Math.floor(cross / 260));
+            const flank = 2.5;
+            for (let position = 2; position < length - 2; position += 1) {
+                let evidence = 0;
+                let support = 0;
+                let samples = 0;
+                for (let across = 1; across < cross - 1; across += crossStep) {
+                    const center = vertical ? luminance(position, across) : luminance(across, position);
+                    const a = vertical ? luminance(position - flank, across) : luminance(across, position - flank);
+                    const b = vertical ? luminance(position + flank, across) : luminance(across, position + flank);
+                    const contrast = ((a + b) / 2) - center;
+                    if (contrast > 4) evidence += Math.min(36, contrast);
+                    if (contrast > 9) support += 1;
+                    samples += 1;
+                }
+                const supportRatio = support / Math.max(1, samples);
+                response[position] = (evidence / Math.max(1, samples)) * (.35 + Math.min(.65, supportRatio * 3.2));
+            }
+            return response;
+        };
+
+        const xResponse = axisResponse(true);
+        const yResponse = axisResponse(false);
+        const displayWidth = Math.max(1, gridViewport.clientWidth);
+        const displayHeight = Math.max(1, gridViewport.clientHeight);
+        const xScale = canvas.width / displayWidth;
+        const yScale = canvas.height / displayHeight;
+        const sampleResponse = (response, value) => {
+            const index = Math.max(0, Math.min(response.length - 1, Math.round(value)));
+            return Number(response[index] || 0);
+        };
+        const axisComb = (response, spacingCanvas) => {
+            if (spacingCanvas < 4) return { score: 0, phase: 0 };
+            const phaseSteps = Math.max(8, Math.min(96, Math.round(spacingCanvas)));
+            let bestScore = 0;
+            let bestPhase = 0;
+            for (let step = 0; step < phaseSteps; step += 1) {
+                const phase = (step / phaseSteps) * spacingCanvas;
+                let score = 0;
+                let count = 0;
+                for (let position = phase; position < response.length; position += spacingCanvas) {
+                    score += sampleResponse(response, position);
+                    count += 1;
+                }
+                const average = count >= 4 ? score / count : 0;
+                if (average > bestScore) {
+                    bestScore = average;
+                    bestPhase = phase;
+                }
+            }
+            return { score: bestScore, phase: bestPhase };
+        };
+
+        const minSize = 8;
+        const maxSize = Math.max(minSize, Math.min(192, Math.floor(Math.min(displayWidth, displayHeight) / 3)));
+        let best = null;
+        for (let size = minSize; size <= maxSize; size += 1) {
+            const x = axisComb(xResponse, size * xScale);
+            const y = axisComb(yResponse, size * yScale);
+            const balanced = Math.min(x.score, y.score);
+            const combined = (x.score + y.score) / 2;
+            const score = (balanced * .7) + (combined * .3);
+            if (!best || score > best.score) best = { size, score, x, y };
+        }
+        if (!best || best.score < 1.15) {
+            throw new Error('Pippin could not find a reliable repeated square grid in this artwork. Keep the current calibration or adjust it manually.');
+        }
+
+        const xPhaseDisplay = best.x.phase / xScale;
+        const yPhaseDisplay = best.y.phase / yScale;
+        const nearestEquivalentOffset = (phase, current, size) =>
+            phase + (Math.round((current - phase) / size) * size);
+        const suggestedX = Math.round(nearestEquivalentOffset(xPhaseDisplay, Number(gridOffsetX.value || 0), best.size));
+        const suggestedY = Math.round(nearestEquivalentOffset(yPhaseDisplay, Number(gridOffsetY.value || 0), best.size));
+        const confidence = Math.max(55, Math.min(96, Math.round(54 + (best.score * 8))));
+
+        gridSize.value = String(best.size);
+        gridOffsetX.value = String(suggestedX);
+        gridOffsetY.value = String(suggestedY);
+        gridVisible.checked = true;
+        previewGrid();
+
+        return { size: best.size, x: suggestedX, y: suggestedY, confidence };
+    };
+
+    detectGrid?.addEventListener('click', async () => {
+        const previousLabel = detectGrid.textContent;
+        detectGrid.disabled = true;
+        detectGrid.setAttribute('aria-busy', 'true');
+        detectGrid.textContent = 'Finding…';
+        if (gridRegistrationStatus) gridRegistrationStatus.textContent = 'Pippin is measuring repeated linework in the battlemap…';
+        try {
+            const suggestion = await detectPrintedGrid();
+            const message = `Printed grid found · ${suggestion.size}px · X ${suggestion.x} · Y ${suggestion.y} · ${suggestion.confidence}% confidence · preview only`;
+            if (gridRegistrationStatus) gridRegistrationStatus.textContent = message;
+            if (cartographerStatus) cartographerStatus.textContent = `${message}. Press Save Grid to make it authoritative.`;
+            say(`${message}. Press Save Grid when the overlay aligns.`);
+        } catch (error) {
+            const message = error?.message || 'Printed-grid registration could not be completed.';
+            if (gridRegistrationStatus) gridRegistrationStatus.textContent = message;
+            if (cartographerStatus) cartographerStatus.textContent = message;
+            say(message);
+        } finally {
+            detectGrid.disabled = false;
+            detectGrid.removeAttribute('aria-busy');
+            detectGrid.textContent = previousLabel;
+        }
+    });
 
     if (saveGrid) {
         saveGrid.addEventListener('click', async () => {

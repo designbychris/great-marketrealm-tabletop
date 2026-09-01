@@ -1,3 +1,13 @@
+## 0.30.1-alpha.12 — Phase IV.30.1F: The Cartographer's Registration
+
+- Adds Keeper-only **Find Printed Grid** intelligence to the existing Calibrate Grid panel.
+- Analyses the already-loaded battlemap locally for repeated thin horizontal and vertical line evidence, then searches for a square periodicity supported on both axes.
+- Suggests gameplay-grid square size and the nearest equivalent X/Y registration phase as a live preview, without creating a second grid model.
+- Keeps detection preview-only: the existing Save Grid action remains the sole authoritative persistence boundary.
+- Fails conservatively when printed-grid evidence is weak and leaves manual calibration fully available.
+- Establishes the hostile misaligned-grid dungeon as the primary browser-certification benchmark.
+- Version: `0.30.1-alpha.12`.
+
 ## 0.30.1-alpha.11 — Phase IV.30.1E: The Cartographer's Lens Controls
 
 - Moves the Cartographer's Lens zoom, fit and reset controls into a compact fixed overlay directly on the battlemap.

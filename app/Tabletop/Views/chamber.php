@@ -991,8 +991,10 @@ $sceneImage = $scene !== null
                                 <button type="button" data-grid-nudge="1,0" aria-label="Nudge grid right">→</button>
                                 <button type="button" data-grid-nudge="0,1" aria-label="Nudge grid down">↓</button>
                             </div>
+                            <button type="button" data-detect-grid>Find Printed Grid</button>
                             <button type="button" data-save-grid>Save Grid</button>
                             <button type="button" data-reset-grid>Reset Preview</button>
+                            <span class="gmrt-grid-calibrator__registration" data-grid-registration-status role="status" aria-live="polite">Printed-grid detection is idle.</span>
                         </div>
                     </details>
                 <?php endif; ?>
