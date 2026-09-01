@@ -2163,3 +2163,27 @@
 .gmrt-board__viewport.is-generated-surface .gmrt-board__map { display:none !important; }
 
 /* IV.30.2A.1A forensic corrective — generated battlefield origin provenance. */
+
+/* Phase IV.30.2B — Beyond the Dungeon Walls */
+.gmrt-dungeon-forge-layer .gmrt-forge-features { pointer-events:none; }
+.gmrt-dungeon-forge-layer .gmrt-forge-features rect,
+.gmrt-dungeon-forge-layer .gmrt-forge-features polyline { vector-effect:non-scaling-stroke; }
+.gmrt-dungeon-forge-layer[data-forge-scene-type="forest"] .gmrt-forge-floor rect { fill:rgba(86,113,55,.38); }
+.gmrt-dungeon-forge-layer[data-forge-scene-type="forest"] .gmrt-forge-rock { fill:#171b12; }
+.gmrt-dungeon-forge-layer .gmrt-forge-features .is-clearing { fill:rgba(181,166,104,.25); stroke:rgba(223,205,137,.28); stroke-width:.08; }
+.gmrt-dungeon-forge-layer .gmrt-forge-features .is-trail { fill:none; stroke:rgba(192,160,105,.72); stroke-width:1.45; stroke-linecap:round; stroke-linejoin:round; }
+.gmrt-dungeon-forge-layer .gmrt-forge-features .is-tree-cluster,
+.gmrt-dungeon-forge-layer .gmrt-forge-features .is-village-tree { fill:rgba(46,77,38,.88); stroke:rgba(119,144,79,.8); stroke-width:.12; }
+.gmrt-dungeon-forge-layer .gmrt-forge-features .is-rock-cluster { fill:rgba(78,78,68,.9); stroke:rgba(151,145,122,.75); stroke-width:.12; }
+.gmrt-dungeon-forge-layer .gmrt-forge-features .is-fallen-log { fill:rgba(91,62,34,.9); stroke:rgba(165,120,68,.7); stroke-width:.1; }
+.gmrt-dungeon-forge-layer[data-forge-scene-type="village"] .gmrt-forge-floor rect { fill:rgba(109,91,57,.34); }
+.gmrt-dungeon-forge-layer[data-forge-scene-type="village"] .gmrt-forge-rock { fill:#1c1913; }
+.gmrt-dungeon-forge-layer .gmrt-forge-features .is-road { fill:rgba(138,111,73,.72); stroke:none; }
+.gmrt-dungeon-forge-layer .gmrt-forge-features .is-village-square { fill:rgba(157,139,99,.62); stroke:rgba(213,190,133,.45); stroke-width:.09; }
+.gmrt-dungeon-forge-layer .gmrt-forge-features .is-house,
+.gmrt-dungeon-forge-layer .gmrt-forge-features .is-cottage,
+.gmrt-dungeon-forge-layer .gmrt-forge-features .is-workshop,
+.gmrt-dungeon-forge-layer .gmrt-forge-features .is-inn { fill:rgba(112,66,43,.9); stroke:rgba(222,177,105,.82); stroke-width:.14; }
+.gmrt-dungeon-forge-layer .gmrt-forge-features .is-inn { fill:rgba(131,73,44,.95); }
+.gmrt-dungeon-forge-layer .gmrt-forge-features .is-well { fill:rgba(78,92,95,.9); stroke:rgba(179,192,181,.82); stroke-width:.13; }
+.gmrt-dungeon-forge-layer .gmrt-forge-features .is-fenced-garden { fill:rgba(71,101,52,.58); stroke:rgba(177,145,84,.95); stroke-width:.13; stroke-dasharray:.3 .2; }

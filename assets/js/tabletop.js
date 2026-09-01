@@ -2460,6 +2460,7 @@
     const dungeonForge = document.querySelector('[data-dungeon-forge]');
     const dungeonForgeLayer = document.querySelector('[data-dungeon-forge-layer]');
     const dungeonForgeSeed = document.querySelector('[data-dungeon-forge-seed]');
+    const dungeonForgeSceneType = document.querySelector('[data-dungeon-forge-scene-type]');
     const dungeonForgeStyle = document.querySelector('[data-dungeon-forge-style]');
     const dungeonForgeTheme = document.querySelector('[data-dungeon-forge-theme]');
     const dungeonForgeGenerate = document.querySelector('[data-dungeon-forge-generate]');
@@ -2502,6 +2503,7 @@
         dungeonForgeLayer.classList.add('has-plan');
         dungeonForgeLayer.classList.toggle('is-draft', draft);
         dungeonForgeLayer.dataset.forgeTheme = String(plan.theme || 'pantry-stone');
+        dungeonForgeLayer.dataset.forgeSceneType = String(plan.scene_type || 'dungeon');
 
         const rock = forgeSvg('rect', { x: 0, y: 0, width: cols, height: rows, class: 'gmrt-forge-rock' });
         dungeonForgeLayer.appendChild(rock);
@@ -2560,6 +2562,19 @@
             }
         }
         dungeonForgeLayer.appendChild(decorate);
+
+        const featureGroup = forgeSvg('g', { class: 'gmrt-forge-features' });
+        (plan.features || []).forEach((feature) => {
+            const kind = String(feature.kind || 'feature');
+            if (kind === 'trail' && Array.isArray(feature.points) && feature.points.length > 1) {
+                featureGroup.appendChild(forgeSvg('polyline', { points:feature.points.map(p=>`${p.x},${p.y}`).join(' '), class:'is-trail' }));
+                return;
+            }
+            const x=Number(feature.x||0), y=Number(feature.y||0), w=Math.max(.2,Number(feature.w||1)), h=Math.max(.2,Number(feature.h||1));
+            featureGroup.appendChild(forgeSvg('rect', { x, y, width:w, height:h, rx:kind.includes('tree')?.7:kind==='well'?.5:.12, class:`is-${kind}` }));
+        });
+        dungeonForgeLayer.appendChild(featureGroup);
+
         const lineGroup = forgeSvg('g', { class: 'gmrt-forge-ink' });
         plan.floor.forEach((cell) => {
             const x = Number(cell.x); const y = Number(cell.y);
@@ -2753,9 +2768,111 @@
         });
 
         return {
-            version:2, seed, style, theme, cols, rows,
-            floor:[...floor.values()], rooms, doors, barriers, lights
+            version:3, scene_type:'dungeon', seed, style, theme, cols, rows,
+            floor:[...floor.values()], rooms, doors, barriers, lights, features:[]
         };
+    };
+
+
+    // IV.30.2B — Beyond the Dungeon Walls.
+    // Scene Type owns topology; Theme owns presentation. Forests and villages
+    // therefore compose with the same Great Marketrealm treatments without
+    // borrowing dungeon room/corridor geometry.
+    const forgePlanDimensions = (style, preferredAspect = null) => {
+        const colsByStyle = { compact:24, standard:32, grand:40 };
+        const cols = colsByStyle[style] || colsByStyle.standard;
+        const measuredAspect = preferredAspect === null
+            ? (board.clientHeight / Math.max(1, board.clientWidth))
+            : Number(preferredAspect);
+        const boardAspect = Math.max(.5, Math.min(2, measuredAspect || .7));
+        return { cols, rows:Math.max(12, Math.min(36, Math.round(cols * boardAspect))) };
+    };
+
+    const forgeBoundaryBarriers = (cols, rows) => [
+        {type:'wall',x1:0,y1:0,x2:1,y2:0},
+        {type:'wall',x1:1,y1:0,x2:1,y2:1},
+        {type:'wall',x1:1,y1:1,x2:0,y2:1},
+        {type:'wall',x1:0,y1:1,x2:0,y2:0}
+    ];
+
+    const forgeObstacleRect = (barriers, feature, cols, rows, doorway = null) => {
+        const x1=feature.x, y1=feature.y, x2=feature.x+feature.w, y2=feature.y+feature.h;
+        const add=(ax,ay,bx,by)=>barriers.push({type:'wall',x1:ax/cols,y1:ay/rows,x2:bx/cols,y2:by/rows});
+        if (!doorway) {
+            add(x1,y1,x2,y1); add(x2,y1,x2,y2); add(x2,y2,x1,y2); add(x1,y2,x1,y1); return;
+        }
+        const side=doorway.side; const d1=doorway.at; const d2=doorway.at+1;
+        if (side==='south') { add(x1,y1,x2,y1); add(x2,y1,x2,y2); add(x2,y2,d2,y2); add(d1,y2,x1,y2); add(x1,y2,x1,y1); }
+        else if (side==='north') { add(x1,y1,d1,y1); add(d2,y1,x2,y1); add(x2,y1,x2,y2); add(x2,y2,x1,y2); add(x1,y2,x1,y1); }
+        else { add(x1,y1,x2,y1); add(x2,y1,x2,y2); add(x2,y2,x1,y2); add(x1,y2,x1,y1); }
+        barriers.push({type:'door',x1:d1/cols,y1:(side==='north'?y1:y2)/rows,x2:d2/cols,y2:(side==='north'?y1:y2)/rows});
+    };
+
+    const generateForestForgePlan = (seed, style, theme = 'pantry-stone', preferredAspect = null) => {
+        const {cols,rows}=forgePlanDimensions(style, preferredAspect);
+        const random=forgeRandom(`${seed}|${style}|forest`);
+        const integer=(min,max)=>min+Math.floor(random()*((max-min)+1));
+        const floor=[]; for(let y=0;y<rows;y+=1) for(let x=0;x<cols;x+=1) floor.push({x,y});
+        const features=[]; const barriers=forgeBoundaryBarriers(cols,rows); const rooms=[];
+        const clearingCount={compact:3,standard:4,grand:5}[style]||4;
+        for(let i=0;i<clearingCount;i+=1){
+            const w=integer(5,8), h=integer(4,6), x=integer(2,Math.max(2,cols-w-3)), y=integer(2,Math.max(2,rows-h-3));
+            rooms.push({x,y,w,h}); features.push({kind:'clearing',x,y,w,h});
+        }
+        const trail=[];
+        rooms.sort((a,b)=>a.x-b.x).forEach((room,index)=>{
+            const cx=Math.floor(room.x+room.w/2), cy=Math.floor(room.y+room.h/2);
+            trail.push({x:cx,y:cy});
+            if(index>0){ const prev=rooms[index-1]; trail.push({x:cx,y:Math.floor(prev.y+prev.h/2)}); }
+        });
+        features.push({kind:'trail',points:trail});
+        const obstacleCount={compact:9,standard:14,grand:20}[style]||14;
+        for(let i=0;i<obstacleCount;i+=1){
+            const w=integer(2,4), h=integer(2,4), x=integer(1,Math.max(1,cols-w-2)), y=integer(1,Math.max(1,rows-h-2));
+            const blocked=rooms.some(r=>x<r.x+r.w+1&&x+w+1>r.x&&y<r.y+r.h+1&&y+h+1>r.y);
+            if(blocked){ i-=1; continue; }
+            const kind=i%5===0?'rock-cluster':'tree-cluster'; const feature={kind,x,y,w,h}; features.push(feature); forgeObstacleRect(barriers,feature,cols,rows);
+        }
+        const logCount=style==='compact'?2:style==='grand'?5:3;
+        for(let i=0;i<logCount;i+=1){
+            const x=integer(2,cols-5), y=integer(2,rows-3); const feature={kind:'fallen-log',x,y,w:3,h:1}; features.push(feature);
+            barriers.push({type:'wall',x1:x/cols,y1:(y+.5)/rows,x2:(x+3)/cols,y2:(y+.5)/rows});
+        }
+        const lights=rooms.slice(0,Math.min(3,rooms.length)).map((r,i)=>({kind:i===0?'brazier':'lantern',x:(r.x+r.w/2)/cols,y:(r.y+r.h/2)/rows}));
+        return {version:3,scene_type:'forest',seed,style,theme,cols,rows,floor,rooms,doors:[],barriers,lights,features};
+    };
+
+    const generateVillageForgePlan = (seed, style, theme = 'pantry-stone', preferredAspect = null) => {
+        const {cols,rows}=forgePlanDimensions(style, preferredAspect);
+        const random=forgeRandom(`${seed}|${style}|village`);
+        const integer=(min,max)=>min+Math.floor(random()*((max-min)+1));
+        const floor=[]; for(let y=0;y<rows;y+=1) for(let x=0;x<cols;x+=1) floor.push({x,y});
+        const features=[]; const barriers=forgeBoundaryBarriers(cols,rows); const rooms=[]; const doors=[];
+        const roadY=Math.floor(rows/2); features.push({kind:'road',x:0,y:roadY-1,w:cols,h:3});
+        const square={kind:'village-square',x:Math.floor(cols/2)-3,y:roadY-3,w:7,h:7}; features.push(square);
+        const slots=[]; for(let x=2;x<cols-6;x+=7){ slots.push({x,y:2}); slots.push({x,y:Math.max(2,rows-7)}); }
+        const count=Math.min(slots.length,{compact:5,standard:7,grand:10}[style]||7);
+        for(let i=0;i<count;i+=1){
+            const slot=slots[i]; const w=integer(4,6), h=integer(3,5); const x=Math.min(cols-w-2,slot.x), y=Math.min(rows-h-2,slot.y);
+            const kind=i===0?'inn':i===1?'cottage':i===2?'workshop':'house'; const feature={kind,x,y,w,h}; features.push(feature); rooms.push({x,y,w,h});
+            const side=y<roadY?'south':'north'; const at=Math.max(x+1,Math.min(x+w-2,Math.floor(x+w/2))); const doorway={side,at};
+            forgeObstacleRect(barriers,feature,cols,rows,doorway);
+            const dy=(side==='north'?y:y+h)/rows; const door={x1:at/cols,y1:dy,x2:(at+1)/cols,y2:dy}; doors.push(door);
+        }
+        const well={kind:'well',x:Math.floor(cols/2),y:roadY,w:1,h:1}; features.push(well);
+        const wx=well.x, wy=well.y; barriers.push({type:'wall',x1:(wx-.35)/cols,y1:(wy-.35)/rows,x2:(wx+.35)/cols,y2:(wy-.35)/rows}); barriers.push({type:'wall',x1:(wx+.35)/cols,y1:(wy-.35)/rows,x2:(wx+.35)/cols,y2:(wy+.35)/rows});
+        features.push({kind:'fenced-garden',x:Math.max(2,cols-9),y:Math.max(2,roadY-6),w:5,h:4});
+        const garden=features[features.length-1]; forgeObstacleRect(barriers,garden,cols,rows);
+        const treeCount=style==='compact'?3:style==='grand'?8:5;
+        for(let i=0;i<treeCount;i+=1){ const feature={kind:'village-tree',x:integer(1,cols-3),y:integer(1,rows-3),w:2,h:2}; features.push(feature); forgeObstacleRect(barriers,feature,cols,rows); }
+        const lights=[{kind:'lantern',x:.5,y:(roadY+.5)/rows},{kind:'brazier',x:(square.x+square.w/2)/cols,y:(square.y+square.h/2)/rows}];
+        return {version:3,scene_type:'village',seed,style,theme,cols,rows,floor,rooms,doors,barriers,lights,features};
+    };
+
+    const generateSceneForgePlan = (sceneType, seed, style, theme = 'pantry-stone', preferredAspect = null) => {
+        if (sceneType === 'forest') return generateForestForgePlan(seed, style, theme, preferredAspect);
+        if (sceneType === 'village') return generateVillageForgePlan(seed, style, theme, preferredAspect);
+        return generateDungeonForgePlan(seed, style, theme, preferredAspect);
     };
 
     const setForgeStatus = (message) => {
@@ -2768,14 +2885,15 @@
             setForgeStatus('This Scene already contains a forged dungeon. Prepare another Scene to forge a new one.');
             return;
         }
+        const sceneType = String(dungeonForgeSceneType?.value || 'dungeon');
         const seed = String(dungeonForgeSeed?.value || '').trim() || 'Peppercorn-01';
         const style = String(dungeonForgeStyle?.value || 'standard');
         const theme = String(dungeonForgeTheme?.value || 'pantry-stone');
-        dungeonForgeDraft = generateDungeonForgePlan(seed, style, theme);
+        dungeonForgeDraft = generateSceneForgePlan(sceneType, seed, style, theme);
         renderDungeonForgePlan(dungeonForgeDraft, true);
         if (dungeonForgeBuild) dungeonForgeBuild.disabled = false;
         if (dungeonForgeClear) dungeonForgeClear.disabled = false;
-        setForgeStatus(`${dungeonForgeDraft.rooms.length} rooms · ${dungeonForgeDraft.barriers.length} walls/doors · ${dungeonForgeDraft.doors.length} doors · ${dungeonForgeDraft.lights.length} suggested lights · preview only.`);
+        setForgeStatus(`${String(dungeonForgeDraft.scene_type || 'dungeon')} · ${dungeonForgeDraft.rooms.length} major places · ${dungeonForgeDraft.barriers.length} vision objects · ${dungeonForgeDraft.doors.length} doors · ${dungeonForgeDraft.lights.length} suggested lights · preview only.`);
     };
 
     dungeonForgeGenerate?.addEventListener('click', () => {
@@ -3372,6 +3490,7 @@
     const atlasClose = document.querySelector('[data-atlas-close]');
     const atlasForgeName = document.querySelector('[data-atlas-forge-name]');
     const atlasForgeSeed = document.querySelector('[data-atlas-forge-seed]');
+    const atlasForgeSceneType = document.querySelector('[data-atlas-forge-scene-type]');
     const atlasForgeStyle = document.querySelector('[data-atlas-forge-style]');
     const atlasForgeTheme = document.querySelector('[data-atlas-forge-theme]');
     const atlasForgeReroll = document.querySelector('[data-atlas-forge-reroll]');
@@ -3399,11 +3518,12 @@
 
     atlasForgeCreate?.addEventListener('click', async () => {
         const sceneName = String(atlasForgeName?.value || '').trim();
+        const sceneType = String(atlasForgeSceneType?.value || 'dungeon');
         const seed = String(atlasForgeSeed?.value || '').trim() || 'Peppercorn-01';
         const style = String(atlasForgeStyle?.value || 'standard');
         const theme = String(atlasForgeTheme?.value || 'pantry-stone');
         if (!sceneName) {
-            const message = 'Give Pippin a name for the new dungeon first.';
+            const message = 'Give Pippin a name for the new Scene first.';
             if (atlasForgeStatus) atlasForgeStatus.textContent = message;
             atlasForgeName?.focus();
             say(message);
@@ -3413,9 +3533,9 @@
         let plan;
         try {
             const aspectByStyle = { compact:.78, standard:.7, grand:.65 };
-            plan = generateDungeonForgePlan(seed, style, theme, aspectByStyle[style] || .7);
+            plan = generateSceneForgePlan(sceneType, seed, style, theme, aspectByStyle[style] || .7);
         } catch (error) {
-            const message = error?.message || 'Pippin could not prepare that dungeon plan.';
+            const message = error?.message || 'Pippin could not prepare that Scene plan.';
             if (atlasForgeStatus) atlasForgeStatus.textContent = message;
             say(message);
             return;
@@ -3440,7 +3560,7 @@
                 window.location.reload();
             }
         } catch (error) {
-            const message = error?.message || 'The new dungeon Scene could not be forged.';
+            const message = error?.message || 'The new generated Scene could not be forged.';
             if (atlasForgeStatus) atlasForgeStatus.textContent = message;
             say(message);
             atlasForgeCreate.disabled = false;

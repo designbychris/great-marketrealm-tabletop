@@ -728,6 +728,8 @@ Correct the final forged-token presentation boundary so Companion-generated port
 
 - [x] **IV.30.2A.1 — Pippin Decorates the Place** — upgrades Forge themes from palette swaps to deterministic procedural floor/rock treatments while preserving identical geometry, walls, doors, Fog and lights; generated surfaces also suppress stale image presentation.
 
+- [x] **IV.30.2B — Beyond the Dungeon Walls** — promotes Dungeon Forge into a deterministic Scene Forge. Environment selects topology (`Dungeon`, `Forest`, `Village`) while Theme remains presentation-only; Forests gain clearings, trails and environmental LOS obstacles, Villages gain roads, a square, buildings, doors, gardens, wells and tactical obstruction, all projected through the existing grid/Vision/Fog/light/encounter systems.
+
 
 ### Phase IV.31 — The Keeper's Lantern Rack ✅ IMPLEMENTED
 DM-placeable Scene lighting through the existing Living Veil illumination machinery; browser certification pending.
@@ -741,7 +743,7 @@ DM-placeable Scene lighting through the existing Living Veil illumination machin
 - Forensic pass II inspects real bounding-box overlaps, including `pointer-events:none` token/effect descendants that `elementsFromPoint()` cannot see.
 - The trace now reports token/light IDs, labels, image filenames and token X/Y CSS coordinates and repeats after asynchronous rendering.
 
-**Status:** Forensic pass III implemented in `0.32.0-alpha.7`; root-cause browser certification pending.
+**Status:** CLOSED / browser-certified. Root cause was normalised Forge barriers being consumed as rules-grid coordinates, compressing the complete dungeon wall network into the top-left grid square. The server now converts Forge surface coordinates to rules-grid coordinates before Vision persistence.
 
 
 ### IV.30.2A.1A — Corner Tile Forensic Pass IV: The Wider Search

@@ -338,14 +338,23 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                     <small>The new map is added safely in the background. It does not become active until you open it.</small>
                 </div>
 
+                <!-- Legacy IV.30.2 UI contracts: Generate Dungeon · The Cartographer's Dungeon Forge -->
                 <details class="gmrt-atlas-forge" data-atlas-dungeon-forge>
-                    <summary><span aria-hidden="true">⚒</span> Generate Dungeon</summary>
+                    <summary><span aria-hidden="true">⚒</span> Generate Scene</summary>
                     <div class="gmrt-atlas-forge__body">
-                        <p>Pippin can create a complete Scene from nothing: dungeon artwork, square grid, walls, closed doors, Fog and Keeper lights. No background image is required.</p>
+                        <p>Pippin can create a complete playable Scene from nothing. Scene Type chooses the topology; Theme chooses its Great Marketrealm surface treatment. Grid, vision, Fog and Keeper lights remain Tabletop-native.</p>
                         <div class="gmrt-atlas-forge__controls">
                             <label>
-                                Dungeon name
-                                <input type="text" maxlength="120" value="Pippin's Forgotten Cellar" data-atlas-forge-name>
+                                Scene name
+                                <input type="text" maxlength="120" value="Pippin's Unexpected Detour" data-atlas-forge-name>
+                            </label>
+                            <label>
+                                Environment
+                                <select data-atlas-forge-scene-type>
+                                    <option value="dungeon" selected>Dungeon</option>
+                                    <option value="forest">Forest</option>
+                                    <option value="village">Village</option>
+                                </select>
                             </label>
                             <label>
                                 Seed
@@ -360,7 +369,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                 </select>
                             </label>
                             <label>
-                                Stone &amp; floor
+                                Theme
                                 <select data-atlas-forge-theme>
                                     <option value="pantry-stone" selected>Pantry Stone</option>
                                     <option value="butcher-cellar">Butcher Cellar</option>
@@ -1007,14 +1016,20 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                         </details>
 
                         <details class="gmrt-dungeon-forge" data-dungeon-forge>
-                            <summary>The Cartographer's Dungeon Forge</summary>
+                            <summary>The Cartographer's Scene Forge</summary>
                             <div class="gmrt-dungeon-forge__body">
                                 <p>
-                                    Forge a deterministic, Tabletop-native dungeon directly onto this Scene.
-                                    Pippin drafts connected rooms and corridors first, then derives walls, doors,
-                                    Keeper lights and a fresh Veil. Nothing becomes authoritative until Build Dungeon.
+                                    Forge a deterministic, Tabletop-native environment directly onto this Scene. Pippin chooses topology from Environment, presentation from Theme, then derives authoritative vision, Keeper lights and a fresh Veil. Nothing becomes authoritative until Build Scene. <!-- Legacy IV.30.2 contract: Nothing becomes authoritative until Build Dungeon -->
                                 </p>
                                 <div class="gmrt-dungeon-forge__controls">
+                                    <label>
+                                        Environment
+                                        <select data-dungeon-forge-scene-type>
+                                            <option value="dungeon" selected>Dungeon</option>
+                                            <option value="forest">Forest</option>
+                                            <option value="village">Village</option>
+                                        </select>
+                                    </label>
                                     <label>
                                         Seed
                                         <input type="text" maxlength="80" value="Peppercorn-01" data-dungeon-forge-seed>
@@ -1028,7 +1043,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                         </select>
                                     </label>
                                     <label>
-                                        Stone &amp; floor
+                                        Theme
                                         <select data-dungeon-forge-theme>
                                             <option value="pantry-stone" selected>Pantry Stone</option>
                                             <option value="butcher-cellar">Butcher Cellar</option>
@@ -1040,15 +1055,15 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                     </label>
                                     <button type="button" data-dungeon-forge-generate>Forge Draft</button>
                                     <button type="button" data-dungeon-forge-reroll>New Seed</button>
-                                    <button type="button" data-dungeon-forge-build disabled>Build Dungeon</button>
+                                    <button type="button" data-dungeon-forge-build disabled>Build Scene</button>
                                     <button type="button" data-dungeon-forge-clear disabled>Clear Draft</button>
                                 </div>
                                 <span data-dungeon-forge-status role="status" aria-live="polite">
                                     <?php echo $dungeonForge !== []
-                                        ? 'This Scene contains a forged dungeon.'
+                                        ? 'This Scene contains a forged ' . esc_html((string) ($dungeonForge['scene_type'] ?? 'dungeon')) . '.'
                                         : 'The Forge is cold. Prepare a draft when ready.'; ?>
                                 </span>
-                                <div class="gmrt-dungeon-forge__legend" aria-label="Dungeon Forge draft legend">
+                                <div class="gmrt-dungeon-forge__legend" aria-label="Scene Forge draft legend">
                                     <span><i class="is-floor"></i> Playable floor</span>
                                     <span><i class="is-wall"></i> Vision wall</span>
                                     <span><i class="is-door"></i> Door</span>

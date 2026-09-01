@@ -69,7 +69,7 @@ final class DungeonForgeAjaxController
 
             return [
                 'message' => sprintf(
-                    'Dungeon forged · %d rooms · %d barriers · %d lights · Fog enabled.',
+                    'Scene forged · %d major places · %d barriers · %d lights · Fog enabled.',
                     count($plan['rooms']),
                     count($projection['barrier_ids']),
                     count($projection['light_ids'])
@@ -115,7 +115,7 @@ final class DungeonForgeAjaxController
                 'scene' => $scene->toArray(),
                 'forge' => $projection,
                 'message' => sprintf(
-                    '%s has been forged into the Keeper\'s Atlas · %d rooms · %d doors · %d lights.',
+                    '%s has been forged into the Keeper\'s Atlas · %d major places · %d doors · %d lights.',
                     $scene->name(),
                     count($plan['rooms']),
                     count($plan['doors']),
@@ -131,7 +131,7 @@ final class DungeonForgeAjaxController
         $raw = isset($_POST['plan']) ? wp_unslash((string) $_POST['plan']) : '{}';
         $decoded = json_decode($raw, true);
         if (! is_array($decoded)) {
-            throw new RuntimeException('The Dungeon Forge draft could not be read.');
+            throw new RuntimeException('The Scene Forge draft could not be read.');
         }
         return $this->normalisePlan($decoded);
     }
@@ -161,11 +161,12 @@ final class DungeonForgeAjaxController
             $lightIds[] = $id;
         }
 
-        // A forged dungeon starts veiled. The Keeper still owns the final reveal.
+        // Every forged environment starts veiled. The Keeper still owns the final reveal.
         $fog = $this->fog->configure($tableId, $userId, true, true, $sceneId);
 
         $projection = [
-            'version' => 2,
+            'version' => 3,
+            'scene_type' => $plan['scene_type'],
             'seed' => $plan['seed'],
             'style' => $plan['style'],
             'theme' => $plan['theme'],
@@ -175,6 +176,7 @@ final class DungeonForgeAjaxController
             'rooms' => $plan['rooms'],
             'doors' => $plan['doors'],
             'lights' => $plan['lights'],
+            'features' => $plan['features'],
             'barrier_ids' => array_map(static fn ($barrier): string => $barrier->id(), $created),
             'light_ids' => $lightIds,
             'built_at' => gmdate(DATE_ATOM),
@@ -216,6 +218,11 @@ final class DungeonForgeAjaxController
             throw new RuntimeException('The Dungeon Forge requires a short deterministic seed.');
         }
 
+        $sceneType = sanitize_key((string) ($plan['scene_type'] ?? 'dungeon'));
+        if (! in_array($sceneType, ['dungeon', 'forest', 'village'], true)) {
+            $sceneType = 'dungeon';
+        }
+
         $style = sanitize_key((string) ($plan['style'] ?? 'standard'));
         if (! in_array($style, ['compact', 'standard', 'grand'], true)) {
             $style = 'standard';
@@ -236,8 +243,8 @@ final class DungeonForgeAjaxController
             $y = (int) ($cell['y'] ?? -1);
             if ($x < 0 || $x >= $cols || $y < 0 || $y >= $rows) continue;
             $floor[$x . ':' . $y] = ['x' => $x, 'y' => $y];
-            if (count($floor) > 1200) {
-                throw new RuntimeException('That Dungeon Forge floor plan is too large for one Scene.');
+            if (count($floor) > 1600) {
+                throw new RuntimeException('That Scene Forge floor plan is too large for one Scene.');
             }
         }
         if (count($floor) < 18) {
@@ -255,7 +262,7 @@ final class DungeonForgeAjaxController
             if (count($rooms) > 24) break;
         }
         if (count($rooms) < 3) {
-            throw new RuntimeException('The Dungeon Forge requires at least three connected rooms.');
+            throw new RuntimeException('The Scene Forge requires at least three major playable places.');
         }
 
         $barriers = [];
@@ -307,8 +314,34 @@ final class DungeonForgeAjaxController
             if (count($lights) >= 20) break;
         }
 
+        $features = [];
+        foreach (is_array($plan['features'] ?? null) ? $plan['features'] : [] as $feature) {
+            if (! is_array($feature)) continue;
+            $kind = sanitize_key((string) ($feature['kind'] ?? 'feature'));
+            if ($kind === '') continue;
+            $normalised = ['kind' => $kind];
+            foreach (['x', 'y', 'w', 'h'] as $field) {
+                if (array_key_exists($field, $feature)) {
+                    $normalised[$field] = max(0.0, min((float) ($field === 'x' || $field === 'w' ? $cols : $rows), (float) $feature[$field]));
+                }
+            }
+            if (isset($feature['points']) && is_array($feature['points'])) {
+                $points = [];
+                foreach (array_slice($feature['points'], 0, 80) as $point) {
+                    if (! is_array($point)) continue;
+                    $points[] = [
+                        'x' => max(0.0, min((float) $cols, (float) ($point['x'] ?? 0))),
+                        'y' => max(0.0, min((float) $rows, (float) ($point['y'] ?? 0))),
+                    ];
+                }
+                $normalised['points'] = $points;
+            }
+            $features[] = $normalised;
+            if (count($features) >= 80) break;
+        }
+
         $floor = array_values($floor);
-        return compact('seed', 'style', 'theme', 'cols', 'rows', 'floor', 'rooms', 'barriers', 'doors', 'lights');
+        return compact('seed', 'style', 'theme', 'cols', 'rows', 'floor', 'rooms', 'barriers', 'doors', 'lights', 'features') + ['scene_type' => $sceneType];
     }
 
     private function clamp(float $value): float
