@@ -1,3 +1,12 @@
+## 0.30.1-alpha.11 — Phase IV.30.1E: The Cartographer's Lens Controls
+
+- Moves the Cartographer's Lens zoom, fit and reset controls into a compact fixed overlay directly on the battlemap.
+- Reuses the established Lens scale/translation state and drag-to-pan behaviour rather than introducing a parallel map-navigation system.
+- Adds live zoom percentage, accessible labels/tooltips, focus-visible treatment and automatic disabled states at the existing 25% / 300% zoom bounds.
+- Gives Fit Map a small viewport gutter so artwork does not sit flush against the Lens edge.
+- Keeps all view manipulation client-side; no authoritative Scene, grid, Fog, token or cartography state is mutated.
+- Version: `0.30.1-alpha.11`.
+
 ## 0.30.1-alpha.10 — Phase IV.30.1D.1: The Connected Dungeon
 
 - Added a playable-floor connectivity pass to Hybrid Judgement before structural and organic linework are merged.

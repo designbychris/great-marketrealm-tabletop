@@ -24,7 +24,7 @@ final class PluginFoundationTest extends TestCase
             $source
         );
         self::assertStringContainsString(
-            "define('GMRT_VERSION', '0.30.1-alpha.10')",
+            "define('GMRT_VERSION', '0.30.1-alpha.11')",
             $source
         );
         self::assertStringContainsString(

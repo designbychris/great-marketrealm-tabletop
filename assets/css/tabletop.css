@@ -1132,6 +1132,61 @@
 }
 
 
+/* Phase IV.30.1E — The Cartographer's Lens Controls */
+.gmrt-board__lens-controls {
+    position: absolute;
+    top: .75rem;
+    right: .75rem;
+    z-index: 45;
+    display: grid;
+    grid-template-columns: minmax(2.55rem, auto);
+    gap: .28rem;
+    padding: .32rem;
+    border: 1px solid rgba(244,234,214,.42);
+    border-radius: 10px;
+    background: rgba(20,17,12,.88);
+    box-shadow: 0 5px 18px rgba(0,0,0,.34);
+    backdrop-filter: blur(4px);
+}
+.gmrt-board__lens-controls button {
+    min-width: 2.55rem;
+    min-height: 2.35rem;
+    border: 1px solid rgba(244,234,214,.34);
+    border-radius: 7px;
+    padding: .34rem .46rem;
+    background: rgba(0,0,0,.32);
+    color: inherit;
+    font: 800 .78rem system-ui,sans-serif;
+    cursor: pointer;
+}
+.gmrt-board__lens-controls button[data-lens-zoom-in],
+.gmrt-board__lens-controls button[data-lens-zoom-out] {
+    font-size: 1.15rem;
+    line-height: 1;
+}
+.gmrt-board__lens-controls button:disabled {
+    cursor: not-allowed;
+    opacity: .42;
+}
+.gmrt-board__lens-controls button:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+}
+.gmrt-board__lens-controls output {
+    min-width: 2.55rem;
+    padding: .18rem .25rem;
+    text-align: center;
+    font: 800 .68rem system-ui,sans-serif;
+    opacity: .86;
+}
+@media (max-width: 640px) {
+    .gmrt-board__lens-controls {
+        top: .5rem;
+        right: .5rem;
+    }
+}
+
+
 /* Phase IV.22 — The Veil of the Unknown */
 .gmrt-fog-controls {
     display: flex;

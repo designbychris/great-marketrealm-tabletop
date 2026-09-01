@@ -883,12 +883,7 @@ $sceneImage = $scene !== null
 
                 <div class="gmrt-cartographers-lens" data-cartographers-lens>
                     <strong class="gmrt-cartographers-lens__title">Cartographer's Lens</strong>
-                    <button type="button" data-lens-zoom-out aria-label="Zoom battlefield out">−</button>
-                    <output data-lens-zoom aria-live="polite">100%</output>
-                    <button type="button" data-lens-zoom-in aria-label="Zoom battlefield in">+</button>
-                    <button type="button" data-lens-fit>Fit Map</button>
-                    <button type="button" data-lens-reset>Reset View</button>
-                    <span class="gmrt-cartographers-lens__hint">Drag the map to pan while zoomed.</span>
+                    <span class="gmrt-cartographers-lens__hint">Drag the map to pan. View controls now stay with the battlefield.</span>
                 </div>
 
                 <?php if ($state->isDungeonMaster()) : ?>
@@ -1015,7 +1010,18 @@ $sceneImage = $scene !== null
                 <?php endif; ?>
 
                 <div class="gmrt-board__lens-stage" data-lens-stage>
-                <div
+                    <nav
+                        class="gmrt-board__lens-controls"
+                        data-lens-controls
+                        aria-label="Battlemap view controls"
+                    >
+                        <button type="button" data-lens-zoom-in aria-label="Zoom battlefield in" title="Zoom in">+</button>
+                        <button type="button" data-lens-zoom-out aria-label="Zoom battlefield out" title="Zoom out">−</button>
+                        <output data-lens-zoom aria-live="polite" aria-label="Battlemap zoom level">100%</output>
+                        <button type="button" data-lens-fit aria-label="Fit battlefield to view" title="Fit map to view">Fit</button>
+                        <button type="button" data-lens-reset aria-label="Reset battlefield view to 100 percent" title="Reset view to 100%">Reset</button>
+                    </nav>
+                    <div
                     class="gmrt-board__viewport"
                     data-grid-type="<?php echo esc_attr(
                         (string) $scene['grid_type']

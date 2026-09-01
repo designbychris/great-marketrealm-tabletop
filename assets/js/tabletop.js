@@ -573,6 +573,8 @@
             lensZoomLabel.value = label;
             lensZoomLabel.textContent = label;
         }
+        if (lensZoomOut) lensZoomOut.disabled = lens.scale <= lens.min + .0001;
+        if (lensZoomIn) lensZoomIn.disabled = lens.scale >= lens.max - .0001;
     };
 
     const zoomLens = (delta) => {
@@ -596,9 +598,12 @@
         const mapWidth = lensViewport.offsetWidth;
         const mapHeight = lensViewport.offsetHeight;
         if (!mapWidth || !mapHeight) return;
+        const fitPadding = 24;
+        const availableWidth = Math.max(1, lensStage.clientWidth - (fitPadding * 2));
+        const availableHeight = Math.max(1, lensStage.clientHeight - (fitPadding * 2));
         lens.scale = clampLensScale(Math.min(
-            lensStage.clientWidth / mapWidth,
-            lensStage.clientHeight / mapHeight
+            availableWidth / mapWidth,
+            availableHeight / mapHeight
         ));
         lens.x = (lensStage.clientWidth - (mapWidth * lens.scale)) / 2;
         lens.y = (lensStage.clientHeight - (mapHeight * lens.scale)) / 2;
@@ -616,6 +621,7 @@
     lensZoomIn?.addEventListener('click', () => zoomLens(lens.step));
     lensFit?.addEventListener('click', fitLens);
     lensReset?.addEventListener('click', resetLens);
+    renderLens();
 
     const isLensInteractiveTarget = (target) =>
         target instanceof Element
