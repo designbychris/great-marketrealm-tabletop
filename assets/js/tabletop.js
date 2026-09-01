@@ -3818,16 +3818,18 @@
 
     keeperLightButtons.forEach((button) => button.addEventListener('click', () => {
         keeperLightPlacement=String(button.dataset.keeperLightKind || 'torch');
+        board.classList.add('is-keeper-light-placing');
+        root.dataset.keeperLightPlacement = keeperLightPlacement;
         keeperLightButtons.forEach((candidate)=>candidate.classList.toggle('is-active',candidate===button));
         if (keeperLightCancel) keeperLightCancel.disabled=false;
         if (keeperLightStatus) keeperLightStatus.textContent=`${keeperLightLabels[keeperLightPlacement] || 'Light'} selected — click the map to place it.`;
     }));
-    keeperLightCancel?.addEventListener('click',()=>{keeperLightPlacement=null;keeperLightButtons.forEach((button)=>button.classList.remove('is-active'));keeperLightCancel.disabled=true;if(keeperLightStatus)keeperLightStatus.textContent='Placement finished.';});
+    keeperLightCancel?.addEventListener('click',()=>{keeperLightPlacement=null;board.classList.remove('is-keeper-light-placing');root.dataset.keeperLightPlacement='';keeperLightButtons.forEach((button)=>button.classList.remove('is-active'));keeperLightCancel.disabled=true;if(keeperLightStatus)keeperLightStatus.textContent='Placement finished.';});
 
-    // Lantern placement owns the next battlefield click in capture phase.
-    // Map overlays (tokens, fog, vision and cartography) may consume bubbling
-    // clicks, so Keeper placement must be caught at the board boundary first.
-    board.addEventListener('click', async (event) => {
+    // Lantern placement owns the next battlefield pointer in capture phase.
+    // Use pointerdown rather than a late click so the armed placement wins before
+    // fog, tokens, Lens panning, vision or cartography can claim the gesture.
+    board.addEventListener('pointerdown', async (event) => {
         if (!keeperLightPlacement) return;
 
         event.preventDefault();
@@ -3844,6 +3846,8 @@
                 scene_id: preparationSceneId || projectedSceneId
             });
             keeperLightPlacement = null;
+            board.classList.remove('is-keeper-light-placing');
+            root.dataset.keeperLightPlacement = '';
             keeperLightButtons.forEach((button) => button.classList.remove('is-active'));
             if (keeperLightCancel) keeperLightCancel.disabled = true;
             if (keeperLightStatus) keeperLightStatus.textContent = data.message || 'Light placed.';
