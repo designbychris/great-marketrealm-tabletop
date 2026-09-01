@@ -2268,20 +2268,6 @@
     });
 
     board.addEventListener('click', async (event) => {
-        if (keeperLightPlacement) {
-            event.stopImmediatePropagation();
-            const point = coordinatesFromPointer(event);
-            const kind = keeperLightPlacement;
-            keeperLightPlacement = null;
-            keeperLightButtons.forEach((button) => button.classList.remove('is-active'));
-            if (keeperLightCancel) keeperLightCancel.disabled = true;
-            try {
-                const data = await request('gmrt_tend_environmental_light', { light_action:'place', kind, x:point.x, y:point.y, scene_id:preparationSceneId||projectedSceneId });
-                if (keeperLightStatus) keeperLightStatus.textContent = data.message || 'Light placed.';
-                await replaceChamber(data.message || 'Light placed.', preparationSceneId || null);
-            } catch (error) { if (keeperLightStatus) keeperLightStatus.textContent = error.message || 'The light could not be placed.'; }
-            return;
-        }
         if (!visionDrafting || !visionTool) return;
         event.preventDefault();
         event.stopPropagation();
@@ -3837,6 +3823,35 @@
         if (keeperLightStatus) keeperLightStatus.textContent=`${keeperLightLabels[keeperLightPlacement] || 'Light'} selected — click the map to place it.`;
     }));
     keeperLightCancel?.addEventListener('click',()=>{keeperLightPlacement=null;keeperLightButtons.forEach((button)=>button.classList.remove('is-active'));keeperLightCancel.disabled=true;if(keeperLightStatus)keeperLightStatus.textContent='Placement finished.';});
+
+    // Lantern placement owns the next battlefield click in capture phase.
+    // Map overlays (tokens, fog, vision and cartography) may consume bubbling
+    // clicks, so Keeper placement must be caught at the board boundary first.
+    board.addEventListener('click', async (event) => {
+        if (!keeperLightPlacement) return;
+
+        event.preventDefault();
+        event.stopImmediatePropagation();
+
+        const point = coordinatesFromPointer(event);
+        const kind = keeperLightPlacement;
+        try {
+            const data = await request('gmrt_tend_environmental_light', {
+                light_action: 'place',
+                kind,
+                x: point.x,
+                y: point.y,
+                scene_id: preparationSceneId || projectedSceneId
+            });
+            keeperLightPlacement = null;
+            keeperLightButtons.forEach((button) => button.classList.remove('is-active'));
+            if (keeperLightCancel) keeperLightCancel.disabled = true;
+            if (keeperLightStatus) keeperLightStatus.textContent = data.message || 'Light placed.';
+            await replaceChamber(data.message || 'Light placed.', preparationSceneId || null);
+        } catch (error) {
+            if (keeperLightStatus) keeperLightStatus.textContent = (error.message || 'The light could not be placed.') + ' Placement remains armed; click the map to try again or cancel.';
+        }
+    }, true);
     keeperLightRoster?.addEventListener('click', async (event) => {
         const button=event.target.closest('button'); if(!button)return;
         const lightId=String(button.dataset.keeperLightToggle || button.dataset.keeperLightRemove || ''); if(!lightId)return;
