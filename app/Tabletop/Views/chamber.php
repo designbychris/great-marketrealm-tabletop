@@ -342,7 +342,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                 <details class="gmrt-atlas-forge" data-atlas-dungeon-forge>
                     <summary><span aria-hidden="true">⚒</span> Generate Scene</summary>
                     <div class="gmrt-atlas-forge__body">
-                        <p>Pippin can create a complete playable Scene from nothing. Scene Type chooses the topology; Theme chooses its Great Marketrealm surface treatment. Grid, vision, Fog and Keeper lights remain Tabletop-native.</p>
+                        <p>Pippin can create a complete playable Scene from nothing. No background image is required. Scene Type chooses the topology; Theme chooses its Great Marketrealm surface treatment. Grid, vision, Fog and Keeper lights remain Tabletop-native.</p>
                         <div class="gmrt-atlas-forge__controls">
                             <label>
                                 Scene name
