@@ -951,91 +951,83 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
             </div>
         </section>
     <?php elseif (is_array($campaignLobby)) : ?>
-        <section class="gmrt-campaign-lobby" aria-labelledby="gmrt-campaign-lobby-title">
-            <header class="gmrt-campaign-lobby__header">
-                <div>
-                    <p class="gmrt-chamber__eyebrow">The Keeper's Campaign Shelf</p>
-                    <h2 id="gmrt-campaign-lobby-title">Choose a Tabletop</h2>
-                    <p>Open one of your existing campaigns, or set a new Table and give the adventure a name.</p>
-                </div>
-            </header>
-
-            <?php $ownedTables = is_array($campaignLobby['tables'] ?? null) ? $campaignLobby['tables'] : []; ?>
-            <?php if ($ownedTables !== []) : ?>
-                <div class="gmrt-campaign-lobby__shelf" aria-label="Your Tabletop campaigns">
-                    <?php foreach ($ownedTables as $ownedTable) : ?>
-                        <article class="gmrt-campaign-card">
-                            <p class="gmrt-chamber__eyebrow"><?php echo esc_html(ucfirst((string) ($ownedTable['status'] ?? 'preparing'))); ?></p>
-                            <h3><?php echo esc_html((string) ($ownedTable['name'] ?? 'Untitled Table')); ?></h3>
-                            <?php if ((string) ($ownedTable['description'] ?? '') !== '') : ?>
-                                <p><?php echo esc_html((string) $ownedTable['description']); ?></p>
-                            <?php endif; ?>
-                            <a class="gmrt-campaign-card__open" href="<?php echo esc_url(add_query_arg('table', (string) ($ownedTable['id'] ?? ''))); ?>">Open Table</a>
-                            <?php $campaignRoster = is_array($ownedTable['roster'] ?? null) ? $ownedTable['roster'] : []; ?>
-                            <?php $campaignPlayers = array_values(array_filter($campaignRoster, static fn ($member): bool => ($member['role'] ?? '') === 'player' && ($member['status'] ?? '') !== 'left')); ?>
-                            <details class="gmrt-campaign-card__doors">
-                                <summary>Manage Players <span><?php echo esc_html((string) count($campaignPlayers)); ?> player<?php echo count($campaignPlayers) === 1 ? '' : 's'; ?></span></summary>
-                                <div class="gmrt-campaign-card__roster">
-                                    <strong>The Gathering</strong>
-                                    <?php if ($campaignRoster !== []) : ?>
-                                        <ul>
-                                            <?php foreach ($campaignRoster as $campaignMember) : ?>
-                                                <li>
-                                                    <span>
-                                                        <?php echo esc_html((string) ($campaignMember['display_name'] ?? ('User #' . (string) ($campaignMember['user_id'] ?? '')))); ?>
-                                                        <small><?php echo esc_html(ucwords(str_replace('-', ' ', (string) ($campaignMember['role'] ?? 'player')))); ?> · <?php echo esc_html(ucfirst((string) ($campaignMember['status'] ?? 'unknown'))); ?></small>
-                                                    </span>
-                                                    <?php if (($campaignMember['role'] ?? '') === 'player' && ($campaignMember['status'] ?? '') !== 'left') : ?>
-                                                        <button type="button" data-campaign-remove-player data-table-id="<?php echo esc_attr((string) ($ownedTable['id'] ?? '')); ?>" data-user-id="<?php echo esc_attr((string) ($campaignMember['user_id'] ?? '')); ?>">Remove</button>
-                                                    <?php endif; ?>
-                                                </li>
-                                            <?php endforeach; ?>
-                                        </ul>
-                                    <?php endif; ?>
-                                    <form data-campaign-invite-form data-table-id="<?php echo esc_attr((string) ($ownedTable['id'] ?? '')); ?>">
-                                        <label>
-                                            <span>Summon a player</span>
-                                            <input type="text" name="player" autocomplete="off" required placeholder="username or email">
-                                        </label>
-                                        <button type="submit">Send Summons</button>
-                                    </form>
-                                    <span data-campaign-gathering-status role="status" aria-live="polite"></span>
-                                </div>
-                            </details>
-                        </article>
-                    <?php endforeach; ?>
-                </div>
-            <?php else : ?>
-                <p class="gmrt-campaign-lobby__empty">No campaigns are resting on your shelf yet.</p>
+        <section class="gmrt-campaign-lobby gmrt-wayfinder" aria-labelledby="gmrt-campaign-lobby-title">
+            <?php $campaignArt = (string) ($campaignLobby['art_url'] ?? ''); ?>
+            <?php if ($campaignArt !== '') : ?>
+                <div class="gmrt-wayfinder__scene" aria-hidden="true"><img src="<?php echo esc_url($campaignArt); ?>" alt=""></div>
             <?php endif; ?>
-
-            <?php if (! empty($campaignLobby['may_create'])) : ?>
-                <form class="gmrt-create-tabletop" data-create-tabletop>
+            <div class="gmrt-wayfinder__content">
+                <header class="gmrt-campaign-lobby__header">
                     <div>
-                        <p class="gmrt-chamber__eyebrow">IV.33.1 · The Keeper Names the Campaign</p>
-                        <h3>Set a New Table</h3>
+                        <p class="gmrt-chamber__eyebrow">IV.33.3 · Pippin Remembers the Way</p>
+                        <h2 id="gmrt-campaign-lobby-title">Pippin's Table Atlas</h2>
+                        <p>Every road back to the adventure, carefully recorded. Probably in the correct pocket.</p>
                     </div>
-                    <label>
-                        <span>Campaign name</span>
-                        <input type="text" name="name" maxlength="120" required placeholder="e.g. The Mystery of the Missing Marmalade">
-                    </label>
-                    <label>
-                        <span>Campaign description <small>(optional)</small></span>
-                        <textarea name="description" maxlength="500" rows="3" placeholder="A short note about the adventure waiting at this Table…"></textarea>
-                    </label>
-                    <button type="submit">Create Tabletop</button>
-                    <span data-create-tabletop-status role="status" aria-live="polite"></span>
-                    <small>A fresh Table starts with a blank generated Scene. The Atlas and Pippin's Forge can furnish it next.</small>
-                </form>
-            <?php endif; ?>
+                </header>
 
-            <?php if (! empty($canPrepareTestTable)) : ?>
-                <details class="gmrt-testing-grounds">
-                    <summary>Development tools</summary>
-                    <button type="button" class="gmrt-test-table-button" data-prepare-test-table>Prepare Test Table</button>
-                    <small class="gmrt-test-table-note">Creates Sage's Combat Testing Grounds for regression and screen testing.</small>
-                </details>
-            <?php endif; ?>
+                <?php $campaignTables = is_array($campaignLobby['tables'] ?? null) ? $campaignLobby['tables'] : []; ?>
+                <?php if ($campaignTables !== []) : ?>
+                    <div class="gmrt-campaign-lobby__shelf" aria-label="Your Tabletop campaigns">
+                        <?php foreach ($campaignTables as $campaignTable) : ?>
+                            <?php $isOwner = ! empty($campaignTable['is_owner']); ?>
+                            <?php $membershipStatus = (string) ($campaignTable['membership_status'] ?? ''); ?>
+                            <article class="gmrt-campaign-card<?php echo $isOwner ? ' is-keeper' : ' is-adventurer'; ?>">
+                                <p class="gmrt-chamber__eyebrow">
+                                    <?php echo esc_html($isOwner ? 'Dungeon Master' : ($membershipStatus === 'invited' ? 'Your chair is waiting' : 'Adventurer')); ?>
+                                    · <?php echo esc_html(ucfirst((string) ($campaignTable['status'] ?? 'preparing'))); ?>
+                                </p>
+                                <h3><?php echo esc_html((string) ($campaignTable['name'] ?? 'Untitled Table')); ?></h3>
+                                <?php if ((string) ($campaignTable['description'] ?? '') !== '') : ?>
+                                    <p><?php echo esc_html((string) $campaignTable['description']); ?></p>
+                                <?php endif; ?>
+                                <a class="gmrt-campaign-card__open" href="<?php echo esc_url(add_query_arg('table', (string) ($campaignTable['id'] ?? ''))); ?>">
+                                    <?php echo esc_html($membershipStatus === 'invited' && ! $isOwner ? 'Take My Seat' : 'Return to Table'); ?>
+                                </a>
+
+                                <?php if ($isOwner) : ?>
+                                    <?php $campaignRoster = is_array($campaignTable['roster'] ?? null) ? $campaignTable['roster'] : []; ?>
+                                    <?php $campaignPlayers = array_values(array_filter($campaignRoster, static fn ($member): bool => ($member['role'] ?? '') === 'player' && ($member['status'] ?? '') !== 'left')); ?>
+                                    <details class="gmrt-campaign-card__doors">
+                                        <summary>Manage Players <span><?php echo esc_html((string) count($campaignPlayers)); ?> player<?php echo count($campaignPlayers) === 1 ? '' : 's'; ?></span></summary>
+                                        <div class="gmrt-campaign-card__roster">
+                                            <strong>The Gathering</strong>
+                                            <?php if ($campaignRoster !== []) : ?>
+                                                <ul>
+                                                    <?php foreach ($campaignRoster as $campaignMember) : ?>
+                                                        <li><span><?php echo esc_html((string) ($campaignMember['display_name'] ?? ('User #' . (string) ($campaignMember['user_id'] ?? '')))); ?><small><?php echo esc_html(ucwords(str_replace('-', ' ', (string) ($campaignMember['role'] ?? 'player')))); ?> · <?php echo esc_html(ucfirst((string) ($campaignMember['status'] ?? 'unknown'))); ?></small></span><?php if (($campaignMember['role'] ?? '') === 'player' && ($campaignMember['status'] ?? '') !== 'left') : ?><button type="button" data-campaign-remove-player data-table-id="<?php echo esc_attr((string) ($campaignTable['id'] ?? '')); ?>" data-user-id="<?php echo esc_attr((string) ($campaignMember['user_id'] ?? '')); ?>">Remove</button><?php endif; ?></li>
+                                                    <?php endforeach; ?>
+                                                </ul>
+                                            <?php endif; ?>
+                                            <form data-campaign-invite-form data-table-id="<?php echo esc_attr((string) ($campaignTable['id'] ?? '')); ?>"><label><span>Summon a player</span><input type="text" name="player" autocomplete="off" required placeholder="username or email"></label><button type="submit">Send Summons</button></form>
+                                            <span data-campaign-gathering-status role="status" aria-live="polite"></span>
+                                        </div>
+                                    </details>
+                                    <details class="gmrt-campaign-card__remove">
+                                        <summary>Remove this Tabletop</summary>
+                                        <p>This permanently removes the campaign from the Table Atlas and closes its saved route. This cannot be undone.</p>
+                                        <button type="button" data-remove-tabletop data-table-id="<?php echo esc_attr((string) ($campaignTable['id'] ?? '')); ?>" data-table-name="<?php echo esc_attr((string) ($campaignTable['name'] ?? 'this Tabletop')); ?>">Remove Tabletop</button>
+                                        <span data-remove-tabletop-status role="status" aria-live="polite"></span>
+                                    </details>
+                                <?php endif; ?>
+                            </article>
+                        <?php endforeach; ?>
+                    </div>
+                <?php else : ?>
+                    <p class="gmrt-campaign-lobby__empty">Pippin has no saved roads for you yet. A Keeper can set a new Table, or an Adventurer can return after receiving a Summons.</p>
+                <?php endif; ?>
+
+                <?php if (! empty($campaignLobby['may_create'])) : ?>
+                    <form class="gmrt-create-tabletop" data-create-tabletop>
+                        <div><p class="gmrt-chamber__eyebrow">Set another road on the map</p><h3>Create a New Tabletop</h3></div>
+                        <label><span>Campaign name</span><input type="text" name="name" maxlength="120" required placeholder="e.g. The Mystery of the Missing Marmalade"></label>
+                        <label><span>Campaign description <small>(optional)</small></span><textarea name="description" maxlength="500" rows="3" placeholder="A short note about the adventure waiting at this Table…"></textarea></label>
+                        <button type="submit">Create Tabletop</button><span data-create-tabletop-status role="status" aria-live="polite"></span>
+                        <small>A fresh Table starts with a blank generated Scene. The Atlas and Pippin's Forge can furnish it next.</small>
+                    </form>
+                <?php endif; ?>
+
+                <?php if (! empty($canPrepareTestTable)) : ?><details class="gmrt-testing-grounds"><summary>Development tools</summary><button type="button" class="gmrt-test-table-button" data-prepare-test-table>Prepare Test Table</button><small class="gmrt-test-table-note">Creates Sage's Combat Testing Grounds for regression and screen testing.</small></details><?php endif; ?>
+            </div>
         </section>
     <?php elseif ($message !== null) : ?>
         <section

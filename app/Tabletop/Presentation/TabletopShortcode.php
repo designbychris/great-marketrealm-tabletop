@@ -66,27 +66,42 @@ final class TabletopShortcode
             $projector = $this->identities !== null
                 ? new TableMemberProjector($this->identities)
                 : null;
-            $owned = array_map(
-                function ($table) use ($projector): array {
-                    $roster = [];
-                    if ($this->members !== null) {
-                        foreach ($this->members->forTable($table->id()) as $member) {
-                            $roster[] = $projector !== null
-                                ? $projector->project($member)
-                                : $member->toArray();
-                        }
-                    }
+            $registry = TableRegistryFactory::make();
+            $campaigns = [];
 
-                    return [
-                        'id' => $table->id(),
-                        'name' => $table->name(),
-                        'description' => $table->description(),
-                        'status' => $table->status(),
-                        'roster' => $roster,
-                    ];
-                },
-                TableRegistryFactory::make()->ownedBy($userId)
-            );
+            foreach ($registry->all() as $table) {
+                $member = $this->members?->find($table->id(), $userId);
+                $isOwner = $table->dungeonMasterUserId() === $userId;
+                $memberStatus = $member?->status() ?? '';
+
+                if (! $isOwner && ! in_array($memberStatus, [TableMemberStatus::ACTIVE, TableMemberStatus::INVITED], true)) {
+                    continue;
+                }
+
+                $roster = [];
+                if ($this->members !== null) {
+                    foreach ($this->members->forTable($table->id()) as $rosterMember) {
+                        $roster[] = $projector !== null
+                            ? $projector->project($rosterMember)
+                            : $rosterMember->toArray();
+                    }
+                }
+
+                $campaigns[] = [
+                    'id' => $table->id(),
+                    'name' => $table->name(),
+                    'description' => $table->description(),
+                    'status' => $table->status(),
+                    'roster' => $roster,
+                    'is_owner' => $isOwner,
+                    'membership_status' => $memberStatus,
+                    'last_visited' => $table->lastHeartbeatAt()?->format(DATE_ATOM),
+                ];
+            }
+
+            usort($campaigns, static function (array $left, array $right): int {
+                return strcmp((string) ($right['last_visited'] ?? ''), (string) ($left['last_visited'] ?? ''));
+            });
 
             return $this->renderer->render(
                 null,
@@ -96,7 +111,8 @@ final class TabletopShortcode
                 null,
                 [
                     'may_create' => (new WordPressDungeonMasterPolicy())->mayCreate($userId),
-                    'tables' => $owned,
+                    'tables' => $campaigns,
+                    'art_url' => GMRT_URL . 'assets/images/pippin-peppercorn-cartographer.png',
                 ]
             );
         }

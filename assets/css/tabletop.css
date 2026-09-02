@@ -5282,3 +5282,27 @@
 .gmrt-campaign-card__roster input { width: 100%; }
 [data-campaign-gathering-status]:not(:empty) { display: block; padding: .45rem .55rem; border-left: 3px solid currentColor; }
 @media (max-width: 680px) { .gmrt-campaign-card__roster form { grid-template-columns: 1fr; } }
+
+
+/* Phase IV.33.3 — Pippin Remembers the Way */
+.gmrt-chamber:has(.gmrt-wayfinder) { padding: 0; overflow: hidden; background: #100d0a; }
+.gmrt-wayfinder { position: relative; max-width: none; width: 100vw; min-height: calc(100dvh - 96px); margin-inline: calc(50% - 50vw); isolation: isolate; }
+.gmrt-wayfinder__scene { position: absolute; inset: 0; z-index: -2; overflow: hidden; background: #100d0a; }
+.gmrt-wayfinder__scene::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(12,9,6,.18), rgba(12,9,6,.55) 45%, rgba(12,9,6,.88)); }
+.gmrt-wayfinder__scene img { width: 100%; height: 100%; object-fit: cover; image-rendering: auto; }
+.gmrt-wayfinder__content { width: min(1180px, calc(100% - 2rem)); margin: 0 auto; padding: clamp(1rem,3vw,2.5rem) 0 2.5rem; display: grid; gap: 1.25rem; }
+.gmrt-wayfinder .gmrt-campaign-lobby__header { background: rgba(33,27,20,.92); backdrop-filter: blur(2px); }
+.gmrt-wayfinder .gmrt-campaign-card,
+.gmrt-wayfinder .gmrt-create-tabletop,
+.gmrt-wayfinder .gmrt-testing-grounds { background: rgba(33,27,20,.94); }
+.gmrt-campaign-card.is-adventurer { border-color: rgba(244,234,214,.42); }
+.gmrt-campaign-card__remove { margin-top: .8rem; padding-top: .65rem; border-top: 2px dashed rgba(244,234,214,.16); }
+.gmrt-campaign-card__remove summary { cursor: pointer; font-weight: 700; opacity: .78; }
+.gmrt-campaign-card__remove p { font-size: .88rem; opacity: .76; }
+.gmrt-campaign-card__remove button { border: 2px solid rgba(244,234,214,.5); background: #24130f; color: #fff4dc; padding: .55rem .75rem; font: inherit; font-weight: 700; cursor: pointer; }
+.gmrt-campaign-card__remove button:disabled { opacity: .55; cursor: wait; }
+[data-remove-tabletop-status]:not(:empty) { display: block; margin-top: .5rem; font-size: .86rem; }
+@media (max-width: 720px) {
+    .gmrt-wayfinder { min-height: calc(100dvh - 72px); }
+    .gmrt-wayfinder__scene::after { background: rgba(12,9,6,.68); }
+}

@@ -333,6 +333,27 @@
         }
     });
 
+    // Phase IV.33.3 — Pippin Remembers the Way: Keeper-owned Table removal.
+    document.addEventListener('click', async (event) => {
+        const button = event.target.closest('[data-remove-tabletop]');
+        if (!button) return;
+        const campaignTableId = button.dataset.tableId || '';
+        const tableName = button.dataset.tableName || 'this Tabletop';
+        const status = button.parentElement?.querySelector('[data-remove-tabletop-status]');
+        if (!campaignTableId) return;
+        if (!window.confirm(`Remove “${tableName}” permanently? This cannot be undone.`)) return;
+        button.disabled = true;
+        if (status) status.textContent = 'Pippin is erasing this road from the atlas…';
+        try {
+            const data = await request('gmrt_remove_tabletop', { table_id: campaignTableId });
+            if (status) status.textContent = data.message || 'Tabletop removed.';
+            window.setTimeout(() => window.location.reload(), 350);
+        } catch (error) {
+            if (status) status.textContent = error.message || 'The Tabletop could not be removed.';
+            button.disabled = false;
+        }
+    });
+
     const gatheringStatus = document.querySelector('[data-gathering-status]');
     let keeperSecretD20Result = null;
     const gatheringSay = (message) => {

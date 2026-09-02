@@ -1052,3 +1052,8 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - Added Campaign Shelf roster projection and DM-side player administration.
 - Keepers can summon and remove players without first entering the battlefield.
 - Reused the existing authoritative Gathering invitation/removal endpoints and membership persistence.
+
+### Phase IV.33.3 — Pippin Remembers the Way
+- Turned the bare Tabletop route into Pippin's persistent Table Atlas for both DMs and Players.
+- Added role-aware Return to Table / Take My Seat campaign cards over the established Pippin cartographer artwork.
+- Added Keeper-only permanent Tabletop removal with nonce and owner authorization plus campaign-keyed persistence cleanup.

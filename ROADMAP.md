@@ -803,3 +803,6 @@ The Tabletop moves beyond Sage's fixed Testing Grounds into persistent Keeper-ow
 
 ### Phase IV.33.2 — The Keeper Opens the Doors
 Campaign Shelf player management: inspect the Gathering, send Summons, and remove seats while preserving the existing Table membership authority.
+
+### IV.33.3 — Pippin Remembers the Way
+Persistent Pippin Table Atlas: one Tabletop entrance for Keeper-owned campaigns, Player memberships and invitations, plus Keeper-only removal of abandoned Tables. **Built; awaiting automated and browser certification.**
