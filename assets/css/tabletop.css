@@ -3583,14 +3583,15 @@
    Presentation only.
    ========================================================================== */
 
-/* Atlas and Bestiary share the exact same drawer top edge. The Bestiary tab
-   keeps its lower rail slot via margin rather than dragging the whole drawer
-   down, so both open workspaces align pixel-for-pixel at the top. */
+/* Atlas and Bestiary share the exact same drawer top edge. The inactive Atlas
+   tab already occupies the upper rail slot when the Bestiary is open, so the
+   Bestiary toggle must start at its own drawer edge with no second vertical
+   offset. This keeps the two tabs contiguous instead of creating a double gap. */
 .gmrt-bestiary-drawer {
     top: 7.75rem;
 }
 .gmrt-bestiary-drawer__toggle {
-    margin-top: 7rem;
+    margin-top: 0;
 }
 .gmrt-bestiary-drawer__panel {
     position: relative;
@@ -3686,7 +3687,7 @@
         top: 7.75rem;
     }
     .gmrt-bestiary-drawer__toggle {
-        margin-top: 7rem;
+        margin-top: 0;
     }
     .gmrt-bestiary-drawer__panel {
         top: 0;
