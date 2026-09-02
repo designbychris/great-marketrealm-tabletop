@@ -153,7 +153,8 @@ final class TabletopServiceProvider
         $this->shortcode = new TabletopShortcode(
             $chamber,
             new TabletopChamberRenderer(),
-            new WordPressTableMembershipRepository()
+            new WordPressTableMembershipRepository(),
+            new WordPressTableMemberIdentityDirectory()
         );
 
         $this->ajax = new TabletopAjaxController(

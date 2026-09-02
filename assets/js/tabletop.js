@@ -291,6 +291,48 @@
         });
     }
 
+    // Phase IV.33.2 — Campaign Shelf player administration.
+    document.querySelectorAll('[data-campaign-invite-form]').forEach((form) => {
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const input = form.querySelector('[name="player"]');
+            const button = form.querySelector('button[type="submit"]');
+            const status = form.parentElement?.querySelector('[data-campaign-gathering-status]');
+            const player = input ? input.value.trim() : '';
+            const campaignTableId = form.dataset.tableId || '';
+            if (!player || !campaignTableId) return;
+            if (button) button.disabled = true;
+            if (status) status.textContent = 'Sending the Summons…';
+            try {
+                const data = await request('gmrt_invite_table_player', { table_id: campaignTableId, player });
+                if (status) status.textContent = data.message || 'Invitation sent.';
+                window.setTimeout(() => window.location.reload(), 450);
+            } catch (error) {
+                if (status) status.textContent = error.message || 'The player could not be invited.';
+                if (button) button.disabled = false;
+            }
+        });
+    });
+
+    document.addEventListener('click', async (event) => {
+        const button = event.target.closest('[data-campaign-remove-player]');
+        if (!button) return;
+        const campaignTableId = button.dataset.tableId || '';
+        const userId = button.dataset.userId || '';
+        const status = button.closest('.gmrt-campaign-card__roster')?.querySelector('[data-campaign-gathering-status]');
+        if (!campaignTableId || !userId) return;
+        button.disabled = true;
+        if (status) status.textContent = 'Closing that seat…';
+        try {
+            const data = await request('gmrt_remove_table_player', { table_id: campaignTableId, user_id: userId });
+            if (status) status.textContent = data.message || 'Player removed.';
+            window.setTimeout(() => window.location.reload(), 450);
+        } catch (error) {
+            if (status) status.textContent = error.message || 'The player could not be removed.';
+            button.disabled = false;
+        }
+    });
+
     const gatheringStatus = document.querySelector('[data-gathering-status]');
     let keeperSecretD20Result = null;
     const gatheringSay = (message) => {

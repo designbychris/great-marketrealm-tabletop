@@ -971,6 +971,37 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                 <p><?php echo esc_html((string) $ownedTable['description']); ?></p>
                             <?php endif; ?>
                             <a class="gmrt-campaign-card__open" href="<?php echo esc_url(add_query_arg('table', (string) ($ownedTable['id'] ?? ''))); ?>">Open Table</a>
+                            <?php $campaignRoster = is_array($ownedTable['roster'] ?? null) ? $ownedTable['roster'] : []; ?>
+                            <?php $campaignPlayers = array_values(array_filter($campaignRoster, static fn ($member): bool => ($member['role'] ?? '') === 'player' && ($member['status'] ?? '') !== 'left')); ?>
+                            <details class="gmrt-campaign-card__doors">
+                                <summary>Manage Players <span><?php echo esc_html((string) count($campaignPlayers)); ?> player<?php echo count($campaignPlayers) === 1 ? '' : 's'; ?></span></summary>
+                                <div class="gmrt-campaign-card__roster">
+                                    <strong>The Gathering</strong>
+                                    <?php if ($campaignRoster !== []) : ?>
+                                        <ul>
+                                            <?php foreach ($campaignRoster as $campaignMember) : ?>
+                                                <li>
+                                                    <span>
+                                                        <?php echo esc_html((string) ($campaignMember['display_name'] ?? ('User #' . (string) ($campaignMember['user_id'] ?? '')))); ?>
+                                                        <small><?php echo esc_html(ucwords(str_replace('-', ' ', (string) ($campaignMember['role'] ?? 'player')))); ?> · <?php echo esc_html(ucfirst((string) ($campaignMember['status'] ?? 'unknown'))); ?></small>
+                                                    </span>
+                                                    <?php if (($campaignMember['role'] ?? '') === 'player' && ($campaignMember['status'] ?? '') !== 'left') : ?>
+                                                        <button type="button" data-campaign-remove-player data-table-id="<?php echo esc_attr((string) ($ownedTable['id'] ?? '')); ?>" data-user-id="<?php echo esc_attr((string) ($campaignMember['user_id'] ?? '')); ?>">Remove</button>
+                                                    <?php endif; ?>
+                                                </li>
+                                            <?php endforeach; ?>
+                                        </ul>
+                                    <?php endif; ?>
+                                    <form data-campaign-invite-form data-table-id="<?php echo esc_attr((string) ($ownedTable['id'] ?? '')); ?>">
+                                        <label>
+                                            <span>Summon a player</span>
+                                            <input type="text" name="player" autocomplete="off" required placeholder="username or email">
+                                        </label>
+                                        <button type="submit">Send Summons</button>
+                                    </form>
+                                    <span data-campaign-gathering-status role="status" aria-live="polite"></span>
+                                </div>
+                            </details>
                         </article>
                     <?php endforeach; ?>
                 </div>

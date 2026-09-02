@@ -800,3 +800,6 @@ The Tabletop moves beyond Sage's fixed Testing Grounds into persistent Keeper-ow
 - [x] **IV.33.1 — The Keeper Names the Campaign** — adds a DM-authorised Campaign Shelf and Create Tabletop flow, persistent name/optional description metadata, automatic DM seating, a fresh generated `The First Blank Page` Scene, direct entry into the new Table, and keeps the Testing Grounds tucked safely under Development tools.
 - [ ] **IV.33.2 — The Keeper Opens the Doors** — campaign-level Gathering and invitation management from the Campaign Shelf.
 - [ ] **IV.33.3 — The First Map on the Table** — choose blank, Atlas or Pippin Forge as a new campaign's opening Scene.
+
+### Phase IV.33.2 — The Keeper Opens the Doors
+Campaign Shelf player management: inspect the Gathering, send Summons, and remove seats while preserving the existing Table membership authority.

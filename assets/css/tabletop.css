@@ -5267,3 +5267,18 @@
 .gmrt-campaign-lobby__empty { padding: 1rem; border: 2px dashed rgba(244,234,214,.25); }
 .gmrt-testing-grounds { padding: .75rem 1rem; opacity: .8; }
 .gmrt-testing-grounds summary { cursor: pointer; font-weight: 700; }
+
+/* Phase IV.33.2 — The Keeper Opens the Doors */
+.gmrt-campaign-card__doors { margin-top: .85rem; border-top: 2px solid rgba(244,234,214,.18); padding-top: .7rem; }
+.gmrt-campaign-card__doors summary { cursor: pointer; font-weight: 800; }
+.gmrt-campaign-card__doors summary span { opacity: .72; font-size: .82em; margin-left: .35rem; }
+.gmrt-campaign-card__roster { display: grid; gap: .7rem; margin-top: .75rem; }
+.gmrt-campaign-card__roster ul { display: grid; gap: .45rem; margin: 0; padding: 0; list-style: none; }
+.gmrt-campaign-card__roster li { display: flex; align-items: center; justify-content: space-between; gap: .75rem; padding: .55rem .65rem; border: 2px solid rgba(244,234,214,.16); background: rgba(16,13,10,.28); }
+.gmrt-campaign-card__roster li span { display: grid; gap: .12rem; }
+.gmrt-campaign-card__roster li small { opacity: .72; }
+.gmrt-campaign-card__roster form { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: .55rem; align-items: end; }
+.gmrt-campaign-card__roster label { display: grid; gap: .3rem; }
+.gmrt-campaign-card__roster input { width: 100%; }
+[data-campaign-gathering-status]:not(:empty) { display: block; padding: .45rem .55rem; border-left: 3px solid currentColor; }
+@media (max-width: 680px) { .gmrt-campaign-card__roster form { grid-template-columns: 1fr; } }

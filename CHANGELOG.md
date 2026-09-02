@@ -1047,3 +1047,8 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - Existing Table records remain compatible when no description metadata exists.
 - Keeps Sage's Combat Testing Grounds as a secondary development fixture rather than using it as the real campaign creation path.
 - Adds a Companion-friendly `gmrt_tabletop_may_create_table` policy seam while preserving server-side nonce and role enforcement.
+
+### Phase IV.33.2 — The Keeper Opens the Doors
+- Added Campaign Shelf roster projection and DM-side player administration.
+- Keepers can summon and remove players without first entering the battlefield.
+- Reused the existing authoritative Gathering invitation/removal endpoints and membership persistence.

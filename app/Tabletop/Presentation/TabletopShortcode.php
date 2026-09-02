@@ -8,6 +8,8 @@ use GreatMarketrealmTabletop\Tabletop\Exceptions\TabletopAccessDenied;
 use GreatMarketrealmTabletop\Tabletop\Services\TabletopChamber;
 use Throwable;
 use GreatMarketrealmTabletop\Tables\Memberships\Contracts\TableMembershipRepository;
+use GreatMarketrealmTabletop\Tables\Memberships\Contracts\TableMemberIdentityDirectory;
+use GreatMarketrealmTabletop\Tables\Memberships\Presentation\TableMemberProjector;
 use GreatMarketrealmTabletop\Tables\Memberships\Models\TableMemberStatus;
 use GreatMarketrealmTabletop\Tables\Services\TableRegistryFactory;
 use GreatMarketrealmTabletop\Tabletop\Campaigns\WordPressDungeonMasterPolicy;
@@ -24,7 +26,8 @@ final class TabletopShortcode
     public function __construct(
         private TabletopChamber $chamber,
         private TabletopChamberRenderer $renderer,
-        private ?TableMembershipRepository $members = null
+        private ?TableMembershipRepository $members = null,
+        private ?TableMemberIdentityDirectory $identities = null
     ) {}
 
     /** @param array<string,mixed>|string $attributes */
@@ -60,13 +63,28 @@ final class TabletopShortcode
 
         if ($tableId === '') {
             $userId = get_current_user_id();
+            $projector = $this->identities !== null
+                ? new TableMemberProjector($this->identities)
+                : null;
             $owned = array_map(
-                static fn ($table): array => [
-                    'id' => $table->id(),
-                    'name' => $table->name(),
-                    'description' => $table->description(),
-                    'status' => $table->status(),
-                ],
+                function ($table) use ($projector): array {
+                    $roster = [];
+                    if ($this->members !== null) {
+                        foreach ($this->members->forTable($table->id()) as $member) {
+                            $roster[] = $projector !== null
+                                ? $projector->project($member)
+                                : $member->toArray();
+                        }
+                    }
+
+                    return [
+                        'id' => $table->id(),
+                        'name' => $table->name(),
+                        'description' => $table->description(),
+                        'status' => $table->status(),
+                        'roster' => $roster,
+                    ];
+                },
                 TableRegistryFactory::make()->ownedBy($userId)
             );
 
