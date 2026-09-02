@@ -42,7 +42,9 @@ final class KeeperTidiesDeskRegressionTest extends TestCase
         self::assertStringContainsString('<summary>Dungeon Master Controls</summary>', $view);
         self::assertStringContainsString("The Keeper's Lantern Rack", $view);
         self::assertStringContainsString('Sight Beyond the Door', $view);
-        self::assertStringNotContainsString('data-cartographers-lens', $view);
+        self::assertStringContainsString('data-cartographers-lens', $view);
+        self::assertStringNotContainsString('class="gmrt-cartographers-lens"', $view);
+        self::assertStringNotContainsString("<strong class=\"gmrt-cartographers-lens__title\">Cartographer's Lens</strong>", $view);
     }
 
     public function test_dungeon_master_character_picker_is_kept_available_but_compact(): void

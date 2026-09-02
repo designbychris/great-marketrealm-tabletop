@@ -1168,6 +1168,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                 <div class="gmrt-board__lens-stage" data-lens-stage>
                     <nav
                         class="gmrt-board__lens-controls"
+                        data-cartographers-lens
                         data-lens-controls
                         aria-label="Battlemap view controls"
                     >
