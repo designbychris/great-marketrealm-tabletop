@@ -1061,3 +1061,12 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - IV.33.3 final browser polish: Pippin's Table Atlas now suppresses the in-Chamber masthead, and permanent Table removal can resolve legacy Testing Grounds records whose stored option key predates their authoritative Table UUID.
 
 - IV.33.3 final polish: successful Tabletop removal now updates Pippin's Table Atlas immediately in the browser, removing the deleted campaign card without requiring a manual page refresh; removing the final card restores the Atlas empty-state message.
+
+### Phase IV.33.4 — The First Map on the Table
+- Adds a three-way opening-Scene choice to Keeper campaign creation: Blank Table, owned uploaded Atlas map, or Pippin's Scene Forge.
+- Preserves `The First Blank Page` as the safe default and creates `Pippin's Forge Workbench` for Forge-first campaigns.
+- Copies reusable image-backed Atlas Scenes into the new Table without moving the source, preserving map attachment, dimensions and calibrated grid.
+- Enforces source-Table ownership server-side and deliberately excludes generated Forge Scenes from the Atlas-copy picker because their authoritative generated-world state is stored beyond the bare Scene surface.
+- Carries Forge-first creation into the new campaign and opens the existing Scene Forge automatically, without adding a second Forge workflow.
+- Adds regression coverage for all three creation paths, Atlas ownership/cloning and Forge onboarding.
+

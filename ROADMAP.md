@@ -798,15 +798,20 @@ The Tabletop now owns a cinematic 16-bit entrance while WordPress remains the au
 The Tabletop moves beyond Sage's fixed Testing Grounds into persistent Keeper-owned campaigns.
 
 - [x] **IV.33.1 — The Keeper Names the Campaign** — adds a DM-authorised Campaign Shelf and Create Tabletop flow, persistent name/optional description metadata, automatic DM seating, a fresh generated `The First Blank Page` Scene, direct entry into the new Table, and keeps the Testing Grounds tucked safely under Development tools.
-- [ ] **IV.33.2 — The Keeper Opens the Doors** — campaign-level Gathering and invitation management from the Campaign Shelf.
-- [ ] **IV.33.3 — The First Map on the Table** — choose blank, Atlas or Pippin Forge as a new campaign's opening Scene.
+- [x] **IV.33.2 — The Keeper Opens the Doors** — campaign-level Gathering and invitation management from the Campaign Shelf.
+- [x] **IV.33.3 — Pippin Remembers the Way** — one persistent Pippin Table Atlas for Keeper-owned campaigns, Player memberships and invitations, plus live Keeper-only removal of abandoned Tables.
+- [ ] **IV.33.4 — The First Map on the Table** — choose blank, an owned uploaded Atlas map, or Pippin's Forge as a new campaign's opening Scene.
 
 ### Phase IV.33.2 — The Keeper Opens the Doors
 Campaign Shelf player management: inspect the Gathering, send Summons, and remove seats while preserving the existing Table membership authority.
 
 ### IV.33.3 — Pippin Remembers the Way
-Persistent Pippin Table Atlas: one Tabletop entrance for Keeper-owned campaigns, Player memberships and invitations, plus Keeper-only removal of abandoned Tables. **Built; awaiting automated and browser certification.**
+Persistent Pippin Table Atlas: one Tabletop entrance for Keeper-owned campaigns, Player memberships and invitations, plus Keeper-only removal of abandoned Tables. **Automated and browser certified.**
 
 - IV.33.3 final browser polish: Pippin's Table Atlas now suppresses the in-Chamber masthead, and permanent Table removal can resolve legacy Testing Grounds records whose stored option key predates their authoritative Table UUID.
 
 - IV.33.3 final polish: successful Tabletop removal now updates Pippin's Table Atlas immediately in the browser, removing the deleted campaign card without requiring a manual page refresh; removing the final card restores the Atlas empty-state message.
+
+### IV.33.4 — The First Map on the Table
+New Keeper-created campaigns now choose how their opening Scene arrives: preserve the certified blank Table, copy an owned uploaded Atlas map with its grid calibration, or enter directly at Pippin's existing Scene Forge on a fresh workbench. Atlas sources remain server-authorised to the current Keeper and the source Scene is never moved or mutated. **Built; awaiting automated and browser certification.**
+

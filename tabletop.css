@@ -1,0 +1,5364 @@
+.gmrt-chamber {
+    background: #17140f;
+    color: #f4ead6;
+    font-family: Georgia, "Times New Roman", serif;
+}
+
+.gmrt-chamber {
+    min-height: 100vh;
+    padding: clamp(1rem, 3vw, 2.5rem);
+    box-sizing: border-box;
+}
+
+.gmrt-chamber__masthead,
+.gmrt-board__heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.gmrt-chamber__masthead {
+    max-width: 1500px;
+    margin: 0 auto 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(244, 234, 214, .18);
+}
+
+.gmrt-chamber__masthead h1,
+.gmrt-board__heading h2,
+.gmrt-party h2,
+.gmrt-chamber__notice h2 {
+    margin: .15rem 0 0;
+}
+
+.gmrt-chamber__eyebrow {
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    font-size: .75rem;
+    opacity: .72;
+}
+
+.gmrt-chamber__viewer {
+    display: grid;
+    gap: .25rem;
+    text-align: right;
+}
+
+.gmrt-chamber__viewer span {
+    font-weight: 700;
+}
+
+.gmrt-chamber__viewer small {
+    opacity: .7;
+    text-transform: capitalize;
+}
+
+.gmrt-chamber__layout {
+    max-width: 1500px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(240px, 310px);
+    gap: 1.5rem;
+    align-items: start;
+}
+
+.gmrt-board,
+.gmrt-party,
+.gmrt-chamber__notice {
+    border: 1px solid rgba(244, 234, 214, .16);
+    border-radius: 16px;
+    background: rgba(255, 248, 232, .055);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .24);
+}
+
+.gmrt-board {
+    padding: 1rem;
+    min-width: 0;
+}
+
+.gmrt-board__heading {
+    margin-bottom: 1rem;
+}
+
+.gmrt-board__heading > span {
+    font-size: .8rem;
+    opacity: .7;
+    text-transform: capitalize;
+}
+
+.gmrt-board__viewport {
+    position: relative;
+    overflow: hidden;
+    min-height: 460px;
+    border-radius: 10px;
+    background: #080706;
+    isolation: isolate;
+}
+
+.gmrt-board__map {
+    display: block;
+    width: 100%;
+    height: auto;
+    position: relative;
+    z-index: 1;
+}
+
+.gmrt-board__grid,
+.gmrt-board__tokens {
+    position: absolute;
+    inset: 0;
+}
+
+.gmrt-board__grid {
+    z-index: 2;
+    pointer-events: none;
+    background-image:
+        linear-gradient(
+            rgba(255, 255, 255, var(--gmrt-grid-opacity, .13)) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(255, 255, 255, var(--gmrt-grid-opacity, .13)) 1px,
+            transparent 1px
+        );
+    background-size:
+        var(--gmrt-grid-size)
+        var(--gmrt-grid-size);
+    background-position:
+        var(--gmrt-grid-offset-x, 0px)
+        var(--gmrt-grid-offset-y, 0px);
+    display: var(--gmrt-grid-display, block);
+}
+
+.gmrt-board__tokens {
+    z-index: 3;
+    pointer-events: none;
+}
+
+.gmrt-token {
+    position: absolute;
+    left: var(--gmrt-token-x);
+    top: var(--gmrt-token-y);
+    width: calc(2.5rem * var(--gmrt-token-width));
+    min-width: 2.5rem;
+    aspect-ratio:
+        var(--gmrt-token-width)
+        / var(--gmrt-token-height);
+    transform: translate(-50%, -50%);
+    display: grid;
+    place-items: center;
+    border: 3px solid #f4ead6;
+    border-radius: 50%;
+    background: #463722;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .5);
+    font-weight: 700;
+    font-family: system-ui, sans-serif;
+}
+
+.gmrt-token--creature {
+    border-radius: 28%;
+}
+
+.gmrt-token--object {
+    border-radius: 8px;
+}
+
+.gmrt-token.is-hidden-token {
+    opacity: .45;
+    outline: 2px dashed rgba(244, 234, 214, .65);
+    outline-offset: 3px;
+}
+
+.gmrt-party {
+    padding: 1.25rem;
+}
+
+.gmrt-party > ul {
+    list-style: none;
+    margin: 1rem 0;
+    padding: 0;
+    display: grid;
+    gap: .65rem;
+}
+
+.gmrt-party > ul > li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: .15rem .65rem;
+    padding: .7rem;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, .055);
+}
+
+.gmrt-party > ul > li > span {
+    grid-row: 1 / span 2;
+    width: 2.25rem;
+    height: 2.25rem;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .1);
+    font: 700 .7rem system-ui, sans-serif;
+}
+
+.gmrt-party > ul > li > small {
+    opacity: .65;
+    text-transform: capitalize;
+}
+
+.gmrt-party__note {
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(244, 234, 214, .14);
+}
+
+.gmrt-party__note p {
+    margin-bottom: 0;
+    opacity: .75;
+    line-height: 1.5;
+}
+
+.gmrt-chamber__notice {
+    max-width: 850px;
+    margin: 8vh auto;
+    padding: clamp(1.5rem, 5vw, 4rem);
+    text-align: center;
+}
+
+.gmrt-board__missing-map {
+    min-height: 460px;
+    display: grid;
+    place-items: center;
+    padding: 2rem;
+    box-sizing: border-box;
+    color: rgba(244, 234, 214, .7);
+}
+
+@media (max-width: 900px) {
+    .gmrt-chamber__layout {
+        grid-template-columns: 1fr;
+    }
+
+    .gmrt-party {
+        order: -1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gmrt-chamber *,
+    .gmrt-chamber *::before,
+    .gmrt-chamber *::after {
+        scroll-behavior: auto !important;
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+
+.gmrt-token[role="button"] {
+    pointer-events: auto;
+    cursor: grab;
+    touch-action: none;
+}
+
+.gmrt-token.is-dragging {
+    cursor: grabbing;
+    z-index: 2;
+    transform: translate(-50%, -50%) scale(1.08);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, .65);
+}
+
+.gmrt-token:focus-visible,
+.gmrt-token.is-selected {
+    outline: 3px solid currentColor;
+    outline-offset: 4px;
+}
+
+.gmrt-chamber__status {
+    max-width: 1500px;
+    min-height: 1.5rem;
+    margin: 1rem auto 0;
+    font-family: system-ui, sans-serif;
+    font-size: .875rem;
+    color: rgba(244, 234, 214, .82);
+}
+
+
+
+.gmrt-exploration-strip {
+    max-width: 1500px;
+    margin: 0 auto 1rem;
+    padding: .9rem 1rem;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    border: 1px solid rgba(184, 208, 150, .28);
+    border-radius: 12px;
+    background: rgba(63, 82, 49, .22);
+}
+
+.gmrt-exploration-strip h2 { margin: .15rem 0 .25rem; font-size: 1.15rem; }
+.gmrt-exploration-strip__copy { margin: 0; max-width: 44rem; opacity: .8; }
+.gmrt-start-encounter { min-width: min(32rem, 48%); }
+.gmrt-start-encounter > summary { cursor: pointer; font-weight: 700; }
+.gmrt-start-encounter__body { margin-top: .7rem; display: grid; gap: .7rem; }
+.gmrt-start-encounter__body fieldset { display: grid; gap: .4rem; margin: 0; }
+.gmrt-start-encounter__combatant {
+    display: grid;
+    grid-template-columns: auto minmax(8rem, 1fr) auto 4.5rem;
+    align-items: center;
+    gap: .45rem;
+}
+.gmrt-start-encounter__combatant input[type="number"] { width: 4.5rem; }
+@media (max-width: 760px) {
+    .gmrt-exploration-strip { flex-direction: column; }
+    .gmrt-start-encounter { min-width: 0; width: 100%; }
+    .gmrt-start-encounter__combatant { grid-template-columns: auto 1fr 4.5rem; }
+    .gmrt-start-encounter__combatant > span:nth-of-type(2) { display: none; }
+}
+
+.gmrt-encounter-strip {
+    max-width: 1500px;
+    margin: 0 auto 1rem;
+    padding: .85rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    border: 1px solid rgba(244, 234, 214, .2);
+    border-radius: 12px;
+    background: rgba(111, 45, 32, .28);
+}
+
+.gmrt-encounter-strip h2 {
+    margin: .15rem 0 0;
+    font-size: 1.15rem;
+}
+
+.gmrt-encounter-strip__state {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: .5rem 1rem;
+    font-family: system-ui, sans-serif;
+    font-size: .82rem;
+}
+
+
+.gmrt-deeds {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    justify-content: flex-end;
+}
+
+.gmrt-deed {
+    border: 1px solid rgba(244, 234, 214, .35);
+    border-radius: 8px;
+    padding: .45rem .7rem;
+    background: rgba(0, 0, 0, .22);
+    color: inherit;
+    font: 700 .78rem system-ui, sans-serif;
+    cursor: pointer;
+}
+
+.gmrt-deed:hover,
+.gmrt-deed:focus-visible {
+    background: rgba(244, 234, 214, .14);
+}
+
+
+.gmrt-deeds__target {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    font: 700 .75rem system-ui, sans-serif;
+}
+
+.gmrt-deeds__target select {
+    max-width: 12rem;
+    border: 1px solid rgba(244, 234, 214, .35);
+    border-radius: 8px;
+    padding: .4rem .55rem;
+    background: rgba(0, 0, 0, .32);
+    color: inherit;
+}
+
+
+.gmrt-hp {
+    grid-column: 2;
+    display: grid;
+    gap: .2rem;
+    margin-top: .25rem;
+}
+
+.gmrt-hp__track {
+    height: .5rem;
+    overflow: hidden;
+    border: 1px solid rgba(244, 234, 214, .28);
+    border-radius: 999px;
+    background: rgba(0, 0, 0, .28);
+}
+
+.gmrt-hp__fill {
+    display: block;
+    width: var(--gmrt-hp);
+    height: 100%;
+    background: currentColor;
+    opacity: .82;
+}
+
+.gmrt-hp small {
+    font-family: system-ui, sans-serif;
+    font-size: .7rem;
+    opacity: .72;
+}
+
+
+.gmrt-death-saves {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: .55rem;
+    padding: .55rem .7rem;
+    border: 1px solid rgba(244, 234, 214, .25);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, .24);
+    font-family: system-ui, sans-serif;
+    font-size: .78rem;
+}
+
+.gmrt-death-saves strong {
+    letter-spacing: .08em;
+}
+
+.gmrt-death-saves button {
+    border: 1px solid currentColor;
+    border-radius: 7px;
+    padding: .38rem .58rem;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.gmrt-test-table-button {
+    display:inline-block;margin-top:.8rem;border:2px solid currentColor;border-radius:7px;
+    padding:.6rem .85rem;background:rgba(0,0,0,.18);color:inherit;font:inherit;font-weight:800;cursor:pointer;
+}
+.gmrt-test-table-button:disabled { opacity:.65; cursor:wait; }
+.gmrt-test-table-note { display:block; margin-top:.65rem; opacity:.78; }
+
+.gmrt-end-turn {
+    border: 2px solid currentColor;
+    border-radius: 6px;
+    padding: .45rem .7rem;
+    background: rgba(0, 0, 0, .2);
+    color: inherit;
+    font: inherit;
+    font-weight: 800;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.gmrt-end-turn:hover,
+.gmrt-end-turn:focus-visible {
+    transform: translateY(-1px);
+}
+
+.gmrt-end-turn:disabled {
+    opacity: .65;
+    cursor: wait;
+    transform: none;
+}
+
+.gmrt-current-turn strong {
+    font-weight: 800;
+}
+
+
+.gmrt-afflictions {
+    flex-basis: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .4rem;
+    padding-top: .55rem;
+    border-top: 1px solid rgba(244, 234, 214, .18);
+    font: 700 .72rem system-ui, sans-serif;
+}
+
+.gmrt-afflictions select,
+.gmrt-afflictions input,
+.gmrt-afflictions button {
+    border: 1px solid rgba(244, 234, 214, .35);
+    border-radius: 6px;
+    padding: .35rem .5rem;
+    background: rgba(0, 0, 0, .3);
+    color: inherit;
+    font: inherit;
+}
+
+.gmrt-afflictions input {
+    width: 3.6rem;
+}
+
+.gmrt-token__conditions {
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + .2rem);
+    transform: translateX(-50%);
+    display: flex;
+    gap: 2px;
+    pointer-events: none;
+}
+
+.gmrt-condition {
+    width: .55rem;
+    height: .55rem;
+    border: 1px solid #f4ead6;
+    background: #766c59;
+    box-shadow: 1px 1px 0 rgba(0, 0, 0, .8);
+}
+
+.gmrt-condition--poisoned {
+    position: relative;
+    border-radius: 50%;
+    background: #77a35b;
+    animation: gmrt-poison-bubble 1.1s steps(4, end) infinite;
+}
+
+.gmrt-condition--poisoned::after {
+    content: "";
+    position: absolute;
+    width: .25rem;
+    height: .25rem;
+    left: .45rem;
+    top: -.3rem;
+    border: 1px solid #f4ead6;
+    border-radius: 50%;
+    background: #77a35b;
+}
+
+.gmrt-condition--prone {
+    transform: rotate(45deg);
+}
+
+.gmrt-condition--stunned {
+    background: #d5b84d;
+    transform: rotate(45deg);
+}
+
+@keyframes gmrt-poison-bubble {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
+
+
+/* Phase IV.18 — The Measure of the Battlefield */
+
+.gmrt-targeting-layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 3;
+    pointer-events: none;
+    overflow: visible;
+}
+
+.gmrt-board__tokens {
+    z-index: 9;
+}
+
+.gmrt-target-line {
+    stroke: rgba(244, 234, 214, .9);
+    stroke-width: 3;
+    stroke-linecap: square;
+    stroke-dasharray: none;
+    opacity: 0;
+    filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, .7));
+}
+
+.gmrt-target-line.is-visible {
+    opacity: 1;
+}
+
+.gmrt-target-line.is-long-range {
+    stroke-dasharray: 9 5;
+}
+
+.gmrt-target-line.is-out-of-range {
+    stroke-dasharray: 3 7;
+    stroke-width: 2;
+}
+
+.gmrt-target-range {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2rem;
+    padding: .25rem .55rem;
+    border: 1px solid rgba(244, 234, 214, .24);
+    border-radius: 6px;
+    font: 800 .68rem/1.1 system-ui, sans-serif;
+    letter-spacing: .035em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.gmrt-target-range.is-out-of-range {
+    border-style: dashed;
+}
+
+.gmrt-target-range.is-long-range::before {
+    content: "↗";
+    margin-right: .3rem;
+}
+
+.gmrt-target-range.is-out-of-range::before {
+    content: "×";
+    margin-right: .3rem;
+}
+
+.gmrt-diceworks {
+    flex-basis: 100%;
+    position: relative;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: .7rem;
+    min-height: 4.5rem;
+    margin-top: .7rem;
+    padding: .55rem .75rem;
+    border: 2px solid rgba(244, 234, 214, .28);
+    box-shadow:
+        inset 0 0 0 2px rgba(0, 0, 0, .25),
+        3px 3px 0 rgba(0, 0, 0, .35);
+    background:
+        linear-gradient(
+            180deg,
+            rgba(50, 30, 24, .96),
+            rgba(22, 17, 15, .96)
+        );
+    font-family: ui-monospace, "Courier New", monospace;
+}
+
+.gmrt-diceworks[hidden] {
+    display: none;
+}
+
+.gmrt-diceworks__heading {
+    display: grid;
+    gap: .15rem;
+    min-width: 8rem;
+    text-transform: uppercase;
+}
+
+.gmrt-diceworks__heading span {
+    font-size: .58rem;
+    opacity: .72;
+    letter-spacing: .12em;
+}
+
+.gmrt-diceworks__heading strong {
+    font-size: .75rem;
+}
+
+.gmrt-diceworks__tray {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: .65rem;
+    min-width: 7rem;
+}
+
+.gmrt-pixel-d20 {
+    position: relative;
+    width: 2.85rem;
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    clip-path: polygon(
+        50% 0,
+        92% 24%,
+        100% 66%,
+        72% 100%,
+        28% 100%,
+        0 66%,
+        8% 24%
+    );
+    background: #d6b968;
+    color: #17120d;
+    box-shadow: inset 0 0 0 4px #f5e7b7;
+    font-size: .92rem;
+    font-weight: 900;
+    image-rendering: pixelated;
+}
+
+.gmrt-pixel-d20[hidden] {
+    display: none;
+}
+
+.gmrt-diceworks.is-rolling .gmrt-pixel-d20 {
+    animation:
+        gmrt-d20-tumble .42s steps(5, end) infinite;
+}
+
+.gmrt-pixel-d20.is-chosen {
+    transform: scale(1.14);
+    outline: 3px solid currentColor;
+    outline-offset: 3px;
+}
+
+.gmrt-pixel-d20.is-rejected {
+    opacity: .36;
+    transform: translateY(.3rem) scale(.88);
+}
+
+.gmrt-diceworks.is-critical-hit .gmrt-pixel-d20.is-chosen {
+    animation: gmrt-d20-victory .55s steps(4, end) 2;
+}
+
+.gmrt-diceworks.is-critical-miss .gmrt-pixel-d20.is-chosen {
+    transform: rotate(-9deg) translateY(.25rem);
+}
+
+.gmrt-diceworks > small {
+    max-width: 12rem;
+    font-size: .62rem;
+    line-height: 1.25;
+    opacity: .8;
+}
+
+.gmrt-lonely-confetti {
+    position: absolute;
+    top: -.2rem;
+    left: 50%;
+    width: 5px;
+    height: 8px;
+    background: #f4ead6;
+    box-shadow: 1px 1px 0 rgba(0, 0, 0, .7);
+    animation:
+        gmrt-lonely-confetti-fall 1.6s steps(8, end) forwards;
+}
+
+.gmrt-lonely-confetti[hidden] {
+    display: none;
+}
+
+@keyframes gmrt-d20-tumble {
+    0% { transform: translate(0, 0) rotate(0); }
+    25% { transform: translate(-4px, -3px) rotate(-12deg); }
+    50% { transform: translate(3px, 2px) rotate(9deg); }
+    75% { transform: translate(-2px, 3px) rotate(-6deg); }
+    100% { transform: translate(0, 0) rotate(0); }
+}
+
+@keyframes gmrt-d20-victory {
+    0%, 100% { transform: scale(1.14); }
+    50% { transform: scale(1.28) translateY(-3px); }
+}
+
+@keyframes gmrt-lonely-confetti-fall {
+    0% {
+        transform: translate(0, 0) rotate(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(17px, 72px) rotate(110deg);
+        opacity: .2;
+    }
+}
+
+@media (max-width: 760px) {
+    .gmrt-diceworks {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .gmrt-diceworks > small {
+        max-width: none;
+    }
+
+    .gmrt-target-range {
+        flex-basis: 100%;
+        justify-content: center;
+    }
+}
+
+
+/* Phase IV.19 — The Chronicle of Battle */
+
+.gmrt-diceworks {
+    grid-template-columns: auto auto minmax(12rem, 1fr) auto;
+}
+
+.gmrt-diceworks__outcome {
+    display: grid;
+    align-content: center;
+    gap: .18rem;
+    min-width: 0;
+    padding-left: .7rem;
+    border-left: 1px solid rgba(244, 234, 214, .18);
+}
+
+.gmrt-diceworks__outcome[hidden] {
+    display: none;
+}
+
+.gmrt-diceworks__outcome strong {
+    font-size: .82rem;
+    letter-spacing: .06em;
+}
+
+.gmrt-diceworks__outcome span {
+    font-size: .64rem;
+    line-height: 1.35;
+    opacity: .86;
+    overflow-wrap: anywhere;
+}
+
+.gmrt-battle-log {
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(244, 234, 214, .14);
+}
+
+.gmrt-battle-log__heading {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: .75rem;
+    margin-bottom: .7rem;
+}
+
+.gmrt-battle-log__heading h3 {
+    margin: .12rem 0 0;
+    font-size: 1rem;
+}
+
+.gmrt-battle-log__heading > span {
+    font: 700 .62rem system-ui, sans-serif;
+    opacity: .55;
+    text-transform: uppercase;
+}
+
+.gmrt-battle-log ol {
+    list-style: none;
+    display: grid;
+    gap: .4rem;
+    max-height: 22rem;
+    overflow: auto;
+    margin: 0;
+    padding: 0 .2rem 0 0;
+}
+
+.gmrt-battle-log li {
+    display: grid;
+    gap: .18rem;
+    padding: .5rem .55rem;
+    border-left: 2px solid rgba(244, 234, 214, .28);
+    background: rgba(0, 0, 0, .16);
+}
+
+.gmrt-battle-log li small {
+    font: 800 .58rem system-ui, sans-serif;
+    letter-spacing: .08em;
+    opacity: .55;
+    text-transform: uppercase;
+}
+
+.gmrt-battle-log li span {
+    font: .72rem/1.35 Georgia, "Times New Roman", serif;
+}
+
+.gmrt-battle-log__empty {
+    margin: .5rem 0 0;
+    font-size: .75rem;
+    opacity: .55;
+}
+
+.gmrt-chamber__status {
+    opacity: .72;
+}
+
+@media (max-width: 980px) {
+    .gmrt-diceworks {
+        grid-template-columns: auto 1fr;
+    }
+
+    .gmrt-diceworks__outcome {
+        grid-column: 1 / -1;
+        border-left: 0;
+        border-top: 1px solid rgba(244, 234, 214, .18);
+        padding: .55rem 0 0;
+    }
+}
+
+@media (max-width: 760px) {
+    .gmrt-diceworks {
+        grid-template-columns: 1fr;
+    }
+
+    .gmrt-diceworks__outcome {
+        grid-column: auto;
+    }
+}
+
+
+/* Phase IV.19.1 — Chronicle & Fallen Combatant Presentation */
+
+.gmrt-battle-log ol {
+    grid-auto-rows: max-content;
+    min-height: 13rem;
+    max-height: 26rem;
+    padding-right: .35rem;
+    scrollbar-gutter: stable;
+}
+
+.gmrt-battle-log li {
+    box-sizing: border-box;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+    grid-auto-flow: row;
+    min-height: 0;
+    height: auto;
+    margin: 0;
+    padding: .6rem .65rem;
+    overflow: visible;
+    border-radius: 7px;
+}
+
+.gmrt-battle-log li > small,
+.gmrt-battle-log li > span {
+    grid-column: 1;
+    grid-row: auto;
+    min-width: 0;
+    margin: 0;
+}
+
+.gmrt-battle-log li > span {
+    display: block;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: normal;
+}
+
+.gmrt-token__state-badge {
+    position: absolute;
+    left: 50%;
+    top: calc(100% + .18rem);
+    transform: translateX(-50%);
+    min-width: 1.65rem;
+    padding: 1px 3px;
+    border: 1px solid currentColor;
+    background: #17140f;
+    box-shadow: 1px 1px 0 rgba(0, 0, 0, .75);
+    font: 900 .48rem/1.1 ui-monospace, monospace;
+    letter-spacing: .05em;
+    text-align: center;
+    pointer-events: none;
+}
+
+.gmrt-token__state-badge[hidden] {
+    display: none;
+}
+
+.gmrt-token.is-state-wounded {
+    box-shadow:
+        0 4px 14px rgba(0, 0, 0, .5),
+        inset 0 -5px 0 rgba(0, 0, 0, .18);
+}
+
+.gmrt-token.is-state-downed {
+    opacity: .68;
+    transform:
+        translate(-50%, -50%)
+        rotate(18deg);
+}
+
+.gmrt-token.is-state-defeated {
+    opacity: .52;
+    filter: saturate(.4);
+    transform:
+        translate(-50%, -50%)
+        rotate(8deg);
+}
+
+.gmrt-token.is-state-deceased {
+    opacity: .38;
+    filter: grayscale(1);
+}
+
+.gmrt-token.is-state-deceased::after {
+    content: "×";
+    position: absolute;
+    inset: -.3rem;
+    display: grid;
+    place-items: center;
+    font: 900 1.55rem/1 ui-monospace, monospace;
+    text-shadow:
+        2px 0 #17140f,
+        -2px 0 #17140f,
+        0 2px #17140f,
+        0 -2px #17140f;
+    pointer-events: none;
+}
+
+.gmrt-hp__state {
+    font: 900 .58rem/1 system-ui, sans-serif;
+    letter-spacing: .08em;
+}
+
+.gmrt-hp__state--downed,
+.gmrt-hp__state--defeated,
+.gmrt-hp__state--deceased {
+    opacity: .82;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gmrt-token.is-state-downed,
+    .gmrt-token.is-state-defeated {
+        transition: none;
+    }
+}
+
+
+/* Phase IV.20 — The Arsenal of the Adventurer */
+.gmrt-deeds__attack {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    font: 700 .75rem system-ui, sans-serif;
+}
+.gmrt-deeds__attack select {
+    max-width: 18rem;
+    border: 1px solid rgba(244, 234, 214, .35);
+    border-radius: 8px;
+    padding: .4rem .55rem;
+    background: rgba(0, 0, 0, .32);
+    color: inherit;
+}
+.gmrt-board__viewport,
+.gmrt-board__map,
+.gmrt-board__grid,
+.gmrt-board__tokens,
+.gmrt-targeting-layer {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+@media (max-width: 760px) {
+    .gmrt-deeds__attack { flex-basis: 100%; }
+    .gmrt-deeds__attack select { max-width: min(100%, 24rem); }
+}
+
+
+/* Phase IV.21 — The Cartographer's Table */
+.gmrt-board__tools {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: .65rem;
+    flex-wrap: wrap;
+}
+.gmrt-cartographer-button {
+    border: 1px solid rgba(244, 234, 214, .45);
+    border-radius: 8px;
+    padding: .45rem .7rem;
+    background: rgba(0, 0, 0, .34);
+    color: inherit;
+    font: 800 .75rem system-ui, sans-serif;
+    cursor: pointer;
+}
+.gmrt-cartographer-button:hover,
+.gmrt-cartographer-button:focus-visible {
+    background: rgba(255, 255, 255, .1);
+}
+.gmrt-cartographer-status {
+    margin: .35rem 0 .75rem;
+    font: 600 .72rem/1.4 system-ui, sans-serif;
+    opacity: .78;
+}
+.gmrt-board__map {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    image-rendering: auto;
+}
+
+
+/* Phase IV.21A — The Cartographer's Grid */
+.gmrt-grid-calibrator { margin: .45rem 0 .75rem; border: 1px solid rgba(244,234,214,.2); border-radius: 9px; padding: .55rem .7rem; }
+.gmrt-grid-calibrator summary { cursor: pointer; font-weight: 800; }
+.gmrt-grid-calibrator__controls { display: flex; align-items: end; gap: .6rem; flex-wrap: wrap; padding-top: .65rem; }
+.gmrt-grid-calibrator label { display: flex; align-items: center; gap: .35rem; font: 700 .72rem system-ui,sans-serif; }
+.gmrt-grid-calibrator input[type=number] { width: 5.2rem; }
+.gmrt-grid-calibrator input, .gmrt-grid-calibrator button { accent-color: currentColor; }
+.gmrt-grid-calibrator button, .gmrt-grid-calibrator input[type=number] { border: 1px solid rgba(244,234,214,.35); border-radius: 7px; background: rgba(0,0,0,.3); color: inherit; padding: .38rem .5rem; }
+.gmrt-grid-calibrator__nudges { display: flex; gap: .25rem; }
+.gmrt-grid-calibrator__nudges button { min-width: 2rem; cursor: pointer; }
+.gmrt-grid-calibrator__registration { flex-basis:100%; min-height:1.1rem; opacity:.78; font:700 .72rem/1.4 system-ui,sans-serif; }
+.gmrt-grid-calibrator [data-detect-grid] { cursor:pointer; }
+.gmrt-grid-calibrator [data-detect-grid][aria-busy="true"] { opacity:.7; cursor:progress; }
+
+
+/* Phase IV.21B — The Cartographer's Lens */
+.gmrt-cartographers-lens { display:flex; align-items:center; gap:.45rem; flex-wrap:wrap; margin:.45rem 0 .75rem; padding:.55rem .7rem; border:1px solid rgba(244,234,214,.2); border-radius:9px; }
+.gmrt-cartographers-lens__title { margin-right:.2rem; }
+.gmrt-cartographers-lens button { border:1px solid rgba(244,234,214,.35); border-radius:7px; background:rgba(0,0,0,.3); color:inherit; padding:.38rem .55rem; cursor:pointer; }
+.gmrt-cartographers-lens output { min-width:3.8rem; text-align:center; font:800 .75rem system-ui,sans-serif; }
+.gmrt-cartographers-lens__hint { opacity:.7; font-size:.72rem; }
+.gmrt-board__lens-stage { position:relative; overflow:hidden; width:100%; min-height:22rem; border-radius:inherit; touch-action:none; cursor:grab; }
+.gmrt-board__lens-stage.is-panning { cursor:grabbing; }
+.gmrt-board__lens-stage .gmrt-board__viewport { transform-origin:0 0; will-change:transform; }
+
+
+/* Phase IV.21B.1 — The Steady Lens */
+.gmrt-board__lens-stage,
+.gmrt-board__lens-stage .gmrt-board__viewport,
+.gmrt-board__lens-stage .gmrt-board__map {
+    user-select: none;
+    -webkit-user-select: none;
+}
+.gmrt-board__lens-stage .gmrt-board__map {
+    -webkit-user-drag: none;
+    pointer-events: none;
+}
+.gmrt-board__lens-stage {
+    overscroll-behavior: contain;
+}
+
+
+/* Phase IV.30.1E — The Cartographer's Lens Controls */
+.gmrt-board__lens-controls {
+    position: absolute;
+    top: .75rem;
+    right: .75rem;
+    z-index: 45;
+    display: grid;
+    grid-template-columns: minmax(2.55rem, auto);
+    gap: .28rem;
+    padding: .32rem;
+    border: 1px solid rgba(244,234,214,.42);
+    border-radius: 10px;
+    background: rgba(20,17,12,.88);
+    box-shadow: 0 5px 18px rgba(0,0,0,.34);
+    backdrop-filter: blur(4px);
+}
+.gmrt-board__lens-controls button {
+    min-width: 2.55rem;
+    min-height: 2.35rem;
+    border: 1px solid rgba(244,234,214,.34);
+    border-radius: 7px;
+    padding: .34rem .46rem;
+    background: rgba(0,0,0,.32);
+    color: inherit;
+    font: 800 .78rem system-ui,sans-serif;
+    cursor: pointer;
+}
+.gmrt-board__lens-controls button[data-lens-zoom-in],
+.gmrt-board__lens-controls button[data-lens-zoom-out] {
+    font-size: 1.15rem;
+    line-height: 1;
+}
+.gmrt-board__lens-controls button:disabled {
+    cursor: not-allowed;
+    opacity: .42;
+}
+.gmrt-board__lens-controls button:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+}
+.gmrt-board__lens-controls output {
+    min-width: 2.55rem;
+    padding: .18rem .25rem;
+    text-align: center;
+    font: 800 .68rem system-ui,sans-serif;
+    opacity: .86;
+}
+@media (max-width: 640px) {
+    .gmrt-board__lens-controls {
+        top: .5rem;
+        right: .5rem;
+    }
+}
+
+
+/* Phase IV.22 — The Veil of the Unknown */
+.gmrt-fog-controls {
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    flex-wrap: wrap;
+    margin: .45rem 0 .75rem;
+    padding: .55rem .7rem;
+    border: 1px solid rgba(244,234,214,.2);
+    border-radius: 9px;
+}
+.gmrt-fog-controls label {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    font: 700 .72rem system-ui,sans-serif;
+}
+.gmrt-fog-controls button {
+    border: 1px solid rgba(244,234,214,.35);
+    border-radius: 7px;
+    background: rgba(0,0,0,.3);
+    color: inherit;
+    padding: .38rem .55rem;
+    cursor: pointer;
+}
+.gmrt-fog-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 8;
+    pointer-events: none;
+    overflow: hidden;
+}
+.gmrt-fog-layer[hidden] {
+    display: none;
+}
+.gmrt-fog-cell {
+    position: absolute;
+    box-sizing: border-box;
+    margin: -1px;
+    padding: 1px;
+    background-clip: padding-box;
+}
+
+.gmrt-fog-cell.is-unexplored {
+    background:
+        linear-gradient(
+            135deg,
+            rgba(10, 9, 11, .995),
+            rgba(3, 3, 5, 1)
+        );
+    box-shadow:
+        inset 0 0 10px rgba(0, 0, 0, .22);
+}
+
+.gmrt-fog-cell.is-memory {
+    background:
+        rgba(9, 8, 11, .56);
+    box-shadow:
+        inset 0 0 8px rgba(0, 0, 0, .16);
+    backdrop-filter: grayscale(.38) brightness(.72);
+}
+
+.gmrt-fog-cell.is-vision-edge::after,
+.gmrt-fog-cell.is-memory-edge::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.gmrt-fog-cell.is-vision-edge::after {
+    background:
+        repeating-linear-gradient(
+            45deg,
+            rgba(244, 234, 214, .09) 0 2px,
+            rgba(0, 0, 0, .12) 2px 4px
+        );
+    opacity: .62;
+    mix-blend-mode: screen;
+}
+
+.gmrt-fog-cell.is-memory-edge::after {
+    background:
+        repeating-linear-gradient(
+            135deg,
+            rgba(0, 0, 0, .48) 0 3px,
+            rgba(26, 22, 28, .28) 3px 6px
+        );
+    opacity: .72;
+}
+
+.gmrt-fog-layer::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        repeating-linear-gradient(
+            0deg,
+            rgba(255, 255, 255, .012) 0 1px,
+            transparent 1px 3px
+        );
+    opacity: .38;
+    z-index: 2;
+}
+
+
+/* Phase IV.22A — The Living Veil */
+.gmrt-fog-layer {
+    isolation: isolate;
+}
+
+.gmrt-fog-cell {
+    transition:
+        opacity .18s steps(2, end),
+        filter .18s steps(2, end);
+}
+
+.gmrt-fog-cell.is-unexplored {
+    filter: contrast(1.04);
+}
+
+.gmrt-fog-cell.is-memory {
+    filter:
+        saturate(.58)
+        contrast(.92);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gmrt-fog-cell {
+        transition: none;
+    }
+}
+
+/* Phase IV.22B — Sight Beyond the Door */
+.gmrt-vision-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .5rem;
+    margin: .7rem 0;
+    padding: .65rem .75rem;
+    border: 1px solid rgba(244, 234, 214, .18);
+    border-radius: 8px;
+    background: rgba(18, 15, 11, .55);
+}
+.gmrt-vision-controls > strong { color: #f4ead6; }
+.gmrt-vision-controls > span { opacity: .78; }
+.gmrt-vision-controls button {
+    border: 1px solid rgba(244, 234, 214, .35);
+    border-radius: 6px;
+    padding: .38rem .55rem;
+    background: rgba(0, 0, 0, .3);
+    color: inherit;
+    cursor: pointer;
+}
+.gmrt-vision-controls button.is-active {
+    outline: 2px solid rgba(244, 214, 136, .9);
+    outline-offset: 2px;
+}
+.gmrt-vision-layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 7;
+    pointer-events: none;
+    overflow: visible;
+}
+.gmrt-vision-barrier {
+    stroke: rgba(255, 219, 139, .96);
+    stroke-width: 4;
+    stroke-linecap: square;
+    vector-effect: non-scaling-stroke;
+}
+.gmrt-vision-barrier.is-door {
+    stroke: rgba(132, 218, 255, .98);
+    stroke-dasharray: 8 4;
+}
+.gmrt-vision-barrier.is-door.is-open {
+    opacity: .42;
+    stroke-dasharray: 3 7;
+}
+.gmrt-vision-roster {
+    flex-basis: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem;
+}
+.gmrt-vision-roster__item {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    padding: .25rem .35rem;
+    border: 1px solid rgba(244, 234, 214, .16);
+    border-radius: 6px;
+    background: rgba(0, 0, 0, .2);
+    font-size: .8rem;
+}
+
+/* Phase IV.22B.1 — The Keeper's Cartography */
+.gmrt-vision-barrier.is-preview {
+    opacity: .7;
+    stroke-dasharray: 5 5;
+    stroke-width: 3;
+}
+.gmrt-vision-barrier.is-selected {
+    stroke-width: 7;
+    filter: drop-shadow(0 0 4px rgba(255, 244, 190, .9));
+}
+.gmrt-vision-roster__item { cursor: pointer; }
+.gmrt-vision-roster__item.is-selected {
+    outline: 2px solid rgba(244, 214, 136, .9);
+    outline-offset: 1px;
+    background: rgba(244, 214, 136, .1);
+}
+.gmrt-vision-controls [data-vision-undo]:disabled,
+.gmrt-vision-controls [data-vision-cancel]:disabled {
+    opacity: .42;
+    cursor: default;
+}
+
+/* Phase IV.23 — The Gathering at the Table */
+.gmrt-party__member {
+    display: grid;
+    grid-template-columns: 42px auto 1fr;
+    align-items: center;
+    column-gap: .55rem;
+}
+.gmrt-party__avatar {
+    grid-row: 1 / span 2;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    background: rgba(244, 214, 136, .12);
+    border: 1px solid rgba(244, 214, 136, .35);
+    font-weight: 800;
+}
+.gmrt-party__avatar img { width: 100%; height: 100%; object-fit: cover; }
+.gmrt-party__role {
+    display: inline-flex;
+    width: max-content;
+    padding: .12rem .38rem;
+    border-radius: 999px;
+    border: 1px solid rgba(244, 234, 214, .24);
+    font-size: .7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+.gmrt-gathering-controls,
+.gmrt-companion-link,
+.gmrt-gathering-invitation {
+    margin-top: 1rem;
+    padding: .8rem;
+    border: 1px solid rgba(244, 234, 214, .16);
+    border-radius: 8px;
+    background: rgba(18, 15, 11, .5);
+}
+.gmrt-gathering-controls form { display: grid; gap: .45rem; }
+.gmrt-gathering-controls label { display: grid; gap: .25rem; }
+.gmrt-gathering-controls input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: .5rem .55rem;
+    border-radius: 6px;
+    border: 1px solid rgba(244, 234, 214, .28);
+    background: rgba(0, 0, 0, .3);
+    color: inherit;
+}
+.gmrt-gathering-controls button,
+.gmrt-gathering-invitation button {
+    padding: .5rem .7rem;
+    border-radius: 6px;
+    border: 1px solid rgba(244, 214, 136, .45);
+    background: rgba(244, 214, 136, .1);
+    color: inherit;
+    cursor: pointer;
+}
+.gmrt-companion-link .is-connected { color: #aee7ae; font-weight: 800; }
+.gmrt-gathering-invitation { max-width: 620px; margin: 2rem auto; }
+
+/* Phase IV.23A — The Summons to the Table */
+.gmrt-party__member {
+    position: relative;
+    border: 1px solid rgba(255,255,255,.08);
+    transition: border-color .16s ease, box-shadow .16s ease;
+}
+.gmrt-party__member--dungeon-master {
+    border-color: rgba(218, 180, 92, .52);
+    box-shadow: inset 3px 0 0 rgba(218, 180, 92, .8);
+}
+.gmrt-party__member--player {
+    border-color: rgba(111, 190, 180, .42);
+    box-shadow: inset 3px 0 0 rgba(111, 190, 180, .68);
+}
+.gmrt-party__role {
+    border-radius: 3px;
+    min-width: auto;
+    width: auto;
+    height: auto;
+    padding: .2rem .38rem;
+    font-size: .68rem;
+    line-height: 1;
+}
+.gmrt-party__member--dungeon-master .gmrt-party__role {
+    background: rgba(218, 180, 92, .2);
+    border-color: rgba(218, 180, 92, .58);
+    color: #f5db9b;
+}
+.gmrt-party__member--player .gmrt-party__role {
+    background: rgba(111, 190, 180, .16);
+    border-color: rgba(111, 190, 180, .48);
+    color: #bde9e2;
+}
+
+
+/* Phase IV.23A.2 — The Living Table */
+.gmrt-token.is-active-turn {
+    outline: 3px solid currentColor;
+    outline-offset: 3px;
+}
+
+/* Phase IV.25 — The Companion Character Gate */
+.gmrt-token__face { position:absolute; inset:3px; display:grid; place-items:center; overflow:hidden; border-radius:50%; }
+.gmrt-token__face img { width:var(--gmrt-token-zoom,100%); height:var(--gmrt-token-zoom,100%); max-width:none; object-fit:cover; object-position:var(--gmrt-token-focus-x,50%) var(--gmrt-token-focus-y,50%); pointer-events:none; }
+.gmrt-character-gate { display:grid; gap:.55rem; margin-top:.75rem; }
+.gmrt-character-gate label { display:grid; gap:.35rem; }
+.gmrt-character-gate select { width:100%; }
+.gmrt-character-gate__chosen { margin:.55rem 0 0; }
+
+
+/* Phase IV.26 — The Adventurer's Satchel */
+.gmrt-satchel{position:fixed;left:0;top:var(--gmrt-satchel-top,7.75rem);bottom:var(--gmrt-satchel-bottom,1rem);z-index:80;display:flex;align-items:flex-start;transform:translateX(calc(-100% + 3.25rem));transition:transform .2s ease}.gmrt-satchel[data-open="true"]{transform:translateX(0)}
+.gmrt-satchel__toggle{order:2;width:3.25rem;min-height:7rem;padding:.55rem .35rem;border:1px solid rgba(244,214,136,.48);border-left:0;border-radius:0 8px 8px 0;background:#2b2118;color:#f4ead6;display:grid;gap:.35rem;place-items:center;cursor:pointer}.gmrt-satchel__toggle span:last-child{writing-mode:vertical-rl;text-orientation:mixed;font-weight:800;letter-spacing:.04em}
+.gmrt-satchel__panel{width:min(460px,calc(100vw - 4rem));height:100%;max-height:none;overflow-y:auto;overflow-x:hidden;padding:1rem;background:#1d1812;color:#f4ead6;border:1px solid rgba(244,214,136,.4);border-left:0;box-shadow:10px 12px 30px rgba(0,0,0,.35)}
+.gmrt-satchel__identity{position:sticky;top:-1rem;z-index:2;background:#1d1812;padding-top:1rem;display:flex;gap:.8rem;align-items:center;border-bottom:1px solid rgba(244,214,136,.2);padding-bottom:.8rem}.gmrt-satchel__identity img{width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid rgba(244,214,136,.6)}.gmrt-satchel__identity h2,.gmrt-satchel__identity p{margin:.1rem 0}
+.gmrt-satchel__measures,.gmrt-satchel__abilities{display:grid;grid-template-columns:repeat(3,1fr);gap:.45rem;margin:.8rem 0}.gmrt-satchel__measures>div,.gmrt-satchel__abilities>div{display:grid;text-align:center;padding:.45rem;border:1px solid rgba(244,234,214,.15);background:rgba(255,255,255,.035)}.gmrt-satchel__measures span,.gmrt-satchel__abilities span{font-size:.68rem;text-transform:uppercase;opacity:.72}.gmrt-satchel__measures strong,.gmrt-satchel__abilities strong{font-size:1.05rem}.gmrt-satchel__measures small,.gmrt-satchel__abilities small{font-size:.72rem;opacity:.78}
+.gmrt-satchel__section{border-top:1px solid rgba(244,214,136,.18);padding:.65rem 0}.gmrt-satchel__section h3{margin:0 0 .35rem}.gmrt-satchel__section summary{cursor:pointer;font-weight:800}.gmrt-satchel__list{display:grid;grid-template-columns:1fr 1fr;gap:.2rem .8rem;margin-top:.5rem}.gmrt-satchel__list>div{display:flex;justify-content:space-between;padding:.2rem 0;border-bottom:1px dotted rgba(244,234,214,.13)}.gmrt-satchel__promise{font-size:.78rem;opacity:.72;margin:.75rem 0 0}
+@media (max-width:700px){.gmrt-satchel__panel{width:calc(100vw - 4rem)}}
+@media (prefers-reduced-motion:reduce){.gmrt-satchel{transition:none}}
+
+/* Phase IV.26A — Quick Hands at the Table */
+.gmrt-quick-roll{font:inherit;color:inherit;cursor:pointer;border:1px solid rgba(244,234,214,.15);background:rgba(255,255,255,.035)}
+.gmrt-quick-roll:hover,.gmrt-quick-roll:focus-visible{border-color:rgba(244,214,136,.65);background:rgba(244,214,136,.1);outline:none}
+.gmrt-quick-roll:disabled{cursor:wait;opacity:.62}
+.gmrt-satchel__abilities .gmrt-quick-roll{display:grid;text-align:center;padding:.45rem}
+.gmrt-quick-roll--measure{display:grid;text-align:center;padding:.45rem}
+.gmrt-quick-roll--row{display:flex;justify-content:space-between;align-items:center;padding:.28rem .35rem;border-radius:4px;text-align:left}
+.gmrt-quick-hands-result{margin:.7rem 0 0;padding:.65rem .7rem;border:1px solid rgba(244,214,136,.32);border-radius:6px;background:rgba(244,214,136,.07);font-size:.82rem;line-height:1.35}
+
+
+/* Phase IV.26B — Weapons to Hand */
+.gmrt-weapon-list{display:grid;gap:.55rem;margin-top:.55rem}.gmrt-weapon-card{padding:.6rem;border:1px solid rgba(244,214,136,.24);border-radius:6px;background:rgba(255,255,255,.035)}
+.gmrt-weapon-card header{display:flex;justify-content:space-between;gap:.65rem;align-items:flex-start}.gmrt-weapon-card header>div{display:grid}.gmrt-weapon-card header small{opacity:.7;font-size:.72rem}.gmrt-weapon-card header b{font-size:1.05rem;color:#f4d688}
+.gmrt-weapon-card p{margin:.35rem 0;font-size:.82rem}.gmrt-weapon-card__properties{display:block;opacity:.7;font-size:.7rem}.gmrt-weapon-card__actions{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-top:.5rem}
+.gmrt-weapon-card__actions button{font:inherit;color:inherit;cursor:pointer;padding:.42rem;border:1px solid rgba(244,214,136,.4);border-radius:5px;background:rgba(244,214,136,.08)}.gmrt-weapon-card__actions button:hover,.gmrt-weapon-card__actions button:focus-visible{background:rgba(244,214,136,.16);outline:none;border-color:rgba(244,214,136,.72)}.gmrt-weapon-card__actions button:disabled{opacity:.6;cursor:wait}.gmrt-satchel__empty{font-size:.8rem;opacity:.74}
+
+/* IV.26C — The Spell Pouch / Unfurl the Satchel */
+.gmrt-spellcasting-measures{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem;margin:.6rem 0}.gmrt-spellcasting-measures>div{display:grid;text-align:center;padding:.4rem;border:1px solid rgba(244,234,214,.15);background:rgba(255,255,255,.035)}.gmrt-spellcasting-measures span{font-size:.65rem;text-transform:uppercase;opacity:.72}.gmrt-spell-slots{display:flex;flex-wrap:wrap;gap:.35rem;margin:.5rem 0}.gmrt-spell-slots span{padding:.25rem .4rem;border:1px solid rgba(244,214,136,.25);border-radius:999px;font-size:.72rem}.gmrt-spell-list{display:grid;gap:.5rem;margin-top:.55rem}.gmrt-spell-card{padding:.65rem;border:1px solid rgba(244,214,136,.2);border-radius:6px;background:rgba(255,255,255,.025)}.gmrt-spell-card header{display:flex;justify-content:space-between;gap:.6rem}.gmrt-spell-card header>div{display:grid}.gmrt-spell-card small,.gmrt-spell-card__meta{font-size:.72rem;opacity:.75}.gmrt-spell-card p{margin:.4rem 0;font-size:.8rem;line-height:1.4}.gmrt-spell-card__formula{display:block;color:#f4d688;font-weight:800}
+
+/* IV.26C.3 — Magic at Your Fingertips */
+.gmrt-spell-card__actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:.4rem;margin-top:.55rem}.gmrt-spell-card__actions button{font:inherit;color:inherit;cursor:pointer;padding:.42rem;border:1px solid rgba(244,214,136,.4);border-radius:5px;background:rgba(244,214,136,.08)}.gmrt-spell-card__actions button:hover,.gmrt-spell-card__actions button:focus-visible{background:rgba(244,214,136,.16);outline:none;border-color:rgba(244,214,136,.72)}.gmrt-spell-card__actions button:disabled{opacity:.6;cursor:wait}
+
+
+/* IV.26D — Adventuring Measures at the Table */
+.gmrt-satchel__hp { position: relative; }
+.gmrt-satchel__hp > button { margin-top: .35rem; font: inherit; cursor: pointer; }
+.gmrt-satchel__hp form { position: absolute; z-index: 4; left: 0; top: calc(100% + .35rem); min-width: 18rem; padding: .75rem; border: 1px solid currentColor; border-radius: .6rem; background: #17120d; box-shadow: 0 .5rem 1.5rem rgba(0,0,0,.35); }
+.gmrt-satchel__hp form[hidden] { display: none; }
+.gmrt-satchel__hp form label { display: grid; gap: .2rem; margin-bottom: .5rem; }
+.gmrt-satchel__hp form input { width: 100%; box-sizing: border-box; }
+.gmrt-satchel__hp form p { margin: .35rem 0 .6rem; }
+.gmrt-satchel__hp [role="status"] { display: block; margin-top: .4rem; font-size: .8em; }
+
+
+/* Phase IV.26D.2 — Clear the Battlefield & The Living Gathering */
+.gmrt-character-gate__callout {
+    display: grid;
+    gap: .35rem;
+    margin-top: .8rem;
+    padding: .85rem;
+    border: 2px solid rgba(244, 214, 136, .72);
+    border-radius: 8px;
+    background: rgba(244, 214, 136, .12);
+    box-shadow: 0 0 0 3px rgba(244, 214, 136, .06);
+}
+.gmrt-character-gate__callout strong { font-size: 1.08rem; }
+.gmrt-character-gate__callout span { line-height: 1.35; }
+.gmrt-remove-token-button {
+    border-color: rgba(231, 132, 112, .56) !important;
+    background: rgba(123, 38, 25, .22) !important;
+}
+.gmrt-remove-token-button[hidden] { display: none !important; }
+
+
+/* Phase IV.26F — Colours of the Fellowship */
+.gmrt-party__member{border-color:color-mix(in srgb,var(--gmrt-fellowship-colour,#65b9ae) 58%,transparent);box-shadow:inset 4px 0 0 var(--gmrt-fellowship-colour,#65b9ae)}
+.gmrt-party__avatar{border-color:var(--gmrt-fellowship-colour,#65b9ae)}
+.gmrt-party__role{border-color:color-mix(in srgb,var(--gmrt-fellowship-colour,#65b9ae) 62%,transparent);color:color-mix(in srgb,var(--gmrt-fellowship-colour,#65b9ae) 78%,white);background:color-mix(in srgb,var(--gmrt-fellowship-colour,#65b9ae) 16%,transparent)}
+.gmrt-fellowship-colour{margin:.65rem 0 .85rem;padding:.55rem .6rem;border:1px solid rgba(244,234,214,.14);border-radius:7px;background:rgba(0,0,0,.12)}
+.gmrt-fellowship-colour>span{display:block;margin-bottom:.4rem;font:800 .62rem system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;opacity:.72}
+.gmrt-fellowship-colour__swatches{display:flex;flex-wrap:wrap;gap:.38rem}.gmrt-fellowship-colour__swatches button{width:1.45rem;height:1.45rem;border-radius:50%;border:2px solid rgba(255,255,255,.24);background:var(--gmrt-swatch);cursor:pointer;box-shadow:0 0 0 1px rgba(0,0,0,.45)}.gmrt-fellowship-colour__swatches button[aria-pressed="true"]{outline:2px solid #f4ead6;outline-offset:2px}.gmrt-fellowship-colour__swatches button:focus-visible{outline:3px solid #fff;outline-offset:2px}
+.gmrt-battle-log li{border-left-color:var(--gmrt-fellowship-colour,#8f8779);box-shadow:inset 2px 0 0 color-mix(in srgb,var(--gmrt-fellowship-colour,#8f8779) 45%,transparent)}
+.gmrt-satchel__panel{border-color:color-mix(in srgb,var(--gmrt-fellowship-colour,#d8ad4f) 48%,#f4d688)}.gmrt-satchel__identity img{border-color:var(--gmrt-fellowship-colour,#d8ad4f)}.gmrt-satchel__toggle{border-color:color-mix(in srgb,var(--gmrt-fellowship-colour,#d8ad4f) 58%,#f4d688)}
+.gmrt-token{--gmrt-owner-ring:var(--gmrt-fellowship-colour,transparent)}.gmrt-token[data-token-controller]:not([data-token-controller=""]){box-shadow:0 0 0 2px color-mix(in srgb,var(--gmrt-owner-ring) 58%,transparent)}
+
+
+/* Phase IV.26G — Footsteps Through the Veil */
+.gmrt-footstep-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 6;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.gmrt-footstep {
+    position: absolute;
+    left: var(--gmrt-step-x);
+    top: var(--gmrt-step-y);
+    width: 14px;
+    height: 18px;
+    opacity: var(--gmrt-step-opacity, .48);
+    color: var(--gmrt-step-colour, #65b9ae);
+    transform: translate(-50%, -50%) rotate(var(--gmrt-step-angle, 0deg));
+    transform-origin: center;
+    filter: saturate(1.08) brightness(.62) contrast(1.35);
+}
+
+.gmrt-footstep i {
+    position: absolute;
+    display: block;
+    width: 5px;
+    height: 8px;
+    background: currentColor;
+    box-shadow: 0 2px 0 color-mix(in srgb, currentColor 92%, #17120d);
+    image-rendering: pixelated;
+}
+
+.gmrt-footstep i:first-child {
+    left: 2px;
+    top: 1px;
+    transform: rotate(-8deg);
+}
+
+.gmrt-footstep i:last-child {
+    right: 2px;
+    bottom: 1px;
+    transform: rotate(8deg);
+}
+
+.gmrt-footstep.is-memory {
+    filter: saturate(.72) brightness(.58) contrast(1.25);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gmrt-footstep { transition: none; }
+}
+
+/* Phase IV.27B — The First Lantern */
+.gmrt-light-layer { position:absolute; inset:0; z-index:7; pointer-events:none; overflow:hidden; }
+.gmrt-carried-light { position:absolute; left:var(--gmrt-light-x); top:var(--gmrt-light-y); width:18%; aspect-ratio:1; transform:translate(-50%,-50%); border-radius:50%; background:radial-gradient(circle, rgba(255,232,160,.22) 0 28%, rgba(255,190,92,.12) 29% 58%, rgba(255,160,64,0) 72%); filter:blur(2px); }
+.gmrt-lantern-measure button { display:block; margin:.35rem auto 0; font:inherit; }
+.gmrt-lantern-measure small { display:block; margin-top:.25rem; line-height:1.15; }
+/* Phase IV.27D — Fire Upon the Floor. */
+.gmrt-carried-light.is-dropped { display:grid; place-items:center; filter:none; }
+.gmrt-pixel-flame { position:relative; display:block; width:14px; height:18px; image-rendering:pixelated; filter:drop-shadow(0 0 4px rgba(255,184,64,.95)); animation:gmrt-pixel-flame-flicker .52s steps(2,end) infinite; transform-origin:50% 100%; }
+.gmrt-pixel-flame::before { content:""; position:absolute; left:4px; top:2px; width:6px; height:12px; background:#f47b20; box-shadow:-2px 4px 0 #f47b20,2px 2px 0 #ffb52e,-4px 8px 0 #d94b1f,4px 8px 0 #f47b20,-2px 12px 0 #8b3d22,2px 12px 0 #8b3d22; }
+.gmrt-pixel-flame::after { content:""; position:absolute; left:6px; top:6px; width:4px; height:6px; background:#ffe36a; box-shadow:-2px 4px 0 #ffb52e; }
+.gmrt-pixel-flame > b { position:absolute; left:1px; bottom:0; width:12px; height:2px; background:#5a321f; box-shadow:2px -2px 0 #7b4829; }
+.gmrt-pixel-flame > em { position:absolute; left:1px; top:4px; width:2px; height:2px; background:#ffb52e; opacity:0; animation:gmrt-pixel-ember-pop 1.15s steps(3,end) infinite; }
+@keyframes gmrt-pixel-flame-flicker { 0%,100% { transform:translateY(0) scaleX(1); } 50% { transform:translate(1px,-1px) scaleX(.86); } }
+@keyframes gmrt-pixel-ember-pop { 0%,55% { opacity:0; transform:translate(0,4px); } 60% { opacity:1; transform:translate(0,0); } 80% { opacity:1; transform:translate(-2px,-4px); } 100% { opacity:0; transform:translate(1px,-7px); } }
+.gmrt-lantern-measure [data-dropped-light-action] { margin-top:.3rem; }
+@media (prefers-reduced-motion: reduce) { .gmrt-pixel-flame, .gmrt-pixel-flame > em { animation:none; } .gmrt-pixel-flame > em { display:none; } }
+
+
+/* Phase IV.27E — Light Wrought by Magic. */
+.gmrt-carried-light.is-magical { display:grid; place-items:center; width:20%; filter:none; background:radial-gradient(circle, rgba(255,250,190,.28) 0 18%, rgba(223,209,117,.15) 19% 48%, rgba(210,190,85,0) 72%); }
+.gmrt-shelfshine-spark { position:relative; width:12px; height:12px; image-rendering:pixelated; animation:gmrt-shelfshine-pulse 1s steps(3,end) infinite; }
+.gmrt-shelfshine-spark::before { content:""; position:absolute; left:5px; top:0; width:2px; height:12px; background:#fff8a8; box-shadow:-5px 5px 0 #e8cf62,5px 5px 0 #e8cf62,-3px 3px 0 #fff3a0,3px 3px 0 #fff3a0; }
+.gmrt-shelfshine-spark::after { content:""; position:absolute; left:0; top:5px; width:12px; height:2px; background:#fff8a8; }
+.gmrt-spell-card__illumination { align-items:center; flex-wrap:wrap; }
+.gmrt-spell-card__illumination small { display:block; flex-basis:100%; opacity:.78; }
+@keyframes gmrt-shelfshine-pulse { 0%,100% { transform:scale(.9); opacity:.72; } 50% { transform:scale(1.12); opacity:1; } }
+@media (prefers-reduced-motion: reduce) { .gmrt-shelfshine-spark { animation:none; } }
+
+/* IV.28A — The Keeper's Atlas */
+.gmrt-atlas {
+    margin: 0 0 1rem;
+    border: 1px solid rgba(112, 92, 63, .42);
+    border-radius: 14px;
+    background: rgba(250, 242, 219, .92);
+    color: #34291d;
+}
+.gmrt-atlas > summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: .9rem 1rem;
+    cursor: pointer;
+}
+.gmrt-atlas > summary span:first-child { display: grid; gap: .15rem; }
+.gmrt-atlas > summary small { font-weight: 400; opacity: .72; }
+.gmrt-atlas__body { padding: 0 1rem 1rem; }
+.gmrt-atlas__introduction { display: flex; justify-content: space-between; gap: 1rem; align-items: end; margin-bottom: .8rem; }
+.gmrt-atlas__introduction p { margin: 0; max-width: 68ch; }
+.gmrt-atlas__register { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: .75rem; }
+.gmrt-atlas-card { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: .7rem; align-items: center; padding: .65rem; border: 1px solid rgba(86, 68, 44, .25); border-radius: 10px; background: rgba(255,255,255,.56); }
+.gmrt-atlas-card.is-active { outline: 2px solid rgba(82, 111, 67, .55); }
+.gmrt-atlas-card__image { width: 72px; aspect-ratio: 4/3; overflow: hidden; border-radius: 7px; background: rgba(67,53,37,.12); display: grid; place-items: center; }
+.gmrt-atlas-card__image img { width: 100%; height: 100%; object-fit: cover; }
+.gmrt-atlas-card__copy { display: grid; gap: .15rem; min-width: 0; }
+.gmrt-atlas-card__copy strong { overflow-wrap: anywhere; }
+.gmrt-atlas-card__copy small { opacity: .72; }
+.gmrt-atlas-card button, .gmrt-atlas-card__active { grid-column: 1 / -1; }
+.gmrt-atlas-card__active { font-size: .78rem; font-weight: 700; }
+.gmrt-atlas__add { display: flex; flex-wrap: wrap; gap: .75rem; align-items: end; padding-top: .9rem; margin-top: .9rem; border-top: 1px solid rgba(86,68,44,.2); }
+.gmrt-atlas__add label { display: grid; gap: .25rem; font-size: .82rem; font-weight: 700; }
+.gmrt-atlas__add input[type="text"] { min-width: min(280px, 70vw); }
+.gmrt-atlas__add input[type="number"] { width: 6rem; }
+.gmrt-atlas__add > small { flex-basis: 100%; opacity: .72; }
+@media (max-width: 620px) {
+    .gmrt-atlas__introduction { display: grid; }
+    .gmrt-atlas__register { grid-template-columns: 1fr; }
+    .gmrt-atlas__add { align-items: stretch; }
+}
+
+/* Phase IV.28B — Behind the Curtain */
+.gmrt-atlas-drawer{position:fixed;right:0;top:7.75rem;bottom:1rem;z-index:82;display:flex;align-items:flex-start;transform:translateX(calc(100% - 3.25rem));transition:transform .2s ease}.gmrt-atlas-drawer[data-open="true"]{transform:translateX(0)}
+.gmrt-atlas-drawer__toggle{width:3.25rem;min-height:7rem;padding:.55rem .35rem;border:1px solid rgba(244,214,136,.48);border-right:0;border-radius:8px 0 0 8px;background:#2b2118;color:#f4ead6;display:grid;gap:.35rem;place-items:center;cursor:pointer}.gmrt-atlas-drawer__toggle span{writing-mode:vertical-rl;text-orientation:mixed;font-weight:800;letter-spacing:.04em}
+.gmrt-atlas-drawer__panel{width:min(500px,calc(100vw - 4rem));height:100%;overflow-y:auto;padding:1rem;background:#1d1812;color:#f4ead6;border:1px solid rgba(244,214,136,.4);border-right:0;box-shadow:-10px 12px 30px rgba(0,0,0,.35)}
+.gmrt-atlas__header{display:flex;justify-content:space-between;gap:1rem;align-items:start;position:sticky;top:-1rem;z-index:3;margin:-1rem -1rem .8rem;padding:1rem;background:#1d1812;border-bottom:1px solid rgba(244,214,136,.2)}.gmrt-atlas__header h2,.gmrt-atlas__header p{margin:.1rem 0}.gmrt-atlas__header button{font-size:1.5rem;line-height:1;background:transparent;color:inherit;border:0;cursor:pointer}
+.gmrt-atlas-card__actions{grid-column:1/-1;display:flex;gap:.45rem;flex-wrap:wrap}.gmrt-atlas-card__actions button{flex:1 1 8rem}
+.gmrt-preparation-banner{display:flex;justify-content:space-between;gap:1rem;align-items:center;margin:0 0 1rem;padding:.8rem 1rem;border:1px solid rgba(244,214,136,.4);border-radius:8px;background:rgba(56,40,23,.86);color:#f4ead6}.gmrt-preparation-banner div{display:grid;gap:.18rem}.gmrt-preparation-banner strong{font-size:1.05rem}.gmrt-preparation-banner span{font-size:.84rem;opacity:.82}.gmrt-preparation-banner button{white-space:nowrap}
+@media(max-width:700px){.gmrt-atlas-drawer__panel{width:calc(100vw - 4rem)}.gmrt-preparation-banner{display:grid}}
+@media(prefers-reduced-motion:reduce){.gmrt-atlas-drawer{transition:none}}
+
+
+/* IV.28B.1 — The Keeper Clears the Shelves */
+.gmrt-atlas-card__remove { opacity: .78; font-size: .82rem; }
+.gmrt-atlas-card__remove:hover, .gmrt-atlas-card__remove:focus-visible { opacity: 1; }
+
+/* IV.28D — The Threshold Markers */
+.gmrt-threshold-tools {
+    display: grid;
+    gap: .75rem;
+    margin: 1rem 0;
+    padding: .9rem;
+    border: 1px solid rgba(216, 173, 79, .32);
+    border-radius: .75rem;
+    background: rgba(20, 23, 24, .78);
+}
+
+.gmrt-threshold-tools h3,
+.gmrt-threshold-tools p { margin: 0; }
+.gmrt-threshold-tools__actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+
+.gmrt-threshold-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 8;
+    pointer-events: none;
+}
+
+.gmrt-threshold-marker {
+    position: absolute;
+    left: var(--gmrt-threshold-x);
+    top: var(--gmrt-threshold-y);
+    width: 2.1rem;
+    height: 2.1rem;
+    padding: 0;
+    transform: translate(-50%, -50%);
+    border: 2px dashed currentColor;
+    border-radius: 50%;
+    background: rgba(16, 18, 18, .78);
+    font-size: 1.15rem;
+    line-height: 1;
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+.gmrt-threshold-marker--party { color: #f2d887; }
+.gmrt-threshold-marker--monster { color: #d79a9a; }
+.gmrt-threshold-marker:focus-visible { outline: 3px solid currentColor; outline-offset: 3px; }
+
+/* IV.28D.1 — Threshold placement interaction hardening */
+.gmrt-board__viewport.is-threshold-placing,
+.gmrt-board__viewport.is-threshold-placing * {
+    cursor: crosshair !important;
+}
+
+.gmrt-threshold-placement {
+    position: fixed;
+    z-index: 96;
+    top: clamp(5rem, 10vh, 8rem);
+    left: 50%;
+    display: flex;
+    gap: .8rem;
+    align-items: center;
+    max-width: min(42rem, calc(100vw - 2rem));
+    padding: .7rem .85rem;
+    transform: translateX(-50%);
+    border: 1px solid rgba(242, 216, 135, .72);
+    border-radius: .7rem;
+    background: rgba(24, 21, 16, .96);
+    color: #f4ead6;
+    box-shadow: 0 .75rem 2rem rgba(0, 0, 0, .38);
+    font-weight: 700;
+}
+
+.gmrt-threshold-placement span {
+    flex: 1 1 auto;
+}
+
+.gmrt-threshold-placement button {
+    flex: 0 0 auto;
+    white-space: nowrap;
+}
+
+@media(max-width:700px) {
+    .gmrt-threshold-placement {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}
+
+/* Phase IV.29A — The Keeper's Bestiary */
+.gmrt-bestiary-drawer{position:fixed;right:0;top:16.5rem;bottom:1rem;z-index:82;display:flex;align-items:flex-start;transform:translateX(calc(100% - 3.25rem));transition:transform .2s ease}.gmrt-bestiary-drawer[data-open="true"]{z-index:83;transform:translateX(0)}
+.gmrt-bestiary-drawer__toggle{width:3.25rem;min-height:8.5rem;padding:.55rem .35rem;border:1px solid rgba(183,218,164,.46);border-right:0;border-radius:8px 0 0 8px;background:#20291c;color:#edf5df;display:grid;gap:.35rem;place-items:center;cursor:pointer}.gmrt-bestiary-drawer__toggle span:last-child{writing-mode:vertical-rl;text-orientation:mixed;font-weight:800;letter-spacing:.04em}
+.gmrt-bestiary-drawer__panel{width:min(520px,calc(100vw - 4rem));height:100%;overflow-y:auto;padding:1rem;background:#171d14;color:#edf5df;border:1px solid rgba(183,218,164,.38);border-right:0;box-shadow:-10px 12px 30px rgba(0,0,0,.38)}
+.gmrt-bestiary__header{display:flex;justify-content:space-between;gap:1rem;align-items:start;padding-bottom:.85rem;border-bottom:1px solid rgba(183,218,164,.24)}.gmrt-bestiary__header h2{margin:.1rem 0 .2rem}.gmrt-bestiary__header button{font-size:1.35rem;line-height:1}.gmrt-bestiary__body{display:grid;gap:.85rem;padding-top:.85rem}.gmrt-bestiary__introduction{margin:0;color:rgba(237,245,223,.78);line-height:1.45}.gmrt-bestiary__search{display:grid;gap:.35rem;font-weight:800}.gmrt-bestiary__search input{width:100%;padding:.7rem .75rem;border:1px solid rgba(183,218,164,.35);border-radius:6px;background:#0e120c;color:#f5f8ed}.gmrt-bestiary__register{display:grid;gap:.75rem}.gmrt-bestiary-card{display:grid;gap:.7rem;padding:.8rem;border:1px solid rgba(183,218,164,.25);border-radius:8px;background:rgba(255,255,255,.035)}.gmrt-bestiary-card[hidden]{display:none}.gmrt-bestiary-card>header{display:flex;gap:.65rem;align-items:center}.gmrt-bestiary-card>header>div:last-child{display:grid;gap:.12rem}.gmrt-bestiary-card__sigil{display:grid;place-items:center;width:2.35rem;height:2.35rem;border:1px solid rgba(183,218,164,.38);border-radius:50%;background:#283622;color:#d9efc7}.gmrt-bestiary-card__measures{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.45rem;margin:0}.gmrt-bestiary-card__measures div{padding:.45rem;text-align:center;border:1px solid rgba(183,218,164,.16);background:rgba(0,0,0,.14)}.gmrt-bestiary-card__measures dt{font-size:.67rem;font-weight:800;text-transform:uppercase;opacity:.7}.gmrt-bestiary-card__measures dd{margin:.12rem 0 0;font-weight:800}.gmrt-bestiary-card__record summary{cursor:pointer;font-weight:800}.gmrt-bestiary-card__record section{margin-top:.65rem;padding-top:.55rem;border-top:1px solid rgba(183,218,164,.15)}.gmrt-bestiary-card__record h3{margin:0 0 .35rem;font-size:.82rem;text-transform:uppercase;letter-spacing:.04em}.gmrt-bestiary-card__record ul{display:grid;gap:.45rem;margin:.25rem 0;padding-left:1.1rem}.gmrt-bestiary-card__record li span{display:block;margin-top:.08rem;font-size:.78rem;opacity:.75}.gmrt-bestiary-card__record p{margin:.25rem 0;font-size:.82rem}.gmrt-bestiary-card__source{display:block;margin-top:.65rem;opacity:.55}.gmrt-bestiary-card__deployment{display:grid;gap:.5rem;padding-top:.15rem}.gmrt-bestiary-card__deployment-options{display:flex;gap:.7rem;align-items:center;flex-wrap:wrap}.gmrt-bestiary-card__deployment-options label{display:flex;gap:.35rem;align-items:center;font-size:.78rem;font-weight:800}.gmrt-bestiary-card__deployment-options input[type="number"]{width:4.25rem;padding:.35rem;background:#0e120c;color:#f5f8ed;border:1px solid rgba(183,218,164,.35);border-radius:5px}.gmrt-bestiary-card__deployment-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.45rem}.gmrt-bestiary-card__summon{min-height:2.5rem}.gmrt-bestiary-card__deployment>small{opacity:.65}.gmrt-board__viewport.is-bestiary-placing{cursor:crosshair}.gmrt-bestiary-placement{border-color:rgba(183,218,164,.52)}.gmrt-bestiary-card__summon[disabled]{opacity:.48;cursor:not-allowed}.gmrt-bestiary__empty{margin:0;padding:.8rem;border:1px dashed rgba(183,218,164,.3);text-align:center;opacity:.75}
+.gmrt-bestiary__filters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.4rem}.gmrt-bestiary__filters button{display:flex;justify-content:center;align-items:center;gap:.35rem;min-height:2.35rem;padding:.45rem .5rem;border:1px solid rgba(183,218,164,.24);border-radius:6px;background:rgba(0,0,0,.16);color:#edf5df;font-size:.72rem;font-weight:850;cursor:pointer}.gmrt-bestiary__filters button[aria-pressed="true"]{border-color:rgba(183,218,164,.72);background:#283622;box-shadow:0 0 0 1px rgba(183,218,164,.12)}.gmrt-bestiary__filters span{display:inline-grid;place-items:center;min-width:1.35rem;height:1.35rem;padding:0 .3rem;border-radius:999px;background:rgba(237,245,223,.12);font-size:.66rem}.gmrt-bestiary-card>header .gmrt-bestiary-card__map-badge{margin-left:auto;white-space:nowrap;padding:.22rem .42rem;border:1px solid rgba(183,218,164,.46);border-radius:999px;background:#26391f;color:#e8f7d8;font-size:.61rem;font-weight:900;letter-spacing:.05em}
+@media(max-width:700px){.gmrt-bestiary-drawer{top:16.5rem}.gmrt-bestiary-drawer__panel{width:calc(100vw - 4rem)}}@media(prefers-reduced-motion:reduce){.gmrt-bestiary-drawer{transition:none}}
+
+/* IV.29C.1 — Eyes on the Enemy */
+.gmrt-combat-guidance{display:grid;gap:.2rem;justify-items:end;text-align:right;font:700 .76rem system-ui,sans-serif}.gmrt-combat-guidance>span:first-child{opacity:.62;text-transform:uppercase;letter-spacing:.05em}.gmrt-combat-guidance strong{max-width:34rem}.gmrt-combat-dock{display:grid;gap:.55rem;justify-content:stretch;padding:.7rem;border:1px solid rgba(244,234,214,.24);border-radius:8px;background:rgba(0,0,0,.16)}.gmrt-combat-dock[hidden]{display:none}.gmrt-combat-dock .gmrt-deeds__attack,.gmrt-combat-dock .gmrt-deeds__target{display:grid;grid-template-columns:4.5rem minmax(0,1fr);align-items:center;gap:.45rem}.gmrt-combat-dock select{max-width:none;width:100%}.gmrt-combat-dock__deeds{display:grid;grid-template-columns:repeat(auto-fit,minmax(6.5rem,1fr));gap:.35rem}.gmrt-combat-dock__deeds .gmrt-deed{min-width:0;white-space:nowrap}.gmrt-combat-dock__hint{opacity:.68;line-height:1.35}.gmrt-satchel__battle{display:grid;gap:.55rem;margin:.8rem 0;padding:.75rem;border:1px solid rgba(244,214,136,.2);border-radius:8px;background:rgba(244,214,136,.035)}.gmrt-satchel__battle h3,.gmrt-satchel__battle p{margin:.05rem 0}.gmrt-satchel__battle.is-active-turn{border-color:color-mix(in srgb,var(--gmrt-fellowship-colour,#d8ad4f) 68%,#f4d688);box-shadow:0 0 0 1px color-mix(in srgb,var(--gmrt-fellowship-colour,#d8ad4f) 32%,transparent)}.gmrt-bestiary-card__instances{display:grid;gap:.45rem;padding-top:.5rem;border-top:1px solid rgba(183,218,164,.16)}.gmrt-bestiary-card__instances>h3{margin:0;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;opacity:.72}.gmrt-bestiary-instance{display:grid;gap:.4rem;padding:.55rem;border:1px solid rgba(183,218,164,.14);border-radius:6px;background:rgba(0,0,0,.12)}.gmrt-bestiary-instance__summary{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.15rem .6rem;align-items:center}.gmrt-bestiary-instance__summary>small:last-child{grid-column:1/-1;opacity:.7}.gmrt-bestiary-instance__turn{justify-self:start;padding:.18rem .38rem;border:1px solid rgba(183,218,164,.52);border-radius:4px;font-size:.66rem;font-weight:900;letter-spacing:.06em;background:#26391f;color:#e8f7d8}.gmrt-bestiary-instance.is-active-turn,.gmrt-bestiary-card.is-active-turn{border-color:rgba(183,218,164,.66);box-shadow:0 0 0 1px rgba(183,218,164,.18)}.gmrt-bestiary-drawer__toggle.has-active-turn{border-color:rgba(183,218,164,.88);box-shadow:-3px 0 0 rgba(183,218,164,.22)}.gmrt-bestiary-drawer__toggle.has-active-turn::after{content:'TURN';font-size:.55rem;font-weight:900;letter-spacing:.08em}.gmrt-bestiary-instance .gmrt-combat-dock{margin-top:.25rem;background:rgba(183,218,164,.045)}
+@media(max-width:700px){.gmrt-combat-guidance{justify-items:start;text-align:left}.gmrt-combat-dock .gmrt-deeds__attack,.gmrt-combat-dock .gmrt-deeds__target{grid-template-columns:1fr}}
+
+/* IV.29C.1 browser corrective — make player turn ownership unmistakable. */
+.gmrt-satchel__toggle.has-active-turn {
+    box-shadow: 3px 0 0 color-mix(in srgb,var(--gmrt-fellowship-colour,#d8ad4f) 45%,transparent);
+}
+.gmrt-satchel__toggle.has-active-turn::after {
+    content: "TURN";
+    font-size: .55rem;
+    font-weight: 900;
+    letter-spacing: .08em;
+}
+.gmrt-satchel__battle-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .65rem;
+}
+.gmrt-player-turn-badge,
+.gmrt-combat-turn-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: .2rem .45rem;
+    border: 1px solid currentColor;
+    border-radius: 4px;
+    font: 900 .68rem/1 system-ui,sans-serif;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+.gmrt-player-turn-badge[hidden],
+.gmrt-combat-turn-badge[hidden] {
+    display: none;
+}
+.gmrt-combat-turn-badge {
+    font-size: .78rem;
+    padding: .28rem .55rem;
+}
+.gmrt-target-range:not(.is-in-range):not(.is-long-range):not(.is-out-of-range) {
+    opacity: .72;
+    border-style: dashed;
+}
+@media (prefers-reduced-motion: no-preference) {
+    .gmrt-satchel__toggle.has-active-turn,
+    .gmrt-player-turn-badge,
+    .gmrt-combat-turn-badge {
+        animation: gmrt-turn-beacon 1.8s ease-in-out infinite;
+    }
+}
+@keyframes gmrt-turn-beacon {
+    0%,100% { filter: brightness(1); }
+    50% { filter: brightness(1.18); }
+}
+
+/* IV.29C.1A — Roll for Damage */
+.gmrt-diceworks__damage-roll {
+    margin-top: .55rem;
+    align-self: flex-start;
+    font: inherit;
+    font-weight: 800;
+    letter-spacing: .035em;
+}
+
+.gmrt-diceworks__damage-roll[hidden] {
+    display: none !important;
+}
+
+/* Phase IV.30 — Keeper's Cartography Assistant */
+.gmrt-cartography-assistant {
+    flex-basis: 100%;
+    margin-top: .2rem;
+    border-top: 1px solid rgba(244, 234, 214, .14);
+    padding-top: .45rem;
+}
+.gmrt-cartography-assistant > summary {
+    cursor: pointer;
+    color: #f4ead6;
+    font-weight: 700;
+}
+.gmrt-cartography-assistant__body {
+    display: grid;
+    gap: .55rem;
+    margin-top: .55rem;
+}
+.gmrt-cartography-assistant__body > p {
+    margin: 0;
+    opacity: .78;
+}
+.gmrt-cartography-assistant__controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: .45rem;
+}
+.gmrt-cartography-assistant__controls label {
+    display: grid;
+    gap: .2rem;
+    font-size: .82rem;
+}
+.gmrt-cartography-assistant__controls select {
+    min-height: 2rem;
+    border: 1px solid rgba(244, 234, 214, .28);
+    border-radius: 6px;
+    background: rgba(0, 0, 0, .35);
+    color: inherit;
+    padding: .25rem .4rem;
+}
+.gmrt-cartography-assistant__review {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: .35rem;
+    max-height: 15rem;
+    overflow: auto;
+}
+.gmrt-cartography-assistant__suggestion {
+    display: flex;
+    align-items: flex-start;
+    gap: .4rem;
+    padding: .35rem .45rem;
+    border: 1px solid rgba(244, 234, 214, .14);
+    border-radius: 6px;
+    background: rgba(0, 0, 0, .18);
+    font-size: .78rem;
+}
+.gmrt-cartography-suggestion-layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 8;
+    pointer-events: none;
+    overflow: visible;
+}
+.gmrt-cartography-suggestion {
+    stroke: rgba(255, 148, 232, .96);
+    stroke-width: 3;
+    stroke-dasharray: 5 4;
+    stroke-linecap: square;
+    vector-effect: non-scaling-stroke;
+    filter: drop-shadow(0 0 2px rgba(0, 0, 0, .8));
+}
+.gmrt-cartography-suggestion.is-door {
+    stroke: rgba(122, 226, 255, .98);
+    stroke-dasharray: 3 3;
+}
+.gmrt-cartography-suggestion.is-unselected {
+    opacity: .22;
+}
+
+
+/* Phase IV.31 — The Keeper's Lantern Rack */
+.gmrt-lantern-rack{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;margin:.7rem 0;padding:.65rem .75rem;border:1px solid rgba(244,234,214,.18);border-radius:8px;background:rgba(28,20,10,.68)}
+.gmrt-lantern-rack>strong{color:#f4ead6}.gmrt-lantern-rack>span{opacity:.78}.gmrt-lantern-rack__tools{display:flex;flex-wrap:wrap;gap:.4rem}.gmrt-lantern-rack button{border:1px solid rgba(244,234,214,.35);border-radius:6px;padding:.38rem .55rem;background:rgba(0,0,0,.3);color:inherit;cursor:pointer}.gmrt-lantern-rack button.is-active{outline:2px solid rgba(255,196,88,.95);outline-offset:2px}.gmrt-lantern-rack__roster{flex-basis:100%;display:grid;gap:.35rem}.gmrt-lantern-rack__row{display:flex;align-items:center;gap:.5rem;padding:.35rem .45rem;border:1px solid rgba(244,234,214,.12);border-radius:6px}.gmrt-lantern-rack__identity{display:grid;gap:.05rem;min-width:9rem;margin-right:auto}.gmrt-lantern-rack__identity small{opacity:.66}.gmrt-lantern-rack__state{min-width:4.6rem;font-size:.78rem;font-weight:800}.gmrt-lantern-rack__state.is-lit{color:#b7daa4}.gmrt-lantern-rack__state.is-doused{color:#aaa49a}.gmrt-carried-light.is-environmental{display:grid;place-items:center;width:var(--gmrt-light-diameter,18%);filter:none;pointer-events:none}.gmrt-keeper-light-marker{font-style:normal;font-size:1.05rem;filter:drop-shadow(0 1px 2px #000)}.gmrt-carried-light.is-environmental.is-magical{background:radial-gradient(circle,rgba(224,247,255,.3) 0 18%,rgba(158,211,255,.16) 19% 50%,rgba(120,190,255,0) 72%)}
+
+.gmrt-carried-light.is-environmental.is-doused{background:none;opacity:.55}.gmrt-carried-light.is-environmental.is-doused .gmrt-keeper-light-marker{filter:grayscale(1) drop-shadow(0 1px 2px #000)}
+
+/* IV.31 corrective — armed Keeper lights own the battlefield pointer. */
+.gmrt-board__viewport.is-keeper-light-placing,
+.gmrt-board__viewport.is-keeper-light-placing * {
+    cursor: crosshair !important;
+}
+
+/* Phase IV.30.2 — The Cartographer's Dungeon Forge */
+.gmrt-dungeon-forge {
+    flex-basis: 100%;
+    margin-top: .75rem;
+    border-top: 1px solid rgba(244, 234, 214, .16);
+    padding-top: .55rem;
+}
+.gmrt-dungeon-forge > summary { cursor: pointer; font-weight: 800; }
+.gmrt-dungeon-forge__body { display: grid; gap: .65rem; padding-top: .7rem; }
+.gmrt-dungeon-forge__body > p { margin: 0; max-width: 80ch; opacity: .8; line-height: 1.45; }
+.gmrt-dungeon-forge__controls { display: flex; flex-wrap: wrap; align-items: end; gap: .5rem; }
+.gmrt-dungeon-forge__controls label { display: grid; gap: .2rem; font-size: .78rem; font-weight: 800; }
+.gmrt-dungeon-forge__controls input,
+.gmrt-dungeon-forge__controls select {
+    min-height: 2.25rem;
+    padding: .35rem .5rem;
+    border: 1px solid rgba(244, 234, 214, .3);
+    border-radius: 6px;
+    background: rgba(0,0,0,.35);
+    color: inherit;
+}
+.gmrt-dungeon-forge__legend { display: flex; flex-wrap: wrap; gap: .75rem; font-size: .75rem; opacity: .75; }
+.gmrt-dungeon-forge__legend span { display: inline-flex; align-items: center; gap: .3rem; }
+.gmrt-dungeon-forge__legend i { width: .8rem; height: .8rem; border: 1px solid currentColor; display: inline-block; }
+.gmrt-dungeon-forge__legend .is-floor { background: #b9a77d; }
+.gmrt-dungeon-forge__legend .is-wall { background: #16130f; }
+.gmrt-dungeon-forge__legend .is-door { background: #b86f36; }
+.gmrt-dungeon-forge__legend .is-light { background: #e5c05c; border-radius: 50%; }
+
+.gmrt-dungeon-forge-layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+    overflow: hidden;
+    opacity: 0;
+}
+.gmrt-dungeon-forge-layer.has-plan { opacity: 1; }
+.gmrt-dungeon-forge-layer.is-draft { opacity: .82; filter: saturate(.8); }
+.gmrt-dungeon-forge-layer .gmrt-forge-rock { fill: #17140f; }
+.gmrt-dungeon-forge-layer .gmrt-forge-floor rect { fill: #a9966b; stroke: rgba(255,245,218,.055); stroke-width: .035; }
+.gmrt-dungeon-forge-layer .gmrt-forge-ink line {
+    stroke: #080706;
+    stroke-width: .16;
+    stroke-linecap: square;
+}
+.gmrt-dungeon-forge-layer .gmrt-forge-doors line {
+    stroke: #b86f36;
+    stroke-width: .24;
+    stroke-linecap: square;
+}
+.gmrt-dungeon-forge-layer .gmrt-forge-lights text { font-size: .72px; paint-order: stroke; stroke: rgba(0,0,0,.8); stroke-width: .08px; }
+
+/* Phase IV.30.2A — The Forge Creates Worlds */
+.gmrt-board__viewport.is-generated-surface {
+    min-height: 0;
+    aspect-ratio: var(--gmrt-generated-aspect, 4 / 3);
+}
+
+.gmrt-atlas-forge {
+    margin-top: .9rem;
+    padding-top: .9rem;
+    border-top: 1px solid rgba(86, 68, 44, .28);
+}
+.gmrt-atlas-forge > summary {
+    cursor: pointer;
+    font-weight: 900;
+}
+.gmrt-atlas-forge__body {
+    display: grid;
+    gap: .7rem;
+    padding-top: .7rem;
+}
+.gmrt-atlas-forge__body > p {
+    margin: 0;
+    line-height: 1.45;
+    opacity: .82;
+}
+.gmrt-atlas-forge__controls {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .55rem;
+}
+.gmrt-atlas-forge__controls label {
+    display: grid;
+    gap: .25rem;
+    font-size: .78rem;
+    font-weight: 800;
+}
+.gmrt-atlas-forge__controls input,
+.gmrt-atlas-forge__controls select {
+    width: 100%;
+    min-width: 0;
+}
+.gmrt-atlas-forge__controls button {
+    align-self: end;
+}
+.gmrt-atlas-card.is-forged-world .gmrt-atlas-card__image {
+    background:
+        linear-gradient(135deg, rgba(169,150,107,.34), rgba(23,20,15,.82)),
+        repeating-linear-gradient(0deg, rgba(255,255,255,.06) 0 1px, transparent 1px 12px),
+        repeating-linear-gradient(90deg, rgba(255,255,255,.06) 0 1px, transparent 1px 12px);
+}
+.gmrt-atlas-card__forge-sigil { font-size: 1.75rem; filter: drop-shadow(0 2px 2px rgba(0,0,0,.35)); }
+
+/* The geometry stays authoritative; themes only repaint the generated SVG surface. */
+.gmrt-dungeon-forge-layer[data-forge-theme="pantry-stone"] .gmrt-forge-rock { fill: #17140f; }
+.gmrt-dungeon-forge-layer[data-forge-theme="pantry-stone"] .gmrt-forge-floor rect { fill: #a9966b; }
+.gmrt-dungeon-forge-layer[data-forge-theme="pantry-stone"] .gmrt-forge-ink line { stroke: #080706; }
+
+.gmrt-dungeon-forge-layer[data-forge-theme="butcher-cellar"] .gmrt-forge-rock { fill: #1d1110; }
+.gmrt-dungeon-forge-layer[data-forge-theme="butcher-cellar"] .gmrt-forge-floor rect { fill: #8f6559; }
+.gmrt-dungeon-forge-layer[data-forge-theme="butcher-cellar"] .gmrt-forge-ink line { stroke: #100706; }
+
+.gmrt-dungeon-forge-layer[data-forge-theme="rootland-cavern"] .gmrt-forge-rock { fill: #17140e; }
+.gmrt-dungeon-forge-layer[data-forge-theme="rootland-cavern"] .gmrt-forge-floor rect { fill: #78684d; }
+.gmrt-dungeon-forge-layer[data-forge-theme="rootland-cavern"] .gmrt-forge-ink line { stroke: #090806; }
+
+.gmrt-dungeon-forge-layer[data-forge-theme="frostreem-vault"] .gmrt-forge-rock { fill: #142027; }
+.gmrt-dungeon-forge-layer[data-forge-theme="frostreem-vault"] .gmrt-forge-floor rect { fill: #8aa6ad; }
+.gmrt-dungeon-forge-layer[data-forge-theme="frostreem-vault"] .gmrt-forge-ink line { stroke: #081117; }
+
+.gmrt-dungeon-forge-layer[data-forge-theme="bakery-crypt"] .gmrt-forge-rock { fill: #211812; }
+.gmrt-dungeon-forge-layer[data-forge-theme="bakery-crypt"] .gmrt-forge-floor rect { fill: #b69169; }
+.gmrt-dungeon-forge-layer[data-forge-theme="bakery-crypt"] .gmrt-forge-ink line { stroke: #120b08; }
+
+.gmrt-dungeon-forge-layer[data-forge-theme="mushroom-grotto"] .gmrt-forge-rock { fill: #16131b; }
+.gmrt-dungeon-forge-layer[data-forge-theme="mushroom-grotto"] .gmrt-forge-floor rect { fill: #786b82; }
+.gmrt-dungeon-forge-layer[data-forge-theme="mushroom-grotto"] .gmrt-forge-ink line { stroke: #0c0910; }
+
+@media (max-width: 700px) {
+    .gmrt-atlas-forge__controls { grid-template-columns: 1fr; }
+}
+
+/* Phase IV.30.2A.1 — Pippin Decorates the Place */
+.gmrt-dungeon-forge-layer .gmrt-forge-decoration { pointer-events:none; }
+.gmrt-dungeon-forge-layer .gmrt-forge-decoration * { vector-effect:non-scaling-stroke; fill:none; stroke-linecap:square; stroke-linejoin:miter; }
+.gmrt-dungeon-forge-layer .gmrt-forge-decoration .is-crack { stroke:#5d5138; stroke-width:.045; opacity:.78; }
+.gmrt-dungeon-forge-layer .gmrt-forge-decoration .is-pit { fill:#665a40; stroke:#d2bd86; stroke-width:.025; opacity:.58; }
+.gmrt-dungeon-forge-layer[data-forge-theme="pantry-stone"] .gmrt-forge-floor rect:nth-child(3n) { fill:#ad9c70; }
+.gmrt-dungeon-forge-layer[data-forge-theme="pantry-stone"] .gmrt-forge-floor rect:nth-child(5n) { fill:#9d8d63; }
+
+.gmrt-dungeon-forge-layer .gmrt-forge-decoration .is-mortar,
+.gmrt-dungeon-forge-layer .gmrt-forge-decoration .is-brick { stroke:rgba(57,33,25,.55); stroke-width:.045; }
+.gmrt-dungeon-forge-layer .gmrt-forge-decoration .is-drain { fill:#342624; stroke:#b58b77; stroke-width:.035; opacity:.9; }
+.gmrt-dungeon-forge-layer[data-forge-theme="butcher-cellar"] .gmrt-forge-floor rect:nth-child(4n) { fill:#855b52; }
+
+.gmrt-dungeon-forge-layer .gmrt-forge-decoration .is-root { stroke:#443520; stroke-width:.085; opacity:.82; }
+.gmrt-dungeon-forge-layer .gmrt-forge-decoration .is-pebble { fill:#514934; stroke:#99866a; stroke-width:.03; }
+.gmrt-dungeon-forge-layer[data-forge-theme="rootland-cavern"] .gmrt-forge-floor rect:nth-child(4n) { fill:#706044; }
+
+.gmrt-dungeon-forge-layer .gmrt-forge-decoration .is-ice-crack { stroke:#d2edf2; stroke-width:.04; opacity:.76; }
+.gmrt-dungeon-forge-layer .gmrt-forge-decoration .is-frost-chip { fill:#bfdce2; stroke:#eefcff; stroke-width:.025; opacity:.7; }
+.gmrt-dungeon-forge-layer[data-forge-theme="frostreem-vault"] .gmrt-forge-floor rect:nth-child(3n) { fill:#789ba5; }
+.gmrt-dungeon-forge-layer[data-forge-theme="frostreem-vault"] .gmrt-forge-rock { fill:#101c23; }
+
+.gmrt-dungeon-forge-layer .gmrt-forge-decoration .is-crumb { fill:#d7b47f; stroke:#6b472b; stroke-width:.02; }
+.gmrt-dungeon-forge-layer[data-forge-theme="bakery-crypt"] .gmrt-forge-floor rect:nth-child(3n) { fill:#a77f58; }
+
+.gmrt-dungeon-forge-layer .gmrt-forge-decoration .is-mushroom-cap { fill:#79648a; stroke:#c5a8d2; stroke-width:.035; }
+.gmrt-dungeon-forge-layer .gmrt-forge-decoration .is-mushroom-stem { stroke:#c9b8a4; stroke-width:.055; }
+.gmrt-dungeon-forge-layer .gmrt-forge-decoration .is-spore { fill:#b9a7c7; stroke:none; opacity:.65; }
+.gmrt-dungeon-forge-layer[data-forge-theme="mushroom-grotto"] .gmrt-forge-floor rect:nth-child(4n) { fill:#6f6078; }
+
+.gmrt-dungeon-forge-layer .gmrt-forge-decoration .is-rock-face { stroke:rgba(230,215,184,.13); stroke-width:.065; opacity:.75; }
+.gmrt-board__viewport.is-generated-surface .gmrt-board__map { display:none !important; }
+
+/* IV.30.2A.1A forensic corrective — generated battlefield origin provenance. */
+
+/* Phase IV.30.2B — Beyond the Dungeon Walls */
+.gmrt-dungeon-forge-layer .gmrt-forge-features { pointer-events:none; }
+.gmrt-dungeon-forge-layer .gmrt-forge-features rect,
+.gmrt-dungeon-forge-layer .gmrt-forge-features polyline { vector-effect:non-scaling-stroke; }
+.gmrt-dungeon-forge-layer[data-forge-scene-type="forest"] .gmrt-forge-floor rect { fill:rgba(86,113,55,.38); }
+.gmrt-dungeon-forge-layer[data-forge-scene-type="forest"] .gmrt-forge-rock { fill:#171b12; }
+.gmrt-dungeon-forge-layer .gmrt-forge-features .is-clearing { fill:rgba(181,166,104,.25); stroke:rgba(223,205,137,.28); stroke-width:.08; }
+.gmrt-dungeon-forge-layer .gmrt-forge-features .is-trail { fill:none; stroke:rgba(192,160,105,.72); stroke-width:1.45; stroke-linecap:round; stroke-linejoin:round; }
+.gmrt-dungeon-forge-layer .gmrt-forge-features .is-tree-cluster,
+.gmrt-dungeon-forge-layer .gmrt-forge-features .is-village-tree { fill:rgba(46,77,38,.88); stroke:rgba(119,144,79,.8); stroke-width:.12; }
+.gmrt-dungeon-forge-layer .gmrt-forge-features .is-rock-cluster { fill:rgba(78,78,68,.9); stroke:rgba(151,145,122,.75); stroke-width:.12; }
+.gmrt-dungeon-forge-layer .gmrt-forge-features .is-fallen-log { fill:rgba(91,62,34,.9); stroke:rgba(165,120,68,.7); stroke-width:.1; }
+.gmrt-dungeon-forge-layer[data-forge-scene-type="village"] .gmrt-forge-floor rect { fill:rgba(109,91,57,.34); }
+.gmrt-dungeon-forge-layer[data-forge-scene-type="village"] .gmrt-forge-rock { fill:#1c1913; }
+.gmrt-dungeon-forge-layer .gmrt-forge-features .is-road { fill:rgba(138,111,73,.72); stroke:none; }
+.gmrt-dungeon-forge-layer .gmrt-forge-features .is-village-square { fill:rgba(157,139,99,.62); stroke:rgba(213,190,133,.45); stroke-width:.09; }
+.gmrt-dungeon-forge-layer .gmrt-forge-features .is-house,
+.gmrt-dungeon-forge-layer .gmrt-forge-features .is-cottage,
+.gmrt-dungeon-forge-layer .gmrt-forge-features .is-workshop,
+.gmrt-dungeon-forge-layer .gmrt-forge-features .is-inn { fill:rgba(112,66,43,.9); stroke:rgba(222,177,105,.82); stroke-width:.14; }
+.gmrt-dungeon-forge-layer .gmrt-forge-features .is-inn { fill:rgba(131,73,44,.95); }
+.gmrt-dungeon-forge-layer .gmrt-forge-features .is-well { fill:rgba(78,92,95,.9); stroke:rgba(179,192,181,.82); stroke-width:.13; }
+.gmrt-dungeon-forge-layer .gmrt-forge-features .is-fenced-garden { fill:rgba(71,101,52,.58); stroke:rgba(177,145,84,.95); stroke-width:.13; stroke-dasharray:.3 .2; }
+
+/* Phase IV.30.2B.1 — Pippin Discovers That Trees Aren't Rooms. */
+.gmrt-dungeon-forge-layer[data-forge-scene-type="forest"] .gmrt-forge-rock,
+.gmrt-dungeon-forge-layer[data-forge-scene-type="village"] .gmrt-forge-rock { fill:#45492d; }
+.gmrt-dungeon-forge-layer[data-forge-scene-type="forest"] .gmrt-forge-floor rect,
+.gmrt-dungeon-forge-layer[data-forge-scene-type="village"] .gmrt-forge-floor rect { fill:#697046; stroke:none; }
+.gmrt-dungeon-forge-layer[data-forge-scene-type="forest"] .gmrt-forge-floor rect:nth-child(n),
+.gmrt-dungeon-forge-layer[data-forge-scene-type="village"] .gmrt-forge-floor rect:nth-child(n) { fill:#697046; }
+.gmrt-dungeon-forge-layer .gmrt-forge-decoration .is-outdoor-speck { fill:rgba(224,211,151,.16); stroke:none; }
+.gmrt-dungeon-forge-layer .is-organic-canopy .is-canopy-blob { fill:rgba(43,75,36,.94); stroke:rgba(119,144,79,.7); stroke-width:.08; }
+.gmrt-dungeon-forge-layer .is-organic-canopy .is-tree-trunk { fill:#65492f; stroke:rgba(31,24,17,.65); stroke-width:.08; }
+.gmrt-dungeon-forge-layer .is-organic-rocks .is-rock { fill:#65675d; stroke:rgba(174,166,137,.65); stroke-width:.08; }
+.gmrt-dungeon-forge-layer .is-village-building .is-building-body { fill:#9a6845; stroke:#e0b46f; stroke-width:.12; }
+.gmrt-dungeon-forge-layer .is-village-building .is-building-roof { fill:#75482f; stroke:#e0b46f; stroke-width:.1; }
+.gmrt-dungeon-forge-layer .gmrt-forge-features .is-clearing { fill:rgba(174,160,96,.38); stroke:none; }
+.gmrt-dungeon-forge-layer .gmrt-forge-features .is-road { fill:rgba(147,116,72,.78); }
+.gmrt-dungeon-forge-layer .gmrt-forge-features .is-village-square { fill:rgba(166,143,94,.78); stroke:rgba(220,194,131,.45); }
+
+/* Phase IV.30.2B.2 — Pippin Learns to Colour Inside the Lines. */
+.gmrt-vision-barrier.is-forge-environmental:not(.is-selected) {
+    opacity: 0;
+}
+.gmrt-vision-barrier.is-forge-environmental.is-selected {
+    opacity: .78;
+    stroke-dasharray: 6 5;
+}
+.gmrt-dungeon-forge-layer .is-organic-canopy .is-canopy-highlight {
+    fill: rgba(136, 158, 88, .24);
+    stroke: none;
+}
+.gmrt-dungeon-forge-layer .is-organic-canopy .is-tree-root {
+    fill: none;
+    stroke: rgba(83, 60, 39, .72);
+    stroke-width: .07;
+    stroke-linecap: round;
+}
+.gmrt-dungeon-forge-layer .is-organic-rocks .is-rock-highlight {
+    fill: none;
+    stroke: rgba(216, 205, 173, .34);
+    stroke-width: .08;
+    stroke-linecap: round;
+}
+.gmrt-dungeon-forge-layer .is-village-building .is-building-shadow {
+    fill: rgba(24, 18, 12, .25);
+    stroke: none;
+    transform: translate(.13px, .15px);
+}
+.gmrt-dungeon-forge-layer .is-village-building .is-building-body {
+    fill: #95613f;
+    stroke: rgba(231, 188, 116, .78);
+    stroke-width: .08;
+}
+.gmrt-dungeon-forge-layer .is-village-building .is-building-roof {
+    fill: #75452d;
+    stroke: rgba(232, 190, 118, .78);
+    stroke-width: .08;
+}
+.gmrt-dungeon-forge-layer .is-village-building .is-roof-right,
+.gmrt-dungeon-forge-layer .is-village-building .is-roof-bottom {
+    fill: #68402b;
+}
+.gmrt-dungeon-forge-layer .is-village-building .is-roof-ridge {
+    stroke: rgba(247, 212, 146, .72);
+    stroke-width: .08;
+    stroke-linecap: round;
+}
+.gmrt-dungeon-forge-layer .is-village-building .is-building-door {
+    fill: #4d3022;
+    stroke: rgba(238, 192, 111, .82);
+    stroke-width: .06;
+}
+.gmrt-dungeon-forge-layer .is-village-building .is-building-window {
+    fill: rgba(168, 218, 218, .72);
+    stroke: rgba(242, 210, 138, .78);
+    stroke-width: .055;
+}
+.gmrt-dungeon-forge-layer .is-village-building .is-building-chimney {
+    fill: #5a4233;
+    stroke: rgba(225, 181, 113, .65);
+    stroke-width: .05;
+}
+.gmrt-dungeon-forge-layer .is-detailed-log .is-log-body {
+    fill: #76502f;
+    stroke: #b17d49;
+    stroke-width: .08;
+}
+.gmrt-dungeon-forge-layer .is-detailed-log .is-log-end {
+    fill: #a77b4d;
+    stroke: #563820;
+    stroke-width: .07;
+}
+.gmrt-dungeon-forge-layer .is-detailed-log .is-log-bark {
+    stroke: rgba(64, 39, 22, .55);
+    stroke-width: .055;
+    stroke-linecap: round;
+}
+.gmrt-dungeon-forge-layer .is-detailed-well .is-well-rim {
+    fill: #77786f;
+    stroke: #c5bda4;
+    stroke-width: .1;
+}
+.gmrt-dungeon-forge-layer .is-detailed-well .is-well-water {
+    fill: #405f67;
+    stroke: rgba(186, 215, 211, .64);
+    stroke-width: .07;
+}
+.gmrt-dungeon-forge-layer .is-detailed-well .is-well-post,
+.gmrt-dungeon-forge-layer .is-detailed-well .is-well-beam {
+    stroke: #6d4b2c;
+    stroke-width: .1;
+    stroke-linecap: round;
+}
+.gmrt-dungeon-forge-layer .is-detailed-garden .is-garden-soil {
+    fill: rgba(91, 73, 43, .7);
+    stroke: none;
+}
+.gmrt-dungeon-forge-layer .is-detailed-garden .is-garden-row {
+    stroke: rgba(111, 145, 68, .9);
+    stroke-width: .18;
+    stroke-linecap: round;
+}
+.gmrt-dungeon-forge-layer .is-detailed-garden .is-garden-fence {
+    fill: none;
+    stroke: rgba(177, 145, 84, .95);
+    stroke-width: .12;
+    stroke-dasharray: .34 .2;
+}
+.gmrt-dungeon-forge-layer .gmrt-forge-features .is-trail-underlay {
+    stroke: rgba(95, 71, 43, .34);
+    stroke-width: 1.75;
+}
+.gmrt-dungeon-forge-layer .gmrt-forge-features .is-trail-track {
+    stroke: rgba(188, 155, 94, .72);
+    stroke-width: 1.25;
+}
+
+/* Phase IV.32.1 — The Keeper Finds the Pixel Chisel.
+ * Presentation-only foundation for the Tabletop's SNES-era interface.
+ * Rules geometry, positioning and interaction state remain untouched.
+ */
+.gmrt-chamber {
+    --gmrt-pixel-ink: #17120d;
+    --gmrt-pixel-ink-soft: #2a2118;
+    --gmrt-pixel-panel: #2f281f;
+    --gmrt-pixel-panel-high: #3c3226;
+    --gmrt-pixel-panel-low: #211b16;
+    --gmrt-pixel-parchment: #ead9b5;
+    --gmrt-pixel-gold: #d7b86e;
+    --gmrt-pixel-gold-hi: #f1d58b;
+    --gmrt-pixel-gold-low: #806438;
+    --gmrt-pixel-green: #778b50;
+    --gmrt-pixel-red: #874632;
+    --gmrt-pixel-focus: #f7de8e;
+    --gmrt-pixel-unit: 2px;
+    --gmrt-pixel-shadow: 4px 4px 0 rgba(0, 0, 0, .52);
+    --gmrt-pixel-inset:
+        inset 2px 2px 0 rgba(255, 242, 199, .08),
+        inset -2px -2px 0 rgba(0, 0, 0, .34);
+    background:
+        linear-gradient(rgba(255,255,255,.012) 50%, transparent 50%) 0 0 / 100% 4px,
+        #17140f;
+}
+
+.gmrt-chamber__masthead {
+    padding: .85rem 1rem;
+    border: 2px solid var(--gmrt-pixel-gold-low);
+    border-top-color: var(--gmrt-pixel-gold);
+    border-left-color: var(--gmrt-pixel-gold);
+    border-radius: 2px;
+    background: var(--gmrt-pixel-panel-low);
+    box-shadow: var(--gmrt-pixel-inset), var(--gmrt-pixel-shadow);
+}
+
+.gmrt-chamber__eyebrow,
+.gmrt-chamber__viewer,
+.gmrt-board__tools,
+.gmrt-chamber__status,
+.gmrt-encounter-strip__state {
+    font-family: ui-monospace, "Courier New", monospace;
+}
+
+.gmrt-chamber__masthead h1,
+.gmrt-board__heading h2,
+.gmrt-party h2,
+.gmrt-chamber__notice h2 {
+    font-family: ui-monospace, "Courier New", monospace;
+    letter-spacing: .025em;
+    text-shadow: 2px 2px 0 rgba(0, 0, 0, .58);
+}
+
+.gmrt-chamber__eyebrow {
+    color: var(--gmrt-pixel-gold-hi);
+    opacity: .82;
+    letter-spacing: .16em;
+}
+
+.gmrt-board,
+.gmrt-party,
+.gmrt-chamber__notice {
+    border: 2px solid var(--gmrt-pixel-gold-low);
+    border-top-color: var(--gmrt-pixel-gold);
+    border-left-color: var(--gmrt-pixel-gold);
+    border-radius: 2px;
+    background:
+        linear-gradient(135deg, rgba(255,255,255,.035), transparent 38%),
+        var(--gmrt-pixel-panel);
+    box-shadow: var(--gmrt-pixel-inset), var(--gmrt-pixel-shadow);
+}
+
+.gmrt-board {
+    padding: .9rem;
+}
+
+.gmrt-board__heading {
+    padding: .25rem .25rem .75rem;
+    border-bottom: 2px solid rgba(215, 184, 110, .26);
+}
+
+.gmrt-board__heading > span,
+.gmrt-board__tools > span {
+    font: 800 .7rem/1.2 ui-monospace, "Courier New", monospace;
+    letter-spacing: .04em;
+    color: rgba(234, 217, 181, .78);
+}
+
+.gmrt-board__lens-stage {
+    border: 2px solid var(--gmrt-pixel-gold-low);
+    border-top-color: var(--gmrt-pixel-gold);
+    border-left-color: var(--gmrt-pixel-gold);
+    border-radius: 2px;
+    box-shadow:
+        inset 2px 2px 0 rgba(255,255,255,.08),
+        inset -2px -2px 0 rgba(0,0,0,.58),
+        4px 4px 0 rgba(0,0,0,.42);
+}
+
+.gmrt-board__viewport {
+    border-radius: 0;
+}
+
+.gmrt-cartographers-lens,
+.gmrt-fog-controls,
+.gmrt-vision-controls,
+.gmrt-lantern-rack,
+.gmrt-grid-calibrator,
+.gmrt-exploration-strip,
+.gmrt-encounter-strip {
+    border: 2px solid rgba(128, 100, 56, .88);
+    border-top-color: rgba(215, 184, 110, .72);
+    border-left-color: rgba(215, 184, 110, .72);
+    border-radius: 2px;
+    background: var(--gmrt-pixel-panel-low);
+    box-shadow: var(--gmrt-pixel-inset), 3px 3px 0 rgba(0,0,0,.34);
+}
+
+.gmrt-exploration-strip {
+    background: #263020;
+}
+
+.gmrt-encounter-strip {
+    background: #42251f;
+}
+
+.gmrt-chamber button:not(.gmrt-token),
+.gmrt-chamber select,
+.gmrt-chamber input[type="text"],
+.gmrt-chamber input[type="number"],
+.gmrt-chamber input[type="search"] {
+    border: 2px solid #6f5835;
+    border-top-color: #d4b56d;
+    border-left-color: #d4b56d;
+    border-radius: 1px;
+    background: #211b16;
+    color: #f2e5c8;
+    box-shadow:
+        inset 2px 2px 0 rgba(255,255,255,.045),
+        inset -2px -2px 0 rgba(0,0,0,.42),
+        2px 2px 0 rgba(0,0,0,.34);
+    font-family: ui-monospace, "Courier New", monospace;
+    font-weight: 800;
+}
+
+.gmrt-chamber button:not(.gmrt-token) {
+    cursor: pointer;
+    transition: transform 80ms steps(1, end), background-color 80ms steps(1, end), border-color 80ms steps(1, end);
+}
+
+.gmrt-chamber button:not(.gmrt-token):hover:not(:disabled) {
+    background: #352a1f;
+    border-top-color: var(--gmrt-pixel-gold-hi);
+    border-left-color: var(--gmrt-pixel-gold-hi);
+}
+
+.gmrt-chamber button:not(.gmrt-token):active:not(:disabled) {
+    transform: translate(2px, 2px);
+    box-shadow:
+        inset 2px 2px 0 rgba(0,0,0,.36),
+        inset -2px -2px 0 rgba(255,255,255,.035);
+}
+
+.gmrt-chamber button:not(.gmrt-token):focus-visible,
+.gmrt-chamber select:focus-visible,
+.gmrt-chamber input:focus-visible,
+.gmrt-chamber summary:focus-visible {
+    outline: 2px solid var(--gmrt-pixel-focus);
+    outline-offset: 3px;
+}
+
+.gmrt-chamber button:not(.gmrt-token):disabled {
+    opacity: .48;
+    filter: grayscale(.28);
+    cursor: not-allowed;
+}
+
+.gmrt-chamber input[type="checkbox"] {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 0;
+    accent-color: var(--gmrt-pixel-gold);
+}
+
+.gmrt-board__lens-controls {
+    gap: 4px;
+    padding: 5px;
+    border: 2px solid var(--gmrt-pixel-gold-low);
+    border-top-color: var(--gmrt-pixel-gold-hi);
+    border-left-color: var(--gmrt-pixel-gold-hi);
+    border-radius: 2px;
+    background: #17130f;
+    box-shadow:
+        inset 2px 2px 0 rgba(255,255,255,.055),
+        inset -2px -2px 0 rgba(0,0,0,.52),
+        4px 4px 0 rgba(0,0,0,.58);
+    backdrop-filter: none;
+}
+
+.gmrt-board__lens-controls button {
+    min-width: 2.7rem;
+    min-height: 2.45rem;
+    border-radius: 0;
+    text-shadow: 1px 1px 0 #000;
+}
+
+.gmrt-board__lens-controls output {
+    padding: .3rem .2rem;
+    border-top: 2px solid rgba(215,184,110,.24);
+    border-bottom: 2px solid rgba(0,0,0,.35);
+    color: var(--gmrt-pixel-gold-hi);
+    font: 900 .68rem/1 ui-monospace, "Courier New", monospace;
+}
+
+.gmrt-party > ul > li,
+.gmrt-battle-log li,
+.gmrt-lantern-rack__row,
+.gmrt-death-saves {
+    border: 2px solid rgba(128,100,56,.46);
+    border-radius: 1px;
+    background: rgba(18, 14, 11, .38);
+    box-shadow: inset 2px 2px 0 rgba(255,255,255,.025);
+}
+
+.gmrt-party > ul > li > span,
+.gmrt-token__state-badge,
+.gmrt-condition,
+.gmrt-target-range {
+    border-radius: 0;
+}
+
+.gmrt-party > ul > li > span {
+    border: 2px solid rgba(215,184,110,.36);
+    background: #241d16;
+    box-shadow: inset 2px 2px 0 rgba(255,255,255,.035);
+}
+
+.gmrt-hp__track {
+    height: .6rem;
+    border: 2px solid rgba(128,100,56,.58);
+    border-radius: 0;
+    background: #100d0a;
+}
+
+.gmrt-hp__fill {
+    image-rendering: pixelated;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gmrt-chamber button:not(.gmrt-token) {
+        transition: none;
+    }
+}
+
+/* Phase IV.32.2 — The Atlas Gets a 16-Bit Makeover.
+ * Presentation-only treatment for the Keeper's Atlas, Scene register,
+ * Scene Forge, cartography tools, threshold tools and Lantern Rack.
+ */
+.gmrt-atlas-drawer {
+    filter: none;
+}
+
+.gmrt-atlas-drawer__toggle {
+    width: 3.35rem;
+    min-height: 7.4rem;
+    padding: .65rem .35rem;
+    border: 2px solid var(--gmrt-pixel-gold-low);
+    border-top-color: var(--gmrt-pixel-gold-hi);
+    border-left-color: var(--gmrt-pixel-gold-hi);
+    border-right: 0;
+    border-radius: 2px 0 0 2px;
+    background:
+        linear-gradient(90deg, rgba(255,255,255,.045), transparent 35%),
+        #261e17;
+    color: var(--gmrt-pixel-parchment);
+    box-shadow:
+        inset 2px 2px 0 rgba(255,255,255,.055),
+        inset 0 -2px 0 rgba(0,0,0,.46),
+        -4px 4px 0 rgba(0,0,0,.48);
+    font-family: ui-monospace, "Courier New", monospace;
+    text-shadow: 1px 1px 0 #000;
+}
+
+.gmrt-atlas-drawer__toggle::before {
+    content: "◆";
+    color: var(--gmrt-pixel-gold-hi);
+    font-size: .8rem;
+    line-height: 1;
+}
+
+.gmrt-atlas-drawer__toggle span {
+    font-weight: 900;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.gmrt-atlas-drawer[data-open="true"] .gmrt-atlas-drawer__toggle {
+    background: #35291d;
+    color: var(--gmrt-pixel-gold-hi);
+}
+
+.gmrt-atlas-drawer__panel {
+    width: min(520px, calc(100vw - 4rem));
+    padding: 1rem;
+    border: 2px solid var(--gmrt-pixel-gold-low);
+    border-top-color: var(--gmrt-pixel-gold);
+    border-left-color: var(--gmrt-pixel-gold);
+    border-right: 0;
+    border-radius: 2px 0 0 2px;
+    background:
+        linear-gradient(rgba(255,255,255,.018) 50%, transparent 50%) 0 0 / 100% 4px,
+        #1b1712;
+    color: var(--gmrt-pixel-parchment);
+    box-shadow:
+        inset 2px 2px 0 rgba(255,255,255,.045),
+        inset -2px -2px 0 rgba(0,0,0,.42),
+        -6px 6px 0 rgba(0,0,0,.54);
+    scrollbar-color: var(--gmrt-pixel-gold-low) #17120d;
+    scrollbar-width: thin;
+}
+
+.gmrt-atlas-drawer__panel::-webkit-scrollbar { width: 12px; }
+.gmrt-atlas-drawer__panel::-webkit-scrollbar-track { background: #17120d; }
+.gmrt-atlas-drawer__panel::-webkit-scrollbar-thumb {
+    border: 2px solid #17120d;
+    border-radius: 0;
+    background: var(--gmrt-pixel-gold-low);
+}
+
+.gmrt-atlas__header {
+    top: -1rem;
+    margin: -1rem -1rem .9rem;
+    padding: .85rem 1rem .8rem;
+    border-bottom: 2px solid var(--gmrt-pixel-gold-low);
+    background:
+        linear-gradient(90deg, rgba(215,184,110,.08), transparent 44%),
+        #211b16;
+    box-shadow: 0 3px 0 rgba(0,0,0,.34);
+}
+
+.gmrt-atlas__header::after {
+    content: "";
+    position: absolute;
+    left: 1rem;
+    right: 4rem;
+    bottom: -2px;
+    height: 2px;
+    background: repeating-linear-gradient(90deg, var(--gmrt-pixel-gold) 0 8px, transparent 8px 14px);
+    opacity: .42;
+    pointer-events: none;
+}
+
+.gmrt-atlas__header h2 {
+    margin: .1rem 0;
+    color: var(--gmrt-pixel-gold-hi);
+    font-family: ui-monospace, "Courier New", monospace;
+    letter-spacing: .035em;
+    text-shadow: 2px 2px 0 #000;
+}
+
+.gmrt-atlas__header small,
+.gmrt-atlas__introduction,
+.gmrt-atlas-card__copy small,
+.gmrt-atlas-forge__body > p,
+.gmrt-threshold-tools p,
+.gmrt-threshold-tools small,
+.gmrt-cartography-assistant__body > p,
+.gmrt-lantern-rack > span {
+    color: rgba(234,217,181,.72);
+}
+
+.gmrt-atlas__header [data-atlas-close] {
+    width: 2.35rem;
+    height: 2.35rem;
+    padding: 0;
+    display: grid;
+    place-items: center;
+    font: 900 1.25rem/1 ui-monospace, "Courier New", monospace;
+}
+
+.gmrt-atlas__introduction {
+    align-items: center;
+    margin-bottom: .9rem;
+    padding: .6rem .7rem;
+    border-left: 4px solid var(--gmrt-pixel-gold-low);
+    background: rgba(215,184,110,.055);
+    font-family: ui-monospace, "Courier New", monospace;
+    font-size: .78rem;
+}
+
+.gmrt-atlas__introduction [data-atlas-status]:not(:empty),
+.gmrt-atlas-forge [role="status"]:not(:empty),
+.gmrt-cartography-assistant [role="status"]:not(:empty) {
+    padding: .35rem .45rem;
+    border: 2px solid rgba(128,100,56,.62);
+    background: #17130f;
+    color: var(--gmrt-pixel-gold-hi);
+    font: 800 .72rem/1.35 ui-monospace, "Courier New", monospace;
+}
+
+.gmrt-atlas__register {
+    gap: .65rem;
+}
+
+.gmrt-atlas-card {
+    position: relative;
+    grid-template-columns: 76px minmax(0, 1fr);
+    gap: .7rem;
+    padding: .7rem;
+    border: 2px solid #604b2f;
+    border-top-color: #9b7c48;
+    border-left-color: #9b7c48;
+    border-radius: 1px;
+    background:
+        linear-gradient(135deg, rgba(255,255,255,.035), transparent 34%),
+        #282118;
+    color: var(--gmrt-pixel-parchment);
+    box-shadow:
+        inset 2px 2px 0 rgba(255,255,255,.035),
+        inset -2px -2px 0 rgba(0,0,0,.46),
+        3px 3px 0 rgba(0,0,0,.38);
+}
+
+.gmrt-atlas-card::before {
+    content: "";
+    position: absolute;
+    left: -2px;
+    top: 10px;
+    width: 4px;
+    height: 22px;
+    background: #665137;
+}
+
+.gmrt-atlas-card.is-active {
+    outline: 2px solid var(--gmrt-pixel-green);
+    outline-offset: 2px;
+    border-top-color: #aebf79;
+    border-left-color: #aebf79;
+    background:
+        linear-gradient(135deg, rgba(174,191,121,.085), transparent 42%),
+        #293020;
+}
+
+.gmrt-atlas-card.is-active::before {
+    background: #aebf79;
+}
+
+.gmrt-atlas-card.is-forged-world::after {
+    content: "FORGED";
+    position: absolute;
+    right: 6px;
+    top: 6px;
+    padding: 2px 4px;
+    border: 1px solid rgba(215,184,110,.62);
+    background: #17130f;
+    color: var(--gmrt-pixel-gold-hi);
+    font: 900 .52rem/1 ui-monospace, "Courier New", monospace;
+    letter-spacing: .08em;
+}
+
+.gmrt-atlas-card__image {
+    width: 76px;
+    border: 2px solid #5f4b31;
+    border-top-color: #b08d55;
+    border-left-color: #b08d55;
+    border-radius: 0;
+    background:
+        linear-gradient(45deg, rgba(215,184,110,.08) 25%, transparent 25% 75%, rgba(215,184,110,.08) 75%) 0 0 / 8px 8px,
+        #16130f;
+    box-shadow: inset 2px 2px 0 rgba(255,255,255,.035);
+    image-rendering: pixelated;
+}
+
+.gmrt-atlas-card__image img {
+    image-rendering: pixelated;
+}
+
+.gmrt-atlas-card__forge-sigil {
+    color: var(--gmrt-pixel-gold-hi);
+    font-size: 1.45rem;
+    filter: grayscale(.15) sepia(.25);
+    text-shadow: 2px 2px 0 #000;
+}
+
+.gmrt-atlas-card__copy strong {
+    padding-right: 3.4rem;
+    color: #f0dfbc;
+    font-family: ui-monospace, "Courier New", monospace;
+    font-size: .84rem;
+    line-height: 1.25;
+    letter-spacing: .025em;
+}
+
+.gmrt-atlas-card__active {
+    color: #c8dda1;
+    font: 900 .68rem/1.2 ui-monospace, "Courier New", monospace;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+}
+
+.gmrt-atlas-card__actions {
+    gap: 4px;
+    padding-top: .35rem;
+    border-top: 2px solid rgba(128,100,56,.3);
+}
+
+.gmrt-atlas-card__actions button {
+    min-height: 2.25rem;
+    font-size: .7rem;
+}
+
+.gmrt-atlas-card__remove {
+    color: #d9a894 !important;
+}
+
+.gmrt-atlas__add,
+.gmrt-atlas-forge,
+.gmrt-threshold-tools,
+.gmrt-cartography-assistant,
+.gmrt-lantern-rack,
+.gmrt-dungeon-forge {
+    border: 2px solid rgba(128,100,56,.72);
+    border-top-color: rgba(215,184,110,.58);
+    border-left-color: rgba(215,184,110,.58);
+    border-radius: 1px;
+    background: #201a15;
+    box-shadow:
+        inset 2px 2px 0 rgba(255,255,255,.025),
+        inset -2px -2px 0 rgba(0,0,0,.38),
+        3px 3px 0 rgba(0,0,0,.3);
+}
+
+.gmrt-atlas__add {
+    margin-top: .85rem;
+    padding: .75rem;
+}
+
+.gmrt-atlas__add > small {
+    color: rgba(234,217,181,.66);
+    font-family: ui-monospace, "Courier New", monospace;
+}
+
+.gmrt-atlas-forge,
+.gmrt-threshold-tools {
+    margin: .9rem 0 0;
+    padding: .75rem;
+}
+
+.gmrt-atlas-forge > summary,
+.gmrt-cartography-assistant > summary,
+.gmrt-dungeon-forge > summary {
+    position: relative;
+    padding: .2rem .2rem .2rem 1.25rem;
+    color: var(--gmrt-pixel-gold-hi);
+    font-family: ui-monospace, "Courier New", monospace;
+    letter-spacing: .025em;
+    list-style: none;
+}
+
+.gmrt-atlas-forge > summary::-webkit-details-marker,
+.gmrt-cartography-assistant > summary::-webkit-details-marker,
+.gmrt-dungeon-forge > summary::-webkit-details-marker {
+    display: none;
+}
+
+.gmrt-atlas-forge > summary::before,
+.gmrt-cartography-assistant > summary::before,
+.gmrt-dungeon-forge > summary::before {
+    content: "▶";
+    position: absolute;
+    left: .1rem;
+    top: .25rem;
+    color: var(--gmrt-pixel-gold);
+    font-size: .72rem;
+}
+
+.gmrt-atlas-forge[open] > summary::before,
+.gmrt-cartography-assistant[open] > summary::before,
+.gmrt-dungeon-forge[open] > summary::before {
+    content: "▼";
+}
+
+.gmrt-atlas-forge__body,
+.gmrt-cartography-assistant__body,
+.gmrt-dungeon-forge__body {
+    margin-top: .55rem;
+    padding: .65rem;
+    border-top: 2px solid rgba(128,100,56,.34);
+    background: rgba(0,0,0,.12);
+}
+
+.gmrt-atlas-forge__controls,
+.gmrt-cartography-assistant__controls,
+.gmrt-dungeon-forge__controls {
+    gap: .55rem;
+}
+
+.gmrt-atlas-forge__controls label,
+.gmrt-cartography-assistant__controls label,
+.gmrt-dungeon-forge__controls label,
+.gmrt-atlas__add label {
+    color: #d9c69e;
+    font-family: ui-monospace, "Courier New", monospace;
+    font-size: .7rem;
+    letter-spacing: .035em;
+    text-transform: uppercase;
+}
+
+.gmrt-threshold-tools h3 {
+    color: var(--gmrt-pixel-gold-hi);
+    font-family: ui-monospace, "Courier New", monospace;
+    text-shadow: 1px 1px 0 #000;
+}
+
+.gmrt-threshold-tools__actions {
+    gap: 4px;
+}
+
+.gmrt-lantern-rack {
+    align-items: center;
+    gap: .55rem;
+    margin: .75rem 0;
+    padding: .7rem;
+}
+
+.gmrt-lantern-rack > strong {
+    color: var(--gmrt-pixel-gold-hi);
+    font-family: ui-monospace, "Courier New", monospace;
+    letter-spacing: .025em;
+    text-shadow: 1px 1px 0 #000;
+}
+
+.gmrt-lantern-rack__tools {
+    gap: 4px;
+}
+
+.gmrt-lantern-rack button.is-active {
+    outline: 2px solid #f0c75d;
+    outline-offset: 2px;
+    background: #49351b;
+    color: #fff0b0;
+}
+
+.gmrt-lantern-rack__roster {
+    gap: 4px;
+    padding-top: .4rem;
+    border-top: 2px solid rgba(128,100,56,.34);
+}
+
+.gmrt-lantern-rack__row {
+    min-height: 2.8rem;
+    padding: .42rem .5rem;
+    border-color: rgba(128,100,56,.54);
+    background: #18140f;
+}
+
+.gmrt-lantern-rack__identity strong,
+.gmrt-lantern-rack__state {
+    font-family: ui-monospace, "Courier New", monospace;
+}
+
+.gmrt-lantern-rack__state.is-lit {
+    color: #bedc88;
+    text-shadow: 1px 1px 0 #000;
+}
+
+.gmrt-lantern-rack__state.is-doused {
+    color: #aaa49a;
+}
+
+.gmrt-cartography-assistant__review {
+    gap: 4px;
+    padding-right: 2px;
+    scrollbar-color: var(--gmrt-pixel-gold-low) #17120d;
+}
+
+.gmrt-cartography-assistant__suggestion {
+    padding: .45rem .5rem;
+    border: 2px solid rgba(128,100,56,.44);
+    border-radius: 0;
+    background: #18140f;
+    color: #ddcba7;
+    font-family: ui-monospace, "Courier New", monospace;
+    box-shadow: inset 2px 2px 0 rgba(255,255,255,.02);
+}
+
+.gmrt-dungeon-forge__legend {
+    gap: .45rem;
+    padding: .45rem .5rem;
+    border: 2px solid rgba(128,100,56,.36);
+    background: #18140f;
+    font-family: ui-monospace, "Courier New", monospace;
+    opacity: .9;
+}
+
+.gmrt-dungeon-forge__legend span {
+    padding-right: .35rem;
+}
+
+.gmrt-dungeon-forge__legend i {
+    width: .7rem;
+    height: .7rem;
+    border: 2px solid currentColor;
+    border-radius: 0 !important;
+    image-rendering: pixelated;
+}
+
+@media (max-width: 700px) {
+    .gmrt-atlas-drawer__panel {
+        width: calc(100vw - 4rem);
+    }
+
+    .gmrt-atlas-card {
+        grid-template-columns: 64px minmax(0, 1fr);
+    }
+
+    .gmrt-atlas-card__image {
+        width: 64px;
+    }
+
+    .gmrt-atlas-forge__controls {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Phase IV.32.2A — Pippin's Field Notes. */
+.gmrt-pippin-desk {
+    margin: .65rem 0;
+    border: 2px solid var(--gmrt-pixel-gold-low);
+    background: #15110d;
+    box-shadow: inset 2px 2px 0 rgba(255,255,255,.025), 4px 4px 0 #080604;
+}
+
+.gmrt-pippin-desk > summary {
+    cursor: pointer;
+    padding: .55rem .65rem;
+    color: var(--gmrt-pixel-gold-hi);
+    font-family: ui-monospace, "Courier New", monospace;
+    font-weight: 800;
+    letter-spacing: .035em;
+    text-transform: uppercase;
+    list-style: none;
+}
+
+.gmrt-pippin-desk > summary::-webkit-details-marker { display: none; }
+.gmrt-pippin-desk > summary::before { content: "▶"; margin-right: .45rem; }
+.gmrt-pippin-desk[open] > summary::before { content: "▼"; }
+
+.gmrt-pippin-desk__portrait {
+    margin: 0 .6rem;
+    border: 2px solid #8d6a35;
+    background: #090806;
+    overflow: hidden;
+    box-shadow: inset 0 0 0 2px #241a10;
+}
+
+.gmrt-pippin-desk__portrait img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.gmrt-pippin-desk__copy {
+    display: grid;
+    gap: .15rem;
+    padding: .6rem .7rem .75rem;
+    font-family: ui-monospace, "Courier New", monospace;
+}
+
+.gmrt-pippin-desk__copy strong { color: #ffe39a; font-size: 1rem; }
+.gmrt-pippin-desk__copy span { color: #b9d58b; font-size: .76rem; text-transform: uppercase; letter-spacing: .06em; }
+.gmrt-pippin-desk__copy p { margin: .35rem 0 0; color: #d7c6a3; line-height: 1.45; }
+
+.gmrt-pippin-note {
+    position: relative;
+    display: grid;
+    grid-template-columns: 84px minmax(0, 1fr);
+    align-items: end;
+    gap: 6px;
+    margin: .75rem 0 .9rem;
+    min-height: 92px;
+}
+
+.gmrt-pippin-note__portrait {
+    position: relative;
+    z-index: 2;
+    display: block;
+    width: 96px;
+    max-width: none;
+    margin: 0 -10px -2px 0;
+    image-rendering: pixelated;
+    filter: drop-shadow(3px 3px 0 rgba(0,0,0,.75));
+}
+
+.gmrt-pippin-note__bubble {
+    position: relative;
+    min-height: 76px;
+    padding: .55rem .65rem .6rem .8rem;
+    border: 3px solid #9b753a;
+    background: #211910;
+    color: #e8d7b3;
+    font-family: ui-monospace, "Courier New", monospace;
+    box-shadow: inset 2px 2px 0 #49371f, inset -2px -2px 0 #0d0a07, 4px 4px 0 #080604;
+}
+
+.gmrt-pippin-note__bubble::before {
+    content: "";
+    position: absolute;
+    left: -9px;
+    bottom: 19px;
+    width: 12px;
+    height: 12px;
+    border-left: 3px solid #9b753a;
+    border-bottom: 3px solid #9b753a;
+    background: #211910;
+    transform: rotate(45deg);
+}
+
+.gmrt-pippin-note__label {
+    display: block;
+    margin-bottom: .25rem;
+    color: #ffe39a;
+    font-size: .72rem;
+    font-weight: 900;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    text-shadow: 1px 1px 0 #000;
+}
+
+.gmrt-pippin-note__bubble p {
+    margin: 0;
+    color: inherit;
+    font-size: .78rem;
+    line-height: 1.45;
+}
+
+.gmrt-pippin-note.is-speaking .gmrt-pippin-note__bubble {
+    outline: 2px solid rgba(255,227,154,.3);
+    outline-offset: 2px;
+}
+
+@media (max-width: 520px) {
+    .gmrt-pippin-note { grid-template-columns: 66px minmax(0, 1fr); }
+    .gmrt-pippin-note__portrait { width: 78px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gmrt-pippin-note.is-speaking .gmrt-pippin-note__bubble { outline-offset: 0; }
+}
+
+/* Phase IV.32.2B — Pippin Demands a Bigger Office.
+ * Responsive workspace proportions for the Keeper drawers and Gathering rail.
+ * Presentation only: no Scene, creature, party, HP, Fog or encounter authority changes.
+ */
+.gmrt-chamber {
+    --gmrt-keeper-drawer-width: 700px;
+    --gmrt-party-rail-width: 370px;
+}
+
+.gmrt-chamber__layout {
+    max-width: 1650px;
+    grid-template-columns: minmax(0, 1fr) minmax(340px, var(--gmrt-party-rail-width));
+}
+
+.gmrt-atlas-drawer__panel,
+.gmrt-bestiary-drawer__panel {
+    width: min(var(--gmrt-keeper-drawer-width), calc(100vw - 4rem));
+}
+
+.gmrt-atlas__register,
+.gmrt-bestiary__register {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: .8rem;
+}
+
+.gmrt-atlas-card {
+    grid-template-columns: 92px minmax(0, 1fr);
+    align-content: start;
+    min-width: 0;
+}
+
+.gmrt-atlas-card__image {
+    width: 92px;
+}
+
+.gmrt-atlas-card__copy strong {
+    padding-right: 3.75rem;
+    overflow-wrap: break-word;
+    word-break: normal;
+    hyphens: auto;
+}
+
+.gmrt-atlas-card__actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.gmrt-atlas-card__actions button:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+}
+
+.gmrt-bestiary-card {
+    min-width: 0;
+    align-content: start;
+}
+
+.gmrt-bestiary-card > header > div:last-child {
+    min-width: 0;
+}
+
+.gmrt-bestiary-card > header strong,
+.gmrt-bestiary-card > header small {
+    overflow-wrap: break-word;
+    word-break: normal;
+}
+
+.gmrt-pippin-note {
+    grid-template-columns: 124px minmax(0, 1fr);
+    min-height: 132px;
+    gap: 10px;
+}
+
+.gmrt-pippin-note__portrait {
+    width: 142px;
+    margin: 0 -14px -4px 0;
+}
+
+.gmrt-pippin-note__bubble {
+    min-height: 98px;
+    padding: .7rem .8rem .72rem 1rem;
+}
+
+.gmrt-pippin-note__bubble p {
+    font-size: .82rem;
+    line-height: 1.5;
+}
+
+.gmrt-pippin-desk__portrait {
+    margin: 0 .8rem;
+}
+
+.gmrt-party {
+    padding: 1rem;
+}
+
+.gmrt-party > ul {
+    gap: .7rem;
+}
+
+.gmrt-party__member,
+.gmrt-party > ul > li.gmrt-party__member {
+    grid-template-columns: 54px minmax(0, 1fr) auto;
+    grid-auto-rows: auto;
+    gap: .35rem .65rem;
+    align-items: center;
+    padding: .75rem;
+}
+
+.gmrt-party__avatar,
+.gmrt-party > ul > li > .gmrt-party__avatar {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    width: 50px;
+    height: 50px;
+    border-radius: 1px;
+    image-rendering: pixelated;
+}
+
+.gmrt-party__avatar img {
+    image-rendering: pixelated;
+}
+
+.gmrt-party__member > strong {
+    grid-column: 2;
+    grid-row: 1;
+    min-width: 0;
+    overflow-wrap: break-word;
+    color: #f0dfbc;
+    font-family: ui-monospace, "Courier New", monospace;
+    font-size: .94rem;
+    line-height: 1.2;
+}
+
+.gmrt-party__role {
+    grid-column: 3;
+    grid-row: 1;
+    justify-self: end;
+    align-self: start;
+    white-space: nowrap;
+}
+
+.gmrt-party__remove {
+    grid-column: 2 / -1;
+    grid-row: 2;
+    justify-self: stretch;
+    width: 100%;
+    min-height: 2rem;
+    padding: .35rem .5rem;
+    font-size: .66rem;
+}
+
+.gmrt-party__member > .gmrt-hp {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    width: 100%;
+    margin-top: .15rem;
+}
+
+.gmrt-party__member > .gmrt-hp small {
+    font-family: ui-monospace, "Courier New", monospace;
+    font-size: .68rem;
+    color: rgba(234,217,181,.76);
+}
+
+.gmrt-fellowship-colour {
+    padding: .65rem .7rem;
+    border-radius: 1px;
+}
+
+.gmrt-fellowship-colour > span {
+    font-family: ui-monospace, "Courier New", monospace;
+}
+
+.gmrt-fellowship-colour__swatches {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 6px;
+}
+
+.gmrt-fellowship-colour__swatches button {
+    width: 100%;
+    min-width: 0;
+    aspect-ratio: 1;
+    height: auto;
+    border-radius: 0;
+}
+
+@media (max-width: 1180px) and (min-width: 901px) {
+    .gmrt-chamber {
+        --gmrt-party-rail-width: 330px;
+        --gmrt-keeper-drawer-width: 640px;
+    }
+}
+
+@media (max-width: 900px) {
+    .gmrt-chamber__layout {
+        grid-template-columns: 1fr;
+    }
+
+    .gmrt-party {
+        width: auto;
+    }
+}
+
+@media (max-width: 760px) {
+    .gmrt-atlas-drawer__panel,
+    .gmrt-bestiary-drawer__panel {
+        width: calc(100vw - 4rem);
+    }
+
+    .gmrt-atlas__register,
+    .gmrt-bestiary__register {
+        grid-template-columns: 1fr;
+    }
+
+    .gmrt-atlas-card {
+        grid-template-columns: 72px minmax(0, 1fr);
+    }
+
+    .gmrt-atlas-card__image {
+        width: 72px;
+    }
+
+    .gmrt-pippin-note {
+        grid-template-columns: 92px minmax(0, 1fr);
+        min-height: 104px;
+    }
+
+    .gmrt-pippin-note__portrait {
+        width: 108px;
+    }
+}
+
+/* ==========================================================================\n   IV.32.2C — The Keeper Rearranges the Furniture\n   ========================================================================== */
+.gmrt-chamber {
+    --gmrt-command-width: 1650px;
+}
+
+/* Atlas and Bestiary share one moving Keeper rail. The inactive panel stays
+   hidden while its tab follows the active drawer's outer edge. */
+.gmrt-atlas-drawer__panel,
+.gmrt-bestiary-drawer__panel {
+    visibility: hidden;
+}
+.gmrt-atlas-drawer[data-open="true"] .gmrt-atlas-drawer__panel,
+.gmrt-bestiary-drawer[data-open="true"] .gmrt-bestiary-drawer__panel {
+    visibility: visible;
+}
+.gmrt-chamber[data-keeper-drawer-open="atlas"] .gmrt-bestiary-drawer,
+.gmrt-chamber[data-keeper-drawer-open="bestiary"] .gmrt-atlas-drawer {
+    transform: translateX(0);
+    pointer-events: none;
+}
+.gmrt-chamber[data-keeper-drawer-open="atlas"] .gmrt-bestiary-drawer__toggle,
+.gmrt-chamber[data-keeper-drawer-open="bestiary"] .gmrt-atlas-drawer__toggle {
+    pointer-events: auto;
+}
+
+/* One visual command deck: table identity, current mode and Scene sit on the
+   same full-width rhythm as battlefield + Gathering, with less dead height. */
+.gmrt-chamber__masthead,
+.gmrt-exploration-strip,
+.gmrt-encounter-strip {
+    width: min(100%, var(--gmrt-command-width));
+    max-width: var(--gmrt-command-width);
+    margin-inline: auto;
+}
+.gmrt-chamber__masthead {
+    min-height: 0;
+    padding: .72rem 1rem;
+}
+.gmrt-chamber__masthead h1 {
+    margin-top: .12rem;
+    line-height: 1.05;
+}
+.gmrt-exploration-strip,
+.gmrt-encounter-strip {
+    margin-top: 6px;
+    padding: .55rem 1rem;
+    min-height: 0;
+}
+.gmrt-exploration-strip > div:first-child {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: baseline;
+    gap: .35rem .8rem;
+}
+.gmrt-exploration-strip .gmrt-chamber__eyebrow {
+    grid-column: 1 / -1;
+    margin-bottom: 0;
+}
+.gmrt-exploration-strip h2 {
+    margin: 0;
+    white-space: nowrap;
+}
+.gmrt-exploration-strip__copy {
+    margin: 0;
+    font-size: .78rem;
+    opacity: .78;
+}
+.gmrt-board__heading {
+    min-height: 0;
+    padding: .55rem .7rem;
+}
+.gmrt-board__heading .gmrt-chamber__eyebrow {
+    margin-bottom: .08rem;
+}
+.gmrt-board__heading h2 {
+    margin: 0;
+    line-height: 1.05;
+}
+
+/* Gathering seats: account identity at left, character seat at right,
+   management in its own band, vitality below. */
+.gmrt-party__seat {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    padding: 0;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    border-radius: 0;
+}
+.gmrt-party__seat img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    object-position: var(--gmrt-token-focus-x, 50%) var(--gmrt-token-focus-y, 50%);
+    transform: scale(calc(var(--gmrt-token-zoom, 100%) / 100%));
+    image-rendering: pixelated;
+}
+.gmrt-party__member--player .gmrt-party__seat.has-character {
+    border-color: color-mix(in srgb, var(--gmrt-fellowship-colour, #65b9ae) 76%, #f4d688);
+    background: #15130f;
+}
+.gmrt-party__remove {
+    margin-top: .28rem;
+}
+.gmrt-party__member > .gmrt-hp {
+    margin-top: .32rem;
+    padding-top: .42rem;
+    border-top: 1px solid rgba(216,173,79,.22);
+}
+
+@media (max-width: 900px) {
+    .gmrt-exploration-strip > div:first-child {
+        grid-template-columns: 1fr;
+    }
+    .gmrt-exploration-strip .gmrt-chamber__eyebrow { grid-column: auto; }
+    .gmrt-exploration-strip h2 { white-space: normal; }
+}
+.gmrt-chamber__masthead {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 1rem;
+}
+.gmrt-table-command__scene {
+    min-width: 210px;
+    padding: .35rem .8rem;
+    border-inline: 1px solid rgba(216,173,79,.28);
+    display: grid;
+    gap: .06rem;
+}
+.gmrt-table-command__scene > span,
+.gmrt-table-command__scene > small {
+    font: 700 .66rem ui-monospace, "Courier New", monospace;
+    color: rgba(234,217,181,.7);
+}
+.gmrt-table-command__scene > span {
+    color: #d8ad4f;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+}
+.gmrt-table-command__scene > strong {
+    color: #f4ead6;
+    font-family: ui-monospace, "Courier New", monospace;
+    line-height: 1.15;
+}
+/* Scene identity now lives in the command header; retain the board heading as
+   the action dock and its heading in the DOM for accessible labelling. */
+.gmrt-board__heading > div:first-child {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+}
+.gmrt-board__heading {
+    justify-content: flex-end;
+}
+@media (max-width: 900px) {
+    .gmrt-chamber__masthead { grid-template-columns: 1fr auto; }
+    .gmrt-table-command__scene { grid-column: 1 / -1; grid-row: 2; border-inline: 0; border-top: 1px solid rgba(216,173,79,.22); padding-inline: 0; }
+}
+
+/* ==========================================================================
+   IV.32.2C.1 — The Keeper Tidies the Desk
+   Test-group layout amendments: aligned Keeper panels, compact DM controls,
+   persistent character seats and restored Fellowship Ribbon colours.
+   Presentation only.
+   ========================================================================== */
+
+/* Atlas and Bestiary share the exact same drawer top edge. The inactive Atlas
+   tab already occupies the upper rail slot when the Bestiary is open, so the
+   Bestiary toggle must start at its own drawer edge with no second vertical
+   offset. This keeps the two tabs contiguous instead of creating a double gap. */
+.gmrt-bestiary-drawer {
+    top: 7.75rem;
+}
+.gmrt-bestiary-drawer__toggle {
+    margin-top: 0;
+}
+.gmrt-bestiary-drawer__panel {
+    position: relative;
+    top: -7.5rem;
+    min-height: 80vh;
+    height: calc(100% + 7.5rem);
+}
+
+/* The pixel button foundation intentionally normalises button backgrounds;
+   Fellowship swatches are the exception: their colour is their meaning. */
+.gmrt-chamber .gmrt-fellowship-colour__swatches button {
+    background: var(--gmrt-swatch) !important;
+}
+.gmrt-chamber .gmrt-fellowship-colour__swatches button:hover:not(:disabled),
+.gmrt-chamber .gmrt-fellowship-colour__swatches button:active:not(:disabled) {
+    background: var(--gmrt-swatch) !important;
+}
+
+/* Live Gathering refreshes keep the same compact seat grammar as the initial
+   PHP render. Give the management action a deliberate buffer below the seat. */
+.gmrt-party__member,
+.gmrt-party > ul > li.gmrt-party__member {
+    row-gap: .5rem;
+}
+.gmrt-party__remove {
+    margin-top: .55rem;
+}
+
+/* One compact disclosure now owns the Keeper's battlefield setup controls.
+   It replaces the always-visible Lens help strip and keeps the map nearer the
+   top of the working area without changing any underlying tool behaviour. */
+.gmrt-keeper-controls {
+    margin: .55rem 0 .7rem;
+    border: 2px solid rgba(128,100,56,.88);
+    border-top-color: rgba(215,184,110,.72);
+    border-left-color: rgba(215,184,110,.72);
+    border-radius: 2px;
+    background: var(--gmrt-pixel-panel-low);
+    box-shadow: var(--gmrt-pixel-inset), 3px 3px 0 rgba(0,0,0,.34);
+}
+.gmrt-keeper-controls > summary {
+    cursor: pointer;
+    padding: .55rem .7rem;
+    color: var(--gmrt-pixel-gold-hi);
+    font: 900 .76rem/1.2 ui-monospace, "Courier New", monospace;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    list-style: none;
+}
+.gmrt-keeper-controls > summary::-webkit-details-marker { display: none; }
+.gmrt-keeper-controls > summary::before {
+    content: "▶";
+    margin-right: .55rem;
+    color: var(--gmrt-pixel-gold);
+}
+.gmrt-keeper-controls[open] > summary::before { content: "▼"; }
+.gmrt-keeper-controls[open] > summary {
+    border-bottom: 1px solid rgba(216,173,79,.24);
+}
+.gmrt-keeper-controls__body {
+    display: grid;
+    gap: .55rem;
+    padding: .6rem;
+}
+.gmrt-keeper-controls__body > .gmrt-fog-controls,
+.gmrt-keeper-controls__body > .gmrt-lantern-rack,
+.gmrt-keeper-controls__body > .gmrt-vision-controls,
+.gmrt-keeper-controls__body > .gmrt-grid-calibrator,
+.gmrt-keeper-controls__body > .gmrt-cartographer-status {
+    margin: 0;
+}
+
+/* Keepers rarely need to occupy the Table as a Companion adventurer. Preserve
+   the test utility, but put it behind a compact disclosure instead of taking
+   permanent vertical space in the Gathering rail. */
+.gmrt-character-gate-disclosure {
+    margin-top: .55rem;
+    border-top: 1px solid rgba(216,173,79,.2);
+    padding-top: .45rem;
+}
+.gmrt-character-gate-disclosure > summary {
+    cursor: pointer;
+    color: rgba(234,217,181,.82);
+    font: 800 .69rem/1.25 ui-monospace, "Courier New", monospace;
+}
+.gmrt-character-gate-disclosure__body {
+    display: grid;
+    gap: .5rem;
+    padding-top: .55rem;
+}
+
+@media (max-width: 760px) {
+    .gmrt-bestiary-drawer {
+        top: 7.75rem;
+    }
+    .gmrt-bestiary-drawer__toggle {
+        margin-top: 0;
+    }
+    .gmrt-bestiary-drawer__panel {
+        top: 0;
+        min-height: 0;
+        height: 100%;
+    }
+}
+
+/* ==========================================================================
+   IV.32.3 — Adventurers in Miniature
+   Live-play pixel language for party seats, turn state, combat status and the
+   Keeper's active Bestiary creature. Presentation only: no combat authority.
+   ========================================================================== */
+
+/* The Turn of Battle reads like a compact 16-bit battle status plaque rather
+   than another full-width web panel. */
+.gmrt-encounter-strip {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(13rem, 1fr) minmax(0, 2fr);
+    gap: .8rem 1.25rem;
+    align-items: center;
+    border: 2px solid var(--gmrt-pixel-gold-dim);
+    border-top-color: var(--gmrt-pixel-gold-hi);
+    border-left-color: var(--gmrt-pixel-gold-hi);
+    border-radius: 2px;
+    background:
+        linear-gradient(90deg, rgba(125,38,31,.18), transparent 36%),
+        var(--gmrt-pixel-panel);
+    box-shadow: var(--gmrt-pixel-inset), var(--gmrt-pixel-shadow);
+}
+.gmrt-encounter-strip::before {
+    content: "BATTLE";
+    position: absolute;
+    top: -1px;
+    right: .65rem;
+    padding: .16rem .42rem;
+    border-inline: 1px solid var(--gmrt-pixel-gold-dim);
+    border-bottom: 1px solid var(--gmrt-pixel-gold-dim);
+    background: #341a18;
+    color: #f1c96d;
+    font: 900 .58rem/1.15 ui-monospace, "Courier New", monospace;
+    letter-spacing: .12em;
+}
+.gmrt-encounter-strip__state {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: .45rem;
+    flex-wrap: wrap;
+}
+.gmrt-encounter-strip__state > strong,
+.gmrt-encounter-strip__state > span {
+    min-height: 1.8rem;
+    display: inline-flex;
+    align-items: center;
+    padding: .24rem .48rem;
+    border: 1px solid rgba(216,173,79,.34);
+    background: rgba(0,0,0,.2);
+    color: var(--gmrt-pixel-parchment);
+    font: 800 .68rem/1.2 ui-monospace, "Courier New", monospace;
+}
+.gmrt-encounter-strip__state > strong {
+    color: #f1c96d;
+    background: rgba(104,44,36,.42);
+}
+.gmrt-current-turn {
+    box-shadow: inset 3px 0 0 var(--gmrt-pixel-gold);
+}
+.gmrt-current-turn strong {
+    margin-left: .35rem;
+    color: #fff1b5;
+}
+.gmrt-end-turn {
+    border-color: #b99546 !important;
+    background: #3a2c16 !important;
+    color: #ffe8a0 !important;
+}
+.gmrt-end-encounter {
+    border-color: #81504a !important;
+    background: #2b1817 !important;
+    color: #e4b7ad !important;
+}
+
+/* The Gathering is now a party roster: every seated Companion character is a
+   miniature, and the current turn is visible without opening another panel. */
+.gmrt-party__member,
+.gmrt-party > ul > li.gmrt-party__member {
+    position: relative;
+    overflow: visible;
+    border-radius: 1px;
+    background:
+        linear-gradient(90deg, color-mix(in srgb, var(--gmrt-fellowship-colour,#65b9ae) 10%, transparent), transparent 42%),
+        var(--gmrt-pixel-panel-low);
+}
+.gmrt-party__member.is-active-turn {
+    border-color: color-mix(in srgb, var(--gmrt-fellowship-colour,#d8ad4f) 72%, #ffe69a);
+    box-shadow:
+        inset 4px 0 0 var(--gmrt-fellowship-colour,#d8ad4f),
+        0 0 0 2px rgba(242,205,112,.18),
+        3px 3px 0 rgba(0,0,0,.4);
+}
+.gmrt-party__member.is-active-turn::after {
+    content: "TURN";
+    position: absolute;
+    top: -1px;
+    right: 3.45rem;
+    padding: .14rem .34rem;
+    border: 1px solid color-mix(in srgb, var(--gmrt-fellowship-colour,#d8ad4f) 68%, #e9cc78);
+    background: #262016;
+    color: #ffe691;
+    font: 900 .52rem/1.15 ui-monospace, "Courier New", monospace;
+    letter-spacing: .08em;
+}
+.gmrt-party__avatar,
+.gmrt-party__seat {
+    image-rendering: pixelated;
+    box-shadow: 2px 2px 0 rgba(0,0,0,.42);
+}
+.gmrt-party__seat.has-character {
+    outline: 1px solid color-mix(in srgb, var(--gmrt-fellowship-colour,#65b9ae) 72%, #ead38f);
+    outline-offset: 2px;
+}
+.gmrt-party__member > strong {
+    color: #f5e7c0;
+    text-shadow: 1px 1px 0 #000;
+}
+.gmrt-party__member > .gmrt-hp {
+    padding-top: .45rem;
+    border-top: 1px solid rgba(216,173,79,.18);
+}
+.gmrt-party .gmrt-hp__track {
+    height: .55rem;
+    border-radius: 0;
+    border: 1px solid #6d5733;
+    background: #15120d;
+    box-shadow: inset 1px 1px 0 #000;
+}
+.gmrt-party .gmrt-hp__fill {
+    background: repeating-linear-gradient(90deg, #8fa65b 0 7px, #758b49 7px 9px);
+}
+.gmrt-hp__state {
+    border-radius: 0;
+    padding: .12rem .3rem;
+    font: 900 .57rem/1.15 ui-monospace, "Courier New", monospace;
+    letter-spacing: .07em;
+}
+
+/* Tokens gain a square stepped turn cursor around the existing circular piece;
+   the token itself, ownership ring and movement geometry remain unchanged. */
+.gmrt-token.is-active-turn::before {
+    content: "";
+    position: absolute;
+    inset: -7px;
+    pointer-events: none;
+    border: 2px solid #f2cd70;
+    box-shadow:
+        3px 0 0 #6c5526,
+        -3px 0 0 #6c5526,
+        0 3px 0 #6c5526,
+        0 -3px 0 #6c5526;
+}
+
+/* Player turn guidance and the Satchel become one readable battle command
+   surface instead of a collection of unrelated status fragments. */
+.gmrt-combat-guidance {
+    border: 2px solid rgba(128,100,56,.78);
+    border-top-color: rgba(226,194,113,.72);
+    border-left-color: rgba(226,194,113,.72);
+    border-radius: 1px;
+    padding: .55rem .7rem;
+    background: #1b1711;
+    box-shadow: 3px 3px 0 rgba(0,0,0,.34);
+}
+.gmrt-player-turn-badge,
+.gmrt-combat-turn-badge {
+    border-radius: 0;
+    border: 1px solid #c7a554;
+    background: #4a3718;
+    color: #fff0ae;
+    box-shadow: 2px 2px 0 #000;
+    font-family: ui-monospace, "Courier New", monospace;
+    letter-spacing: .08em;
+}
+.gmrt-satchel__battle.is-active-turn {
+    border-radius: 1px;
+    background: linear-gradient(180deg, rgba(216,173,79,.09), rgba(0,0,0,.12));
+    box-shadow: inset 4px 0 0 var(--gmrt-fellowship-colour,#d8ad4f), 3px 3px 0 rgba(0,0,0,.35);
+}
+
+/* Bestiary creatures use the same miniature grammar as adventurers. The
+   highlighted instance is the Keeper's active battle command card. */
+.gmrt-bestiary-card {
+    border-radius: 1px;
+    box-shadow: 2px 2px 0 rgba(0,0,0,.28);
+}
+.gmrt-bestiary-card__sigil {
+    border-radius: 1px;
+    box-shadow: inset 1px 1px 0 rgba(255,255,255,.08), 2px 2px 0 rgba(0,0,0,.35);
+}
+.gmrt-bestiary-instance {
+    border-radius: 1px;
+}
+.gmrt-bestiary-instance.is-active-turn,
+.gmrt-bestiary-card.is-active-turn {
+    border-color: #a7d084;
+    box-shadow: inset 3px 0 0 #78a85d, 3px 3px 0 rgba(0,0,0,.36);
+}
+.gmrt-bestiary-instance__turn {
+    border-radius: 0;
+    background: #2b491f;
+    color: #eaffcf;
+    box-shadow: 2px 2px 0 rgba(0,0,0,.4);
+    font-family: ui-monospace, "Courier New", monospace;
+}
+.gmrt-bestiary-drawer__toggle.has-active-turn::after {
+    content: "TURN";
+    display: inline-grid;
+    place-items: center;
+    margin-top: .35rem;
+    min-width: 2.2rem;
+    padding: .12rem .22rem;
+    border: 1px solid #87b76d;
+    background: #21331b;
+    color: #eaffcf;
+}
+
+@media (max-width: 900px) {
+    .gmrt-encounter-strip { grid-template-columns: 1fr; }
+    .gmrt-encounter-strip__state { justify-content: flex-start; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gmrt-party__member.is-active-turn,
+    .gmrt-token.is-active-turn::before,
+    .gmrt-bestiary-instance.is-active-turn,
+    .gmrt-bestiary-card.is-active-turn {
+        animation: none;
+    }
+}
+
+
+/* IV.32.3A — The Deeds Remember Every Adventurer: the Satchel shares the
+ * Keeper drawers' restrained pixel scrollbar instead of the browser chrome. */
+.gmrt-satchel__panel {
+    scrollbar-color: var(--gmrt-pixel-gold-low) #17120d;
+    scrollbar-width: thin;
+}
+.gmrt-satchel__panel::-webkit-scrollbar { width: 12px; }
+.gmrt-satchel__panel::-webkit-scrollbar-track { background: #17120d; }
+.gmrt-satchel__panel::-webkit-scrollbar-thumb {
+    border: 2px solid #17120d;
+    border-radius: 0;
+    background: var(--gmrt-pixel-gold-low);
+}
+.gmrt-satchel__panel::-webkit-scrollbar-thumb:hover {
+    background: var(--gmrt-pixel-gold);
+}
+
+/* IV.32.3B — The Keeper Rolls Behind the Screen
+   Keeper-only dice remain private presentation and never become Chronicle state. */
+.gmrt-party__secret-roll {
+    grid-column: 2 / -1;
+    grid-row: 2;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: .4rem;
+    align-items: center;
+    margin-top: .28rem;
+    padding-top: .38rem;
+    border-top: 1px dashed rgba(216, 173, 79, .22);
+}
+
+.gmrt-party__secret-roll button {
+    min-height: 2rem;
+    width: 100%;
+    padding: .34rem .55rem;
+    border-color: #7e6538;
+    background: #17130e;
+    color: #e8d398;
+    font: 800 .66rem/1.1 ui-monospace, "Courier New", monospace;
+    letter-spacing: .03em;
+}
+
+.gmrt-party__secret-roll button:hover,
+.gmrt-party__secret-roll button:focus-visible {
+    border-color: #d6ad55;
+    color: #fff0b5;
+}
+
+.gmrt-party__secret-result {
+    min-width: 5.5rem;
+    color: #f4d67c;
+    font: 900 .64rem/1.15 ui-monospace, "Courier New", monospace;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.gmrt-party__secret-result:empty {
+    display: none;
+}
+
+/* ==========================================================================
+   IV.32.4A — The Battlefield Finds Its Pixels
+   Presentation-only battlefield grammar. Rules-grid geometry, token
+   coordinates, movement, targeting authority, Vision and Fog stay unchanged.
+   ========================================================================== */
+
+/* The rules grid keeps exactly the same calibrated size and offset, but its
+   ink now belongs to the Tabletop's 16-bit parchment/brass language. */
+.gmrt-board__grid {
+    background-image:
+        linear-gradient(
+            rgba(234, 217, 181, var(--gmrt-grid-opacity, .13)) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(234, 217, 181, var(--gmrt-grid-opacity, .13)) 1px,
+            transparent 1px
+        );
+    image-rendering: pixelated;
+}
+
+/* Tokens retain their existing circles/squares and exact hit geometry. The
+   battlefield skin simply gives the pieces harder stepped edges and shadows. */
+.gmrt-token {
+    border-color: var(--gmrt-pixel-parchment);
+    box-shadow:
+        0 0 0 2px color-mix(in srgb, var(--gmrt-owner-ring, transparent) 56%, transparent),
+        3px 3px 0 rgba(0, 0, 0, .62);
+    image-rendering: pixelated;
+}
+
+.gmrt-token[role="button"] {
+    cursor: grab;
+}
+
+.gmrt-token.is-dragging {
+    box-shadow:
+        0 0 0 2px var(--gmrt-pixel-gold-hi),
+        5px 5px 0 rgba(0, 0, 0, .64);
+}
+
+/* Selection is a four-corner reticle rather than a smooth browser outline.
+   Active-turn state keeps its own, stronger cursor from IV.32.3. */
+.gmrt-token.is-selected:not(.is-active-turn)::after,
+.gmrt-token:focus-visible:not(.is-active-turn)::after {
+    content: "";
+    position: absolute;
+    inset: -8px;
+    pointer-events: none;
+    background:
+        linear-gradient(var(--gmrt-pixel-focus), var(--gmrt-pixel-focus)) left top / 8px 2px no-repeat,
+        linear-gradient(var(--gmrt-pixel-focus), var(--gmrt-pixel-focus)) left top / 2px 8px no-repeat,
+        linear-gradient(var(--gmrt-pixel-focus), var(--gmrt-pixel-focus)) right top / 8px 2px no-repeat,
+        linear-gradient(var(--gmrt-pixel-focus), var(--gmrt-pixel-focus)) right top / 2px 8px no-repeat,
+        linear-gradient(var(--gmrt-pixel-focus), var(--gmrt-pixel-focus)) left bottom / 8px 2px no-repeat,
+        linear-gradient(var(--gmrt-pixel-focus), var(--gmrt-pixel-focus)) left bottom / 2px 8px no-repeat,
+        linear-gradient(var(--gmrt-pixel-focus), var(--gmrt-pixel-focus)) right bottom / 8px 2px no-repeat,
+        linear-gradient(var(--gmrt-pixel-focus), var(--gmrt-pixel-focus)) right bottom / 2px 8px no-repeat;
+    filter: drop-shadow(2px 2px 0 #000);
+}
+
+.gmrt-token:focus-visible,
+.gmrt-token.is-selected {
+    outline: none;
+}
+
+/* The current-turn cursor keeps its proven behaviour but becomes a stepped
+   corner frame so the miniature remains readable underneath it. */
+.gmrt-token.is-active-turn::before {
+    inset: -9px;
+    border: 0;
+    background:
+        linear-gradient(#f2cd70, #f2cd70) left top / 10px 3px no-repeat,
+        linear-gradient(#f2cd70, #f2cd70) left top / 3px 10px no-repeat,
+        linear-gradient(#f2cd70, #f2cd70) right top / 10px 3px no-repeat,
+        linear-gradient(#f2cd70, #f2cd70) right top / 3px 10px no-repeat,
+        linear-gradient(#f2cd70, #f2cd70) left bottom / 10px 3px no-repeat,
+        linear-gradient(#f2cd70, #f2cd70) left bottom / 3px 10px no-repeat,
+        linear-gradient(#f2cd70, #f2cd70) right bottom / 10px 3px no-repeat,
+        linear-gradient(#f2cd70, #f2cd70) right bottom / 3px 10px no-repeat;
+    box-shadow: none;
+    filter: drop-shadow(2px 2px 0 #2b2110);
+}
+
+/* Authoritative target geometry remains the same SVG line. Only the stroke
+   vocabulary changes to chunky square-pixel cadence. */
+.gmrt-target-line {
+    stroke: var(--gmrt-pixel-gold-hi);
+    stroke-width: 3;
+    stroke-linecap: square;
+    stroke-dasharray: 5 3;
+    shape-rendering: crispEdges;
+    filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, .82));
+}
+
+.gmrt-target-line.is-long-range {
+    stroke-dasharray: 11 5;
+}
+
+.gmrt-target-line.is-out-of-range {
+    stroke: #c86d58;
+    stroke-dasharray: 3 6;
+    stroke-width: 3;
+}
+
+.gmrt-target-range {
+    border-radius: 0;
+    border-width: 2px;
+    border-color: var(--gmrt-pixel-gold-low);
+    background: var(--gmrt-pixel-ink-soft);
+    color: var(--gmrt-pixel-parchment);
+    box-shadow: 2px 2px 0 rgba(0, 0, 0, .55);
+    font-family: ui-monospace, "Courier New", monospace;
+}
+
+/* Keeper doors remain the same Vision barriers and therefore preserve LOS.
+   Their visible editing marks now read as square threshold pixels. */
+.gmrt-vision-barrier {
+    stroke-linecap: square;
+    shape-rendering: crispEdges;
+}
+
+.gmrt-vision-barrier.is-door {
+    stroke: #78c9d8;
+    stroke-width: 5;
+    stroke-dasharray: 10 4;
+    filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, .7));
+}
+
+.gmrt-vision-barrier.is-door.is-open {
+    opacity: .52;
+    stroke-dasharray: 3 6;
+}
+
+/* Arrival/deployment thresholds are Keeper-only battlefield markers. Their
+   interaction and coordinates are unchanged; only the marker shell is square. */
+.gmrt-threshold-marker {
+    width: 2rem;
+    height: 2rem;
+    border: 2px solid currentColor;
+    border-radius: 0;
+    background: var(--gmrt-pixel-ink);
+    box-shadow: 3px 3px 0 rgba(0, 0, 0, .58);
+    font-family: ui-monospace, "Courier New", monospace;
+}
+
+.gmrt-threshold-marker > span {
+    transform: scale(.82);
+}
+
+/* Existing Footsteps are the movement trail; their authority and projection
+   remain untouched while the marks gain a harder 16-bit print. */
+.gmrt-footstep {
+    filter: saturate(1.02) brightness(.64) contrast(1.55)
+        drop-shadow(1px 1px 0 rgba(0, 0, 0, .5));
+    image-rendering: pixelated;
+}
+
+.gmrt-footstep i {
+    box-shadow:
+        1px 0 0 color-mix(in srgb, currentColor 78%, #17120d),
+        0 2px 0 color-mix(in srgb, currentColor 88%, #17120d);
+}
+
+.gmrt-footstep.is-memory {
+    opacity: calc(var(--gmrt-step-opacity, .48) * .72);
+    filter: saturate(.62) brightness(.58) contrast(1.45);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gmrt-token,
+    .gmrt-token::before,
+    .gmrt-token::after,
+    .gmrt-target-line,
+    .gmrt-threshold-marker,
+    .gmrt-footstep {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+
+/* IV.32.4A — Final battlefield polish: compact certified attack results. */
+/* IV.32.4A — Final battlefield polish: the Diceworks is a full-width
+   encounter result, not a third item trapped in the encounter status grid. */
+.gmrt-encounter-strip > .gmrt-diceworks {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-width: 0;
+}
+
+.gmrt-combat-dock {
+    container-type: inline-size;
+    container-name: gmrt-combat-dock;
+}
+
+.gmrt-diceworks__outcome {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+    column-gap: .8rem;
+}
+
+.gmrt-diceworks__outcome strong,
+.gmrt-diceworks__outcome span {
+    grid-column: 1;
+}
+
+.gmrt-diceworks__damage-roll {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: center;
+    margin-top: 0;
+    white-space: nowrap;
+}
+
+.gmrt-diceworks > small {
+    min-width: 0;
+    max-width: 18rem;
+    overflow-wrap: anywhere;
+}
+
+@container gmrt-combat-dock (max-width: 42rem) {
+    .gmrt-diceworks {
+        grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    .gmrt-diceworks__outcome,
+    .gmrt-diceworks > small {
+        grid-column: 1 / -1;
+        max-width: none;
+    }
+
+    .gmrt-diceworks__outcome {
+        border-left: 0;
+        border-top: 1px solid rgba(244, 234, 214, .18);
+        padding: .55rem 0 0;
+    }
+}
+
+@container gmrt-combat-dock (max-width: 30rem) {
+    .gmrt-diceworks__outcome {
+        grid-template-columns: 1fr;
+    }
+
+    .gmrt-diceworks__damage-roll {
+        grid-column: 1;
+        grid-row: auto;
+        justify-self: start;
+        margin-top: .35rem;
+    }
+}
+
+/* Phase IV.32.4B — The Veil Goes 16-Bit
+ * Presentation only: Fog authority, explored cells and LOS remain server-owned.
+ */
+.gmrt-fog-layer {
+    --gmrt-veil-pixel: 4px;
+    image-rendering: pixelated;
+}
+
+.gmrt-fog-cell {
+    overflow: hidden;
+    transition:
+        opacity .16s steps(2, end),
+        filter .16s steps(2, end);
+}
+
+.gmrt-fog-cell::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-size:
+        calc(var(--gmrt-veil-pixel) * 2)
+        calc(var(--gmrt-veil-pixel) * 2);
+}
+
+/* Unknown territory is deliberately dense: near-black pixel dithering gives
+ * the veil texture without suggesting any geometry hidden beneath it. */
+.gmrt-fog-cell.is-unexplored {
+    background:
+        linear-gradient(
+            180deg,
+            rgba(7, 6, 8, .995),
+            rgba(2, 2, 4, 1)
+        );
+    filter: contrast(1.1) brightness(.94);
+    box-shadow:
+        inset 0 0 0 1px rgba(0, 0, 0, .46),
+        inset 0 0 12px rgba(0, 0, 0, .36);
+}
+
+.gmrt-fog-cell.is-unexplored::before {
+    background-image:
+        linear-gradient(45deg, rgba(255,255,255,.018) 25%, transparent 25%),
+        linear-gradient(225deg, rgba(255,255,255,.012) 25%, transparent 25%);
+    opacity: .72;
+}
+
+/* Explored-but-not-visible terrain reads as a faded 16-bit memory rather than
+ * a second flavour of black fog. The map remains recognisable underneath. */
+.gmrt-fog-cell.is-memory {
+    background: rgba(13, 11, 15, .49);
+    backdrop-filter:
+        grayscale(.72)
+        sepia(.1)
+        brightness(.68)
+        contrast(.9);
+    filter: saturate(.5) contrast(.9);
+    box-shadow:
+        inset 0 0 0 1px rgba(183, 146, 79, .055),
+        inset 0 0 10px rgba(0, 0, 0, .13);
+}
+
+.gmrt-fog-cell.is-memory::before {
+    background-image:
+        radial-gradient(
+            circle at center,
+            rgba(221, 196, 146, .075) 0 1px,
+            transparent 1.5px
+        );
+    opacity: .58;
+}
+
+/* A hard stepped rim makes the live sight frontier legible without changing
+ * which cells the authoritative projector considers visible. */
+.gmrt-fog-cell.is-vision-edge::after {
+    inset: 0;
+    background:
+        linear-gradient(90deg, rgba(221, 183, 98, .16), transparent 5px),
+        linear-gradient(270deg, rgba(221, 183, 98, .16), transparent 5px),
+        linear-gradient(180deg, rgba(221, 183, 98, .12), transparent 5px),
+        linear-gradient(0deg, rgba(221, 183, 98, .12), transparent 5px),
+        repeating-linear-gradient(
+            90deg,
+            rgba(244, 234, 214, .075) 0 var(--gmrt-veil-pixel),
+            transparent var(--gmrt-veil-pixel) calc(var(--gmrt-veil-pixel) * 2)
+        );
+    border: 1px solid rgba(222, 181, 91, .11);
+    opacity: .78;
+    mix-blend-mode: screen;
+}
+
+/* The frontier between memory and absolute unknown uses a darker, colder
+ * stepped hatch so Players can instantly read 'I have been there before'. */
+.gmrt-fog-cell.is-memory-edge::after {
+    inset: 0;
+    background:
+        repeating-linear-gradient(
+            135deg,
+            rgba(107, 87, 72, .36) 0 var(--gmrt-veil-pixel),
+            rgba(9, 8, 11, .16) var(--gmrt-veil-pixel)
+                calc(var(--gmrt-veil-pixel) * 2)
+        );
+    border: 1px solid rgba(143, 111, 70, .12);
+    opacity: .76;
+}
+
+/* Keeper-only Player Fog preview gets a subtle pixel frame. This class exists
+ * only when bypass + Preview Player Fog are both true in the Keeper browser. */
+.gmrt-fog-layer.is-player-preview {
+    box-shadow:
+        inset 0 0 0 2px rgba(215, 172, 80, .34),
+        inset 0 0 0 5px rgba(30, 24, 19, .38);
+}
+
+.gmrt-fog-layer.is-player-preview::after {
+    content: "PLAYER VEIL PREVIEW";
+    position: absolute;
+    top: .45rem;
+    left: .45rem;
+    z-index: 3;
+    padding: .2rem .35rem;
+    border: 1px solid rgba(215, 172, 80, .42);
+    background: rgba(20, 16, 13, .82);
+    color: rgba(244, 222, 170, .86);
+    font: 700 .58rem/1.1 "Courier New", monospace;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    box-shadow: 2px 2px 0 rgba(0, 0, 0, .44);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gmrt-fog-cell {
+        transition: none;
+    }
+}
+
+/* Live sight wins when a frontier cell also borders remembered territory. */
+.gmrt-fog-cell.is-vision-edge.is-memory-edge::after {
+    background:
+        linear-gradient(90deg, rgba(221, 183, 98, .16), transparent 5px),
+        linear-gradient(270deg, rgba(221, 183, 98, .16), transparent 5px),
+        repeating-linear-gradient(
+            90deg,
+            rgba(244, 234, 214, .08) 0 var(--gmrt-veil-pixel),
+            transparent var(--gmrt-veil-pixel) calc(var(--gmrt-veil-pixel) * 2)
+        );
+    border-color: rgba(222, 181, 91, .14);
+    opacity: .82;
+    mix-blend-mode: screen;
+}
+
+/* Phase IV.32.4C — The Keeper Lights the Pixels
+ * Presentation-only animation over the existing server-projected light sources.
+ * Radii, Fog illumination and LOS authority remain untouched. */
+.gmrt-carried-light.is-environmental {
+    --gmrt-light-core: rgba(255, 205, 92, .28);
+    --gmrt-light-mid: rgba(255, 150, 52, .12);
+    isolation: isolate;
+    background:
+        radial-gradient(circle, var(--gmrt-light-core) 0 17%, var(--gmrt-light-mid) 18% 49%, transparent 70%),
+        repeating-conic-gradient(from 45deg, rgba(255,255,255,.022) 0 25%, transparent 0 50%) 50% / 8px 8px;
+}
+.gmrt-carried-light.is-environmental::after {
+    content: "";
+    position: absolute;
+    inset: 4%;
+    z-index: -1;
+    border: 2px solid rgba(255, 199, 72, .11);
+    box-shadow: inset 0 0 0 2px rgba(255, 239, 178, .035);
+    opacity: .48;
+    pointer-events: none;
+}
+.gmrt-carried-light.is-environmental.is-torch::after {
+    animation: gmrt-keeper-torch-flicker .72s steps(3, end) infinite;
+}
+.gmrt-carried-light.is-environmental.is-candle {
+    --gmrt-light-core: rgba(255, 225, 132, .28);
+    --gmrt-light-mid: rgba(255, 174, 70, .10);
+}
+.gmrt-carried-light.is-environmental.is-candle::after {
+    animation: gmrt-keeper-candle-flutter .46s steps(2, end) infinite;
+}
+.gmrt-carried-light.is-environmental.is-lantern {
+    --gmrt-light-core: rgba(255, 221, 126, .26);
+    --gmrt-light-mid: rgba(224, 154, 55, .105);
+}
+.gmrt-carried-light.is-environmental.is-lantern::after {
+    animation: gmrt-keeper-lantern-breathe 2.4s steps(4, end) infinite;
+}
+.gmrt-carried-light.is-environmental.is-brazier {
+    --gmrt-light-core: rgba(255, 164, 56, .30);
+    --gmrt-light-mid: rgba(192, 68, 27, .13);
+}
+.gmrt-carried-light.is-environmental.is-brazier::after {
+    border-color: rgba(255, 139, 47, .12);
+    animation: gmrt-keeper-brazier-pulse 1.7s steps(4, end) infinite;
+}
+.gmrt-carried-light.is-environmental.is-magical {
+    --gmrt-light-core: rgba(197, 238, 255, .30);
+    --gmrt-light-mid: rgba(107, 180, 255, .14);
+    background:
+        radial-gradient(circle, var(--gmrt-light-core) 0 17%, var(--gmrt-light-mid) 18% 49%, transparent 70%),
+        repeating-conic-gradient(from 0deg, rgba(196,239,255,.05) 0 12.5%, transparent 0 25%) 50% / 8px 8px;
+}
+.gmrt-carried-light.is-environmental.is-magical::after {
+    border-color: rgba(170, 227, 255, .18);
+    box-shadow: inset 0 0 0 2px rgba(225, 248, 255, .07);
+    animation: gmrt-keeper-magic-shimmer 1.35s steps(4, end) infinite;
+}
+
+/* Battlefield markers are CSS-drawn pixel objects rather than platform emoji. */
+.gmrt-keeper-light-marker {
+    position: relative;
+    display: block;
+    width: 16px;
+    height: 18px;
+    z-index: 2;
+    image-rendering: pixelated;
+    filter: drop-shadow(2px 2px 0 rgba(16, 10, 7, .82));
+}
+.gmrt-keeper-light-marker::before,
+.gmrt-keeper-light-marker::after {
+    content: "";
+    position: absolute;
+}
+.gmrt-keeper-light-marker.is-torch::before {
+    left: 6px; top: 1px; width: 4px; height: 9px; background: #ffd95a;
+    box-shadow: -2px 2px 0 #f18a2a, 2px 2px 0 #ffad32, -2px 6px 0 #d65a25, 2px 6px 0 #f18a2a;
+}
+.gmrt-keeper-light-marker.is-torch::after {
+    left: 7px; top: 9px; width: 3px; height: 9px; background: #6c4328;
+    box-shadow: -2px 2px 0 #93603a;
+}
+.gmrt-keeper-light-marker.is-candle::before {
+    left: 6px; top: 0; width: 4px; height: 6px; background: #ffe477;
+    box-shadow: -2px 2px 0 #ef8c2f, 2px 2px 0 #ffba3d;
+}
+.gmrt-keeper-light-marker.is-candle::after {
+    left: 5px; top: 7px; width: 6px; height: 10px; background: #f1dfbd;
+    box-shadow: 0 8px 0 #c9b48f, -2px 10px 0 #6e4930, 6px 10px 0 #6e4930;
+}
+.gmrt-keeper-light-marker.is-lantern::before {
+    left: 3px; top: 5px; width: 10px; height: 10px; background: #d9902d;
+    box-shadow: inset 2px 2px 0 #ffe178, inset -2px -2px 0 #8a5226, 0 -3px 0 #6c4328;
+}
+.gmrt-keeper-light-marker.is-lantern::after {
+    left: 5px; top: 1px; width: 6px; height: 4px; border: 2px solid #6c4328; border-bottom: 0;
+}
+.gmrt-keeper-light-marker.is-brazier::before {
+    left: 2px; top: 8px; width: 12px; height: 6px; background: #8c4b2c;
+    box-shadow: 2px 6px 0 #513021, 8px 6px 0 #513021, inset 0 2px 0 #c47336;
+}
+.gmrt-keeper-light-marker.is-brazier::after {
+    left: 4px; top: 1px; width: 8px; height: 8px; background: #f68a2d;
+    box-shadow: 2px -2px 0 #ffd359, -2px 3px 0 #cf4e23, 4px 3px 0 #ffad32;
+}
+.gmrt-keeper-light-marker.is-magical::before {
+    left: 7px; top: 1px; width: 2px; height: 16px; background: #dff8ff;
+    box-shadow: -6px 7px 0 #9cdcff, 6px 7px 0 #9cdcff, -3px 4px 0 #c5efff, 3px 4px 0 #c5efff;
+}
+.gmrt-keeper-light-marker.is-magical::after {
+    left: 0; top: 8px; width: 16px; height: 2px; background: #dff8ff;
+}
+
+@keyframes gmrt-keeper-torch-flicker {
+    0%, 100% { opacity: .38; filter: brightness(.92); }
+    33% { opacity: .62; filter: brightness(1.14); }
+    66% { opacity: .46; filter: brightness(1.02); }
+}
+@keyframes gmrt-keeper-candle-flutter {
+    0%, 100% { opacity: .30; filter: brightness(.92); }
+    50% { opacity: .55; filter: brightness(1.12); }
+}
+@keyframes gmrt-keeper-lantern-breathe {
+    0%, 100% { opacity: .42; }
+    50% { opacity: .52; }
+}
+@keyframes gmrt-keeper-brazier-pulse {
+    0%, 100% { opacity: .38; filter: brightness(.94); }
+    50% { opacity: .65; filter: brightness(1.13); }
+}
+@keyframes gmrt-keeper-magic-shimmer {
+    0%, 100% { opacity: .38; filter: brightness(.95); }
+    25% { opacity: .60; filter: brightness(1.16); }
+    50% { opacity: .44; filter: brightness(1.04); }
+    75% { opacity: .68; filter: brightness(1.20); }
+}
+
+.gmrt-carried-light.is-environmental.is-doused {
+    background: none;
+    opacity: .62;
+}
+.gmrt-carried-light.is-environmental.is-doused::after { display: none; }
+.gmrt-carried-light.is-environmental.is-doused .gmrt-keeper-light-marker {
+    filter: grayscale(1) brightness(.65) drop-shadow(2px 2px 0 rgba(16, 10, 7, .82));
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gmrt-carried-light.is-environmental::after { animation: none !important; opacity: .48; filter: none; }
+}
+
+/* ==========================================================================
+   IV.32.4D — The Battlefield's Final Inspection
+   Final presentation-only composition contract for the 16-bit battlefield.
+   This establishes an explicit visual stack so trails, light, Veil, Keeper
+   markers, miniatures and targeting feedback remain legible together without
+   changing any battlefield geometry, visibility, LOS or combat authority.
+   ========================================================================== */
+.gmrt-board__viewport {
+    --gmrt-battlefield-z-map: 1;
+    --gmrt-battlefield-z-grid: 2;
+    --gmrt-battlefield-z-footsteps: 6;
+    --gmrt-battlefield-z-vision: 7;
+    --gmrt-battlefield-z-light: 7;
+    --gmrt-battlefield-z-veil: 8;
+    --gmrt-battlefield-z-thresholds: 9;
+    --gmrt-battlefield-z-tokens: 10;
+    --gmrt-battlefield-z-targeting: 11;
+}
+
+.gmrt-board__map { z-index: var(--gmrt-battlefield-z-map); }
+.gmrt-board__grid { z-index: var(--gmrt-battlefield-z-grid); }
+.gmrt-footstep-layer { z-index: var(--gmrt-battlefield-z-footsteps); }
+.gmrt-vision-layer { z-index: var(--gmrt-battlefield-z-vision); }
+.gmrt-light-layer { z-index: var(--gmrt-battlefield-z-light); }
+.gmrt-fog-layer { z-index: var(--gmrt-battlefield-z-veil); }
+.gmrt-threshold-layer { z-index: var(--gmrt-battlefield-z-thresholds); }
+.gmrt-board__tokens { z-index: var(--gmrt-battlefield-z-tokens); }
+.gmrt-targeting-layer { z-index: var(--gmrt-battlefield-z-targeting); }
+
+/* The final interactive read must remain crisp above the Veil: targeting is
+   information about the Keeper/Player's current action, not map decoration. */
+.gmrt-targeting-layer {
+    mix-blend-mode: normal;
+    isolation: isolate;
+}
+
+/* Keeper threshold markers remain above the Veil but below miniatures so they
+   can be inspected without ever covering a creature at the same coordinate. */
+.gmrt-threshold-marker {
+    filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, .72));
+}
+
+/* Prevent decorative battlefield layers from ever stealing pointer input as
+   the visual stack becomes richer. Tokens/DM markers retain their established
+   interaction rules on their own elements. */
+.gmrt-footstep-layer,
+.gmrt-light-layer,
+.gmrt-fog-layer,
+.gmrt-targeting-layer,
+.gmrt-vision-layer {
+    pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gmrt-targeting-layer,
+    .gmrt-threshold-marker {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+/* Phase IV.32.5 — Pippin Discovers Pixel Art.
+ * Scene Forge presentation only: topology, barriers, doors, lights, grid and Fog
+ * continue to consume the same deterministic plan. */
+.gmrt-dungeon-forge-layer.is-pixel-art,
+.gmrt-dungeon-forge-layer.is-pixel-art * {
+    shape-rendering: crispEdges;
+}
+.gmrt-dungeon-forge-layer.is-pixel-art .gmrt-forge-decoration *,
+.gmrt-dungeon-forge-layer.is-pixel-art .gmrt-forge-features * {
+    stroke-linecap: square;
+    stroke-linejoin: miter;
+}
+.gmrt-dungeon-forge-layer.is-pixel-art .is-dungeon-tile-highlight {
+    fill: rgba(239, 222, 174, .13);
+    stroke: none;
+}
+.gmrt-dungeon-forge-layer.is-pixel-art .is-dungeon-tile-shadow {
+    fill: rgba(20, 15, 11, .18);
+    stroke: none;
+}
+.gmrt-dungeon-forge-layer.is-pixel-art .is-outdoor-speck {
+    fill: rgba(224, 211, 151, .17);
+}
+.gmrt-dungeon-forge-layer.is-pixel-art .is-pixel-canopy .is-canopy-pixel {
+    fill: #31512d;
+    stroke: #617941;
+    stroke-width: .04;
+}
+.gmrt-dungeon-forge-layer.is-pixel-art .is-pixel-canopy .is-canopy-pixel:nth-child(3n) {
+    fill: #3d6135;
+}
+.gmrt-dungeon-forge-layer.is-pixel-art .is-pixel-canopy .is-canopy-highlight {
+    fill: #718850;
+    opacity: .62;
+}
+.gmrt-dungeon-forge-layer.is-pixel-art .is-pixel-canopy .is-tree-trunk {
+    fill: #67482d;
+    stroke: #342317;
+    stroke-width: .04;
+}
+.gmrt-dungeon-forge-layer.is-pixel-art .is-pixel-canopy .is-tree-root {
+    fill: #4f3724;
+    stroke: none;
+}
+.gmrt-dungeon-forge-layer.is-pixel-art .is-pixel-rocks .is-rock {
+    fill: #66675d;
+    stroke: #a89f81;
+    stroke-width: .055;
+}
+.gmrt-dungeon-forge-layer.is-pixel-art .is-pixel-rocks .is-rock-highlight {
+    fill: #8b8978;
+    stroke: none;
+}
+.gmrt-dungeon-forge-layer.is-pixel-art .is-village-building .is-building-shadow {
+    transform: translate(.12px, .12px);
+}
+.gmrt-dungeon-forge-layer.is-pixel-art .is-village-building .is-building-body,
+.gmrt-dungeon-forge-layer.is-pixel-art .is-village-building .is-building-roof,
+.gmrt-dungeon-forge-layer.is-pixel-art .is-village-building .is-building-door,
+.gmrt-dungeon-forge-layer.is-pixel-art .is-village-building .is-building-window,
+.gmrt-dungeon-forge-layer.is-pixel-art .is-village-building .is-building-chimney {
+    shape-rendering: crispEdges;
+}
+.gmrt-dungeon-forge-layer.is-pixel-art .is-village-building .is-roof-pixel-line {
+    stroke: rgba(43, 24, 17, .34);
+    stroke-width: .045;
+    stroke-dasharray: .28 .12;
+}
+.gmrt-dungeon-forge-layer.is-pixel-art .is-detailed-log .is-log-body,
+.gmrt-dungeon-forge-layer.is-pixel-art .is-detailed-log .is-log-end {
+    shape-rendering: crispEdges;
+}
+.gmrt-dungeon-forge-layer.is-pixel-art .is-detailed-log .is-log-end {
+    fill: #a77b4d;
+    stroke: #563820;
+    stroke-width: .055;
+}
+.gmrt-dungeon-forge-layer.is-pixel-art .is-pixel-well .is-well-rim,
+.gmrt-dungeon-forge-layer.is-pixel-art .is-pixel-well .is-well-water {
+    shape-rendering: crispEdges;
+}
+.gmrt-dungeon-forge-layer.is-pixel-art .is-detailed-garden .is-garden-fence {
+    stroke-dasharray: .24 .12;
+    stroke-linecap: square;
+}
+.gmrt-dungeon-forge-layer.is-pixel-art .is-detailed-garden .is-garden-post {
+    fill: #c09655;
+    stroke: #654427;
+    stroke-width: .035;
+}
+.gmrt-dungeon-forge-layer.is-pixel-art .gmrt-forge-features .is-trail-underlay,
+.gmrt-dungeon-forge-layer.is-pixel-art .gmrt-forge-features .is-trail-track {
+    stroke-linecap: square;
+    stroke-linejoin: miter;
+    stroke-dasharray: .75 .16;
+}
+
+/* Phase IV.32.6 — The Door to the Table.
+ * Authentication presentation only. Table authority and login mechanics remain WordPress-owned.
+ */
+.gmrt-chamber:has(.gmrt-table-door) {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: clamp(.75rem, 2vw, 1.5rem);
+    overflow: hidden;
+    background:
+        linear-gradient(rgba(255,255,255,.012) 50%, transparent 50%) 0 0 / 100% 4px,
+        radial-gradient(circle at 50% 30%, rgba(118, 91, 48, .12), transparent 44%),
+        #100d0a;
+}
+
+.gmrt-table-door {
+    position: relative;
+    isolation: isolate;
+    width: min(1180px, 100%);
+    min-height: min(760px, calc(100vh - 3rem));
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(320px, .8fr);
+    align-items: stretch;
+    border: 2px solid var(--gmrt-pixel-gold-low);
+    border-top-color: var(--gmrt-pixel-gold-hi);
+    border-left-color: var(--gmrt-pixel-gold-hi);
+    background: #15110d;
+    box-shadow:
+        inset 2px 2px 0 rgba(255,255,255,.045),
+        inset -2px -2px 0 rgba(0,0,0,.62),
+        8px 8px 0 rgba(0,0,0,.52);
+}
+
+.gmrt-table-door::before,
+.gmrt-table-door::after {
+    content: "";
+    position: absolute;
+    z-index: 4;
+    pointer-events: none;
+}
+
+.gmrt-table-door::before {
+    inset: 8px;
+    border: 1px solid rgba(215, 184, 110, .22);
+}
+
+.gmrt-table-door::after {
+    inset: 0;
+    background:
+        linear-gradient(90deg, rgba(0,0,0,.45), transparent 18%, transparent 78%, rgba(0,0,0,.62)),
+        linear-gradient(0deg, rgba(0,0,0,.55), transparent 28%);
+    mix-blend-mode: multiply;
+}
+
+.gmrt-table-door__scene {
+    position: relative;
+    z-index: 1;
+    min-height: 560px;
+    overflow: hidden;
+    background:
+        linear-gradient(180deg, rgba(14, 11, 8, .12), rgba(14, 11, 8, .72)),
+        #272017;
+}
+
+.gmrt-table-door__art {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    object-position: center;
+    image-rendering: auto;
+    filter: saturate(.82) contrast(1.04) brightness(.72) sepia(.08);
+    transform: scale(1.025);
+}
+
+.gmrt-table-door__scene::before {
+    content: "";
+    position: absolute;
+    z-index: 2;
+    inset: 0;
+    pointer-events: none;
+    background:
+        linear-gradient(90deg, rgba(16,12,9,.15), transparent 44%, rgba(16,12,9,.58)),
+        repeating-linear-gradient(0deg, rgba(245,223,172,.025) 0 2px, transparent 2px 4px);
+}
+
+.gmrt-table-door__threshold {
+    position: absolute;
+    z-index: 3;
+    left: 50%;
+    bottom: 5%;
+    width: 44%;
+    height: 7px;
+    transform: translateX(-50%);
+    background: #b59655;
+    box-shadow:
+        -6px 0 0 #6e5530,
+        6px 0 0 #6e5530,
+        0 -3px 0 rgba(240,211,136,.42),
+        0 5px 0 rgba(0,0,0,.55);
+    opacity: .66;
+}
+
+.gmrt-table-door__panel {
+    position: relative;
+    z-index: 5;
+    align-self: center;
+    margin: clamp(1rem, 3vw, 2.5rem);
+    padding: clamp(1.25rem, 3vw, 2.2rem);
+    border: 2px solid var(--gmrt-pixel-gold-low);
+    border-top-color: var(--gmrt-pixel-gold-hi);
+    border-left-color: var(--gmrt-pixel-gold-hi);
+    background:
+        linear-gradient(135deg, rgba(255,255,255,.045), transparent 34%),
+        rgba(31, 25, 19, .96);
+    box-shadow: var(--gmrt-pixel-inset), 6px 6px 0 rgba(0,0,0,.48);
+}
+
+.gmrt-table-door__panel::before {
+    content: "THE DOOR TO THE TABLE";
+    display: inline-block;
+    margin-bottom: .85rem;
+    padding: .25rem .45rem;
+    border: 1px solid rgba(215,184,110,.46);
+    background: #17120e;
+    color: var(--gmrt-pixel-gold-hi);
+    font: 800 .62rem/1 ui-monospace, "Courier New", monospace;
+    letter-spacing: .12em;
+}
+
+.gmrt-table-door h1 {
+    margin: .35rem 0 1rem;
+    max-width: 15ch;
+    color: #f1e2c1;
+    font: 900 clamp(1.65rem, 4vw, 2.65rem)/1.05 ui-monospace, "Courier New", monospace;
+    letter-spacing: -.035em;
+    text-shadow: 3px 3px 0 rgba(0,0,0,.72);
+}
+
+.gmrt-table-door__lede {
+    margin: 0 0 1.35rem;
+    color: rgba(239, 226, 196, .84);
+    line-height: 1.65;
+}
+
+.gmrt-table-door__enter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+    padding: .9rem 1rem;
+    border: 2px solid #806438;
+    border-top-color: #f1d58b;
+    border-left-color: #f1d58b;
+    background: #2a2118;
+    color: #fff0c9;
+    text-decoration: none;
+    box-shadow:
+        inset 2px 2px 0 rgba(255,255,255,.055),
+        inset -2px -2px 0 rgba(0,0,0,.45),
+        3px 3px 0 rgba(0,0,0,.46);
+    font: 900 .82rem/1.2 ui-monospace, "Courier New", monospace;
+    letter-spacing: .045em;
+    text-transform: uppercase;
+}
+
+.gmrt-table-door__enter:hover {
+    background: #3b2d20;
+    border-top-color: #ffe7a5;
+    border-left-color: #ffe7a5;
+}
+
+.gmrt-table-door__enter:active {
+    transform: translate(2px, 2px);
+    box-shadow: inset 2px 2px 0 rgba(0,0,0,.38);
+}
+
+.gmrt-table-door__enter:focus-visible {
+    outline: 2px solid var(--gmrt-pixel-focus);
+    outline-offset: 4px;
+}
+
+.gmrt-table-door__enter i {
+    color: var(--gmrt-pixel-gold-hi);
+    font-style: normal;
+}
+
+.gmrt-table-door__promise {
+    display: block;
+    margin-top: .8rem;
+    color: rgba(234,217,181,.58);
+    font: 700 .67rem/1.45 ui-monospace, "Courier New", monospace;
+}
+
+.gmrt-table-door__pippin {
+    display: grid;
+    grid-template-columns: 48px 1fr;
+    gap: .75rem;
+    align-items: center;
+    margin-top: 1.4rem;
+    padding-top: 1rem;
+    border-top: 2px solid rgba(128,100,56,.42);
+}
+
+.gmrt-table-door__pippin img {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+.gmrt-table-door__pippin p {
+    margin: 0;
+    color: rgba(239,226,196,.72);
+    font-size: .78rem;
+    line-height: 1.45;
+}
+
+.gmrt-table-door__pippin strong {
+    color: var(--gmrt-pixel-gold-hi);
+    font-family: ui-monospace, "Courier New", monospace;
+}
+
+@media (max-width: 820px) {
+    .gmrt-chamber:has(.gmrt-table-door) {
+        overflow: auto;
+    }
+    .gmrt-table-door {
+        grid-template-columns: 1fr;
+        min-height: 0;
+    }
+    .gmrt-table-door__scene {
+        min-height: 38vh;
+        max-height: 420px;
+    }
+    .gmrt-table-door__panel {
+        margin: 0;
+        border-right: 0;
+        border-bottom: 0;
+        border-left: 0;
+        box-shadow: none;
+    }
+    .gmrt-table-door h1 {
+        max-width: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gmrt-table-door__enter {
+        transition: none;
+    }
+}
+
+/* Phase IV.32.6A — The Door Has a Lock.
+ * Front-end authentication presentation backed by WordPress auth authority.
+ */
+.gmrt-chamber:has(.gmrt-table-door),
+.gmrt-chamber:has(.gmrt-invitation-threshold) {
+    min-height: calc(100vh - 96px);
+    padding: 0;
+    overflow: hidden;
+    background: #100d0a;
+}
+
+.gmrt-table-door,
+.gmrt-invitation-threshold {
+    position: relative;
+    isolation: isolate;
+    width: 100vw;
+    min-height: calc(100vh - 96px);
+    margin-inline: calc(50% - 50vw);
+    overflow: hidden;
+    border: 0;
+    background: #100d0a;
+    box-shadow: none;
+}
+
+.gmrt-table-door__scene,
+.gmrt-invitation-threshold__scene {
+    position: absolute;
+    inset: 0;
+    min-height: 0;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.gmrt-table-door__art,
+.gmrt-invitation-threshold__scene img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    object-position: center;
+    transform: none;
+    filter: saturate(.88) contrast(1.06) brightness(.62);
+}
+
+.gmrt-table-door::after,
+.gmrt-invitation-threshold::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background:
+        linear-gradient(90deg, rgba(8,6,5,.18) 0%, rgba(8,6,5,.24) 42%, rgba(8,6,5,.82) 72%, rgba(8,6,5,.94) 100%),
+        linear-gradient(0deg, rgba(8,6,5,.7), transparent 42%),
+        repeating-linear-gradient(0deg, rgba(245,223,172,.022) 0 2px, transparent 2px 4px);
+}
+
+.gmrt-table-door__panel,
+.gmrt-gathering-invitation {
+    position: relative;
+    z-index: 2;
+    width: min(430px, calc(100% - 2rem));
+    box-sizing: border-box;
+    margin: clamp(1rem, 4vw, 3rem) clamp(1rem, 5vw, 5rem) clamp(1rem, 4vw, 3rem) auto;
+    padding: clamp(1.25rem, 3vw, 2rem);
+    border: 2px solid var(--gmrt-pixel-gold-low);
+    border-top-color: var(--gmrt-pixel-gold-hi);
+    border-left-color: var(--gmrt-pixel-gold-hi);
+    background:
+        linear-gradient(135deg, rgba(255,255,255,.045), transparent 34%),
+        rgba(24, 19, 15, .95);
+    box-shadow: var(--gmrt-pixel-inset), 8px 8px 0 rgba(0,0,0,.52);
+}
+
+.gmrt-table-door {
+    display: flex;
+    align-items: center;
+}
+
+.gmrt-table-door__panel {
+    align-self: center;
+}
+
+.gmrt-table-door__form {
+    display: grid;
+    gap: .85rem;
+    margin-top: 1.1rem;
+}
+
+.gmrt-table-door__form label:not(.gmrt-table-door__remember) {
+    display: grid;
+    gap: .35rem;
+    color: rgba(239,226,196,.86);
+    font: 800 .72rem/1.2 ui-monospace, "Courier New", monospace;
+    text-transform: uppercase;
+    letter-spacing: .055em;
+}
+
+.gmrt-table-door__form input[type="text"],
+.gmrt-table-door__form input[type="password"] {
+    width: 100%;
+    box-sizing: border-box;
+    padding: .8rem .85rem;
+    border: 2px solid #695233;
+    border-top-color: #ab8a50;
+    border-left-color: #ab8a50;
+    border-radius: 0;
+    background: #120f0c;
+    color: #fff0c9;
+    box-shadow: inset 2px 2px 0 rgba(255,255,255,.025), inset -2px -2px 0 rgba(0,0,0,.48);
+    font: 700 .88rem/1.2 ui-monospace, "Courier New", monospace;
+}
+
+.gmrt-table-door__form input[type="text"]:focus,
+.gmrt-table-door__form input[type="password"]:focus {
+    outline: 2px solid var(--gmrt-pixel-focus);
+    outline-offset: 2px;
+}
+
+.gmrt-table-door__remember {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    color: rgba(239,226,196,.68);
+    font: 700 .68rem/1.35 ui-monospace, "Courier New", monospace;
+}
+
+.gmrt-table-door__remember input {
+    accent-color: #b99653;
+}
+
+.gmrt-table-door__error {
+    margin-top: 1rem;
+    padding: .7rem .8rem;
+    border: 2px solid #8c4c42;
+    background: rgba(78, 30, 27, .82);
+    color: #ffd7cb;
+    font: 700 .72rem/1.45 ui-monospace, "Courier New", monospace;
+}
+
+.gmrt-table-door__enter {
+    border-radius: 0;
+    cursor: pointer;
+}
+
+.gmrt-invitation-threshold {
+    display: flex;
+    align-items: center;
+}
+
+.gmrt-gathering-invitation {
+    max-width: none;
+}
+
+.gmrt-gathering-invitation h2 {
+    margin: .35rem 0 .8rem;
+    color: #fff0c9;
+    font: 900 clamp(1.7rem, 3vw, 2.35rem)/1.05 ui-monospace, "Courier New", monospace;
+    text-shadow: 3px 3px 0 rgba(0,0,0,.65);
+}
+
+.gmrt-gathering-invitation p {
+    color: rgba(239,226,196,.82);
+    line-height: 1.6;
+}
+
+.gmrt-gathering-invitation button {
+    margin-top: .6rem;
+    padding: .8rem 1rem;
+    border: 2px solid #806438;
+    border-top-color: #f1d58b;
+    border-left-color: #f1d58b;
+    border-radius: 0;
+    background: #2a2118;
+    color: #fff0c9;
+    box-shadow: 3px 3px 0 rgba(0,0,0,.46);
+    font: 900 .78rem/1.2 ui-monospace, "Courier New", monospace;
+    text-transform: uppercase;
+}
+
+.gmrt-gathering-invitation button:focus-visible {
+    outline: 2px solid var(--gmrt-pixel-focus);
+    outline-offset: 4px;
+}
+
+@media (max-width: 820px) {
+    .gmrt-chamber:has(.gmrt-table-door),
+    .gmrt-chamber:has(.gmrt-invitation-threshold) {
+        overflow: auto;
+    }
+    .gmrt-table-door,
+    .gmrt-invitation-threshold {
+        min-height: calc(100vh - 72px);
+        align-items: flex-end;
+    }
+    .gmrt-table-door::after,
+    .gmrt-invitation-threshold::after {
+        background:
+            linear-gradient(0deg, rgba(8,6,5,.96) 0%, rgba(8,6,5,.78) 46%, rgba(8,6,5,.2) 78%),
+            repeating-linear-gradient(0deg, rgba(245,223,172,.022) 0 2px, transparent 2px 4px);
+    }
+    .gmrt-table-door__panel,
+    .gmrt-gathering-invitation {
+        width: calc(100% - 1.5rem);
+        margin: 35vh .75rem .75rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gmrt-table-door__enter,
+    .gmrt-gathering-invitation button {
+        transition: none;
+    }
+}
+
+
+/* Phase IV.32.6A polish — The threshold loses its second doorframe.
+ * Door and invitation states own the full viewport beneath the site header;
+ * the in-Chamber masthead remains reserved for seated Tabletop play.
+ */
+.gmrt-chamber:has(.gmrt-table-door),
+.gmrt-chamber:has(.gmrt-invitation-threshold) {
+    --gmrt-threshold-header-offset: 99px;
+    min-height: calc(100dvh - var(--gmrt-threshold-header-offset));
+    margin: 0;
+    padding: 0;
+}
+
+.gmrt-table-door,
+.gmrt-invitation-threshold {
+    min-height: calc(100dvh - var(--gmrt-threshold-header-offset, 99px));
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+@media (max-width: 820px) {
+    .gmrt-chamber:has(.gmrt-table-door),
+    .gmrt-chamber:has(.gmrt-invitation-threshold) {
+        --gmrt-threshold-header-offset: 72px;
+    }
+
+    .gmrt-table-door,
+    .gmrt-invitation-threshold {
+        min-height: calc(100dvh - var(--gmrt-threshold-header-offset, 72px));
+    }
+}
+
+/* IV.33.1 — The Keeper Names the Campaign */
+.gmrt-campaign-lobby {
+    max-width: 1180px;
+    margin: 0 auto;
+    display: grid;
+    gap: 1.25rem;
+}
+.gmrt-campaign-lobby__header,
+.gmrt-create-tabletop,
+.gmrt-campaign-card,
+.gmrt-testing-grounds {
+    border: 3px solid rgba(244, 234, 214, .22);
+    background: #211b14;
+    box-shadow: 6px 6px 0 #090806;
+}
+.gmrt-campaign-lobby__header,
+.gmrt-create-tabletop { padding: clamp(1rem, 3vw, 1.75rem); }
+.gmrt-campaign-lobby__header h2,
+.gmrt-create-tabletop h3,
+.gmrt-campaign-card h3 { margin: .2rem 0 .5rem; }
+.gmrt-campaign-lobby__shelf {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+}
+.gmrt-campaign-card { padding: 1rem; }
+.gmrt-campaign-card__open,
+.gmrt-create-tabletop button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    margin-top: .5rem;
+    padding: .65rem 1rem;
+    border: 2px solid #f4ead6;
+    background: #34291c;
+    color: #fff4dc;
+    font: inherit;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow: 3px 3px 0 #090806;
+}
+.gmrt-create-tabletop { display: grid; gap: .85rem; }
+.gmrt-create-tabletop label { display: grid; gap: .35rem; font-weight: 700; }
+.gmrt-create-tabletop input,
+.gmrt-create-tabletop textarea {
+    width: 100%;
+    box-sizing: border-box;
+    border: 2px solid rgba(244,234,214,.45);
+    border-radius: 0;
+    padding: .7rem;
+    background: #100d0a;
+    color: #f4ead6;
+    font: inherit;
+}
+.gmrt-create-tabletop textarea { resize: vertical; }
+.gmrt-create-tabletop button { justify-self: start; }
+.gmrt-create-tabletop button:disabled { opacity: .6; cursor: wait; }
+.gmrt-campaign-lobby__empty { padding: 1rem; border: 2px dashed rgba(244,234,214,.25); }
+.gmrt-testing-grounds { padding: .75rem 1rem; opacity: .8; }
+.gmrt-testing-grounds summary { cursor: pointer; font-weight: 700; }
+
+/* Phase IV.33.2 — The Keeper Opens the Doors */
+.gmrt-campaign-card__doors { margin-top: .85rem; border-top: 2px solid rgba(244,234,214,.18); padding-top: .7rem; }
+.gmrt-campaign-card__doors summary { cursor: pointer; font-weight: 800; }
+.gmrt-campaign-card__doors summary span { opacity: .72; font-size: .82em; margin-left: .35rem; }
+.gmrt-campaign-card__roster { display: grid; gap: .7rem; margin-top: .75rem; }
+.gmrt-campaign-card__roster ul { display: grid; gap: .45rem; margin: 0; padding: 0; list-style: none; }
+.gmrt-campaign-card__roster li { display: flex; align-items: center; justify-content: space-between; gap: .75rem; padding: .55rem .65rem; border: 2px solid rgba(244,234,214,.16); background: rgba(16,13,10,.28); }
+.gmrt-campaign-card__roster li span { display: grid; gap: .12rem; }
+.gmrt-campaign-card__roster li small { opacity: .72; }
+.gmrt-campaign-card__roster form { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: .55rem; align-items: end; }
+.gmrt-campaign-card__roster label { display: grid; gap: .3rem; }
+.gmrt-campaign-card__roster input { width: 100%; }
+[data-campaign-gathering-status]:not(:empty) { display: block; padding: .45rem .55rem; border-left: 3px solid currentColor; }
+@media (max-width: 680px) { .gmrt-campaign-card__roster form { grid-template-columns: 1fr; } }
+
+
+/* Phase IV.33.3 — Pippin Remembers the Way */
+.gmrt-chamber:has(.gmrt-wayfinder) { padding: 0; overflow: hidden; background: #100d0a; }
+.gmrt-wayfinder { position: relative; max-width: none; width: 100vw; min-height: calc(100dvh - 96px); margin-inline: calc(50% - 50vw); isolation: isolate; }
+.gmrt-wayfinder__scene { position: absolute; inset: 0; z-index: -2; overflow: hidden; background: #100d0a; }
+.gmrt-wayfinder__scene::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(12,9,6,.18), rgba(12,9,6,.55) 45%, rgba(12,9,6,.88)); }
+.gmrt-wayfinder__scene img { width: 100%; height: 100%; object-fit: cover; image-rendering: auto; }
+.gmrt-wayfinder__content { width: min(1180px, calc(100% - 2rem)); margin: 0 auto; padding: clamp(1rem,3vw,2.5rem) 0 2.5rem; display: grid; gap: 1.25rem; }
+.gmrt-wayfinder .gmrt-campaign-lobby__header { background: rgba(33,27,20,.92); backdrop-filter: blur(2px); }
+.gmrt-wayfinder .gmrt-campaign-card,
+.gmrt-wayfinder .gmrt-create-tabletop,
+.gmrt-wayfinder .gmrt-testing-grounds { background: rgba(33,27,20,.94); }
+.gmrt-campaign-card.is-adventurer { border-color: rgba(244,234,214,.42); }
+.gmrt-campaign-card__remove { margin-top: .8rem; padding-top: .65rem; border-top: 2px dashed rgba(244,234,214,.16); }
+.gmrt-campaign-card__remove summary { cursor: pointer; font-weight: 700; opacity: .78; }
+.gmrt-campaign-card__remove p { font-size: .88rem; opacity: .76; }
+.gmrt-campaign-card__remove button { border: 2px solid rgba(244,234,214,.5); background: #24130f; color: #fff4dc; padding: .55rem .75rem; font: inherit; font-weight: 700; cursor: pointer; }
+.gmrt-campaign-card__remove button:disabled { opacity: .55; cursor: wait; }
+[data-remove-tabletop-status]:not(:empty) { display: block; margin-top: .5rem; font-size: .86rem; }
+@media (max-width: 720px) {
+    .gmrt-wayfinder { min-height: calc(100dvh - 72px); }
+    .gmrt-wayfinder__scene::after { background: rgba(12,9,6,.68); }
+}
+
+/* Phase IV.33.4 — The First Map on the Table */
+.gmrt-first-map {
+    display: grid;
+    gap: .65rem;
+    margin: .2rem 0;
+    padding: .8rem;
+    border: 2px solid rgba(244,234,214,.22);
+}
+.gmrt-first-map legend {
+    padding: 0 .35rem;
+    font-weight: 800;
+}
+.gmrt-create-tabletop .gmrt-first-map__choice {
+    grid-template-columns: auto minmax(0,1fr);
+    align-items: start;
+    gap: .65rem;
+    padding: .7rem;
+    border: 2px solid rgba(244,234,214,.14);
+    background: rgba(16,13,10,.28);
+    cursor: pointer;
+}
+.gmrt-create-tabletop .gmrt-first-map__choice:has(input:checked) {
+    border-color: rgba(244,234,214,.72);
+    background: rgba(52,41,28,.8);
+    box-shadow: 3px 3px 0 #090806;
+}
+.gmrt-create-tabletop .gmrt-first-map__choice.is-unavailable {
+    opacity: .52;
+    cursor: not-allowed;
+}
+.gmrt-create-tabletop .gmrt-first-map__choice input {
+    width: auto;
+    margin-top: .2rem;
+    accent-color: currentColor;
+}
+.gmrt-first-map__choice span {
+    display: grid;
+    gap: .2rem;
+}
+.gmrt-first-map__choice small,
+.gmrt-first-map__atlas small {
+    font-weight: 400;
+    opacity: .78;
+}
+.gmrt-create-tabletop .gmrt-first-map__atlas select {
+    width: 100%;
+    box-sizing: border-box;
+    border: 2px solid rgba(244,234,214,.45);
+    border-radius: 0;
+    padding: .7rem;
+    background: #100d0a;
+    color: #f4ead6;
+    font: inherit;
+}
+.gmrt-first-map__atlas[hidden] { display: none !important; }
