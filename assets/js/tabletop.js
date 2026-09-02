@@ -862,11 +862,13 @@
             const sourceKind = String(source.source_kind || 'carried');
             glow.className = 'gmrt-carried-light' + (sourceKind === 'dropped' ? ' is-dropped' : '') + (sourceKind === 'magical' ? ' is-magical' : '') + (sourceKind === 'environmental' ? ' is-environmental is-' + String(source.environmental_kind || 'torch') + (source.lit === false ? ' is-doused' : '') : '');
             if (sourceKind === 'environmental') {
+                const lightKind = String(source.environmental_kind || 'torch');
                 const marker = document.createElement('i');
-                marker.className = 'gmrt-keeper-light-marker';
-                marker.textContent = ({torch:'🔥',lantern:'🏮',brazier:'♨',candle:'🕯',magical:'✦'})[String(source.environmental_kind || 'torch')] || '✦';
+                marker.className = 'gmrt-keeper-light-marker is-' + lightKind;
+                marker.setAttribute('aria-hidden', 'true');
+                glow.dataset.lightKind = lightKind;
                 glow.appendChild(marker);
-                glow.setAttribute('aria-label', String(source.label || 'Keeper light source'));
+                glow.setAttribute('aria-label', String(source.label || 'Keeper light source') + (source.lit === false ? ', doused' : ', lit'));
             } else if (sourceKind === 'dropped') {
                 const flame = document.createElement('i');
                 flame.className = 'gmrt-pixel-flame';

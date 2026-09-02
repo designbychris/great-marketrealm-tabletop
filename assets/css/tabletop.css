@@ -4394,3 +4394,153 @@
     opacity: .82;
     mix-blend-mode: screen;
 }
+
+/* Phase IV.32.4C — The Keeper Lights the Pixels
+ * Presentation-only animation over the existing server-projected light sources.
+ * Radii, Fog illumination and LOS authority remain untouched. */
+.gmrt-carried-light.is-environmental {
+    --gmrt-light-core: rgba(255, 205, 92, .28);
+    --gmrt-light-mid: rgba(255, 150, 52, .12);
+    isolation: isolate;
+    background:
+        radial-gradient(circle, var(--gmrt-light-core) 0 17%, var(--gmrt-light-mid) 18% 49%, transparent 70%),
+        repeating-conic-gradient(from 45deg, rgba(255,255,255,.022) 0 25%, transparent 0 50%) 50% / 8px 8px;
+}
+.gmrt-carried-light.is-environmental::after {
+    content: "";
+    position: absolute;
+    inset: 4%;
+    z-index: -1;
+    border: 2px solid rgba(255, 199, 72, .11);
+    box-shadow: inset 0 0 0 2px rgba(255, 239, 178, .035);
+    opacity: .48;
+    pointer-events: none;
+}
+.gmrt-carried-light.is-environmental.is-torch::after {
+    animation: gmrt-keeper-torch-flicker .72s steps(3, end) infinite;
+}
+.gmrt-carried-light.is-environmental.is-candle {
+    --gmrt-light-core: rgba(255, 225, 132, .28);
+    --gmrt-light-mid: rgba(255, 174, 70, .10);
+}
+.gmrt-carried-light.is-environmental.is-candle::after {
+    animation: gmrt-keeper-candle-flutter .46s steps(2, end) infinite;
+}
+.gmrt-carried-light.is-environmental.is-lantern {
+    --gmrt-light-core: rgba(255, 221, 126, .26);
+    --gmrt-light-mid: rgba(224, 154, 55, .105);
+}
+.gmrt-carried-light.is-environmental.is-lantern::after {
+    animation: gmrt-keeper-lantern-breathe 2.4s steps(4, end) infinite;
+}
+.gmrt-carried-light.is-environmental.is-brazier {
+    --gmrt-light-core: rgba(255, 164, 56, .30);
+    --gmrt-light-mid: rgba(192, 68, 27, .13);
+}
+.gmrt-carried-light.is-environmental.is-brazier::after {
+    border-color: rgba(255, 139, 47, .12);
+    animation: gmrt-keeper-brazier-pulse 1.7s steps(4, end) infinite;
+}
+.gmrt-carried-light.is-environmental.is-magical {
+    --gmrt-light-core: rgba(197, 238, 255, .30);
+    --gmrt-light-mid: rgba(107, 180, 255, .14);
+    background:
+        radial-gradient(circle, var(--gmrt-light-core) 0 17%, var(--gmrt-light-mid) 18% 49%, transparent 70%),
+        repeating-conic-gradient(from 0deg, rgba(196,239,255,.05) 0 12.5%, transparent 0 25%) 50% / 8px 8px;
+}
+.gmrt-carried-light.is-environmental.is-magical::after {
+    border-color: rgba(170, 227, 255, .18);
+    box-shadow: inset 0 0 0 2px rgba(225, 248, 255, .07);
+    animation: gmrt-keeper-magic-shimmer 1.35s steps(4, end) infinite;
+}
+
+/* Battlefield markers are CSS-drawn pixel objects rather than platform emoji. */
+.gmrt-keeper-light-marker {
+    position: relative;
+    display: block;
+    width: 16px;
+    height: 18px;
+    z-index: 2;
+    image-rendering: pixelated;
+    filter: drop-shadow(2px 2px 0 rgba(16, 10, 7, .82));
+}
+.gmrt-keeper-light-marker::before,
+.gmrt-keeper-light-marker::after {
+    content: "";
+    position: absolute;
+}
+.gmrt-keeper-light-marker.is-torch::before {
+    left: 6px; top: 1px; width: 4px; height: 9px; background: #ffd95a;
+    box-shadow: -2px 2px 0 #f18a2a, 2px 2px 0 #ffad32, -2px 6px 0 #d65a25, 2px 6px 0 #f18a2a;
+}
+.gmrt-keeper-light-marker.is-torch::after {
+    left: 7px; top: 9px; width: 3px; height: 9px; background: #6c4328;
+    box-shadow: -2px 2px 0 #93603a;
+}
+.gmrt-keeper-light-marker.is-candle::before {
+    left: 6px; top: 0; width: 4px; height: 6px; background: #ffe477;
+    box-shadow: -2px 2px 0 #ef8c2f, 2px 2px 0 #ffba3d;
+}
+.gmrt-keeper-light-marker.is-candle::after {
+    left: 5px; top: 7px; width: 6px; height: 10px; background: #f1dfbd;
+    box-shadow: 0 8px 0 #c9b48f, -2px 10px 0 #6e4930, 6px 10px 0 #6e4930;
+}
+.gmrt-keeper-light-marker.is-lantern::before {
+    left: 3px; top: 5px; width: 10px; height: 10px; background: #d9902d;
+    box-shadow: inset 2px 2px 0 #ffe178, inset -2px -2px 0 #8a5226, 0 -3px 0 #6c4328;
+}
+.gmrt-keeper-light-marker.is-lantern::after {
+    left: 5px; top: 1px; width: 6px; height: 4px; border: 2px solid #6c4328; border-bottom: 0;
+}
+.gmrt-keeper-light-marker.is-brazier::before {
+    left: 2px; top: 8px; width: 12px; height: 6px; background: #8c4b2c;
+    box-shadow: 2px 6px 0 #513021, 8px 6px 0 #513021, inset 0 2px 0 #c47336;
+}
+.gmrt-keeper-light-marker.is-brazier::after {
+    left: 4px; top: 1px; width: 8px; height: 8px; background: #f68a2d;
+    box-shadow: 2px -2px 0 #ffd359, -2px 3px 0 #cf4e23, 4px 3px 0 #ffad32;
+}
+.gmrt-keeper-light-marker.is-magical::before {
+    left: 7px; top: 1px; width: 2px; height: 16px; background: #dff8ff;
+    box-shadow: -6px 7px 0 #9cdcff, 6px 7px 0 #9cdcff, -3px 4px 0 #c5efff, 3px 4px 0 #c5efff;
+}
+.gmrt-keeper-light-marker.is-magical::after {
+    left: 0; top: 8px; width: 16px; height: 2px; background: #dff8ff;
+}
+
+@keyframes gmrt-keeper-torch-flicker {
+    0%, 100% { opacity: .38; filter: brightness(.92); }
+    33% { opacity: .62; filter: brightness(1.14); }
+    66% { opacity: .46; filter: brightness(1.02); }
+}
+@keyframes gmrt-keeper-candle-flutter {
+    0%, 100% { opacity: .30; filter: brightness(.92); }
+    50% { opacity: .55; filter: brightness(1.12); }
+}
+@keyframes gmrt-keeper-lantern-breathe {
+    0%, 100% { opacity: .42; }
+    50% { opacity: .52; }
+}
+@keyframes gmrt-keeper-brazier-pulse {
+    0%, 100% { opacity: .38; filter: brightness(.94); }
+    50% { opacity: .65; filter: brightness(1.13); }
+}
+@keyframes gmrt-keeper-magic-shimmer {
+    0%, 100% { opacity: .38; filter: brightness(.95); }
+    25% { opacity: .60; filter: brightness(1.16); }
+    50% { opacity: .44; filter: brightness(1.04); }
+    75% { opacity: .68; filter: brightness(1.20); }
+}
+
+.gmrt-carried-light.is-environmental.is-doused {
+    background: none;
+    opacity: .62;
+}
+.gmrt-carried-light.is-environmental.is-doused::after { display: none; }
+.gmrt-carried-light.is-environmental.is-doused .gmrt-keeper-light-marker {
+    filter: grayscale(1) brightness(.65) drop-shadow(2px 2px 0 rgba(16, 10, 7, .82));
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gmrt-carried-light.is-environmental::after { animation: none !important; opacity: .48; filter: none; }
+}

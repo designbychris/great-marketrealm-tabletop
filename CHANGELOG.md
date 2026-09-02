@@ -1,3 +1,10 @@
+## Phase IV.32.4C — The Keeper Lights the Pixels
+
+- Replaces platform emoji on Keeper environmental battlefield lights with CSS-drawn 16-bit Torch, Candle, Lantern, Brazier and Magical Light markers.
+- Gives each lit environmental source a restrained stepped animation personality while leaving its server-projected radius and Fog/LOS contribution unchanged.
+- Doused lights remain Keeper-visible but dormant, and `prefers-reduced-motion` disables the new motion without removing the static light presentation.
+- Adds regression protection for pixel markers, per-light motion vocabulary, dormant doused state, reduced motion and the certified Lantern Rack radii.
+
 ## Phase IV.32.4B — The Veil Goes 16-Bit
 
 - Gives unexplored Fog a restrained near-black 16-bit dither while preserving complete concealment.
