@@ -102,7 +102,7 @@ final class DoorToTheTableRegressionTest extends TestCase
         $view = (string) file_get_contents($this->root . '/app/Tabletop/Views/chamber.php');
 
         self::assertStringContainsString(
-            '<?php if (! is_array($entryDoor) && ! is_array($invitation)) : ?>',
+            '<?php if (! is_array($entryDoor) && ! is_array($invitation) && ! is_array($campaignLobby)) : ?>',
             $view
         );
         self::assertStringContainsString('class="gmrt-chamber__masthead"', $view);
