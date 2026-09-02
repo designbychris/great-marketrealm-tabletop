@@ -230,6 +230,19 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
             </h1>
         </div>
 
+        <?php if ($state !== null && $scene !== null) : ?>
+            <div class="gmrt-table-command__scene" aria-label="Current Tabletop Scene">
+                <span><?php echo $encounter !== null ? 'Battle' : 'Exploration Mode'; ?></span>
+                <strong><?php echo esc_html((string) ($scene['name'] ?? 'Active Scene')); ?></strong>
+                <small>
+                    <?php echo esc_html((string) ($scene['grid_type'] ?? 'square')); ?>
+                    <?php if (($scene['grid_type'] ?? '') === 'square') : ?>
+                        · <?php echo esc_html((string) ($scene['grid_size'] ?? '')); ?> px grid
+                    <?php endif; ?>
+                </small>
+            </div>
+        <?php endif; ?>
+
         <?php if ($state !== null) : ?>
             <div class="gmrt-chamber__viewer">
                 <span>
@@ -1510,14 +1523,6 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                     <?php echo esc_html(substr((string) ($member['display_name'] ?? '?'), 0, 1)); ?>
                                 <?php endif; ?>
                             </span>
-                            <span class="gmrt-party__role">
-                                <?php echo esc_html(
-                                    ($member['role'] ?? '')
-                                    === 'dungeon-master'
-                                        ? 'DM'
-                                        : 'Player'
-                                ); ?>
-                            </span>
                             <strong>
                                 <?php echo esc_html(
                                     (string) (
@@ -1547,6 +1552,11 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                             $memberCompanionHp = is_array($memberCompanionPlay['hit_points'] ?? null)
                                 ? $memberCompanionPlay['hit_points']
                                 : [];
+                            $memberCompanionToken = is_array($memberCompanionCharacter['token'] ?? null)
+                                ? $memberCompanionCharacter['token']
+                                : [];
+                            $memberCharacterImage = (string) ($memberCompanionToken['image_url'] ?? '');
+                            $memberCharacterName = (string) ($memberCompanionCharacter['name'] ?? 'Selected character');
 
                             foreach ($tokens as $partyToken) {
                                 if (
@@ -1585,6 +1595,25 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                 ];
                             }
                             ?>
+                            <span
+                                class="gmrt-party__role gmrt-party__seat<?php echo $memberCharacterImage !== '' ? ' has-character' : ''; ?>"
+                                title="<?php echo esc_attr(($member['role'] ?? '') === 'dungeon-master' ? 'Dungeon Master' : ($memberCharacterImage !== '' ? 'Playing: ' . $memberCharacterName : 'Player — no character selected')); ?>"
+                                aria-label="<?php echo esc_attr(($member['role'] ?? '') === 'dungeon-master' ? 'Dungeon Master' : ($memberCharacterImage !== '' ? 'Playing: ' . $memberCharacterName : 'Player — no character selected')); ?>"
+                            >
+                                <?php if (($member['role'] ?? '') === 'dungeon-master') : ?>
+                                    <span aria-hidden="true">DM</span>
+                                <?php elseif ($memberCharacterImage !== '') : ?>
+                                    <img
+                                        src="<?php echo CompanionTokenImageSource::escaped($memberCharacterImage); ?>"
+                                        alt=""
+                                        aria-hidden="true"
+                                        style="--gmrt-token-focus-x: <?php echo esc_attr((string) ($memberCompanionToken['focus_x'] ?? 50)); ?>%; --gmrt-token-focus-y: <?php echo esc_attr((string) ($memberCompanionToken['focus_y'] ?? 50)); ?>%; --gmrt-token-zoom: <?php echo esc_attr((string) ($memberCompanionToken['zoom'] ?? 100)); ?>%;"
+                                    >
+                                <?php else : ?>
+                                    <span aria-hidden="true">P</span>
+                                <?php endif; ?>
+                            </span>
+
                             <?php if (
                                 $state->isDungeonMaster()
                                 && ($member['role'] ?? '') === 'player'

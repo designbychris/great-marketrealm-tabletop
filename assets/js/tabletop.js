@@ -3441,6 +3441,7 @@
             if (atlasButton) atlasButton.setAttribute('aria-expanded', 'false');
         }
         bestiaryDrawer.dataset.open = open ? 'true' : 'false';
+        root.dataset.keeperDrawerOpen = open ? 'bestiary' : '';
         bestiaryToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
         if (open && bestiarySearch) {
             window.setTimeout(() => bestiarySearch.focus(), 210);
@@ -3633,6 +3634,7 @@
             if (bestiaryButton) bestiaryButton.setAttribute('aria-expanded', 'false');
         }
         atlasDrawer.dataset.open = open ? 'true' : 'false';
+        root.dataset.keeperDrawerOpen = open ? 'atlas' : '';
         atlasToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
     };
     atlasToggle?.addEventListener('click', () => setAtlasOpen(atlasDrawer?.dataset.open !== 'true'));
