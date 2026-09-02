@@ -1,4 +1,11 @@
 
+## Phase IV.32.3A — The Deeds Remember Every Adventurer
+
+- Corrects Player Satchel roll Chronicle routing during an active Encounter using a server-validated encounter hint from the live Chamber.
+- Preserves the authoritative Battle Chronicle / Chamber Chronicle split and DM roll behaviour.
+- Gives the Adventurer's Satchel the shared dark pixel scrollbar treatment used by Atlas/Bestiary.
+
+
 
 - IV.30.2A.1A Corner Tile Forensic Pass IV — The Wider Search: expands the generated-corner diagnostic beyond the battlefield subtree, inventorying whole-document overlapping elements, Range-based text/emoji glyphs, image/SVG-image sources, pseudo content, and accessible stylesheet background/content rules.
 ## 0.32.0-alpha.7 — IV.30.2A.1A Corner Tile Forensics III

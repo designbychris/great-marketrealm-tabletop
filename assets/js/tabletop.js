@@ -474,6 +474,9 @@
     });
 
     const quickHandsResult = document.querySelector('[data-quick-hands-result]');
+    const visibleEncounterId = () => String(
+        document.querySelector('[data-encounter-id]')?.dataset.encounterId || ''
+    );
     document.querySelectorAll('[data-quick-roll]').forEach((button) => {
         button.addEventListener('click', async () => {
             const original = button.innerHTML;
@@ -483,7 +486,8 @@
             try {
                 const data = await request('gmrt_quick_hands_roll', {
                     kind: button.dataset.rollKind || '',
-                    key: button.dataset.rollKey || ''
+                    key: button.dataset.rollKey || '',
+                    encounter_id: visibleEncounterId()
                 });
                 const roll = data.roll || {};
                 const flourish = roll.natural_twenty ? ' ✨ Natural 20!' : (roll.natural_one ? ' · Natural 1!' : '');
@@ -511,7 +515,8 @@
             try {
                 const data = await request('gmrt_weapon_hands_roll', {
                     weapon_action: button.dataset.weaponAction || '',
-                    attack_id: button.dataset.attackId || ''
+                    attack_id: button.dataset.attackId || '',
+                    encounter_id: visibleEncounterId()
                 });
                 const roll = data.roll || {};
                 const flourish = roll.action === 'attack' && roll.natural_twenty
@@ -540,7 +545,8 @@
             try {
                 const data = await request('gmrt_spell_pouch_roll', {
                     spell_action: button.dataset.spellAction || '',
-                    spell_id: button.dataset.spellId || ''
+                    spell_id: button.dataset.spellId || '',
+                    encounter_id: visibleEncounterId()
                 });
                 const roll = data.roll || {};
                 const flourish = roll.action === 'attack' && roll.natural_twenty

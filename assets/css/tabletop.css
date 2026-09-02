@@ -3929,3 +3929,21 @@
         animation: none;
     }
 }
+
+
+/* IV.32.3A — The Deeds Remember Every Adventurer: the Satchel shares the
+ * Keeper drawers' restrained pixel scrollbar instead of the browser chrome. */
+.gmrt-satchel__panel {
+    scrollbar-color: var(--gmrt-pixel-gold-low) #17120d;
+    scrollbar-width: thin;
+}
+.gmrt-satchel__panel::-webkit-scrollbar { width: 12px; }
+.gmrt-satchel__panel::-webkit-scrollbar-track { background: #17120d; }
+.gmrt-satchel__panel::-webkit-scrollbar-thumb {
+    border: 2px solid #17120d;
+    border-radius: 0;
+    background: var(--gmrt-pixel-gold-low);
+}
+.gmrt-satchel__panel::-webkit-scrollbar-thumb:hover {
+    background: var(--gmrt-pixel-gold);
+}

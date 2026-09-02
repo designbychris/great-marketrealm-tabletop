@@ -1,3 +1,12 @@
+
+## Phase IV.32.3A — The Deeds Remember Every Adventurer
+
+- [x] Player Satchel rolls carry the Encounter visible in the live Chamber as a server-validated routing hint.
+- [x] Active Encounter rolls remain in Deeds at the Table; Exploration rolls remain in Tales from the Chamber.
+- [x] Quick Hands, Weapons to Hand and Spell Pouch share the same corrected Chronicle path.
+- [x] Satchel scrollbar now matches the pixel Keeper-drawer scrollbar language.
+- [ ] Browser-certify Player roll visibility during battle and after returning to Exploration.
+
 - [x] IV.27E — Light Wrought by Magic: Companion-certified magical illumination in the Living Veil.
 - [x] IV.27E corrective — The Satchel leaves the Chamber with its character token.
 

@@ -34,7 +34,8 @@ final class TableChronicleRecorder
         string $kind,
         string $action,
         string $summary,
-        array $roll
+        array $roll,
+        string $encounterIdHint = ''
     ): void {
         $characterId = trim((string) ($character['id'] ?? ''));
         $characterName = trim((string) ($character['name'] ?? 'Adventurer'));
@@ -53,6 +54,22 @@ final class TableChronicleRecorder
         $encounter = $activeScene !== null
             ? $this->encounters->currentForScene($tableId, $activeScene->id())
             : null;
+
+        // A Player's Satchel request can arrive immediately after the client has
+        // entered battle while the repository's scene lookup is momentarily stale.
+        // Treat the encounter rendered in that player's live Chamber as a hint only:
+        // it must still belong to this Table, remain open, and match the active Scene.
+        $encounterIdHint = trim($encounterIdHint);
+        if ($encounter === null && $encounterIdHint !== '' && $activeScene !== null) {
+            $hintedEncounter = $this->encounters->find($tableId, $encounterIdHint);
+            if (
+                $hintedEncounter !== null
+                && ! $hintedEncounter->isEnded()
+                && $hintedEncounter->sceneId() === $activeScene->id()
+            ) {
+                $encounter = $hintedEncounter;
+            }
+        }
 
         if ($encounter !== null) {
             $tokenId = 'companion-character:' . $characterId;

@@ -75,7 +75,7 @@ final class WeaponHandsAjaxController
                 );
             }
 
-            $this->chronicle->recordSatchelRoll($tableId, $userId, $character, 'weapons-to-hand', (string) $roll['action'], $message, $roll);
+            $this->chronicle->recordSatchelRoll($tableId, $userId, $character, 'weapons-to-hand', (string) $roll['action'], $message, $roll, sanitize_text_field((string) ($_POST['encounter_id'] ?? '')));
 
             wp_send_json_success(['roll' => $roll, 'message' => $message]);
         } catch (Throwable $exception) {
