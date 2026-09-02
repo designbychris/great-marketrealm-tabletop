@@ -1009,3 +1009,4 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - Keeps wide docks on one row, preserves whole labels such as `Disengage`, and typically settles narrow docks into a balanced 3 + 2 arrangement without shrinking typography or changing deed behaviour.
 
 - IV.32.4A final polish: reflowed Guild Diceworks attack certification inside narrow combat docks and clear transient attack/damage results when the authoritative Encounter turn identity changes, preserving Chronicle history.
+- IV.32.4D — The Battlefield's Final Inspection: established the final presentation-only battlefield layer stack so the IV.32.4 pixel grid, trails, Vision, Keeper lights, Living Veil, thresholds, miniatures and targeting feedback compose predictably without changing geometry or authority.

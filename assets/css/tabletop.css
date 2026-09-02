@@ -4544,3 +4544,64 @@
 @media (prefers-reduced-motion: reduce) {
     .gmrt-carried-light.is-environmental::after { animation: none !important; opacity: .48; filter: none; }
 }
+
+/* ==========================================================================
+   IV.32.4D — The Battlefield's Final Inspection
+   Final presentation-only composition contract for the 16-bit battlefield.
+   This establishes an explicit visual stack so trails, light, Veil, Keeper
+   markers, miniatures and targeting feedback remain legible together without
+   changing any battlefield geometry, visibility, LOS or combat authority.
+   ========================================================================== */
+.gmrt-board__viewport {
+    --gmrt-battlefield-z-map: 1;
+    --gmrt-battlefield-z-grid: 2;
+    --gmrt-battlefield-z-footsteps: 6;
+    --gmrt-battlefield-z-vision: 7;
+    --gmrt-battlefield-z-light: 7;
+    --gmrt-battlefield-z-veil: 8;
+    --gmrt-battlefield-z-thresholds: 9;
+    --gmrt-battlefield-z-tokens: 10;
+    --gmrt-battlefield-z-targeting: 11;
+}
+
+.gmrt-board__map { z-index: var(--gmrt-battlefield-z-map); }
+.gmrt-board__grid { z-index: var(--gmrt-battlefield-z-grid); }
+.gmrt-footstep-layer { z-index: var(--gmrt-battlefield-z-footsteps); }
+.gmrt-vision-layer { z-index: var(--gmrt-battlefield-z-vision); }
+.gmrt-light-layer { z-index: var(--gmrt-battlefield-z-light); }
+.gmrt-fog-layer { z-index: var(--gmrt-battlefield-z-veil); }
+.gmrt-threshold-layer { z-index: var(--gmrt-battlefield-z-thresholds); }
+.gmrt-board__tokens { z-index: var(--gmrt-battlefield-z-tokens); }
+.gmrt-targeting-layer { z-index: var(--gmrt-battlefield-z-targeting); }
+
+/* The final interactive read must remain crisp above the Veil: targeting is
+   information about the Keeper/Player's current action, not map decoration. */
+.gmrt-targeting-layer {
+    mix-blend-mode: normal;
+    isolation: isolate;
+}
+
+/* Keeper threshold markers remain above the Veil but below miniatures so they
+   can be inspected without ever covering a creature at the same coordinate. */
+.gmrt-threshold-marker {
+    filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, .72));
+}
+
+/* Prevent decorative battlefield layers from ever stealing pointer input as
+   the visual stack becomes richer. Tokens/DM markers retain their established
+   interaction rules on their own elements. */
+.gmrt-footstep-layer,
+.gmrt-light-layer,
+.gmrt-fog-layer,
+.gmrt-targeting-layer,
+.gmrt-vision-layer {
+    pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gmrt-targeting-layer,
+    .gmrt-threshold-marker {
+        transition: none !important;
+        animation: none !important;
+    }
+}
