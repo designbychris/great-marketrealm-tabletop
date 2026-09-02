@@ -83,7 +83,7 @@ final class DungeonForgeAjaxController
     public function createWorld(): void
     {
         $this->respond(function (string $tableId, int $userId): array {
-            $name = trim(sanitize_text_field((string) ($_POST['scene_name'] ?? '')));
+            $name = trim(sanitize_text_field(wp_unslash((string) ($_POST['scene_name'] ?? ''))));
             if ($name === '') {
                 throw new RuntimeException('Give Pippin a name for this new place before firing the Forge.');
             }

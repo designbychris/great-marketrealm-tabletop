@@ -3,6 +3,76 @@
 
     let activeRefreshTimer = null;
 
+    // Phase IV.32.5A — Keeper Drawer lifecycle rail.
+    // Atlas/Bestiary controls are delegated from the stable document so Chamber
+    // fragment replacement (including generated Scene preparation/opening) cannot
+    // strand freshly-rendered drawer tabs without click handlers.
+    function setKeeperDrawerOpen(kind, open) {
+        const root = document.querySelector('.gmrt-chamber');
+        if (!root) return;
+
+        const atlasDrawer = document.querySelector('[data-keepers-atlas]');
+        const atlasToggle = document.querySelector('[data-atlas-toggle]');
+        const bestiaryDrawer = document.querySelector('[data-keepers-bestiary]');
+        const bestiaryToggle = document.querySelector('[data-bestiary-toggle]');
+
+        if (kind === 'atlas') {
+            if (!atlasDrawer || !atlasToggle) return;
+            if (open) {
+                if (bestiaryDrawer) bestiaryDrawer.dataset.open = 'false';
+                if (bestiaryToggle) bestiaryToggle.setAttribute('aria-expanded', 'false');
+            }
+            atlasDrawer.dataset.open = open ? 'true' : 'false';
+            root.dataset.keeperDrawerOpen = open ? 'atlas' : '';
+            atlasToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+            return;
+        }
+
+        if (kind === 'bestiary') {
+            if (!bestiaryDrawer || !bestiaryToggle) return;
+            if (open) {
+                if (atlasDrawer) atlasDrawer.dataset.open = 'false';
+                if (atlasToggle) atlasToggle.setAttribute('aria-expanded', 'false');
+            }
+            bestiaryDrawer.dataset.open = open ? 'true' : 'false';
+            root.dataset.keeperDrawerOpen = open ? 'bestiary' : '';
+            bestiaryToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+            if (open) {
+                const search = document.querySelector('[data-bestiary-search]');
+                if (search) window.setTimeout(() => search.focus(), 210);
+            }
+        }
+    }
+
+    document.addEventListener('click', (event) => {
+        const atlasToggle = event.target.closest('[data-atlas-toggle]');
+        if (atlasToggle) {
+            event.preventDefault();
+            const drawer = document.querySelector('[data-keepers-atlas]');
+            setKeeperDrawerOpen('atlas', drawer?.dataset.open !== 'true');
+            return;
+        }
+
+        if (event.target.closest('[data-atlas-close]')) {
+            event.preventDefault();
+            setKeeperDrawerOpen('atlas', false);
+            return;
+        }
+
+        const bestiaryToggle = event.target.closest('[data-bestiary-toggle]');
+        if (bestiaryToggle) {
+            event.preventDefault();
+            const drawer = document.querySelector('[data-keepers-bestiary]');
+            setKeeperDrawerOpen('bestiary', drawer?.dataset.open !== 'true');
+            return;
+        }
+
+        if (event.target.closest('[data-bestiary-close]')) {
+            event.preventDefault();
+            setKeeperDrawerOpen('bestiary', false);
+        }
+    });
+
     async function replaceChamber(message, sceneId = null) {
         const current = document.querySelector('.gmrt-chamber');
         const liveStatus = document.querySelector('#gmrt-tabletop-status');
@@ -3554,29 +3624,12 @@
 
     const bestiaryDrawer = document.querySelector('[data-keepers-bestiary]');
     const bestiaryToggle = document.querySelector('[data-bestiary-toggle]');
-    const bestiaryClose = document.querySelector('[data-bestiary-close]');
     const bestiarySearch = document.querySelector('[data-bestiary-search]');
     const bestiaryResults = document.querySelector('[data-bestiary-results]');
     const bestiaryEmpty = document.querySelector('[data-bestiary-empty]');
     const bestiaryFilterButtons = Array.from(document.querySelectorAll('[data-bestiary-filter]'));
     let bestiaryMapFilter = 'all';
-    const setBestiaryOpen = (open) => {
-        if (!bestiaryDrawer || !bestiaryToggle) return;
-        if (open) {
-            const atlas = document.querySelector('[data-keepers-atlas]');
-            const atlasButton = document.querySelector('[data-atlas-toggle]');
-            if (atlas) atlas.dataset.open = 'false';
-            if (atlasButton) atlasButton.setAttribute('aria-expanded', 'false');
-        }
-        bestiaryDrawer.dataset.open = open ? 'true' : 'false';
-        root.dataset.keeperDrawerOpen = open ? 'bestiary' : '';
-        bestiaryToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-        if (open && bestiarySearch) {
-            window.setTimeout(() => bestiarySearch.focus(), 210);
-        }
-    };
-    bestiaryToggle?.addEventListener('click', () => setBestiaryOpen(bestiaryDrawer?.dataset.open !== 'true'));
-    bestiaryClose?.addEventListener('click', () => setBestiaryOpen(false));
+    const setBestiaryOpen = (open) => setKeeperDrawerOpen('bestiary', open);
 
     function refreshBestiaryFilterCounts() {
         const cards = Array.from(document.querySelectorAll('[data-bestiary-card]'));
@@ -3728,7 +3781,6 @@
     const atlasGridSize = document.querySelector('[data-atlas-grid-size]');
     const atlasDrawer = document.querySelector('[data-keepers-atlas]');
     const atlasToggle = document.querySelector('[data-atlas-toggle]');
-    const atlasClose = document.querySelector('[data-atlas-close]');
     const atlasForgeName = document.querySelector('[data-atlas-forge-name]');
     const atlasForgeSeed = document.querySelector('[data-atlas-forge-seed]');
     const atlasForgeSceneType = document.querySelector('[data-atlas-forge-scene-type]');
@@ -3753,20 +3805,7 @@
         }
     };
     atlasForgeSceneType?.addEventListener('change', () => updatePippinFieldNote(String(atlasForgeSceneType.value || 'dungeon')));
-    const setAtlasOpen = (open) => {
-        if (!atlasDrawer || !atlasToggle) return;
-        if (open) {
-            const bestiary = document.querySelector('[data-keepers-bestiary]');
-            const bestiaryButton = document.querySelector('[data-bestiary-toggle]');
-            if (bestiary) bestiary.dataset.open = 'false';
-            if (bestiaryButton) bestiaryButton.setAttribute('aria-expanded', 'false');
-        }
-        atlasDrawer.dataset.open = open ? 'true' : 'false';
-        root.dataset.keeperDrawerOpen = open ? 'atlas' : '';
-        atlasToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-    };
-    atlasToggle?.addEventListener('click', () => setAtlasOpen(atlasDrawer?.dataset.open !== 'true'));
-    atlasClose?.addEventListener('click', () => setAtlasOpen(false));
+    const setAtlasOpen = (open) => setKeeperDrawerOpen('atlas', open);
 
     atlasForgeReroll?.addEventListener('click', () => {
         if (!atlasForgeSeed) return;

@@ -20,7 +20,7 @@ final class KeepersAtlasAjaxController
             $scene = $this->atlas->addMap(
                 $this->tableId(),
                 get_current_user_id(),
-                sanitize_text_field((string) ($_POST['scene_name'] ?? '')),
+                sanitize_text_field(wp_unslash((string) ($_POST['scene_name'] ?? ''))),
                 absint($_POST['attachment_id'] ?? 0),
                 max(1, absint($_POST['grid_size'] ?? 64))
             );

@@ -1017,3 +1017,8 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - Adds dungeon tile highlight/shadow pixels, block-canopy trees, faceted rocks, stepped village architecture, pixel logs, octagonal wells, garden posts and square trail treatment.
 - Keeps Scene topology, floor membership, LOS barriers, doors, Keeper lights, grid registration, Fog and encounter authority unchanged.
 - Adds regression coverage for the pixel projection and the Forge authority boundary.
+
+## 0.32.5-alpha.1 — IV.32.5A: Pippin Fixes the Drawer Hinges
+- Makes Atlas and Bestiary tab opening lifecycle-safe by delegating their click handling from the stable document, so replacing the Chamber while entering/leaving generated Scenes cannot strand fresh drawer tabs without handlers.
+- Keeps the existing moving Keeper rail, mutual drawer exclusion, accessibility state and Bestiary search focus behaviour intact.
+- Unslashes incoming Scene names before WordPress sanitisation so apostrophes render as `Pippin's` rather than leaking the request escape character into persisted/generated Scene titles.
