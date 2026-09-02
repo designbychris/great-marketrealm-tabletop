@@ -991,3 +991,5 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 ### 0.32.4-alpha.1 — IV.32.4A browser-certification polish
 - Lets the five combat deed buttons wrap responsively when a combat dock is narrower than their readable pixel labels.
 - Keeps wide docks on one row, preserves whole labels such as `Disengage`, and typically settles narrow docks into a balanced 3 + 2 arrangement without shrinking typography or changing deed behaviour.
+
+- IV.32.4A final polish: reflowed Guild Diceworks attack certification inside narrow combat docks and clear transient attack/damage results when the authoritative Encounter turn identity changes, preserving Chronicle history.

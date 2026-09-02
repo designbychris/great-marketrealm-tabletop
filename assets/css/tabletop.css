@@ -4172,3 +4172,66 @@
         animation: none !important;
     }
 }
+
+
+/* IV.32.4A — Final battlefield polish: compact certified attack results. */
+.gmrt-combat-dock {
+    container-type: inline-size;
+    container-name: gmrt-combat-dock;
+}
+
+.gmrt-diceworks__outcome {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+    column-gap: .8rem;
+}
+
+.gmrt-diceworks__outcome strong,
+.gmrt-diceworks__outcome span {
+    grid-column: 1;
+}
+
+.gmrt-diceworks__damage-roll {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: center;
+    margin-top: 0;
+    white-space: nowrap;
+}
+
+.gmrt-diceworks > small {
+    min-width: 0;
+    max-width: 18rem;
+    overflow-wrap: anywhere;
+}
+
+@container gmrt-combat-dock (max-width: 42rem) {
+    .gmrt-diceworks {
+        grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    .gmrt-diceworks__outcome,
+    .gmrt-diceworks > small {
+        grid-column: 1 / -1;
+        max-width: none;
+    }
+
+    .gmrt-diceworks__outcome {
+        border-left: 0;
+        border-top: 1px solid rgba(244, 234, 214, .18);
+        padding: .55rem 0 0;
+    }
+}
+
+@container gmrt-combat-dock (max-width: 30rem) {
+    .gmrt-diceworks__outcome {
+        grid-template-columns: 1fr;
+    }
+
+    .gmrt-diceworks__damage-roll {
+        grid-column: 1;
+        grid-row: auto;
+        justify-self: start;
+        margin-top: .35rem;
+    }
+}

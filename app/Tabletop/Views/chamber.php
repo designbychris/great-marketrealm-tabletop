@@ -655,6 +655,9 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
             data-encounter-revision="<?php echo esc_attr(
                 (string) ($encounter['revision'] ?? 1)
             ); ?>"
+            data-encounter-round="<?php echo esc_attr(
+                (string) ($encounter['round'] ?? 0)
+            ); ?>"
         >
             <div>
                 <p class="gmrt-chamber__eyebrow">

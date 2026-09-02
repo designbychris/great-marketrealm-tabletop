@@ -23,3 +23,7 @@ Vision doors keep their existing barrier identities and LOS behaviour. Closed/op
 ## Browser-certification polish
 
 The combat deed strip now uses an adaptive minimum-width grid instead of forcing all five actions into five equal columns. Wide docks retain the single five-button row; narrower Satchel/Bestiary combat docks naturally wrap into a balanced multi-row layout (typically 3 + 2) before labels can overflow. Deed labels remain on one line, so `Disengage` stays intact without shrinking the established pixel typography. This is CSS-only and does not change deed actions or combat authority.
+
+## Final browser-certification polish
+
+The final IV.32.4A polish keeps long combat deed labels inside the dock, lets the Guild Diceworks certified attack result reflow against the **actual combat-dock width** rather than the viewport, and treats attack/damage results as transient turn UI. When the authoritative Encounter changes combatant or advances the round, the old interactive roll card is cleared while the permanent Deeds at the Table Chronicle remains untouched.

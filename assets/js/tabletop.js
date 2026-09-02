@@ -4873,7 +4873,23 @@
             }
 
             if (encounterRevisionChanged && currentEncounter && incomingEncounter) {
+                const previousTurnIdentity = currentEncounterTurnIdentity(currentEncounter);
+                const incomingTurnIdentity = [
+                    incomingEncounterId,
+                    String(incomingEncounter.round || 0),
+                    String(incomingEncounter.current_token_id || '')
+                ].join(':');
+
+                if (
+                    previousTurnIdentity !== incomingTurnIdentity
+                    && diceworks
+                    && diceworks.dataset.turnIdentity
+                ) {
+                    clearTransientCombatRoll();
+                }
+
                 currentEncounter.dataset.encounterRevision = incomingEncounterRevision;
+                currentEncounter.dataset.encounterRound = String(incomingEncounter.round || 0);
 
                 const liveRound = currentEncounter.querySelector('[data-live-round]');
                 if (liveRound) {
@@ -5342,6 +5358,68 @@
         '[data-lonely-confetti]'
     );
 
+    function clearTransientCombatRoll() {
+        if (!diceworks) {
+            return;
+        }
+
+        diceworks.hidden = true;
+        diceworks.classList.remove(
+            'is-rolling',
+            'is-critical-hit',
+            'is-critical-miss'
+        );
+        diceworks.dataset.turnIdentity = '';
+
+        if (diceworksMode) {
+            diceworksMode.textContent = 'D20';
+        }
+        if (diceworksResult) {
+            diceworksResult.textContent = 'Awaiting the roll…';
+        }
+        if (diceworksOutcome) {
+            diceworksOutcome.hidden = true;
+        }
+        if (diceworksOutcomeTitle) {
+            diceworksOutcomeTitle.textContent = 'Awaiting result';
+        }
+        if (diceworksOutcomeDetail) {
+            diceworksOutcomeDetail.textContent = '';
+        }
+        if (damageRollButton) {
+            damageRollButton.hidden = true;
+            damageRollButton.disabled = false;
+            damageRollButton.dataset.attackEventId = '';
+        }
+        combatDice.forEach((die) => {
+            die.hidden = true;
+            die.classList.remove('is-chosen', 'is-rejected');
+            const value = die.querySelector('[data-die-value]');
+            if (value) {
+                value.textContent = '?';
+            }
+        });
+        if (lonelyConfetti) {
+            lonelyConfetti.hidden = true;
+        }
+    }
+
+    function currentEncounterTurnIdentity(encounterNode = null) {
+        const encounter = encounterNode
+            || document.querySelector('[data-encounter-id]');
+        const deeds = document.querySelector('.gmrt-deeds[data-current-token]');
+
+        if (!encounter) {
+            return '';
+        }
+
+        return [
+            encounter.dataset.encounterId || '',
+            encounter.dataset.encounterRound || '0',
+            deeds ? (deeds.dataset.currentToken || '') : ''
+        ].join(':');
+    }
+
     function beginCombatRoll() {
         if (!diceworks) {
             return;
@@ -5356,6 +5434,7 @@
             : 2;
 
         diceworks.hidden = false;
+        diceworks.dataset.turnIdentity = currentEncounterTurnIdentity();
         diceworks.classList.add('is-rolling');
         diceworks.classList.remove(
             'is-critical-hit',

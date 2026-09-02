@@ -62,6 +62,30 @@ final class BattlefieldFindsPixelsRegressionTest extends TestCase
         self::assertStringContainsString('data-footstep-layer', $view);
     }
 
+    public function test_certified_attack_result_reflows_inside_narrow_combat_docks(): void
+    {
+        $css = $this->source('assets/css/tabletop.css');
+
+        self::assertStringContainsString('container-name: gmrt-combat-dock;', $css);
+        self::assertStringContainsString('@container gmrt-combat-dock (max-width: 42rem)', $css);
+        self::assertStringContainsString('.gmrt-diceworks__outcome,', $css);
+        self::assertStringContainsString('grid-column: 1 / -1;', $css);
+        self::assertStringContainsString('white-space: nowrap;', $css);
+    }
+
+    public function test_transient_attack_roll_is_cleared_when_authoritative_turn_identity_changes(): void
+    {
+        $js = $this->source('assets/js/tabletop.js');
+        $view = $this->source('app/Tabletop/Views/chamber.php');
+
+        self::assertStringContainsString('function clearTransientCombatRoll()', $js);
+        self::assertStringContainsString('function currentEncounterTurnIdentity(encounterNode = null)', $js);
+        self::assertStringContainsString('previousTurnIdentity !== incomingTurnIdentity', $js);
+        self::assertStringContainsString('clearTransientCombatRoll();', $js);
+        self::assertStringContainsString("diceworks.dataset.turnIdentity = currentEncounterTurnIdentity();", $js);
+        self::assertStringContainsString('data-encounter-round=', $view);
+    }
+
     public function test_phase_is_documented_as_presentation_only_and_reduced_motion_safe(): void
     {
         $phase = $this->source('docs/Roadmap/PHASE-IV.32.4A.md');
