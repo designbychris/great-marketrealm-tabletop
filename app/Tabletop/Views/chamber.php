@@ -1509,7 +1509,26 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
 
                 <ul data-live-gathering-list>
                     <?php foreach ($members as $member) : ?>
-                        <li style="--gmrt-fellowship-colour: <?php echo esc_attr((string) ($member['table_colour_hex'] ?? '#65b9ae')); ?>" class="gmrt-party__member gmrt-party__member--<?php echo esc_attr((string) ($member['role'] ?? 'player')); ?> gmrt-party__member--<?php echo esc_attr((string) ($member['status'] ?? 'unknown')); ?>">
+                        <?php
+                        $memberSeatCharacterId = (string) ($member['companion_character_id'] ?? '');
+                        $memberHasTurn = false;
+                        if ($memberSeatCharacterId !== '' && $currentTokenId !== '') {
+                            foreach ($tokens as $memberTurnToken) {
+                                if (
+                                    (string) ($memberTurnToken['source_reference'] ?? '') === $memberSeatCharacterId
+                                    && (string) ($memberTurnToken['id'] ?? '') === $currentTokenId
+                                ) {
+                                    $memberHasTurn = true;
+                                    break;
+                                }
+                            }
+                        }
+                        ?>
+                        <li
+                            style="--gmrt-fellowship-colour: <?php echo esc_attr((string) ($member['table_colour_hex'] ?? '#65b9ae')); ?>"
+                            class="gmrt-party__member gmrt-party__member--<?php echo esc_attr((string) ($member['role'] ?? 'player')); ?> gmrt-party__member--<?php echo esc_attr((string) ($member['status'] ?? 'unknown')); ?><?php echo $memberHasTurn ? ' is-active-turn' : ''; ?>"
+                            data-party-character-id="<?php echo esc_attr($memberSeatCharacterId); ?>"
+                        >
                             <?php $avatarUrl = (string) ($member['avatar_url'] ?? ''); ?>
                             <span class="gmrt-party__avatar" aria-hidden="true">
                                 <?php if ($avatarUrl !== '') : ?>

@@ -3696,3 +3696,236 @@
         height: 100%;
     }
 }
+
+/* ==========================================================================
+   IV.32.3 — Adventurers in Miniature
+   Live-play pixel language for party seats, turn state, combat status and the
+   Keeper's active Bestiary creature. Presentation only: no combat authority.
+   ========================================================================== */
+
+/* The Turn of Battle reads like a compact 16-bit battle status plaque rather
+   than another full-width web panel. */
+.gmrt-encounter-strip {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(13rem, 1fr) minmax(0, 2fr);
+    gap: .8rem 1.25rem;
+    align-items: center;
+    border: 2px solid var(--gmrt-pixel-gold-dim);
+    border-top-color: var(--gmrt-pixel-gold-hi);
+    border-left-color: var(--gmrt-pixel-gold-hi);
+    border-radius: 2px;
+    background:
+        linear-gradient(90deg, rgba(125,38,31,.18), transparent 36%),
+        var(--gmrt-pixel-panel);
+    box-shadow: var(--gmrt-pixel-inset), var(--gmrt-pixel-shadow);
+}
+.gmrt-encounter-strip::before {
+    content: "BATTLE";
+    position: absolute;
+    top: -1px;
+    right: .65rem;
+    padding: .16rem .42rem;
+    border-inline: 1px solid var(--gmrt-pixel-gold-dim);
+    border-bottom: 1px solid var(--gmrt-pixel-gold-dim);
+    background: #341a18;
+    color: #f1c96d;
+    font: 900 .58rem/1.15 ui-monospace, "Courier New", monospace;
+    letter-spacing: .12em;
+}
+.gmrt-encounter-strip__state {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: .45rem;
+    flex-wrap: wrap;
+}
+.gmrt-encounter-strip__state > strong,
+.gmrt-encounter-strip__state > span {
+    min-height: 1.8rem;
+    display: inline-flex;
+    align-items: center;
+    padding: .24rem .48rem;
+    border: 1px solid rgba(216,173,79,.34);
+    background: rgba(0,0,0,.2);
+    color: var(--gmrt-pixel-parchment);
+    font: 800 .68rem/1.2 ui-monospace, "Courier New", monospace;
+}
+.gmrt-encounter-strip__state > strong {
+    color: #f1c96d;
+    background: rgba(104,44,36,.42);
+}
+.gmrt-current-turn {
+    box-shadow: inset 3px 0 0 var(--gmrt-pixel-gold);
+}
+.gmrt-current-turn strong {
+    margin-left: .35rem;
+    color: #fff1b5;
+}
+.gmrt-end-turn {
+    border-color: #b99546 !important;
+    background: #3a2c16 !important;
+    color: #ffe8a0 !important;
+}
+.gmrt-end-encounter {
+    border-color: #81504a !important;
+    background: #2b1817 !important;
+    color: #e4b7ad !important;
+}
+
+/* The Gathering is now a party roster: every seated Companion character is a
+   miniature, and the current turn is visible without opening another panel. */
+.gmrt-party__member,
+.gmrt-party > ul > li.gmrt-party__member {
+    position: relative;
+    overflow: visible;
+    border-radius: 1px;
+    background:
+        linear-gradient(90deg, color-mix(in srgb, var(--gmrt-fellowship-colour,#65b9ae) 10%, transparent), transparent 42%),
+        var(--gmrt-pixel-panel-low);
+}
+.gmrt-party__member.is-active-turn {
+    border-color: color-mix(in srgb, var(--gmrt-fellowship-colour,#d8ad4f) 72%, #ffe69a);
+    box-shadow:
+        inset 4px 0 0 var(--gmrt-fellowship-colour,#d8ad4f),
+        0 0 0 2px rgba(242,205,112,.18),
+        3px 3px 0 rgba(0,0,0,.4);
+}
+.gmrt-party__member.is-active-turn::after {
+    content: "TURN";
+    position: absolute;
+    top: -1px;
+    right: 3.45rem;
+    padding: .14rem .34rem;
+    border: 1px solid color-mix(in srgb, var(--gmrt-fellowship-colour,#d8ad4f) 68%, #e9cc78);
+    background: #262016;
+    color: #ffe691;
+    font: 900 .52rem/1.15 ui-monospace, "Courier New", monospace;
+    letter-spacing: .08em;
+}
+.gmrt-party__avatar,
+.gmrt-party__seat {
+    image-rendering: pixelated;
+    box-shadow: 2px 2px 0 rgba(0,0,0,.42);
+}
+.gmrt-party__seat.has-character {
+    outline: 1px solid color-mix(in srgb, var(--gmrt-fellowship-colour,#65b9ae) 72%, #ead38f);
+    outline-offset: 2px;
+}
+.gmrt-party__member > strong {
+    color: #f5e7c0;
+    text-shadow: 1px 1px 0 #000;
+}
+.gmrt-party__member > .gmrt-hp {
+    padding-top: .45rem;
+    border-top: 1px solid rgba(216,173,79,.18);
+}
+.gmrt-party .gmrt-hp__track {
+    height: .55rem;
+    border-radius: 0;
+    border: 1px solid #6d5733;
+    background: #15120d;
+    box-shadow: inset 1px 1px 0 #000;
+}
+.gmrt-party .gmrt-hp__fill {
+    background: repeating-linear-gradient(90deg, #8fa65b 0 7px, #758b49 7px 9px);
+}
+.gmrt-hp__state {
+    border-radius: 0;
+    padding: .12rem .3rem;
+    font: 900 .57rem/1.15 ui-monospace, "Courier New", monospace;
+    letter-spacing: .07em;
+}
+
+/* Tokens gain a square stepped turn cursor around the existing circular piece;
+   the token itself, ownership ring and movement geometry remain unchanged. */
+.gmrt-token.is-active-turn::before {
+    content: "";
+    position: absolute;
+    inset: -7px;
+    pointer-events: none;
+    border: 2px solid #f2cd70;
+    box-shadow:
+        3px 0 0 #6c5526,
+        -3px 0 0 #6c5526,
+        0 3px 0 #6c5526,
+        0 -3px 0 #6c5526;
+}
+
+/* Player turn guidance and the Satchel become one readable battle command
+   surface instead of a collection of unrelated status fragments. */
+.gmrt-combat-guidance {
+    border: 2px solid rgba(128,100,56,.78);
+    border-top-color: rgba(226,194,113,.72);
+    border-left-color: rgba(226,194,113,.72);
+    border-radius: 1px;
+    padding: .55rem .7rem;
+    background: #1b1711;
+    box-shadow: 3px 3px 0 rgba(0,0,0,.34);
+}
+.gmrt-player-turn-badge,
+.gmrt-combat-turn-badge {
+    border-radius: 0;
+    border: 1px solid #c7a554;
+    background: #4a3718;
+    color: #fff0ae;
+    box-shadow: 2px 2px 0 #000;
+    font-family: ui-monospace, "Courier New", monospace;
+    letter-spacing: .08em;
+}
+.gmrt-satchel__battle.is-active-turn {
+    border-radius: 1px;
+    background: linear-gradient(180deg, rgba(216,173,79,.09), rgba(0,0,0,.12));
+    box-shadow: inset 4px 0 0 var(--gmrt-fellowship-colour,#d8ad4f), 3px 3px 0 rgba(0,0,0,.35);
+}
+
+/* Bestiary creatures use the same miniature grammar as adventurers. The
+   highlighted instance is the Keeper's active battle command card. */
+.gmrt-bestiary-card {
+    border-radius: 1px;
+    box-shadow: 2px 2px 0 rgba(0,0,0,.28);
+}
+.gmrt-bestiary-card__sigil {
+    border-radius: 1px;
+    box-shadow: inset 1px 1px 0 rgba(255,255,255,.08), 2px 2px 0 rgba(0,0,0,.35);
+}
+.gmrt-bestiary-instance {
+    border-radius: 1px;
+}
+.gmrt-bestiary-instance.is-active-turn,
+.gmrt-bestiary-card.is-active-turn {
+    border-color: #a7d084;
+    box-shadow: inset 3px 0 0 #78a85d, 3px 3px 0 rgba(0,0,0,.36);
+}
+.gmrt-bestiary-instance__turn {
+    border-radius: 0;
+    background: #2b491f;
+    color: #eaffcf;
+    box-shadow: 2px 2px 0 rgba(0,0,0,.4);
+    font-family: ui-monospace, "Courier New", monospace;
+}
+.gmrt-bestiary-drawer__toggle.has-active-turn::after {
+    content: "TURN";
+    display: inline-grid;
+    place-items: center;
+    margin-top: .35rem;
+    min-width: 2.2rem;
+    padding: .12rem .22rem;
+    border: 1px solid #87b76d;
+    background: #21331b;
+    color: #eaffcf;
+}
+
+@media (max-width: 900px) {
+    .gmrt-encounter-strip { grid-template-columns: 1fr; }
+    .gmrt-encounter-strip__state { justify-content: flex-start; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gmrt-party__member.is-active-turn,
+    .gmrt-token.is-active-turn::before,
+    .gmrt-bestiary-instance.is-active-turn,
+    .gmrt-bestiary-card.is-active-turn {
+        animation: none;
+    }
+}

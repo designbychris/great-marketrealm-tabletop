@@ -164,6 +164,7 @@
                 incomingActiveId !== '' && node.dataset.tokenId === incomingActiveId
             );
         });
+        syncGatheringTurnState();
 
         const root = document.querySelector('.gmrt-chamber');
         if (root && typeof data.sync_revision === 'string') {
@@ -201,6 +202,19 @@
         if (gatheringStatus) gatheringStatus.textContent = message;
     };
 
+    function syncGatheringTurnState() {
+        const activeToken = document.querySelector('[data-token-id].is-active-turn');
+        const activeCharacterId = String(activeToken?.dataset.tokenSource || '');
+
+        document.querySelectorAll('[data-party-character-id]').forEach((member) => {
+            const characterId = String(member.dataset.partyCharacterId || '');
+            member.classList.toggle(
+                'is-active-turn',
+                activeCharacterId !== '' && characterId !== '' && characterId === activeCharacterId
+            );
+        });
+    }
+
     function renderGathering(members) {
         const list = document.querySelector('[data-live-gathering-list]');
         if (!list || !Array.isArray(members)) return;
@@ -212,6 +226,8 @@
             const status = String(member.status || 'unknown');
             item.className = 'gmrt-party__member gmrt-party__member--' + role + ' gmrt-party__member--' + status;
             item.style.setProperty('--gmrt-fellowship-colour', String(member.table_colour_hex || '#65b9ae'));
+            const characterId = String(member.companion_character_id || '');
+            item.dataset.partyCharacterId = characterId;
 
             const avatar = document.createElement('span');
             avatar.className = 'gmrt-party__avatar';
@@ -277,7 +293,6 @@
                 item.appendChild(remove);
             }
 
-            const characterId = String(member.companion_character_id || '');
             const play = member.companion_character && member.companion_character.play
                 ? member.companion_character.play
                 : null;
@@ -302,6 +317,8 @@
 
             list.appendChild(item);
         });
+
+        syncGatheringTurnState();
     }
 
     document.querySelectorAll('[data-table-colour]').forEach((button) => {

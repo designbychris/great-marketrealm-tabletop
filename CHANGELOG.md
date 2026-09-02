@@ -963,3 +963,8 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - Certifies bright-light radii of Torch 20 ft, Lantern 30 ft, Brazier 60 ft, Candle 10 ft, and Magical Light 40 ft, each with an equal dim-light band.
 - Sizes environmental battlefield glows from authoritative projected range plus calibrated grid geometry so every source visibly represents its illumination footprint.
 - Keeps Living Veil projection, Scene ownership, wall occlusion and Behind-the-Curtain preparation authoritative.
+
+## Phase IV.32.3 — Adventurers in Miniature
+- Extended the Tabletop pixel language into live-play party, encounter, Satchel, Bestiary and active-token presentation.
+- Added current-turn highlighting to Gathering character seats by matching the existing authoritative active token source to the seated Companion character on both initial render and Living Table refresh.
+- Kept initiative, turn advancement, combat resolution, HP, conditions, targeting, movement, Fog and persistence unchanged.
