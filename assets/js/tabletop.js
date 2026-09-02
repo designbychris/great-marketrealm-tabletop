@@ -227,8 +227,40 @@
             item.appendChild(avatar);
 
             const roleBadge = document.createElement('span');
-            roleBadge.className = 'gmrt-party__role';
-            roleBadge.textContent = role === 'dungeon-master' ? 'DM' : 'Player';
+            const companionCharacter = member.companion_character && typeof member.companion_character === 'object'
+                ? member.companion_character
+                : null;
+            const companionToken = companionCharacter && companionCharacter.token && typeof companionCharacter.token === 'object'
+                ? companionCharacter.token
+                : null;
+            const characterImage = companionToken && companionToken.image_url
+                ? String(companionToken.image_url)
+                : '';
+            const characterName = companionCharacter && companionCharacter.name
+                ? String(companionCharacter.name)
+                : 'Selected character';
+
+            roleBadge.className = 'gmrt-party__role gmrt-party__seat' + (characterImage ? ' has-character' : '');
+            if (role === 'dungeon-master') {
+                roleBadge.textContent = 'DM';
+                roleBadge.setAttribute('aria-label', 'Dungeon Master');
+                roleBadge.title = 'Dungeon Master';
+            } else if (characterImage) {
+                const characterPortrait = document.createElement('img');
+                characterPortrait.src = characterImage;
+                characterPortrait.alt = '';
+                characterPortrait.setAttribute('aria-hidden', 'true');
+                characterPortrait.style.setProperty('--gmrt-token-focus-x', String(companionToken.focus_x || 50) + '%');
+                characterPortrait.style.setProperty('--gmrt-token-focus-y', String(companionToken.focus_y || 50) + '%');
+                characterPortrait.style.setProperty('--gmrt-token-zoom', String(companionToken.zoom || 100) + '%');
+                roleBadge.appendChild(characterPortrait);
+                roleBadge.setAttribute('aria-label', 'Playing: ' + characterName);
+                roleBadge.title = 'Playing: ' + characterName;
+            } else {
+                roleBadge.textContent = 'P';
+                roleBadge.setAttribute('aria-label', 'Player — no character selected');
+                roleBadge.title = 'Player — no character selected';
+            }
             item.appendChild(roleBadge);
 
             const name = document.createElement('strong');

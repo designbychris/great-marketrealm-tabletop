@@ -969,12 +969,10 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                     </div>
                 </div>
 
-                <div class="gmrt-cartographers-lens" data-cartographers-lens>
-                    <strong class="gmrt-cartographers-lens__title">Cartographer's Lens</strong>
-                    <span class="gmrt-cartographers-lens__hint">Drag the map to pan. View controls now stay with the battlefield.</span>
-                </div>
-
                 <?php if ($state->isDungeonMaster()) : ?>
+                    <details class="gmrt-keeper-controls" data-keeper-controls>
+                        <summary>Dungeon Master Controls</summary>
+                        <div class="gmrt-keeper-controls__body">
                     <div class="gmrt-fog-controls">
                         <strong>The Veil of the Unknown</strong>
                         <label>
@@ -1106,13 +1104,8 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                             </div>
                         </details>
                     </div>
-                <?php endif; ?>
 
-
-                <?php if (
-                    $state->isDungeonMaster()
-                    && ($scene['grid_type'] ?? '') === 'square'
-                ) : ?>
+                <?php if (($scene['grid_type'] ?? '') === 'square') : ?>
                     <details class="gmrt-grid-calibrator" data-grid-calibrator>
                         <summary>Calibrate Grid</summary>
                         <div class="gmrt-grid-calibrator__controls">
@@ -1159,7 +1152,6 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                     </details>
                 <?php endif; ?>
 
-                <?php if ($state->isDungeonMaster()) : ?>
                     <p
                         class="gmrt-cartographer-status"
                         data-cartographer-status
@@ -1169,6 +1161,8 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                         Battlemap artwork may be changed without moving tokens
                         or changing the rules grid.
                     </p>
+                        </div>
+                    </details>
                 <?php endif; ?>
 
                 <div class="gmrt-board__lens-stage" data-lens-stage>
@@ -1714,6 +1708,11 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                             ? $companion['selected_character']
                             : null;
                         ?>
+                        <?php if ($state->isDungeonMaster()) : ?>
+                            <details class="gmrt-character-gate-disclosure">
+                                <summary>Choose a Test Adventurer</summary>
+                                <div class="gmrt-character-gate-disclosure__body">
+                        <?php endif; ?>
                         <?php if ($selectedCharacter !== null) : ?>
                             <p class="gmrt-character-gate__chosen">
                                 <strong><?php echo esc_html((string) ($selectedCharacter['name'] ?? 'Adventurer')); ?></strong>
@@ -1750,6 +1749,10 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                             </form>
                         <?php else : ?>
                             <p>No eligible Companion Characters were found for this Guild account.</p>
+                        <?php endif; ?>
+                        <?php if ($state->isDungeonMaster()) : ?>
+                                </div>
+                            </details>
                         <?php endif; ?>
                     <?php else : ?>
                         <span>Not detected</span>

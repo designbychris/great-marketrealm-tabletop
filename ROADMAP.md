@@ -760,3 +760,6 @@ A staged SNES-era presentation pass for the Tabletop. Pixel styling remains a sk
 - [x] **IV.32.2A — Pippin's Field Notes** — integrates canonical full-art and pixel Pippin into the Scene Forge with a reusable contextual Field Note component.
 - [x] **IV.32.2B — Pippin Demands a Bigger Office** — widens the Atlas and Bestiary into shared responsive Keeper workspaces, gives Scene/creature cards room to breathe, enlarges Pippin's Field Note presentation, and restructures The Gathering rail so portraits, names, roles, actions, HP and the Fellowship Ribbon fit the pixel UI without crowding.
 - [x] **IV.32.2C — The Keeper Rearranges the Furniture** — turns Atlas/Bestiary tabs into one moving Keeper rail, compacts Table/Scene/mode identity into a full-width command header, and gives Gathering seats character portraits (or `P`) plus distinct management and vitality bands without changing Tabletop authority.
+
+### Phase IV.32.2C.1 — The Keeper Tidies the Desk
+Browser-feedback polish for the pixel Tabletop shell: align the Bestiary workspace with the Atlas top edge, preserve live character-seat portraits, restore Fellowship Ribbon colours, consolidate Keeper battlefield tools behind one disclosure, remove obsolete Lens help copy, and compact the DM-only Companion adventurer picker.
