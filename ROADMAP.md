@@ -788,5 +788,7 @@ Browser-feedback polish for the pixel Tabletop shell: align the Bestiary workspa
 
 - [x] **IV.32.5A — Pippin Fixes the Drawer Hinges** — hardens Atlas/Bestiary drawer controls across live Chamber replacement and generated-Scene transitions with document-level delegated controls, and normalises WordPress-slashed Scene names before persistence so apostrophes display cleanly.
 
-## Phase IV.32.6 — The Door to the Table ✅ BUILD READY
-The signed-out Tabletop now opens on a dedicated 16-bit threshold experience with Pippin, a WordPress-owned sign-in action, and preservation of the requested Table/invitation return URL. Browser certification remains required before final completion.
+## Phase IV.32.6 — The Door to the Table ✅ AUTOMATED / VISUAL POLISH IN PROGRESS
+The Tabletop now owns a cinematic 16-bit entrance while WordPress remains the authentication authority beneath it. The requested Table/invitation URL is preserved throughout the threshold flow.
+
+- [x] **IV.32.6A — The Door Has a Lock** — promotes Pippin's dungeon artwork to a full-bleed entrance, authenticates directly through a nonce-protected front-end Tabletop form during `template_redirect`, preserves the exact requested Table/invitation destination, and gives the signed-in `Your chair is waiting` state the same cinematic threshold treatment while keeping invitation acceptance separate from authentication.

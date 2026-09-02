@@ -340,6 +340,11 @@ final class TabletopServiceProvider
         );
 
         add_action(
+            'template_redirect',
+            [$this->shortcode, 'handleDoorLogin']
+        );
+
+        add_action(
             'wp_ajax_gmrt_tabletop_state',
             [$this->ajax, 'state']
         );

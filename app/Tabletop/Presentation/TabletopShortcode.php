@@ -14,7 +14,10 @@ defined('ABSPATH') || exit;
 
 final class TabletopShortcode
 {
+    private ?string $doorLoginError = null;
+
     public const TAG = 'great_marketrealm_tabletop';
+    public const LOGIN_NONCE_ACTION = 'gmrt_tabletop_frontend_login';
 
     public function __construct(
         private TabletopChamber $chamber,
@@ -41,7 +44,9 @@ final class TabletopShortcode
                 false,
                 null,
                 [
-                    'login_url' => wp_login_url($this->returnUrl()),
+                    'action_url' => $this->returnUrl(),
+                    'nonce' => wp_create_nonce(self::LOGIN_NONCE_ACTION),
+                    'error' => $this->doorLoginError,
                     'art_url' => GMRT_URL . 'assets/images/pippin-peppercorn-cartographer.png',
                 ]
             );
@@ -95,6 +100,67 @@ final class TabletopShortcode
                 $exception->getMessage()
             );
         }
+    }
+
+
+    public function handleDoorLogin(): void
+    {
+        if (is_user_logged_in() || ! $this->isDoorLoginRequest()) {
+            return;
+        }
+
+        $this->doorLoginError = $this->authenticateAtDoor();
+
+        if ($this->doorLoginError === null) {
+            wp_safe_redirect($this->returnUrl());
+            exit;
+        }
+    }
+
+    private function isDoorLoginRequest(): bool
+    {
+        return isset($_POST['gmrt_tabletop_login'])
+            && (string) $_POST['gmrt_tabletop_login'] === '1';
+    }
+
+    private function authenticateAtDoor(): ?string
+    {
+        $nonce = isset($_POST['gmrt_tabletop_login_nonce'])
+            ? sanitize_text_field(wp_unslash((string) $_POST['gmrt_tabletop_login_nonce']))
+            : '';
+
+        if ($nonce === '' || ! wp_verify_nonce($nonce, self::LOGIN_NONCE_ACTION)) {
+            return 'The Door could not verify that request. Please try again.';
+        }
+
+        $login = isset($_POST['log'])
+            ? sanitize_text_field(wp_unslash((string) $_POST['log']))
+            : '';
+        $password = isset($_POST['pwd'])
+            ? (string) wp_unslash($_POST['pwd'])
+            : '';
+        $remember = ! empty($_POST['rememberme']);
+
+        if ($login === '' || $password === '') {
+            return 'Enter your Companion username or email and password to open the Door.';
+        }
+
+        $user = wp_signon(
+            [
+                'user_login' => $login,
+                'user_password' => $password,
+                'remember' => $remember,
+            ],
+            is_ssl()
+        );
+
+        if (is_wp_error($user)) {
+            return 'The Door stayed shut. Check your username or email and password, then try again.';
+        }
+
+        wp_set_current_user((int) $user->ID);
+
+        return null;
     }
 
     private function tableId(string $attribute): string

@@ -1029,3 +1029,11 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - Reused packaged Pippin artwork for the scenic threshold and field-note treatment without adding a second authentication system.
 - Added responsive, keyboard-focus and reduced-motion presentation safeguards.
 - Added regression coverage for the signed-out Door, preserved return URL and WordPress authentication authority.
+
+
+## 0.32.6-alpha.2 — Phase IV.32.6A: The Door Has a Lock
+- Replaces the external `wp-login.php` hand-off with a Tabletop-native front-end sign-in form while continuing to use WordPress `wp_signon()` and auth cookies as the sole authentication authority.
+- Processes login during `template_redirect` so auth cookies are issued before page output, protects the form with a dedicated nonce, supports username/email, password-manager autocomplete and Remember Me, and returns successful sign-ins to the exact requested Table/invitation URL.
+- Promotes packaged Pippin dungeon artwork to a full-bleed cinematic threshold behind the login panel.
+- Gives the authenticated `Your chair is waiting` invitation state the same full-bleed threshold presentation while retaining explicit `Take My Seat` membership acceptance as a separate action.
+- Adds accessible inline login errors, keyboard focus, responsive composition and reduced-motion safeguards.

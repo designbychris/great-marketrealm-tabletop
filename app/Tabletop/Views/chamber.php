@@ -890,23 +890,39 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                     alt=""
                     class="gmrt-table-door__art"
                 >
-                <span class="gmrt-table-door__threshold"></span>
             </div>
             <div class="gmrt-table-door__panel">
                 <p class="gmrt-chamber__eyebrow">Great Marketrealm Tabletop</p>
                 <h1 id="gmrt-table-door-title">Beyond This Door, the Table Awaits</h1>
                 <p class="gmrt-table-door__lede">
-                    Adventures, maps and Fellowships are waiting on the other side.
-                    Sign in with your Great Marketrealm Companion account to take your seat.
+                    Sign in with your Great Marketrealm Companion account. The Tabletop uses the same account and the same trusted WordPress session beneath the Door.
                 </p>
-                <a
-                    class="gmrt-table-door__enter"
-                    href="<?php echo esc_url((string) ($entryDoor['login_url'] ?? '')); ?>"
-                >
-                    <span>Enter the Tabletop</span><i aria-hidden="true">▶</i>
-                </a>
+                <?php if (! empty($entryDoor['error'])) : ?>
+                    <div class="gmrt-table-door__error" role="alert">
+                        <?php echo esc_html((string) $entryDoor['error']); ?>
+                    </div>
+                <?php endif; ?>
+                <form class="gmrt-table-door__form" method="post" action="<?php echo esc_url((string) ($entryDoor['action_url'] ?? '')); ?>">
+                    <input type="hidden" name="gmrt_tabletop_login" value="1">
+                    <input type="hidden" name="gmrt_tabletop_login_nonce" value="<?php echo esc_attr((string) ($entryDoor['nonce'] ?? '')); ?>">
+                    <label>
+                        <span>Username or email</span>
+                        <input type="text" name="log" autocomplete="username" required autofocus>
+                    </label>
+                    <label>
+                        <span>Password</span>
+                        <input type="password" name="pwd" autocomplete="current-password" required>
+                    </label>
+                    <label class="gmrt-table-door__remember">
+                        <input type="checkbox" name="rememberme" value="1">
+                        <span>Keep me signed in on this device</span>
+                    </label>
+                    <button class="gmrt-table-door__enter" type="submit">
+                        <span>Enter the Tabletop</span><i aria-hidden="true">▶</i>
+                    </button>
+                </form>
                 <small class="gmrt-table-door__promise">
-                    Your requested Table and invitation link will still be waiting when you return.
+                    Your requested Table and invitation link stay attached to this Door while you sign in.
                 </small>
                 <aside class="gmrt-table-door__pippin" aria-label="Pippin's note">
                     <img src="<?php echo esc_url(GMRT_URL . 'assets/images/pippin-peppercorn-pixel.png'); ?>" alt="" aria-hidden="true">
@@ -915,18 +931,23 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
             </div>
         </section>
     <?php elseif (is_array($invitation)) : ?>
-        <section class="gmrt-gathering-invitation" role="status">
-            <p class="gmrt-chamber__eyebrow">The Gathering at the Table</p>
-            <h2>Your chair is waiting</h2>
-            <p>
-                The Dungeon Master has invited you to join this Table.
-                Taking your seat creates your persistent Table membership;
-                your character remains a separate choice.
-            </p>
-            <button type="button" data-accept-table-invitation>
-                Take My Seat
-            </button>
-            <span data-gathering-status role="status" aria-live="polite"></span>
+        <section class="gmrt-invitation-threshold" aria-labelledby="gmrt-invitation-title">
+            <div class="gmrt-invitation-threshold__scene" aria-hidden="true">
+                <img src="<?php echo esc_url(GMRT_URL . 'assets/images/pippin-peppercorn-cartographer.png'); ?>" alt="">
+            </div>
+            <div class="gmrt-gathering-invitation" role="status">
+                <p class="gmrt-chamber__eyebrow">The Gathering at the Table</p>
+                <h2 id="gmrt-invitation-title">Your chair is waiting</h2>
+                <p>
+                    The Dungeon Master has invited you to join this Table.
+                    Taking your seat creates your persistent Table membership;
+                    your character remains a separate choice.
+                </p>
+                <button type="button" data-accept-table-invitation>
+                    Take My Seat
+                </button>
+                <span data-gathering-status role="status" aria-live="polite"></span>
+            </div>
         </section>
     <?php elseif ($message !== null) : ?>
         <section
