@@ -3595,8 +3595,9 @@
 }
 .gmrt-bestiary-drawer__panel {
     position: relative;
-    top: 0;
-    height: 100%;
+    top: -7.5rem;
+    min-height: 80vh;
+    height: calc(100% + 7.5rem);
 }
 
 /* The pixel button foundation intentionally normalises button backgrounds;
@@ -3691,6 +3692,7 @@
     }
     .gmrt-bestiary-drawer__panel {
         top: 0;
+        min-height: 0;
         height: 100%;
     }
 }

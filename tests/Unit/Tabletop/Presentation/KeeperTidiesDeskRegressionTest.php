@@ -21,8 +21,9 @@ final class KeeperTidiesDeskRegressionTest extends TestCase
         self::assertStringNotContainsString('margin-top: 7rem;', $css);
         self::assertStringNotContainsString('margin-top: 8.75rem;', $css);
         self::assertStringContainsString('.gmrt-bestiary-drawer__panel {', $css);
-        self::assertStringContainsString('top: 0;', $css);
-        self::assertStringContainsString('height: 100%;', $css);
+        self::assertStringContainsString('top: -7.5rem;', $css);
+        self::assertStringContainsString('min-height: 80vh;', $css);
+        self::assertStringContainsString('height: calc(100% + 7.5rem);', $css);
         self::assertStringNotContainsString('top: -8.75rem;', $css);
     }
 
