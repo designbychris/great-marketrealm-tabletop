@@ -30,8 +30,12 @@ final class TabletopPageHostIntegrationTest extends TestCase
             'TabletopShortcode::TAG',
             $source
         );
-        self::assertStringNotContainsString(
+        self::assertStringContainsString(
             "'template_redirect'",
+            $source
+        );
+        self::assertStringContainsString(
+            "[\$this->shortcode, 'handleDoorLogin']",
             $source
         );
         self::assertStringNotContainsString(

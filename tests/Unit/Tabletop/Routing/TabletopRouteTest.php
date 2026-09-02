@@ -15,7 +15,7 @@ final class TabletopRouteTest extends TestCase
         $this->root = dirname(__DIR__, 4);
     }
 
-    public function testProviderDoesNotClaimWordPressPageRoute(): void
+    public function testProviderDoesNotClaimWordPressPageRouteBeyondDoorLogin(): void
     {
         $source = (string) file_get_contents(
             $this->root
@@ -26,8 +26,12 @@ final class TabletopRouteTest extends TestCase
             'TabletopRoute',
             $source
         );
-        self::assertStringNotContainsString(
-            'template_redirect',
+        self::assertStringContainsString(
+            "'template_redirect'",
+            $source
+        );
+        self::assertStringContainsString(
+            "[\$this->shortcode, 'handleDoorLogin']",
             $source
         );
         self::assertStringNotContainsString(

@@ -305,8 +305,12 @@ final class PluginFoundationTest extends TestCase
             'TabletopRoute',
             $provider
         );
-        self::assertStringNotContainsString(
-            'template_redirect',
+        self::assertStringContainsString(
+            "'template_redirect'",
+            $provider
+        );
+        self::assertStringContainsString(
+            "[\$this->shortcode, 'handleDoorLogin']",
             $provider
         );
     }
