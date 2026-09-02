@@ -987,3 +987,7 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - Gives selected tokens a four-corner focus reticle and refines the certified current-turn cursor into a stepped pixel frame.
 - Pixel-styles the existing authoritative target line/range plaque, Keeper deployment thresholds, Vision door editing marks and Footsteps movement trail.
 - Keeps movement, targeting, Vision, Fog, encounter state and persistence untouched and preserves reduced-motion behaviour.
+
+### 0.32.4-alpha.1 — IV.32.4A browser-certification polish
+- Lets the five combat deed buttons wrap responsively when a combat dock is narrower than their readable pixel labels.
+- Keeps wide docks on one row, preserves whole labels such as `Disengage`, and typically settles narrow docks into a balanced 3 + 2 arrangement without shrinking typography or changing deed behaviour.

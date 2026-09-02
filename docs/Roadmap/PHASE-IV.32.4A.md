@@ -19,3 +19,7 @@ Vision doors keep their existing barrier identities and LOS behaviour. Closed/op
 - No encounter or initiative authority changes.
 - Existing accessibility focus remains visible through the selected-token reticle.
 - Reduced-motion users receive no added battlefield animation.
+
+## Browser-certification polish
+
+The combat deed strip now uses an adaptive minimum-width grid instead of forcing all five actions into five equal columns. Wide docks retain the single five-button row; narrower Satchel/Bestiary combat docks naturally wrap into a balanced multi-row layout (typically 3 + 2) before labels can overflow. Deed labels remain on one line, so `Disengage` stays intact without shrinking the established pixel typography. This is CSS-only and does not change deed actions or combat authority.

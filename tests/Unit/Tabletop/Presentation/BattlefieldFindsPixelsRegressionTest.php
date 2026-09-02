@@ -33,6 +33,8 @@ final class BattlefieldFindsPixelsRegressionTest extends TestCase
         self::assertStringContainsString('.gmrt-token.is-active-turn::before {', $css);
         self::assertStringContainsString('filter: drop-shadow(2px 2px 0 #2b2110);', $css);
         self::assertStringContainsString('.gmrt-token:focus-visible,', $css);
+        self::assertStringContainsString('grid-template-columns:repeat(auto-fit,minmax(6.5rem,1fr))', $css);
+        self::assertStringContainsString('.gmrt-combat-dock__deeds .gmrt-deed{min-width:0;white-space:nowrap}', $css);
     }
 
     public function test_targeting_and_threshold_marks_share_the_pixel_battlefield_grammar(): void
