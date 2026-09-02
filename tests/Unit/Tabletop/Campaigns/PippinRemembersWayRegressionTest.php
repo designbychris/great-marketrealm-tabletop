@@ -47,6 +47,9 @@ final class PippinRemembersWayRegressionTest extends TestCase
         self::assertStringContainsString('dungeonMasterUserId() !== $userId', $remover);
         self::assertStringContainsString("'gmrt_tables'", $remover);
         self::assertStringContainsString("(string) (\$record['id'] ?? '') === \$tableId", $remover);
+        self::assertStringContainsString("wp_cache_delete(\$option, 'options')", $remover);
+        self::assertStringContainsString("wp_cache_delete('alloptions', 'options')", $remover);
+        self::assertStringContainsString("That Tabletop could not be removed. Please try again.", $remover);
         $repository = file_get_contents($this->root() . '/app/Tables/Repositories/WordPressTableRepository.php');
         self::assertStringContainsString("(string) (\$candidate['id'] ?? '') === \$id", $repository);
         self::assertStringContainsString("'wp_ajax_gmrt_remove_tabletop'", $provider);

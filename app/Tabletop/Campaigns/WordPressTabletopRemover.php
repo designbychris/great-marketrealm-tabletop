@@ -81,7 +81,33 @@ final class WordPressTabletopRemover
 
             if ($changed) {
                 update_option($option, $records, false);
+
+                // The Atlas is a front-end gateway and may run behind a
+                // persistent WordPress object cache. Make the mutation
+                // authoritative immediately rather than allowing a stale
+                // cached option to resurrect a removed Table on refresh.
+                wp_cache_delete($option, 'options');
+                wp_cache_delete('alloptions', 'options');
+            }
+        }
+
+        // Never report success while the authoritative Table record can still
+        // be read back. This catches a failed option write/cache divergence
+        // instead of leaving a Keeper with a ghost campaign in the Atlas.
+        $remainingTables = get_option('gmrt_tables', []);
+        if (is_array($remainingTables)) {
+            foreach ($remainingTables as $storageKey => $record) {
+                if (
+                    (string) $storageKey === $tableId
+                    || (
+                        is_array($record)
+                        && (string) ($record['id'] ?? '') === $tableId
+                    )
+                ) {
+                    throw new RuntimeException('That Tabletop could not be removed. Please try again.');
+                }
             }
         }
     }
 }
+
