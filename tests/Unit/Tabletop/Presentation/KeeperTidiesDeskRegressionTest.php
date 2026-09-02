@@ -11,12 +11,17 @@ final class KeeperTidiesDeskRegressionTest extends TestCase
         return (string) file_get_contents(dirname(__DIR__, 4) . '/' . $path);
     }
 
-    public function test_bestiary_workspace_rises_to_the_atlas_top_edge_without_moving_its_rail_tab(): void
+    public function test_bestiary_workspace_shares_the_atlas_top_edge_while_its_tab_keeps_the_lower_rail_slot(): void
     {
         $css = $this->source('assets/css/tabletop.css');
+        self::assertStringContainsString('.gmrt-bestiary-drawer {', $css);
+        self::assertStringContainsString('top: 7.75rem;', $css);
+        self::assertStringContainsString('.gmrt-bestiary-drawer__toggle {', $css);
+        self::assertStringContainsString('margin-top: 8.75rem;', $css);
         self::assertStringContainsString('.gmrt-bestiary-drawer__panel {', $css);
-        self::assertStringContainsString('top: -8.75rem;', $css);
-        self::assertStringContainsString('height: calc(100% + 8.75rem);', $css);
+        self::assertStringContainsString('top: 0;', $css);
+        self::assertStringContainsString('height: 100%;', $css);
+        self::assertStringNotContainsString('top: -8.75rem;', $css);
     }
 
     public function test_live_gathering_refresh_preserves_character_portrait_seats(): void

@@ -3583,12 +3583,19 @@
    Presentation only.
    ========================================================================== */
 
-/* The Bestiary tab keeps its lower rail position, but its open workspace rises
-   to the same top edge as the Atlas so both Keeper drawers feel like siblings. */
+/* Atlas and Bestiary share the exact same drawer top edge. The Bestiary tab
+   keeps its lower rail slot via margin rather than dragging the whole drawer
+   down, so both open workspaces align pixel-for-pixel at the top. */
+.gmrt-bestiary-drawer {
+    top: 7.75rem;
+}
+.gmrt-bestiary-drawer__toggle {
+    margin-top: 8.75rem;
+}
 .gmrt-bestiary-drawer__panel {
     position: relative;
-    top: -8.75rem;
-    height: calc(100% + 8.75rem);
+    top: 0;
+    height: 100%;
 }
 
 /* The pixel button foundation intentionally normalises button backgrounds;
@@ -3675,8 +3682,14 @@
 }
 
 @media (max-width: 760px) {
+    .gmrt-bestiary-drawer {
+        top: 7.75rem;
+    }
+    .gmrt-bestiary-drawer__toggle {
+        margin-top: 8.75rem;
+    }
     .gmrt-bestiary-drawer__panel {
-        top: -8.75rem;
-        height: calc(100% + 8.75rem);
+        top: 0;
+        height: 100%;
     }
 }
