@@ -198,9 +198,18 @@
     }
 
     const gatheringStatus = document.querySelector('[data-gathering-status]');
+    let keeperSecretD20Result = null;
     const gatheringSay = (message) => {
         if (gatheringStatus) gatheringStatus.textContent = message;
     };
+
+    function populateKeeperSecretRollResult(scope = document) {
+        const result = scope.querySelector?.('[data-keeper-secret-d20-result]');
+        if (!result) return;
+        result.textContent = keeperSecretD20Result === null
+            ? ''
+            : 'Secret d20: ' + keeperSecretD20Result;
+    }
 
     function syncGatheringTurnState() {
         const activeToken = document.querySelector('[data-token-id].is-active-turn');
@@ -282,6 +291,29 @@
             const name = document.createElement('strong');
             name.textContent = String(member.display_name || ('User #' + String(member.user_id || '')));
             item.appendChild(name);
+
+            if (root?.dataset.viewerRole === 'dungeon-master' && role === 'dungeon-master' && status !== 'left') {
+                const secretZone = document.createElement('div');
+                secretZone.className = 'gmrt-party__secret-roll';
+                secretZone.dataset.keeperSecretRollZone = '';
+
+                const secretButton = document.createElement('button');
+                secretButton.type = 'button';
+                secretButton.dataset.keeperSecretD20 = '';
+                secretButton.textContent = 'Secret d20';
+                secretButton.setAttribute('aria-label', 'Roll a private d20 visible only to the Dungeon Master');
+
+                const secretResult = document.createElement('span');
+                secretResult.className = 'gmrt-party__secret-result';
+                secretResult.dataset.keeperSecretD20Result = '';
+                secretResult.setAttribute('role', 'status');
+                secretResult.setAttribute('aria-live', 'polite');
+
+                secretZone.appendChild(secretButton);
+                secretZone.appendChild(secretResult);
+                item.appendChild(secretZone);
+                populateKeeperSecretRollResult(secretZone);
+            }
 
             if (root?.dataset.viewerRole === 'dungeon-master' && role === 'player' && status !== 'left') {
                 const remove = document.createElement('button');
@@ -378,6 +410,26 @@
     });
 
     document.addEventListener('click', async (event) => {
+        const secretButton = event.target.closest('[data-keeper-secret-d20]');
+        if (secretButton) {
+            if (root?.dataset.viewerRole !== 'dungeon-master') return;
+            secretButton.disabled = true;
+            const previousLabel = secretButton.textContent;
+            secretButton.textContent = 'Rolling…';
+            try {
+                const data = await request('gmrt_keeper_secret_d20', {});
+                keeperSecretD20Result = Number(data.roll || 0);
+                populateKeeperSecretRollResult(secretButton.closest('[data-keeper-secret-roll-zone]') || document);
+            } catch (error) {
+                const result = secretButton.closest('[data-keeper-secret-roll-zone]')?.querySelector('[data-keeper-secret-d20-result]');
+                if (result) result.textContent = error.message || 'Secret roll failed.';
+            } finally {
+                secretButton.disabled = false;
+                secretButton.textContent = previousLabel || 'Secret d20';
+            }
+            return;
+        }
+
         const button = event.target.closest('[data-remove-table-player]');
         if (!button) return;
         const userId = button.dataset.userId || '';

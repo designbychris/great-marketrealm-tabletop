@@ -975,3 +975,9 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - Extended the Tabletop pixel language into live-play party, encounter, Satchel, Bestiary and active-token presentation.
 - Added current-turn highlighting to Gathering character seats by matching the existing authoritative active token source to the seated Companion character on both initial render and Living Table refresh.
 - Kept initiative, turn advancement, combat resolution, HP, conditions, targeting, movement, Fog and persistence unchanged.
+
+## 0.32.3-alpha.3 — Phase IV.32.3B: The Keeper Rolls Behind the Screen
+- Adds a Dungeon-Master-only Secret d20 beneath the Keeper's Gathering seat.
+- Uses the existing `SecureD20Roller` behind a server-side active-DM membership gate.
+- Keeps the result response-only in the Keeper browser: no Chamber Chronicle, Battle Chronicle or Living Table projection.
+- Preserves the last private result across normal live Gathering redraws without server persistence.

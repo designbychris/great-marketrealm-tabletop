@@ -1630,6 +1630,29 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
 
                             <?php if (
                                 $state->isDungeonMaster()
+                                && ($member['role'] ?? '') === 'dungeon-master'
+                                && ($member['status'] ?? '') !== 'left'
+                            ) : ?>
+                                <div class="gmrt-party__secret-roll" data-keeper-secret-roll-zone>
+                                    <button
+                                        type="button"
+                                        data-keeper-secret-d20
+                                        aria-describedby="gmrt-keeper-secret-roll-help"
+                                    >Secret d20</button>
+                                    <span
+                                        class="gmrt-party__secret-result"
+                                        data-keeper-secret-d20-result
+                                        role="status"
+                                        aria-live="polite"
+                                    ></span>
+                                    <span id="gmrt-keeper-secret-roll-help" class="screen-reader-text">
+                                        Roll a private d20 visible only to the Dungeon Master. It is not written to the Chronicle.
+                                    </span>
+                                </div>
+                            <?php endif; ?>
+
+                            <?php if (
+                                $state->isDungeonMaster()
                                 && ($member['role'] ?? '') === 'player'
                                 && ($member['status'] ?? '') !== 'left'
                             ) : ?>

@@ -773,3 +773,7 @@ A staged SNES-era presentation pass for the Tabletop. Pixel styling remains a sk
 
 ### Phase IV.32.2C.1 — The Keeper Tidies the Desk
 Browser-feedback polish for the pixel Tabletop shell: align the Bestiary workspace with the Atlas top edge, preserve live character-seat portraits, restore Fellowship Ribbon colours, consolidate Keeper battlefield tools behind one disclosure, remove obsolete Lens help copy, and compact the DM-only Companion adventurer picker.
+
+- [x] **IV.32.3 — Adventurers in Miniature** — gives current-turn party seats, battlefield miniatures, Bestiary combatants and the battle status plaque one shared 16-bit turn grammar without changing encounter authority.
+- [x] **IV.32.3A — The Deeds Remember Every Adventurer** — routes Player Satchel rolls into the active Battle Chronicle when an encounter is visible and keeps exploration rolls in the Chamber Chronicle; also shares the Keeper drawer scrollbar language with the Satchel.
+- [x] **IV.32.3B — The Keeper Rolls Behind the Screen** — adds a DM-only, server-authorised Secret d20 using the certified secure roller; results remain response-only in the Keeper browser and never enter shared Chronicle or Living Table state.

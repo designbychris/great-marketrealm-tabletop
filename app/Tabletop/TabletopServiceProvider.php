@@ -33,6 +33,7 @@ use GreatMarketrealmTabletop\Tabletop\Http\AdventuringMeasuresAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\QuickHandsAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\WeaponHandsAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\SpellPouchAjaxController;
+use GreatMarketrealmTabletop\Tabletop\Http\KeeperSecretRollAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\TableColourAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\CarriedLightAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\DroppedLightAjaxController;
@@ -121,6 +122,8 @@ final class TabletopServiceProvider
     private WeaponHandsAjaxController $weaponHandsAjax;
 
     private SpellPouchAjaxController $spellPouchAjax;
+
+    private KeeperSecretRollAjaxController $keeperSecretRollAjax;
 
     private TableColourAjaxController $tableColourAjax;
 
@@ -320,6 +323,12 @@ final class TabletopServiceProvider
                 new SecureDamageDieRoller()
             ),
             $chronicle
+        );
+
+
+        $this->keeperSecretRollAjax = new KeeperSecretRollAjaxController(
+            new WordPressTableMembershipRepository(),
+            new SecureD20Roller()
         );
     }
 
@@ -584,6 +593,12 @@ final class TabletopServiceProvider
         add_action(
             'wp_ajax_gmrt_spell_pouch_roll',
             [$this->spellPouchAjax, 'roll']
+        );
+
+
+        add_action(
+            'wp_ajax_gmrt_keeper_secret_d20',
+            [$this->keeperSecretRollAjax, 'roll']
         );
     }
 }

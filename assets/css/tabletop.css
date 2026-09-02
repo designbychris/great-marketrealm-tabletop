@@ -3947,3 +3947,46 @@
 .gmrt-satchel__panel::-webkit-scrollbar-thumb:hover {
     background: var(--gmrt-pixel-gold);
 }
+
+/* IV.32.3B — The Keeper Rolls Behind the Screen
+   Keeper-only dice remain private presentation and never become Chronicle state. */
+.gmrt-party__secret-roll {
+    grid-column: 2 / -1;
+    grid-row: 2;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: .4rem;
+    align-items: center;
+    margin-top: .28rem;
+    padding-top: .38rem;
+    border-top: 1px dashed rgba(216, 173, 79, .22);
+}
+
+.gmrt-party__secret-roll button {
+    min-height: 2rem;
+    width: 100%;
+    padding: .34rem .55rem;
+    border-color: #7e6538;
+    background: #17130e;
+    color: #e8d398;
+    font: 800 .66rem/1.1 ui-monospace, "Courier New", monospace;
+    letter-spacing: .03em;
+}
+
+.gmrt-party__secret-roll button:hover,
+.gmrt-party__secret-roll button:focus-visible {
+    border-color: #d6ad55;
+    color: #fff0b5;
+}
+
+.gmrt-party__secret-result {
+    min-width: 5.5rem;
+    color: #f4d67c;
+    font: 900 .64rem/1.15 ui-monospace, "Courier New", monospace;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.gmrt-party__secret-result:empty {
+    display: none;
+}
