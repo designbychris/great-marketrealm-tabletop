@@ -4702,3 +4702,258 @@
     stroke-linejoin: miter;
     stroke-dasharray: .75 .16;
 }
+
+/* Phase IV.32.6 — The Door to the Table.
+ * Authentication presentation only. Table authority and login mechanics remain WordPress-owned.
+ */
+.gmrt-chamber:has(.gmrt-table-door) {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: clamp(.75rem, 2vw, 1.5rem);
+    overflow: hidden;
+    background:
+        linear-gradient(rgba(255,255,255,.012) 50%, transparent 50%) 0 0 / 100% 4px,
+        radial-gradient(circle at 50% 30%, rgba(118, 91, 48, .12), transparent 44%),
+        #100d0a;
+}
+
+.gmrt-table-door {
+    position: relative;
+    isolation: isolate;
+    width: min(1180px, 100%);
+    min-height: min(760px, calc(100vh - 3rem));
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(320px, .8fr);
+    align-items: stretch;
+    border: 2px solid var(--gmrt-pixel-gold-low);
+    border-top-color: var(--gmrt-pixel-gold-hi);
+    border-left-color: var(--gmrt-pixel-gold-hi);
+    background: #15110d;
+    box-shadow:
+        inset 2px 2px 0 rgba(255,255,255,.045),
+        inset -2px -2px 0 rgba(0,0,0,.62),
+        8px 8px 0 rgba(0,0,0,.52);
+}
+
+.gmrt-table-door::before,
+.gmrt-table-door::after {
+    content: "";
+    position: absolute;
+    z-index: 4;
+    pointer-events: none;
+}
+
+.gmrt-table-door::before {
+    inset: 8px;
+    border: 1px solid rgba(215, 184, 110, .22);
+}
+
+.gmrt-table-door::after {
+    inset: 0;
+    background:
+        linear-gradient(90deg, rgba(0,0,0,.45), transparent 18%, transparent 78%, rgba(0,0,0,.62)),
+        linear-gradient(0deg, rgba(0,0,0,.55), transparent 28%);
+    mix-blend-mode: multiply;
+}
+
+.gmrt-table-door__scene {
+    position: relative;
+    z-index: 1;
+    min-height: 560px;
+    overflow: hidden;
+    background:
+        linear-gradient(180deg, rgba(14, 11, 8, .12), rgba(14, 11, 8, .72)),
+        #272017;
+}
+
+.gmrt-table-door__art {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    object-position: center;
+    image-rendering: auto;
+    filter: saturate(.82) contrast(1.04) brightness(.72) sepia(.08);
+    transform: scale(1.025);
+}
+
+.gmrt-table-door__scene::before {
+    content: "";
+    position: absolute;
+    z-index: 2;
+    inset: 0;
+    pointer-events: none;
+    background:
+        linear-gradient(90deg, rgba(16,12,9,.15), transparent 44%, rgba(16,12,9,.58)),
+        repeating-linear-gradient(0deg, rgba(245,223,172,.025) 0 2px, transparent 2px 4px);
+}
+
+.gmrt-table-door__threshold {
+    position: absolute;
+    z-index: 3;
+    left: 50%;
+    bottom: 5%;
+    width: 44%;
+    height: 7px;
+    transform: translateX(-50%);
+    background: #b59655;
+    box-shadow:
+        -6px 0 0 #6e5530,
+        6px 0 0 #6e5530,
+        0 -3px 0 rgba(240,211,136,.42),
+        0 5px 0 rgba(0,0,0,.55);
+    opacity: .66;
+}
+
+.gmrt-table-door__panel {
+    position: relative;
+    z-index: 5;
+    align-self: center;
+    margin: clamp(1rem, 3vw, 2.5rem);
+    padding: clamp(1.25rem, 3vw, 2.2rem);
+    border: 2px solid var(--gmrt-pixel-gold-low);
+    border-top-color: var(--gmrt-pixel-gold-hi);
+    border-left-color: var(--gmrt-pixel-gold-hi);
+    background:
+        linear-gradient(135deg, rgba(255,255,255,.045), transparent 34%),
+        rgba(31, 25, 19, .96);
+    box-shadow: var(--gmrt-pixel-inset), 6px 6px 0 rgba(0,0,0,.48);
+}
+
+.gmrt-table-door__panel::before {
+    content: "THE DOOR TO THE TABLE";
+    display: inline-block;
+    margin-bottom: .85rem;
+    padding: .25rem .45rem;
+    border: 1px solid rgba(215,184,110,.46);
+    background: #17120e;
+    color: var(--gmrt-pixel-gold-hi);
+    font: 800 .62rem/1 ui-monospace, "Courier New", monospace;
+    letter-spacing: .12em;
+}
+
+.gmrt-table-door h1 {
+    margin: .35rem 0 1rem;
+    max-width: 15ch;
+    color: #f1e2c1;
+    font: 900 clamp(1.65rem, 4vw, 2.65rem)/1.05 ui-monospace, "Courier New", monospace;
+    letter-spacing: -.035em;
+    text-shadow: 3px 3px 0 rgba(0,0,0,.72);
+}
+
+.gmrt-table-door__lede {
+    margin: 0 0 1.35rem;
+    color: rgba(239, 226, 196, .84);
+    line-height: 1.65;
+}
+
+.gmrt-table-door__enter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+    padding: .9rem 1rem;
+    border: 2px solid #806438;
+    border-top-color: #f1d58b;
+    border-left-color: #f1d58b;
+    background: #2a2118;
+    color: #fff0c9;
+    text-decoration: none;
+    box-shadow:
+        inset 2px 2px 0 rgba(255,255,255,.055),
+        inset -2px -2px 0 rgba(0,0,0,.45),
+        3px 3px 0 rgba(0,0,0,.46);
+    font: 900 .82rem/1.2 ui-monospace, "Courier New", monospace;
+    letter-spacing: .045em;
+    text-transform: uppercase;
+}
+
+.gmrt-table-door__enter:hover {
+    background: #3b2d20;
+    border-top-color: #ffe7a5;
+    border-left-color: #ffe7a5;
+}
+
+.gmrt-table-door__enter:active {
+    transform: translate(2px, 2px);
+    box-shadow: inset 2px 2px 0 rgba(0,0,0,.38);
+}
+
+.gmrt-table-door__enter:focus-visible {
+    outline: 2px solid var(--gmrt-pixel-focus);
+    outline-offset: 4px;
+}
+
+.gmrt-table-door__enter i {
+    color: var(--gmrt-pixel-gold-hi);
+    font-style: normal;
+}
+
+.gmrt-table-door__promise {
+    display: block;
+    margin-top: .8rem;
+    color: rgba(234,217,181,.58);
+    font: 700 .67rem/1.45 ui-monospace, "Courier New", monospace;
+}
+
+.gmrt-table-door__pippin {
+    display: grid;
+    grid-template-columns: 48px 1fr;
+    gap: .75rem;
+    align-items: center;
+    margin-top: 1.4rem;
+    padding-top: 1rem;
+    border-top: 2px solid rgba(128,100,56,.42);
+}
+
+.gmrt-table-door__pippin img {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+.gmrt-table-door__pippin p {
+    margin: 0;
+    color: rgba(239,226,196,.72);
+    font-size: .78rem;
+    line-height: 1.45;
+}
+
+.gmrt-table-door__pippin strong {
+    color: var(--gmrt-pixel-gold-hi);
+    font-family: ui-monospace, "Courier New", monospace;
+}
+
+@media (max-width: 820px) {
+    .gmrt-chamber:has(.gmrt-table-door) {
+        overflow: auto;
+    }
+    .gmrt-table-door {
+        grid-template-columns: 1fr;
+        min-height: 0;
+    }
+    .gmrt-table-door__scene {
+        min-height: 38vh;
+        max-height: 420px;
+    }
+    .gmrt-table-door__panel {
+        margin: 0;
+        border-right: 0;
+        border-bottom: 0;
+        border-left: 0;
+        box-shadow: none;
+    }
+    .gmrt-table-door h1 {
+        max-width: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gmrt-table-door__enter {
+        transition: none;
+    }
+}

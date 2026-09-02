@@ -787,3 +787,6 @@ Browser-feedback polish for the pixel Tabletop shell: align the Bestiary workspa
 - [x] **IV.32.5 — Pippin Discovers Pixel Art** — brings the deterministic Scene Forge itself into the 16-bit language: dungeon tile shading, block-canopy trees, faceted rocks, stepped village roofs/buildings, pixel logs/wells/gardens and square trail treatment, while leaving topology, barriers, doors, lights, grid and Fog authority unchanged.
 
 - [x] **IV.32.5A — Pippin Fixes the Drawer Hinges** — hardens Atlas/Bestiary drawer controls across live Chamber replacement and generated-Scene transitions with document-level delegated controls, and normalises WordPress-slashed Scene names before persistence so apostrophes display cleanly.
+
+## Phase IV.32.6 — The Door to the Table ✅ BUILD READY
+The signed-out Tabletop now opens on a dedicated 16-bit threshold experience with Pippin, a WordPress-owned sign-in action, and preservation of the requested Table/invitation return URL. Browser certification remains required before final completion.

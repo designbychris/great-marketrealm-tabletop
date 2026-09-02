@@ -14,7 +14,8 @@ final class TabletopChamberRenderer
         ?TabletopChamberState $state,
         ?string $message = null,
         bool $canPrepareTestTable = false,
-        ?array $invitation = null
+        ?array $invitation = null,
+        ?array $entryDoor = null
     ): string {
         $view = GMRT_PATH
             . 'app/Tabletop/Views/chamber.php';

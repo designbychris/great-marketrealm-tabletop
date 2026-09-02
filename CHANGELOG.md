@@ -1022,3 +1022,10 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - Makes Atlas and Bestiary tab opening lifecycle-safe by delegating their click handling from the stable document, so replacing the Chamber while entering/leaving generated Scenes cannot strand fresh drawer tabs without handlers.
 - Keeps the existing moving Keeper rail, mutual drawer exclusion, accessibility state and Bestiary search focus behaviour intact.
 - Unslashes incoming Scene names before WordPress sanitisation so apostrophes render as `Pippin's` rather than leaking the request escape character into persisted/generated Scene titles.
+
+### Phase IV.32.6 — The Door to the Table
+- Replaced the signed-out plain notice with a dedicated pixel-styled Tabletop entrance.
+- Added a WordPress-owned **Enter the Tabletop** login action that returns visitors to the exact requested Table/invitation URL after authentication.
+- Reused packaged Pippin artwork for the scenic threshold and field-note treatment without adding a second authentication system.
+- Added responsive, keyboard-focus and reduced-motion presentation safeguards.
+- Added regression coverage for the signed-out Door, preserved return URL and WordPress authentication authority.

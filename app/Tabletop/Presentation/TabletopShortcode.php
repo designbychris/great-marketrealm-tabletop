@@ -37,7 +37,13 @@ final class TabletopShortcode
         if (! is_user_logged_in()) {
             return $this->renderer->render(
                 null,
-                'Please sign in to enter the Tabletop Chamber.'
+                null,
+                false,
+                null,
+                [
+                    'login_url' => wp_login_url($this->returnUrl()),
+                    'art_url' => GMRT_URL . 'assets/images/pippin-peppercorn-cartographer.png',
+                ]
             );
         }
 
@@ -106,6 +112,15 @@ final class TabletopShortcode
                 ?? ''
             )
         );
+    }
+
+    private function returnUrl(): string
+    {
+        $requestUri = isset($_SERVER['REQUEST_URI'])
+            ? wp_unslash((string) $_SERVER['REQUEST_URI'])
+            : '/';
+
+        return esc_url_raw(home_url($requestUri));
     }
 
     private function enqueueAssets(): void

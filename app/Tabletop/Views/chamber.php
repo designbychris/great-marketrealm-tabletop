@@ -10,6 +10,7 @@ defined('ABSPATH') || exit;
 /** @var string|null $message */
 /** @var bool $canPrepareTestTable */
 /** @var array<string,mixed>|null $invitation */
+/** @var array<string,mixed>|null $entryDoor */
 
 $table = $state?->table() ?? [];
 $viewer = $state?->viewer() ?? [];
@@ -215,6 +216,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
         </aside>
     <?php endif; ?>
 
+    <?php if (! is_array($entryDoor)) : ?>
     <header class="gmrt-chamber__masthead">
         <div>
             <p class="gmrt-chamber__eyebrow">
@@ -263,6 +265,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
             </div>
         <?php endif; ?>
     </header>
+    <?php endif; ?>
 
 
     <?php if ($state !== null && $state->isDungeonMaster()) : ?>
@@ -879,7 +882,39 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
     <?php endif; ?>
     </div>
 
-    <?php if (is_array($invitation)) : ?>
+    <?php if (is_array($entryDoor)) : ?>
+        <section class="gmrt-table-door" aria-labelledby="gmrt-table-door-title">
+            <div class="gmrt-table-door__scene" aria-hidden="true">
+                <img
+                    src="<?php echo esc_url((string) ($entryDoor['art_url'] ?? '')); ?>"
+                    alt=""
+                    class="gmrt-table-door__art"
+                >
+                <span class="gmrt-table-door__threshold"></span>
+            </div>
+            <div class="gmrt-table-door__panel">
+                <p class="gmrt-chamber__eyebrow">Great Marketrealm Tabletop</p>
+                <h1 id="gmrt-table-door-title">Beyond This Door, the Table Awaits</h1>
+                <p class="gmrt-table-door__lede">
+                    Adventures, maps and Fellowships are waiting on the other side.
+                    Sign in with your Great Marketrealm Companion account to take your seat.
+                </p>
+                <a
+                    class="gmrt-table-door__enter"
+                    href="<?php echo esc_url((string) ($entryDoor['login_url'] ?? '')); ?>"
+                >
+                    <span>Enter the Tabletop</span><i aria-hidden="true">▶</i>
+                </a>
+                <small class="gmrt-table-door__promise">
+                    Your requested Table and invitation link will still be waiting when you return.
+                </small>
+                <aside class="gmrt-table-door__pippin" aria-label="Pippin's note">
+                    <img src="<?php echo esc_url(GMRT_URL . 'assets/images/pippin-peppercorn-pixel.png'); ?>" alt="" aria-hidden="true">
+                    <p><strong>Pippin says:</strong> “I checked the hinges. Twice. The door is almost certainly not a Mimic.”</p>
+                </aside>
+            </div>
+        </section>
+    <?php elseif (is_array($invitation)) : ?>
         <section class="gmrt-gathering-invitation" role="status">
             <p class="gmrt-chamber__eyebrow">The Gathering at the Table</p>
             <h2>Your chair is waiting</h2>
