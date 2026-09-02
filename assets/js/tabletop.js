@@ -347,7 +347,19 @@
         try {
             const data = await request('gmrt_remove_tabletop', { table_id: campaignTableId });
             if (status) status.textContent = data.message || 'Tabletop removed.';
-            window.setTimeout(() => window.location.reload(), 350);
+
+            const card = button.closest('.gmrt-campaign-card');
+            const shelf = card?.closest('.gmrt-campaign-lobby__shelf');
+            if (card) {
+                card.remove();
+            }
+
+            if (shelf && !shelf.querySelector('.gmrt-campaign-card')) {
+                const empty = document.createElement('p');
+                empty.className = 'gmrt-campaign-lobby__empty';
+                empty.textContent = 'Pippin has no saved roads for you yet. A Keeper can set a new Table, or an Adventurer can return after receiving a Summons.';
+                shelf.replaceWith(empty);
+            }
         } catch (error) {
             if (status) status.textContent = error.message || 'The Tabletop could not be removed.';
             button.disabled = false;

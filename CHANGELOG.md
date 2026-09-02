@@ -1059,3 +1059,5 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - Added Keeper-only permanent Tabletop removal with nonce and owner authorization plus campaign-keyed persistence cleanup.
 
 - IV.33.3 final browser polish: Pippin's Table Atlas now suppresses the in-Chamber masthead, and permanent Table removal can resolve legacy Testing Grounds records whose stored option key predates their authoritative Table UUID.
+
+- IV.33.3 final polish: successful Tabletop removal now updates Pippin's Table Atlas immediately in the browser, removing the deleted campaign card without requiring a manual page refresh; removing the final card restores the Atlas empty-state message.

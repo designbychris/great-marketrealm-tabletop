@@ -808,3 +808,5 @@ Campaign Shelf player management: inspect the Gathering, send Summons, and remov
 Persistent Pippin Table Atlas: one Tabletop entrance for Keeper-owned campaigns, Player memberships and invitations, plus Keeper-only removal of abandoned Tables. **Built; awaiting automated and browser certification.**
 
 - IV.33.3 final browser polish: Pippin's Table Atlas now suppresses the in-Chamber masthead, and permanent Table removal can resolve legacy Testing Grounds records whose stored option key predates their authoritative Table UUID.
+
+- IV.33.3 final polish: successful Tabletop removal now updates Pippin's Table Atlas immediately in the browser, removing the deleted campaign card without requiring a manual page refresh; removing the final card restores the Atlas empty-state message.

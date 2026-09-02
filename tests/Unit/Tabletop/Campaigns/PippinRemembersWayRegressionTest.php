@@ -50,5 +50,10 @@ final class PippinRemembersWayRegressionTest extends TestCase
         $repository = file_get_contents($this->root() . '/app/Tables/Repositories/WordPressTableRepository.php');
         self::assertStringContainsString("(string) (\$candidate['id'] ?? '') === \$id", $repository);
         self::assertStringContainsString("'wp_ajax_gmrt_remove_tabletop'", $provider);
+
+        $script = file_get_contents($this->root() . '/assets/js/tabletop.js');
+        self::assertStringContainsString("button.closest('.gmrt-campaign-card')", $script);
+        self::assertStringContainsString('card.remove()', $script);
+        self::assertStringNotContainsString("window.setTimeout(() => window.location.reload(), 350)", $script);
     }
 }
