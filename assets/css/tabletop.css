@@ -5204,3 +5204,66 @@
         min-height: calc(100dvh - var(--gmrt-threshold-header-offset, 72px));
     }
 }
+
+/* IV.33.1 — The Keeper Names the Campaign */
+.gmrt-campaign-lobby {
+    max-width: 1180px;
+    margin: 0 auto;
+    display: grid;
+    gap: 1.25rem;
+}
+.gmrt-campaign-lobby__header,
+.gmrt-create-tabletop,
+.gmrt-campaign-card,
+.gmrt-testing-grounds {
+    border: 3px solid rgba(244, 234, 214, .22);
+    background: #211b14;
+    box-shadow: 6px 6px 0 #090806;
+}
+.gmrt-campaign-lobby__header,
+.gmrt-create-tabletop { padding: clamp(1rem, 3vw, 1.75rem); }
+.gmrt-campaign-lobby__header h2,
+.gmrt-create-tabletop h3,
+.gmrt-campaign-card h3 { margin: .2rem 0 .5rem; }
+.gmrt-campaign-lobby__shelf {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+}
+.gmrt-campaign-card { padding: 1rem; }
+.gmrt-campaign-card__open,
+.gmrt-create-tabletop button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    margin-top: .5rem;
+    padding: .65rem 1rem;
+    border: 2px solid #f4ead6;
+    background: #34291c;
+    color: #fff4dc;
+    font: inherit;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow: 3px 3px 0 #090806;
+}
+.gmrt-create-tabletop { display: grid; gap: .85rem; }
+.gmrt-create-tabletop label { display: grid; gap: .35rem; font-weight: 700; }
+.gmrt-create-tabletop input,
+.gmrt-create-tabletop textarea {
+    width: 100%;
+    box-sizing: border-box;
+    border: 2px solid rgba(244,234,214,.45);
+    border-radius: 0;
+    padding: .7rem;
+    background: #100d0a;
+    color: #f4ead6;
+    font: inherit;
+}
+.gmrt-create-tabletop textarea { resize: vertical; }
+.gmrt-create-tabletop button { justify-self: start; }
+.gmrt-create-tabletop button:disabled { opacity: .6; cursor: wait; }
+.gmrt-campaign-lobby__empty { padding: 1rem; border: 2px dashed rgba(244,234,214,.25); }
+.gmrt-testing-grounds { padding: .75rem 1rem; opacity: .8; }
+.gmrt-testing-grounds summary { cursor: pointer; font-weight: 700; }

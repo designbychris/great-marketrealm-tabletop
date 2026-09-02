@@ -21,6 +21,11 @@ use GreatMarketrealmTabletop\Tabletop\Http\TabletopAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\TableTokenRemovalAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Tokens\Services\TableTokenRemoval;
 use GreatMarketrealmTabletop\Tabletop\Http\TestTableAjaxController;
+use GreatMarketrealmTabletop\Tabletop\Http\CreateTabletopAjaxController;
+use GreatMarketrealmTabletop\Tabletop\Campaigns\TabletopCreator;
+use GreatMarketrealmTabletop\Tabletop\Campaigns\WordPressDungeonMasterPolicy;
+use GreatMarketrealmTabletop\Tables\Services\TableRegistryFactory;
+use GreatMarketrealmTabletop\Tables\Scenes\Services\TableSceneManagerFactory;
 use GreatMarketrealmTabletop\Tabletop\Http\TargetingAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\CartographyAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\CartographyAssistantAjaxController;
@@ -97,6 +102,8 @@ final class TabletopServiceProvider
     private ConditionAjaxController $conditionAjax;
 
     private TestTableAjaxController $testTableAjax;
+
+    private CreateTabletopAjaxController $createTabletopAjax;
 
     private TargetingAjaxController $targetingAjax;
 
@@ -181,6 +188,14 @@ final class TabletopServiceProvider
 
         $this->testTableAjax = new TestTableAjaxController(
             new TestTableProvisioner()
+        );
+
+        $this->createTabletopAjax = new CreateTabletopAjaxController(
+            new TabletopCreator(
+                TableRegistryFactory::make(),
+                TableSceneManagerFactory::make()
+            ),
+            new WordPressDungeonMasterPolicy()
         );
 
         $this->targetingAjax = new TargetingAjaxController(
@@ -488,6 +503,11 @@ final class TabletopServiceProvider
         add_action(
             'wp_ajax_gmrt_prepare_test_table',
             [$this->testTableAjax, 'prepare']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_create_tabletop',
+            [$this->createTabletopAjax, 'create']
         );
 
         add_action(

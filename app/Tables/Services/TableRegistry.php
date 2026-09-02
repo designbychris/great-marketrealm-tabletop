@@ -43,13 +43,14 @@ final class TableRegistry
         $this->gathering = $gathering;
     }
 
-    public function prepare(int $dungeonMasterUserId, string $name): Table
+    public function prepare(int $dungeonMasterUserId, string $name, string $description = ''): Table
     {
         $table = Table::prepare(
             $this->ids->generate(),
             $dungeonMasterUserId,
             $name,
-            $this->clock->now()
+            $this->clock->now(),
+            $description
         );
         $this->tables->save($table);
 
@@ -100,6 +101,16 @@ final class TableRegistry
     /** @return array<int,Table> */
     public function all(): array { return $this->tables->all(); }
     public function find(string $id): ?Table { return $this->tables->find($id); }
+
+    /** @return array<int,Table> */
+    public function ownedBy(int $dungeonMasterUserId): array
+    {
+        return array_values(array_filter(
+            $this->tables->all(),
+            static fn (Table $table): bool => $table->dungeonMasterUserId() === $dungeonMasterUserId
+                && $table->status() !== 'ended'
+        ));
+    }
 
     private function required(string $id): Table
     {

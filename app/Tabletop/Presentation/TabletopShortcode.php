@@ -9,6 +9,8 @@ use GreatMarketrealmTabletop\Tabletop\Services\TabletopChamber;
 use Throwable;
 use GreatMarketrealmTabletop\Tables\Memberships\Contracts\TableMembershipRepository;
 use GreatMarketrealmTabletop\Tables\Memberships\Models\TableMemberStatus;
+use GreatMarketrealmTabletop\Tables\Services\TableRegistryFactory;
+use GreatMarketrealmTabletop\Tabletop\Campaigns\WordPressDungeonMasterPolicy;
 
 defined('ABSPATH') || exit;
 
@@ -57,10 +59,27 @@ final class TabletopShortcode
         );
 
         if ($tableId === '') {
+            $userId = get_current_user_id();
+            $owned = array_map(
+                static fn ($table): array => [
+                    'id' => $table->id(),
+                    'name' => $table->name(),
+                    'description' => $table->description(),
+                    'status' => $table->status(),
+                ],
+                TableRegistryFactory::make()->ownedBy($userId)
+            );
+
             return $this->renderer->render(
                 null,
-                'No Table is selected. Prepare a test Table to begin screen testing.',
-                true
+                null,
+                true,
+                null,
+                null,
+                [
+                    'may_create' => (new WordPressDungeonMasterPolicy())->mayCreate($userId),
+                    'tables' => $owned,
+                ]
             );
         }
 

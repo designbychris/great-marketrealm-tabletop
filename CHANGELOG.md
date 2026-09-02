@@ -1038,3 +1038,12 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - Promotes packaged Pippin dungeon artwork to a full-bleed cinematic threshold behind the login panel.
 - Gives the authenticated `Your chair is waiting` invitation state the same full-bleed threshold presentation while retaining explicit `Take My Seat` membership acceptance as a separate action.
 - Adds accessible inline login errors, keyboard focus, responsive composition and reduced-motion safeguards.
+
+## Phase IV.33.1 — The Keeper Names the Campaign
+
+- Adds a DM-authorised Campaign Shelf when the Tabletop is opened without a selected Table.
+- Adds persistent Keeper-created Tables with campaign name and optional description.
+- New Tables automatically seat their creator as Dungeon Master, become active, and open with a blank generated Scene named `The First Blank Page`.
+- Existing Table records remain compatible when no description metadata exists.
+- Keeps Sage's Combat Testing Grounds as a secondary development fixture rather than using it as the real campaign creation path.
+- Adds a Companion-friendly `gmrt_tabletop_may_create_table` policy seam while preserving server-side nonce and role enforcement.

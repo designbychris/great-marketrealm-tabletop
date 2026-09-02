@@ -267,6 +267,30 @@
         });
     }
 
+    const createTabletopForm = document.querySelector('[data-create-tabletop]');
+    if (createTabletopForm) {
+        createTabletopForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const button = createTabletopForm.querySelector('button[type="submit"]');
+            const status = createTabletopForm.querySelector('[data-create-tabletop-status]');
+            const form = new FormData(createTabletopForm);
+            if (button) button.disabled = true;
+            if (status) status.textContent = 'Pippin is finding a suitable patch of table…';
+            try {
+                const data = await request('gmrt_create_tabletop', {
+                    name: form.get('name') || '',
+                    description: form.get('description') || ''
+                });
+                const url = new URL(window.location.href);
+                url.searchParams.set('table', data.table_id);
+                window.location.assign(url.toString());
+            } catch (error) {
+                if (status) status.textContent = error.message || 'The Tabletop could not be created.';
+                if (button) button.disabled = false;
+            }
+        });
+    }
+
     const gatheringStatus = document.querySelector('[data-gathering-status]');
     let keeperSecretD20Result = null;
     const gatheringSay = (message) => {

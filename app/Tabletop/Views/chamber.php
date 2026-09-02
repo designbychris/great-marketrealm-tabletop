@@ -11,6 +11,7 @@ defined('ABSPATH') || exit;
 /** @var bool $canPrepareTestTable */
 /** @var array<string,mixed>|null $invitation */
 /** @var array<string,mixed>|null $entryDoor */
+/** @var array<string,mixed>|null $campaignLobby */
 
 $table = $state?->table() ?? [];
 $viewer = $state?->viewer() ?? [];
@@ -948,6 +949,62 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                 </button>
                 <span data-gathering-status role="status" aria-live="polite"></span>
             </div>
+        </section>
+    <?php elseif (is_array($campaignLobby)) : ?>
+        <section class="gmrt-campaign-lobby" aria-labelledby="gmrt-campaign-lobby-title">
+            <header class="gmrt-campaign-lobby__header">
+                <div>
+                    <p class="gmrt-chamber__eyebrow">The Keeper's Campaign Shelf</p>
+                    <h2 id="gmrt-campaign-lobby-title">Choose a Tabletop</h2>
+                    <p>Open one of your existing campaigns, or set a new Table and give the adventure a name.</p>
+                </div>
+            </header>
+
+            <?php $ownedTables = is_array($campaignLobby['tables'] ?? null) ? $campaignLobby['tables'] : []; ?>
+            <?php if ($ownedTables !== []) : ?>
+                <div class="gmrt-campaign-lobby__shelf" aria-label="Your Tabletop campaigns">
+                    <?php foreach ($ownedTables as $ownedTable) : ?>
+                        <article class="gmrt-campaign-card">
+                            <p class="gmrt-chamber__eyebrow"><?php echo esc_html(ucfirst((string) ($ownedTable['status'] ?? 'preparing'))); ?></p>
+                            <h3><?php echo esc_html((string) ($ownedTable['name'] ?? 'Untitled Table')); ?></h3>
+                            <?php if ((string) ($ownedTable['description'] ?? '') !== '') : ?>
+                                <p><?php echo esc_html((string) $ownedTable['description']); ?></p>
+                            <?php endif; ?>
+                            <a class="gmrt-campaign-card__open" href="<?php echo esc_url(add_query_arg('table', (string) ($ownedTable['id'] ?? ''))); ?>">Open Table</a>
+                        </article>
+                    <?php endforeach; ?>
+                </div>
+            <?php else : ?>
+                <p class="gmrt-campaign-lobby__empty">No campaigns are resting on your shelf yet.</p>
+            <?php endif; ?>
+
+            <?php if (! empty($campaignLobby['may_create'])) : ?>
+                <form class="gmrt-create-tabletop" data-create-tabletop>
+                    <div>
+                        <p class="gmrt-chamber__eyebrow">IV.33.1 · The Keeper Names the Campaign</p>
+                        <h3>Set a New Table</h3>
+                    </div>
+                    <label>
+                        <span>Campaign name</span>
+                        <input type="text" name="name" maxlength="120" required placeholder="e.g. The Mystery of the Missing Marmalade">
+                    </label>
+                    <label>
+                        <span>Campaign description <small>(optional)</small></span>
+                        <textarea name="description" maxlength="500" rows="3" placeholder="A short note about the adventure waiting at this Table…"></textarea>
+                    </label>
+                    <button type="submit">Create Tabletop</button>
+                    <span data-create-tabletop-status role="status" aria-live="polite"></span>
+                    <small>A fresh Table starts with a blank generated Scene. The Atlas and Pippin's Forge can furnish it next.</small>
+                </form>
+            <?php endif; ?>
+
+            <?php if (! empty($canPrepareTestTable)) : ?>
+                <details class="gmrt-testing-grounds">
+                    <summary>Development tools</summary>
+                    <button type="button" class="gmrt-test-table-button" data-prepare-test-table>Prepare Test Table</button>
+                    <small class="gmrt-test-table-note">Creates Sage's Combat Testing Grounds for regression and screen testing.</small>
+                </details>
+            <?php endif; ?>
         </section>
     <?php elseif ($message !== null) : ?>
         <section

@@ -16,6 +16,7 @@ final class Table
         private string $id,
         private int $dungeonMasterUserId,
         private string $name,
+        private string $description,
         private string $status,
         private DateTimeImmutable $createdAt,
         private ?DateTimeImmutable $activatedAt = null,
@@ -28,10 +29,12 @@ final class Table
         string $id,
         int $dungeonMasterUserId,
         string $name,
-        DateTimeImmutable $createdAt
+        DateTimeImmutable $createdAt,
+        string $description = ''
     ): self {
         $id = trim($id);
         $name = trim($name);
+        $description = trim($description);
 
         if ($id === '') {
             throw new InvalidArgumentException('A Table requires a stable identity.');
@@ -47,6 +50,7 @@ final class Table
             $id,
             $dungeonMasterUserId,
             $name,
+            $description,
             TableStatus::PREPARING,
             $createdAt
         );
@@ -59,6 +63,7 @@ final class Table
             (string) ($record['id'] ?? ''),
             (int) ($record['dungeon_master_user_id'] ?? 0),
             (string) ($record['name'] ?? ''),
+            (string) ($record['description'] ?? ''),
             TableStatus::assert((string) ($record['status'] ?? '')),
             new DateTimeImmutable((string) ($record['created_at'] ?? 'now')),
             self::date($record['activated_at'] ?? null),
@@ -112,6 +117,7 @@ final class Table
     public function id(): string { return $this->id; }
     public function dungeonMasterUserId(): int { return $this->dungeonMasterUserId; }
     public function name(): string { return $this->name; }
+    public function description(): string { return $this->description; }
     public function status(): string { return $this->status; }
     public function createdAt(): DateTimeImmutable { return $this->createdAt; }
     public function activatedAt(): ?DateTimeImmutable { return $this->activatedAt; }
@@ -138,6 +144,7 @@ final class Table
             'id' => $this->id,
             'dungeon_master_user_id' => $this->dungeonMasterUserId,
             'name' => $this->name,
+            'description' => $this->description,
             'status' => $this->status,
             'created_at' => $this->createdAt->format(DATE_ATOM),
             'activated_at' => $this->activatedAt?->format(DATE_ATOM),

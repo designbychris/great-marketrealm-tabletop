@@ -793,3 +793,10 @@ Browser-feedback polish for the pixel Tabletop shell: align the Bestiary workspa
 The Tabletop now owns a cinematic 16-bit entrance while WordPress remains the authentication authority beneath it. The requested Table/invitation URL is preserved throughout the threshold flow.
 
 - [x] **IV.32.6A — The Door Has a Lock** — promotes Pippin's dungeon artwork to a full-bleed entrance, authenticates directly through a nonce-protected front-end Tabletop form during `template_redirect`, preserves the exact requested Table/invitation destination, and gives the signed-in `Your chair is waiting` state the same cinematic threshold treatment while keeping invitation acceptance separate from authentication.
+
+## Phase IV.33 — The Keeper Sets the Table
+The Tabletop moves beyond Sage's fixed Testing Grounds into persistent Keeper-owned campaigns.
+
+- [x] **IV.33.1 — The Keeper Names the Campaign** — adds a DM-authorised Campaign Shelf and Create Tabletop flow, persistent name/optional description metadata, automatic DM seating, a fresh generated `The First Blank Page` Scene, direct entry into the new Table, and keeps the Testing Grounds tucked safely under Development tools.
+- [ ] **IV.33.2 — The Keeper Opens the Doors** — campaign-level Gathering and invitation management from the Campaign Shelf.
+- [ ] **IV.33.3 — The First Map on the Table** — choose blank, Atlas or Pippin Forge as a new campaign's opening Scene.
