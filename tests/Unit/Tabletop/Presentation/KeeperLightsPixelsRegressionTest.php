@@ -20,7 +20,20 @@ final class KeeperLightsPixelsRegressionTest extends TestCase
         self::assertStringContainsString("marker.className = 'gmrt-keeper-light-marker is-' + lightKind", $js);
         self::assertStringContainsString("glow.dataset.lightKind = lightKind", $js);
         self::assertStringContainsString("marker.setAttribute('aria-hidden', 'true')", $js);
-        self::assertStringNotContainsString("marker.textContent = ({torch:'🔥'", $js);
+
+        $renderStart = strpos($js, 'const renderLightSources =');
+        $renderEnd = strpos($js, 'const renderFootsteps', $renderStart + 1);
+        if ($renderEnd === false) {
+            $renderEnd = strpos($js, 'const ', $renderStart + strlen('const renderLightSources ='));
+        }
+
+        self::assertNotFalse($renderStart);
+        self::assertNotFalse($renderEnd);
+
+        $renderLightSources = substr($js, $renderStart, $renderEnd - $renderStart);
+
+        self::assertStringNotContainsString('marker.textContent', $renderLightSources);
+        self::assertStringNotContainsString('🔥', $renderLightSources);
     }
 
     public function test_each_keeper_light_keeps_a_distinct_16_bit_motion_personality(): void
