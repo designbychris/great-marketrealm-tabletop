@@ -1,3 +1,11 @@
+## Phase IV.32.4B — The Veil Goes 16-Bit
+
+- Gives unexplored Fog a restrained near-black 16-bit dither while preserving complete concealment.
+- Recasts explored-but-not-currently-visible territory as a faded, desaturated map memory.
+- Adds stepped presentation for the existing live-sight and memory frontiers without changing projected visibility.
+- Gives the Keeper's existing Player Fog Preview a private pixel frame/label; no preview state is exposed to Players.
+- Keeps Fog persistence, LOS, doors, lights, movement, vision radii and token-visibility authority unchanged.
+
 - IV.32.4A final browser polish: Guild Diceworks now spans the full Turn of Battle grid so certified attack results no longer collapse into the narrow status column.
 
 ## Phase IV.32.3A — The Deeds Remember Every Adventurer

@@ -4243,3 +4243,154 @@
         margin-top: .35rem;
     }
 }
+
+/* Phase IV.32.4B — The Veil Goes 16-Bit
+ * Presentation only: Fog authority, explored cells and LOS remain server-owned.
+ */
+.gmrt-fog-layer {
+    --gmrt-veil-pixel: 4px;
+    image-rendering: pixelated;
+}
+
+.gmrt-fog-cell {
+    overflow: hidden;
+    transition:
+        opacity .16s steps(2, end),
+        filter .16s steps(2, end);
+}
+
+.gmrt-fog-cell::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-size:
+        calc(var(--gmrt-veil-pixel) * 2)
+        calc(var(--gmrt-veil-pixel) * 2);
+}
+
+/* Unknown territory is deliberately dense: near-black pixel dithering gives
+ * the veil texture without suggesting any geometry hidden beneath it. */
+.gmrt-fog-cell.is-unexplored {
+    background:
+        linear-gradient(
+            180deg,
+            rgba(7, 6, 8, .995),
+            rgba(2, 2, 4, 1)
+        );
+    filter: contrast(1.1) brightness(.94);
+    box-shadow:
+        inset 0 0 0 1px rgba(0, 0, 0, .46),
+        inset 0 0 12px rgba(0, 0, 0, .36);
+}
+
+.gmrt-fog-cell.is-unexplored::before {
+    background-image:
+        linear-gradient(45deg, rgba(255,255,255,.018) 25%, transparent 25%),
+        linear-gradient(225deg, rgba(255,255,255,.012) 25%, transparent 25%);
+    opacity: .72;
+}
+
+/* Explored-but-not-visible terrain reads as a faded 16-bit memory rather than
+ * a second flavour of black fog. The map remains recognisable underneath. */
+.gmrt-fog-cell.is-memory {
+    background: rgba(13, 11, 15, .49);
+    backdrop-filter:
+        grayscale(.72)
+        sepia(.1)
+        brightness(.68)
+        contrast(.9);
+    filter: saturate(.5) contrast(.9);
+    box-shadow:
+        inset 0 0 0 1px rgba(183, 146, 79, .055),
+        inset 0 0 10px rgba(0, 0, 0, .13);
+}
+
+.gmrt-fog-cell.is-memory::before {
+    background-image:
+        radial-gradient(
+            circle at center,
+            rgba(221, 196, 146, .075) 0 1px,
+            transparent 1.5px
+        );
+    opacity: .58;
+}
+
+/* A hard stepped rim makes the live sight frontier legible without changing
+ * which cells the authoritative projector considers visible. */
+.gmrt-fog-cell.is-vision-edge::after {
+    inset: 0;
+    background:
+        linear-gradient(90deg, rgba(221, 183, 98, .16), transparent 5px),
+        linear-gradient(270deg, rgba(221, 183, 98, .16), transparent 5px),
+        linear-gradient(180deg, rgba(221, 183, 98, .12), transparent 5px),
+        linear-gradient(0deg, rgba(221, 183, 98, .12), transparent 5px),
+        repeating-linear-gradient(
+            90deg,
+            rgba(244, 234, 214, .075) 0 var(--gmrt-veil-pixel),
+            transparent var(--gmrt-veil-pixel) calc(var(--gmrt-veil-pixel) * 2)
+        );
+    border: 1px solid rgba(222, 181, 91, .11);
+    opacity: .78;
+    mix-blend-mode: screen;
+}
+
+/* The frontier between memory and absolute unknown uses a darker, colder
+ * stepped hatch so Players can instantly read 'I have been there before'. */
+.gmrt-fog-cell.is-memory-edge::after {
+    inset: 0;
+    background:
+        repeating-linear-gradient(
+            135deg,
+            rgba(107, 87, 72, .36) 0 var(--gmrt-veil-pixel),
+            rgba(9, 8, 11, .16) var(--gmrt-veil-pixel)
+                calc(var(--gmrt-veil-pixel) * 2)
+        );
+    border: 1px solid rgba(143, 111, 70, .12);
+    opacity: .76;
+}
+
+/* Keeper-only Player Fog preview gets a subtle pixel frame. This class exists
+ * only when bypass + Preview Player Fog are both true in the Keeper browser. */
+.gmrt-fog-layer.is-player-preview {
+    box-shadow:
+        inset 0 0 0 2px rgba(215, 172, 80, .34),
+        inset 0 0 0 5px rgba(30, 24, 19, .38);
+}
+
+.gmrt-fog-layer.is-player-preview::after {
+    content: "PLAYER VEIL PREVIEW";
+    position: absolute;
+    top: .45rem;
+    left: .45rem;
+    z-index: 3;
+    padding: .2rem .35rem;
+    border: 1px solid rgba(215, 172, 80, .42);
+    background: rgba(20, 16, 13, .82);
+    color: rgba(244, 222, 170, .86);
+    font: 700 .58rem/1.1 "Courier New", monospace;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    box-shadow: 2px 2px 0 rgba(0, 0, 0, .44);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gmrt-fog-cell {
+        transition: none;
+    }
+}
+
+/* Live sight wins when a frontier cell also borders remembered territory. */
+.gmrt-fog-cell.is-vision-edge.is-memory-edge::after {
+    background:
+        linear-gradient(90deg, rgba(221, 183, 98, .16), transparent 5px),
+        linear-gradient(270deg, rgba(221, 183, 98, .16), transparent 5px),
+        repeating-linear-gradient(
+            90deg,
+            rgba(244, 234, 214, .08) 0 var(--gmrt-veil-pixel),
+            transparent var(--gmrt-veil-pixel) calc(var(--gmrt-veil-pixel) * 2)
+        );
+    border-color: rgba(222, 181, 91, .14);
+    opacity: .82;
+    mix-blend-mode: screen;
+}

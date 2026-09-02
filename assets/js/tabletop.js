@@ -936,6 +936,14 @@
         const dmBypass = Boolean(fogProjection.bypass);
         const preview = Boolean(fogPreview && fogPreview.checked);
 
+        // IV.32.4B — presentation-only Keeper cue. This never changes the
+        // authoritative Fog projection; it only identifies the existing
+        // bypass + Player Fog preview state for the 16-bit veil skin.
+        fogLayer.classList.toggle(
+            'is-player-preview',
+            enabled && dmBypass && preview
+        );
+
         if (
             enabled
             && Number(fogProjection.reference_width || 0) < 1
