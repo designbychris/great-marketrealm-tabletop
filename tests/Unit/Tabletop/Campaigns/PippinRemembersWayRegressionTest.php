@@ -16,7 +16,7 @@ final class PippinRemembersWayRegressionTest extends TestCase
         self::assertStringContainsString('$registry->all()', $source);
         self::assertStringContainsString('TableMemberStatus::ACTIVE', $source);
         self::assertStringContainsString('TableMemberStatus::INVITED', $source);
-        self::assertStringContainsString("'is_owner' => $isOwner", $source);
+        self::assertStringContainsString("'is_owner' => \$isOwner", $source);
     }
 
     public function test_table_atlas_has_pippin_art_and_role_aware_return_routes(): void
