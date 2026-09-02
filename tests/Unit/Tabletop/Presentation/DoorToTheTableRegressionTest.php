@@ -96,4 +96,27 @@ final class DoorToTheTableRegressionTest extends TestCase
         self::assertStringContainsString('@media (max-width: 820px)', $css);
         self::assertStringContainsString('@media (prefers-reduced-motion: reduce)', $css);
     }
+
+    public function testThresholdStatesDoNotRenderTheInChamberMasthead(): void
+    {
+        $view = (string) file_get_contents($this->root . '/app/Tabletop/Views/chamber.php');
+
+        self::assertStringContainsString(
+            '<?php if (! is_array($entryDoor) && ! is_array($invitation)) : ?>',
+            $view
+        );
+        self::assertStringContainsString('class="gmrt-chamber__masthead"', $view);
+    }
+
+    public function testThresholdPresentationFillsTheViewportWithoutBottomGap(): void
+    {
+        $css = (string) file_get_contents($this->root . '/assets/css/tabletop.css');
+
+        self::assertStringContainsString('Phase IV.32.6A polish — The threshold loses its second doorframe.', $css);
+        self::assertStringContainsString('--gmrt-threshold-header-offset: 99px;', $css);
+        self::assertStringContainsString('min-height: calc(100dvh - var(--gmrt-threshold-header-offset));', $css);
+        self::assertStringContainsString('margin-bottom: 0;', $css);
+        self::assertStringContainsString('--gmrt-threshold-header-offset: 72px;', $css);
+    }
+
 }

@@ -1,3 +1,4 @@
+- IV.32.6A polish: removed the in-Chamber masthead from Door/invitation threshold states and made both cinematic thresholds fill the remaining viewport beneath the site header without a bottom gap.
 ## Phase IV.32.4C — The Keeper Lights the Pixels
 
 - Replaces platform emoji on Keeper environmental battlefield lights with CSS-drawn 16-bit Torch, Candle, Lantern, Brazier and Magical Light markers.

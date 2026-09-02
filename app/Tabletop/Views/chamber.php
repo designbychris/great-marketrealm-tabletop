@@ -216,7 +216,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
         </aside>
     <?php endif; ?>
 
-    <?php if (! is_array($entryDoor)) : ?>
+    <?php if (! is_array($entryDoor) && ! is_array($invitation)) : ?>
     <header class="gmrt-chamber__masthead">
         <div>
             <p class="gmrt-chamber__eyebrow">
