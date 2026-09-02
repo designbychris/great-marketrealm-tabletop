@@ -1010,3 +1010,10 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 
 - IV.32.4A final polish: reflowed Guild Diceworks attack certification inside narrow combat docks and clear transient attack/damage results when the authoritative Encounter turn identity changes, preserving Chronicle history.
 - IV.32.4D — The Battlefield's Final Inspection: established the final presentation-only battlefield layer stack so the IV.32.4 pixel grid, trails, Vision, Keeper lights, Living Veil, thresholds, miniatures and targeting feedback compose predictably without changing geometry or authority.
+
+## Phase IV.32.5 — Pippin Discovers Pixel Art
+
+- Gives generated Dungeon, Forest and Village scenery a crisp SNES-era projection while preserving the existing deterministic Scene Forge plans.
+- Adds dungeon tile highlight/shadow pixels, block-canopy trees, faceted rocks, stepped village architecture, pixel logs, octagonal wells, garden posts and square trail treatment.
+- Keeps Scene topology, floor membership, LOS barriers, doors, Keeper lights, grid registration, Fog and encounter authority unchanged.
+- Adds regression coverage for the pixel projection and the Forge authority boundary.

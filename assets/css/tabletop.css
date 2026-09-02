@@ -4605,3 +4605,100 @@
         animation: none !important;
     }
 }
+
+/* Phase IV.32.5 — Pippin Discovers Pixel Art.
+ * Scene Forge presentation only: topology, barriers, doors, lights, grid and Fog
+ * continue to consume the same deterministic plan. */
+.gmrt-dungeon-forge-layer.is-pixel-art,
+.gmrt-dungeon-forge-layer.is-pixel-art * {
+    shape-rendering: crispEdges;
+}
+.gmrt-dungeon-forge-layer.is-pixel-art .gmrt-forge-decoration *,
+.gmrt-dungeon-forge-layer.is-pixel-art .gmrt-forge-features * {
+    stroke-linecap: square;
+    stroke-linejoin: miter;
+}
+.gmrt-dungeon-forge-layer.is-pixel-art .is-dungeon-tile-highlight {
+    fill: rgba(239, 222, 174, .13);
+    stroke: none;
+}
+.gmrt-dungeon-forge-layer.is-pixel-art .is-dungeon-tile-shadow {
+    fill: rgba(20, 15, 11, .18);
+    stroke: none;
+}
+.gmrt-dungeon-forge-layer.is-pixel-art .is-outdoor-speck {
+    fill: rgba(224, 211, 151, .17);
+}
+.gmrt-dungeon-forge-layer.is-pixel-art .is-pixel-canopy .is-canopy-pixel {
+    fill: #31512d;
+    stroke: #617941;
+    stroke-width: .04;
+}
+.gmrt-dungeon-forge-layer.is-pixel-art .is-pixel-canopy .is-canopy-pixel:nth-child(3n) {
+    fill: #3d6135;
+}
+.gmrt-dungeon-forge-layer.is-pixel-art .is-pixel-canopy .is-canopy-highlight {
+    fill: #718850;
+    opacity: .62;
+}
+.gmrt-dungeon-forge-layer.is-pixel-art .is-pixel-canopy .is-tree-trunk {
+    fill: #67482d;
+    stroke: #342317;
+    stroke-width: .04;
+}
+.gmrt-dungeon-forge-layer.is-pixel-art .is-pixel-canopy .is-tree-root {
+    fill: #4f3724;
+    stroke: none;
+}
+.gmrt-dungeon-forge-layer.is-pixel-art .is-pixel-rocks .is-rock {
+    fill: #66675d;
+    stroke: #a89f81;
+    stroke-width: .055;
+}
+.gmrt-dungeon-forge-layer.is-pixel-art .is-pixel-rocks .is-rock-highlight {
+    fill: #8b8978;
+    stroke: none;
+}
+.gmrt-dungeon-forge-layer.is-pixel-art .is-village-building .is-building-shadow {
+    transform: translate(.12px, .12px);
+}
+.gmrt-dungeon-forge-layer.is-pixel-art .is-village-building .is-building-body,
+.gmrt-dungeon-forge-layer.is-pixel-art .is-village-building .is-building-roof,
+.gmrt-dungeon-forge-layer.is-pixel-art .is-village-building .is-building-door,
+.gmrt-dungeon-forge-layer.is-pixel-art .is-village-building .is-building-window,
+.gmrt-dungeon-forge-layer.is-pixel-art .is-village-building .is-building-chimney {
+    shape-rendering: crispEdges;
+}
+.gmrt-dungeon-forge-layer.is-pixel-art .is-village-building .is-roof-pixel-line {
+    stroke: rgba(43, 24, 17, .34);
+    stroke-width: .045;
+    stroke-dasharray: .28 .12;
+}
+.gmrt-dungeon-forge-layer.is-pixel-art .is-detailed-log .is-log-body,
+.gmrt-dungeon-forge-layer.is-pixel-art .is-detailed-log .is-log-end {
+    shape-rendering: crispEdges;
+}
+.gmrt-dungeon-forge-layer.is-pixel-art .is-detailed-log .is-log-end {
+    fill: #a77b4d;
+    stroke: #563820;
+    stroke-width: .055;
+}
+.gmrt-dungeon-forge-layer.is-pixel-art .is-pixel-well .is-well-rim,
+.gmrt-dungeon-forge-layer.is-pixel-art .is-pixel-well .is-well-water {
+    shape-rendering: crispEdges;
+}
+.gmrt-dungeon-forge-layer.is-pixel-art .is-detailed-garden .is-garden-fence {
+    stroke-dasharray: .24 .12;
+    stroke-linecap: square;
+}
+.gmrt-dungeon-forge-layer.is-pixel-art .is-detailed-garden .is-garden-post {
+    fill: #c09655;
+    stroke: #654427;
+    stroke-width: .035;
+}
+.gmrt-dungeon-forge-layer.is-pixel-art .gmrt-forge-features .is-trail-underlay,
+.gmrt-dungeon-forge-layer.is-pixel-art .gmrt-forge-features .is-trail-track {
+    stroke-linecap: square;
+    stroke-linejoin: miter;
+    stroke-dasharray: .75 .16;
+}

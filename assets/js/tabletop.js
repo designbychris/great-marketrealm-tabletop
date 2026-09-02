@@ -2637,7 +2637,7 @@
         const rows = Math.max(1, Number(plan.rows || 1));
         dungeonForgeLayer.setAttribute('viewBox', `0 0 ${cols} ${rows}`);
         dungeonForgeLayer.setAttribute('preserveAspectRatio', 'none');
-        dungeonForgeLayer.classList.add('has-plan');
+        dungeonForgeLayer.classList.add('has-plan', 'is-pixel-art');
         dungeonForgeLayer.classList.toggle('is-draft', draft);
         dungeonForgeLayer.dataset.forgeTheme = String(plan.theme || 'pantry-stone');
         dungeonForgeLayer.dataset.forgeSceneType = String(plan.scene_type || 'dungeon');
@@ -2661,15 +2661,19 @@
         const path = (d, className) => forgeSvg('path', { d, class: className });
         const line = (x1, y1, x2, y2, className) => forgeSvg('line', { x1, y1, x2, y2, class: className });
         const circle = (cx, cy, r, className) => forgeSvg('circle', { cx, cy, r, class: className });
+        const polygon = (points, className) => forgeSvg('polygon', { points: points.map(([px, py]) => `${px},${py}`).join(' '), class: className });
+        const pixelRect = (x, y, width, height, className) => forgeSvg('rect', { x, y, width, height, class: className });
 
         const outdoorScene = ['forest', 'village'].includes(String(plan.scene_type || 'dungeon'));
         plan.floor.forEach((cell) => {
             const x = Number(cell.x); const y = Number(cell.y);
             const n = decorationChance(x, y, 'floor');
             if (outdoorScene) {
-                if (n < .055) decorate.appendChild(circle(x+.28, y+.68, .035, 'is-outdoor-speck'));
+                if (n < .055) decorate.appendChild(pixelRect(x+.24, y+.64, .08, .08, 'is-outdoor-speck'));
                 return;
             }
+            decorate.appendChild(pixelRect(x+.05,y+.05,.9,.06,'is-dungeon-tile-highlight'));
+            decorate.appendChild(pixelRect(x+.89,y+.12,.06,.78,'is-dungeon-tile-shadow'));
             if (plan.theme === 'pantry-stone') {
                 if (n < .34) decorate.appendChild(path(`M ${x+.16} ${y+.72} l .16 -.12 l .13 .06 l .18 -.17`, 'is-crack'));
                 if (n > .82) decorate.appendChild(circle(x+.72, y+.28, .055, 'is-pit'));
@@ -2708,36 +2712,37 @@
         const featureGroup = forgeSvg('g', { class: 'gmrt-forge-features' });
         const organicCanopy = (feature) => {
             const x=Number(feature.x||0), y=Number(feature.y||0), w=Math.max(.2,Number(feature.w||1)), h=Math.max(.2,Number(feature.h||1));
-            const canopy=forgeSvg('g', { class:`is-${String(feature.kind)} is-organic-canopy` });
-            const blobs=Math.max(5, Math.min(11, Math.round((w+h)*1.4)));
-            for(let i=0;i<blobs;i+=1){
+            const canopy=forgeSvg('g', { class:`is-${String(feature.kind)} is-organic-canopy is-pixel-canopy` });
+            const unit=Math.max(.18, Math.min(.34, Math.min(w,h)/5));
+            const blocks=Math.max(9, Math.min(20, Math.round((w+h)*2.3)));
+            for(let i=0;i<blocks;i+=1){
                 const n=decorationChance(x+i,y,'canopy'); const m=decorationChance(x,y+i,'canopy-y');
-                const cx=x+.2+(n*Math.max(.25,w-.4)); const cy=y+.2+(m*Math.max(.25,h-.4));
-                const r=Math.max(.48, Math.min(1.25, .5+decorationChance(i,x+y,'canopy-r')*.72));
-                canopy.appendChild(circle(cx,cy,r,'is-canopy-blob'));
-                if (i%3===0) canopy.appendChild(circle(cx-r*.22,cy-r*.26,r*.36,'is-canopy-highlight'));
+                const bx=x+.05+(n*Math.max(.2,w-unit*2)); const by=y+.04+(m*Math.max(.2,h-unit*2));
+                const size=unit*(i%4===0?2:1.45);
+                canopy.appendChild(pixelRect(bx,by,size,size,'is-canopy-pixel'));
+                if (i%4===0) canopy.appendChild(pixelRect(bx,by,size*.52,size*.38,'is-canopy-highlight'));
             }
             const trunkX=x+w/2, trunkY=y+h/2;
-            canopy.appendChild(circle(trunkX,trunkY,.2,'is-tree-trunk'));
-            canopy.appendChild(path(`M ${trunkX-.08} ${trunkY+.04} q -.28 .18 -.42 .5 M ${trunkX+.08} ${trunkY+.04} q .28 .18 .42 .5`,'is-tree-root'));
+            canopy.appendChild(pixelRect(trunkX-.14,trunkY-.08,.28,.42,'is-tree-trunk'));
+            canopy.appendChild(pixelRect(trunkX-.38,trunkY+.24,.28,.1,'is-tree-root'));
+            canopy.appendChild(pixelRect(trunkX+.1,trunkY+.24,.28,.1,'is-tree-root'));
             return canopy;
         };
         const organicRocks = (feature) => {
             const x=Number(feature.x||0), y=Number(feature.y||0), w=Math.max(.5,Number(feature.w||1)), h=Math.max(.5,Number(feature.h||1));
-            const rocks=forgeSvg('g',{class:'is-rock-cluster is-organic-rocks'});
-            [[.2,.62,.28],[.46,.38,.35],[.72,.62,.3]].forEach(([px,py,pr],index)=>{
+            const rocks=forgeSvg('g',{class:'is-rock-cluster is-organic-rocks is-pixel-rocks'});
+            [[.2,.62,.28],[.46,.38,.35],[.72,.62,.3]].forEach(([px,py,pr])=>{
                 const cx=x+w*px, cy=y+h*py, r=Math.min(w,h)*pr;
-                const squash=.72+(decorationChance(index,x+y,'rock-squash')*.18);
-                rocks.appendChild(path(`M ${cx-r} ${cy+.08*r} Q ${cx-.65*r} ${cy-r*squash} ${cx+.08*r} ${cy-r} Q ${cx+.86*r} ${cy-.72*r} ${cx+r} ${cy+.12*r} Q ${cx+.55*r} ${cy+r*squash} ${cx-.25*r} ${cy+.82*r} Q ${cx-.9*r} ${cy+.62*r} ${cx-r} ${cy+.08*r} Z`,'is-rock'));
-                rocks.appendChild(path(`M ${cx-.5*r} ${cy-.12*r} Q ${cx} ${cy-.48*r} ${cx+.45*r} ${cy-.2*r}`,'is-rock-highlight'));
+                rocks.appendChild(polygon([[cx-r,cy+.12*r],[cx-.58*r,cy-.72*r],[cx+.08*r,cy-r],[cx+.78*r,cy-.55*r],[cx+r,cy+.18*r],[cx+.52*r,cy+.82*r],[cx-.36*r,cy+.72*r]],'is-rock'));
+                rocks.appendChild(polygon([[cx-.48*r,cy-.18*r],[cx-.08*r,cy-.55*r],[cx+.38*r,cy-.3*r],[cx+.12*r,cy-.05*r]],'is-rock-highlight'));
             });
             return rocks;
         };
         const villageBuilding = (feature, kind) => {
             const x=Number(feature.x||0), y=Number(feature.y||0), w=Math.max(2,Number(feature.w||2)), h=Math.max(2,Number(feature.h||2));
             const building=forgeSvg('g',{class:`is-${kind} is-village-building`});
-            building.appendChild(forgeSvg('rect',{x,y,width:w,height:h,rx:.08,class:'is-building-shadow'}));
-            building.appendChild(forgeSvg('rect',{x:x+.12,y:y+.12,width:w-.24,height:h-.24,rx:.06,class:'is-building-body'}));
+            building.appendChild(pixelRect(x,y,w,h,'is-building-shadow'));
+            building.appendChild(pixelRect(x+.12,y+.12,w-.24,h-.24,'is-building-body'));
             const verticalRoof=h>w;
             if (verticalRoof) {
                 building.appendChild(path(`M ${x+.08} ${y+.08} L ${x+w/2} ${y+.4} L ${x+w/2} ${y+h-.18} L ${x+.08} ${y+h-.08} Z`,'is-building-roof is-roof-left'));
@@ -2750,29 +2755,34 @@
             }
             const south=y < rows/2;
             const doorY=south ? y+h-.28 : y+.04;
-            building.appendChild(forgeSvg('rect',{x:x+w/2-.22,y:doorY,width:.44,height:.24,rx:.04,class:'is-building-door'}));
-            building.appendChild(forgeSvg('rect',{x:x+.38,y:y+h*.45,width:.42,height:.34,rx:.04,class:'is-building-window'}));
-            building.appendChild(forgeSvg('rect',{x:x+w-.8,y:y+h*.45,width:.42,height:.34,rx:.04,class:'is-building-window'}));
+            building.appendChild(pixelRect(x+w/2-.22,doorY,.44,.24,'is-building-door'));
+            building.appendChild(pixelRect(x+.38,y+h*.45,.42,.34,'is-building-window'));
+            building.appendChild(pixelRect(x+w-.8,y+h*.45,.42,.34,'is-building-window'));
             if (kind === 'inn' || kind === 'workshop') {
-                building.appendChild(forgeSvg('rect',{x:x+w-.85,y:y+.18,width:.34,height:.5,rx:.04,class:'is-building-chimney'}));
+                building.appendChild(pixelRect(x+w-.85,y+.18,.34,.5,'is-building-chimney'));
+            }
+            for (let stripe=1; stripe<4; stripe+=1) {
+                const sy=y+(h*stripe/4);
+                building.appendChild(line(x+.18,sy,x+w-.18,sy,'is-roof-pixel-line'));
             }
             return building;
         };
         const fallenLog = (feature) => {
             const x=Number(feature.x||0), y=Number(feature.y||0), w=Math.max(1,Number(feature.w||3)), h=Math.max(.5,Number(feature.h||1));
             const log=forgeSvg('g',{class:'is-fallen-log is-detailed-log'});
-            log.appendChild(forgeSvg('rect',{x:x+.15,y:y+.24,width:w-.3,height:Math.max(.28,h-.48),rx:.22,class:'is-log-body'}));
-            log.appendChild(circle(x+.2,y+h/2,.25,'is-log-end'));
-            log.appendChild(circle(x+w-.2,y+h/2,.25,'is-log-end'));
+            log.appendChild(pixelRect(x+.15,y+.24,w-.3,Math.max(.28,h-.48),'is-log-body'));
+            log.appendChild(pixelRect(x+.03,y+h/2-.22,.34,.44,'is-log-end'));
+            log.appendChild(pixelRect(x+w-.37,y+h/2-.22,.34,.44,'is-log-end'));
             for(let i=1;i<4;i+=1) log.appendChild(line(x+(w*i/4),y+.3,x+(w*i/4)-.18,y+h-.3,'is-log-bark'));
             return log;
         };
         const villageWell = (feature) => {
             const x=Number(feature.x||0), y=Number(feature.y||0), w=Math.max(1,Number(feature.w||1)), h=Math.max(1,Number(feature.h||1));
             const cx=x+w/2, cy=y+h/2, r=Math.min(w,h)*.46;
-            const well=forgeSvg('g',{class:'is-well is-detailed-well'});
-            well.appendChild(circle(cx,cy,r,'is-well-rim'));
-            well.appendChild(circle(cx,cy,r*.58,'is-well-water'));
+            const well=forgeSvg('g',{class:'is-well is-detailed-well is-pixel-well'});
+            const oct=(radius,className)=>polygon([[cx-radius*.58,cy-radius],[cx+radius*.58,cy-radius],[cx+radius,cy-radius*.58],[cx+radius,cy+radius*.58],[cx+radius*.58,cy+radius],[cx-radius*.58,cy+radius],[cx-radius,cy+radius*.58],[cx-radius,cy-radius*.58]],className);
+            well.appendChild(oct(r,'is-well-rim'));
+            well.appendChild(oct(r*.58,'is-well-water'));
             well.appendChild(line(cx-r*.72,cy-r*.72,cx-r*.72,cy+r*.35,'is-well-post'));
             well.appendChild(line(cx+r*.72,cy-r*.72,cx+r*.72,cy+r*.35,'is-well-post'));
             well.appendChild(line(cx-r*.9,cy-r*.72,cx+r*.9,cy-r*.72,'is-well-beam'));
@@ -2781,9 +2791,10 @@
         const fencedGarden = (feature) => {
             const x=Number(feature.x||0), y=Number(feature.y||0), w=Math.max(1,Number(feature.w||1)), h=Math.max(1,Number(feature.h||1));
             const garden=forgeSvg('g',{class:'is-fenced-garden is-detailed-garden'});
-            garden.appendChild(forgeSvg('rect',{x,y,width:w,height:h,rx:.12,class:'is-garden-soil'}));
+            garden.appendChild(pixelRect(x,y,w,h,'is-garden-soil'));
             for(let i=1;i<4;i+=1) garden.appendChild(line(x+.5,y+(h*i/4),x+w-.5,y+(h*i/4),'is-garden-row'));
-            garden.appendChild(forgeSvg('rect',{x:x+.08,y:y+.08,width:w-.16,height:h-.16,rx:.08,class:'is-garden-fence'}));
+            garden.appendChild(pixelRect(x+.08,y+.08,w-.16,h-.16,'is-garden-fence'));
+            [[x+.08,y+.08],[x+w-.16,y+.08],[x+.08,y+h-.16],[x+w-.16,y+h-.16]].forEach(([px,py])=>garden.appendChild(pixelRect(px,py,.12,.12,'is-garden-post')));
             return garden;
         };
         (plan.features || []).forEach((feature) => {
@@ -2800,7 +2811,7 @@
             if (kind === 'fallen-log') { featureGroup.appendChild(fallenLog(feature)); return; }
             if (kind === 'well') { featureGroup.appendChild(villageWell(feature)); return; }
             if (kind === 'fenced-garden') { featureGroup.appendChild(fencedGarden(feature)); return; }
-            featureGroup.appendChild(forgeSvg('rect', { x, y, width:w, height:h, rx:.18, class:`is-${kind}` }));
+            featureGroup.appendChild(pixelRect(x, y, w, h, `is-${kind}`));
         });
         dungeonForgeLayer.appendChild(featureGroup);
 
