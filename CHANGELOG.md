@@ -1,3 +1,4 @@
+- IV.32.4A final browser polish: Guild Diceworks now spans the full Turn of Battle grid so certified attack results no longer collapse into the narrow status column.
 
 ## Phase IV.32.3A — The Deeds Remember Every Adventurer
 

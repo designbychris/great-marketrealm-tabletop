@@ -4175,6 +4175,14 @@
 
 
 /* IV.32.4A — Final battlefield polish: compact certified attack results. */
+/* IV.32.4A — Final battlefield polish: the Diceworks is a full-width
+   encounter result, not a third item trapped in the encounter status grid. */
+.gmrt-encounter-strip > .gmrt-diceworks {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-width: 0;
+}
+
 .gmrt-combat-dock {
     container-type: inline-size;
     container-name: gmrt-combat-dock;

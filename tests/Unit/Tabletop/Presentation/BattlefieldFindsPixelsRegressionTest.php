@@ -73,6 +73,16 @@ final class BattlefieldFindsPixelsRegressionTest extends TestCase
         self::assertStringContainsString('white-space: nowrap;', $css);
     }
 
+    public function test_diceworks_spans_the_full_encounter_grid_instead_of_becoming_a_narrow_third_item(): void
+    {
+        $css = $this->source('assets/css/tabletop.css');
+
+        self::assertStringContainsString('.gmrt-encounter-strip > .gmrt-diceworks {', $css);
+        self::assertStringContainsString('grid-column: 1 / -1;', $css);
+        self::assertStringContainsString('width: 100%;', $css);
+        self::assertStringContainsString('min-width: 0;', $css);
+    }
+
     public function test_transient_attack_roll_is_cleared_when_authoritative_turn_identity_changes(): void
     {
         $js = $this->source('assets/js/tabletop.js');

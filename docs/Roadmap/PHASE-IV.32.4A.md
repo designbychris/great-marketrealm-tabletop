@@ -27,3 +27,7 @@ The combat deed strip now uses an adaptive minimum-width grid instead of forcing
 ## Final browser-certification polish
 
 The final IV.32.4A polish keeps long combat deed labels inside the dock, lets the Guild Diceworks certified attack result reflow against the **actual combat-dock width** rather than the viewport, and treats attack/damage results as transient turn UI. When the authoritative Encounter changes combatant or advances the round, the old interactive roll card is cleared while the permanent Deeds at the Table Chronicle remains untouched.
+
+### Final browser-polish correction — full-width Diceworks
+
+The certified attack Diceworks is a direct child of the two-column Turn of Battle grid, not of the movable combat dock. It therefore explicitly spans `grid-column: 1 / -1`, preventing it from being auto-placed into the narrow first column and forcing certification copy into one-character-wide wrapping. This remains presentation-only.
