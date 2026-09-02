@@ -27,8 +27,10 @@ final class TreesAreNotRoomsRegressionTest extends TestCase
         $css = $this->source('assets/css/tabletop.css');
         self::assertStringContainsString('const organicCanopy = (feature)', $js);
         self::assertStringContainsString("kind === 'tree-cluster' || kind === 'village-tree'", $js);
-        self::assertStringContainsString('is-canopy-blob', $js);
-        self::assertStringContainsString('.is-organic-canopy .is-canopy-blob', $css);
+        self::assertStringContainsString('is-pixel-canopy', $js);
+        self::assertStringContainsString('is-canopy-pixel', $js);
+        self::assertStringContainsString('.is-pixel-canopy .is-canopy-pixel', $css);
+        self::assertStringNotContainsString('is-canopy-blob', $js);
     }
 
     public function test_village_buildings_have_building_specific_visual_vocabulary(): void
