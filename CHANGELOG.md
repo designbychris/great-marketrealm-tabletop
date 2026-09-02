@@ -981,3 +981,9 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - Uses the existing `SecureD20Roller` behind a server-side active-DM membership gate.
 - Keeps the result response-only in the Keeper browser: no Chamber Chronicle, Battle Chronicle or Living Table projection.
 - Preserves the last private result across normal live Gathering redraws without server persistence.
+
+## 0.32.4-alpha.1 — Phase IV.32.4A: The Battlefield Finds Its Pixels
+- Carries the Tabletop's 16-bit presentation language onto the battlefield grid and miniatures without changing calibrated geometry or token coordinates.
+- Gives selected tokens a four-corner focus reticle and refines the certified current-turn cursor into a stepped pixel frame.
+- Pixel-styles the existing authoritative target line/range plaque, Keeper deployment thresholds, Vision door editing marks and Footsteps movement trail.
+- Keeps movement, targeting, Vision, Fog, encounter state and persistence untouched and preserves reduced-motion behaviour.

@@ -3990,3 +3990,185 @@
 .gmrt-party__secret-result:empty {
     display: none;
 }
+
+/* ==========================================================================
+   IV.32.4A — The Battlefield Finds Its Pixels
+   Presentation-only battlefield grammar. Rules-grid geometry, token
+   coordinates, movement, targeting authority, Vision and Fog stay unchanged.
+   ========================================================================== */
+
+/* The rules grid keeps exactly the same calibrated size and offset, but its
+   ink now belongs to the Tabletop's 16-bit parchment/brass language. */
+.gmrt-board__grid {
+    background-image:
+        linear-gradient(
+            rgba(234, 217, 181, var(--gmrt-grid-opacity, .13)) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(234, 217, 181, var(--gmrt-grid-opacity, .13)) 1px,
+            transparent 1px
+        );
+    image-rendering: pixelated;
+}
+
+/* Tokens retain their existing circles/squares and exact hit geometry. The
+   battlefield skin simply gives the pieces harder stepped edges and shadows. */
+.gmrt-token {
+    border-color: var(--gmrt-pixel-parchment);
+    box-shadow:
+        0 0 0 2px color-mix(in srgb, var(--gmrt-owner-ring, transparent) 56%, transparent),
+        3px 3px 0 rgba(0, 0, 0, .62);
+    image-rendering: pixelated;
+}
+
+.gmrt-token[role="button"] {
+    cursor: grab;
+}
+
+.gmrt-token.is-dragging {
+    box-shadow:
+        0 0 0 2px var(--gmrt-pixel-gold-hi),
+        5px 5px 0 rgba(0, 0, 0, .64);
+}
+
+/* Selection is a four-corner reticle rather than a smooth browser outline.
+   Active-turn state keeps its own, stronger cursor from IV.32.3. */
+.gmrt-token.is-selected:not(.is-active-turn)::after,
+.gmrt-token:focus-visible:not(.is-active-turn)::after {
+    content: "";
+    position: absolute;
+    inset: -8px;
+    pointer-events: none;
+    background:
+        linear-gradient(var(--gmrt-pixel-focus), var(--gmrt-pixel-focus)) left top / 8px 2px no-repeat,
+        linear-gradient(var(--gmrt-pixel-focus), var(--gmrt-pixel-focus)) left top / 2px 8px no-repeat,
+        linear-gradient(var(--gmrt-pixel-focus), var(--gmrt-pixel-focus)) right top / 8px 2px no-repeat,
+        linear-gradient(var(--gmrt-pixel-focus), var(--gmrt-pixel-focus)) right top / 2px 8px no-repeat,
+        linear-gradient(var(--gmrt-pixel-focus), var(--gmrt-pixel-focus)) left bottom / 8px 2px no-repeat,
+        linear-gradient(var(--gmrt-pixel-focus), var(--gmrt-pixel-focus)) left bottom / 2px 8px no-repeat,
+        linear-gradient(var(--gmrt-pixel-focus), var(--gmrt-pixel-focus)) right bottom / 8px 2px no-repeat,
+        linear-gradient(var(--gmrt-pixel-focus), var(--gmrt-pixel-focus)) right bottom / 2px 8px no-repeat;
+    filter: drop-shadow(2px 2px 0 #000);
+}
+
+.gmrt-token:focus-visible,
+.gmrt-token.is-selected {
+    outline: none;
+}
+
+/* The current-turn cursor keeps its proven behaviour but becomes a stepped
+   corner frame so the miniature remains readable underneath it. */
+.gmrt-token.is-active-turn::before {
+    inset: -9px;
+    border: 0;
+    background:
+        linear-gradient(#f2cd70, #f2cd70) left top / 10px 3px no-repeat,
+        linear-gradient(#f2cd70, #f2cd70) left top / 3px 10px no-repeat,
+        linear-gradient(#f2cd70, #f2cd70) right top / 10px 3px no-repeat,
+        linear-gradient(#f2cd70, #f2cd70) right top / 3px 10px no-repeat,
+        linear-gradient(#f2cd70, #f2cd70) left bottom / 10px 3px no-repeat,
+        linear-gradient(#f2cd70, #f2cd70) left bottom / 3px 10px no-repeat,
+        linear-gradient(#f2cd70, #f2cd70) right bottom / 10px 3px no-repeat,
+        linear-gradient(#f2cd70, #f2cd70) right bottom / 3px 10px no-repeat;
+    box-shadow: none;
+    filter: drop-shadow(2px 2px 0 #2b2110);
+}
+
+/* Authoritative target geometry remains the same SVG line. Only the stroke
+   vocabulary changes to chunky square-pixel cadence. */
+.gmrt-target-line {
+    stroke: var(--gmrt-pixel-gold-hi);
+    stroke-width: 3;
+    stroke-linecap: square;
+    stroke-dasharray: 5 3;
+    shape-rendering: crispEdges;
+    filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, .82));
+}
+
+.gmrt-target-line.is-long-range {
+    stroke-dasharray: 11 5;
+}
+
+.gmrt-target-line.is-out-of-range {
+    stroke: #c86d58;
+    stroke-dasharray: 3 6;
+    stroke-width: 3;
+}
+
+.gmrt-target-range {
+    border-radius: 0;
+    border-width: 2px;
+    border-color: var(--gmrt-pixel-gold-low);
+    background: var(--gmrt-pixel-ink-soft);
+    color: var(--gmrt-pixel-parchment);
+    box-shadow: 2px 2px 0 rgba(0, 0, 0, .55);
+    font-family: ui-monospace, "Courier New", monospace;
+}
+
+/* Keeper doors remain the same Vision barriers and therefore preserve LOS.
+   Their visible editing marks now read as square threshold pixels. */
+.gmrt-vision-barrier {
+    stroke-linecap: square;
+    shape-rendering: crispEdges;
+}
+
+.gmrt-vision-barrier.is-door {
+    stroke: #78c9d8;
+    stroke-width: 5;
+    stroke-dasharray: 10 4;
+    filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, .7));
+}
+
+.gmrt-vision-barrier.is-door.is-open {
+    opacity: .52;
+    stroke-dasharray: 3 6;
+}
+
+/* Arrival/deployment thresholds are Keeper-only battlefield markers. Their
+   interaction and coordinates are unchanged; only the marker shell is square. */
+.gmrt-threshold-marker {
+    width: 2rem;
+    height: 2rem;
+    border: 2px solid currentColor;
+    border-radius: 0;
+    background: var(--gmrt-pixel-ink);
+    box-shadow: 3px 3px 0 rgba(0, 0, 0, .58);
+    font-family: ui-monospace, "Courier New", monospace;
+}
+
+.gmrt-threshold-marker > span {
+    transform: scale(.82);
+}
+
+/* Existing Footsteps are the movement trail; their authority and projection
+   remain untouched while the marks gain a harder 16-bit print. */
+.gmrt-footstep {
+    filter: saturate(1.02) brightness(.64) contrast(1.55)
+        drop-shadow(1px 1px 0 rgba(0, 0, 0, .5));
+    image-rendering: pixelated;
+}
+
+.gmrt-footstep i {
+    box-shadow:
+        1px 0 0 color-mix(in srgb, currentColor 78%, #17120d),
+        0 2px 0 color-mix(in srgb, currentColor 88%, #17120d);
+}
+
+.gmrt-footstep.is-memory {
+    opacity: calc(var(--gmrt-step-opacity, .48) * .72);
+    filter: saturate(.62) brightness(.58) contrast(1.45);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gmrt-token,
+    .gmrt-token::before,
+    .gmrt-token::after,
+    .gmrt-target-line,
+    .gmrt-threshold-marker,
+    .gmrt-footstep {
+        transition: none !important;
+        animation: none !important;
+    }
+}
