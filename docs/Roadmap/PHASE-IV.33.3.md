@@ -19,3 +19,9 @@ Table removal is authenticated, protected by the existing Tabletop AJAX nonce, a
 ## Persistence principle
 
 There is deliberately no manual Save button. The Living Table remains authoritative and persistent as play proceeds; this phase supplies the missing discovery and return journey.
+
+## Final browser polish and legacy Table removal compatibility
+
+- The Table Atlas gateway suppresses the in-Chamber masthead so Pippin's full scenic gateway begins directly beneath the site header.
+- Permanent Table removal resolves early development/Testing Grounds records by their authoritative embedded Table UUID even if an older option storage key does not match that UUID.
+- Removal remains Keeper-only and continues to purge table-keyed persistence after ownership is resolved.

@@ -26,6 +26,7 @@ final class PippinRemembersWayRegressionTest extends TestCase
         self::assertStringContainsString('gmrt-wayfinder__scene', $view);
         self::assertStringContainsString('Return to Table', $view);
         self::assertStringContainsString('Take My Seat', $view);
+        self::assertStringContainsString('&& ! is_array($campaignLobby)', $view);
     }
 
     public function test_only_keeper_cards_expose_player_management_and_permanent_removal(): void
@@ -45,6 +46,9 @@ final class PippinRemembersWayRegressionTest extends TestCase
         self::assertStringContainsString('check_ajax_referer(TabletopAjaxController::NONCE_ACTION', $controller);
         self::assertStringContainsString('dungeonMasterUserId() !== $userId', $remover);
         self::assertStringContainsString("'gmrt_tables'", $remover);
+        self::assertStringContainsString("(string) (\$record['id'] ?? '') === \$tableId", $remover);
+        $repository = file_get_contents($this->root() . '/app/Tables/Repositories/WordPressTableRepository.php');
+        self::assertStringContainsString("(string) (\$candidate['id'] ?? '') === \$id", $repository);
         self::assertStringContainsString("'wp_ajax_gmrt_remove_tabletop'", $provider);
     }
 }

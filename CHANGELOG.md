@@ -1057,3 +1057,5 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - Turned the bare Tabletop route into Pippin's persistent Table Atlas for both DMs and Players.
 - Added role-aware Return to Table / Take My Seat campaign cards over the established Pippin cartographer artwork.
 - Added Keeper-only permanent Tabletop removal with nonce and owner authorization plus campaign-keyed persistence cleanup.
+
+- IV.33.3 final browser polish: Pippin's Table Atlas now suppresses the in-Chamber masthead, and permanent Table removal can resolve legacy Testing Grounds records whose stored option key predates their authoritative Table UUID.

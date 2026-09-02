@@ -52,11 +52,36 @@ final class WordPressTabletopRemover
 
         foreach (self::TABLE_KEYED_OPTIONS as $option) {
             $records = get_option($option, []);
-            if (! is_array($records) || ! array_key_exists($tableId, $records)) {
+            if (! is_array($records)) {
                 continue;
             }
-            unset($records[$tableId]);
-            update_option($option, $records, false);
+
+            $changed = false;
+
+            if (array_key_exists($tableId, $records)) {
+                unset($records[$tableId]);
+                $changed = true;
+            }
+
+            // Early development/test Tables may have been persisted under a
+            // legacy option key while keeping the authoritative UUID inside
+            // the Table record. The Atlas can discover those records via all(),
+            // so removal must be able to erase the same legacy record too.
+            if ($option === 'gmrt_tables') {
+                foreach ($records as $storageKey => $record) {
+                    if (
+                        is_array($record)
+                        && (string) ($record['id'] ?? '') === $tableId
+                    ) {
+                        unset($records[$storageKey]);
+                        $changed = true;
+                    }
+                }
+            }
+
+            if ($changed) {
+                update_option($option, $records, false);
+            }
         }
     }
 }

@@ -38,11 +38,27 @@ final class WordPressTableRepository implements TableRepository
 
     public function find(string $id): ?Table
     {
-        $record = $this->records()[$id] ?? null;
+        $records = $this->records();
+        $record = $records[$id] ?? null;
 
-        return is_array($record)
-            ? Table::reconstitute($record)
-            : null;
+        if (is_array($record)) {
+            return Table::reconstitute($record);
+        }
+
+        // Compatibility for Tables created by early development builds where
+        // the option storage key did not necessarily match the persisted UUID.
+        // all() can still surface those Tables in Pippin's Atlas, so find() must
+        // resolve the same record by its authoritative embedded ID.
+        foreach ($records as $candidate) {
+            if (
+                is_array($candidate)
+                && (string) ($candidate['id'] ?? '') === $id
+            ) {
+                return Table::reconstitute($candidate);
+            }
+        }
+
+        return null;
     }
 
     public function save(Table $table): void
