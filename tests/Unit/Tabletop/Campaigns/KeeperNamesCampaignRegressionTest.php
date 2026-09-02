@@ -45,7 +45,7 @@ final class KeeperNamesCampaignRegressionTest extends TestCase
         $view = $this->source('app/Tabletop/Views/chamber.php');
         self::assertStringContainsString('$registry->all()', $shortcode);
         self::assertStringContainsString("'is_owner' => \$isOwner", $shortcode);
-        self::assertStringContainsString("The Keeper's Campaign Shelf", $view);
+        self::assertStringContainsString("Pippin's Table Atlas", $view);
         self::assertStringContainsString('data-create-tabletop', $view);
         self::assertStringContainsString('data-prepare-test-table', $view);
     }
