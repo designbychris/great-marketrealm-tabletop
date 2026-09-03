@@ -13,7 +13,8 @@ final class SessionRecap
         private string $tableId,
         private string $draft,
         private DateTimeImmutable $generatedAt,
-        private bool $keeperEdited = false
+        private bool $keeperEdited = false,
+        private array $contributions = []
     ) {}
 
     /** @param array<string,mixed> $record */
@@ -24,7 +25,8 @@ final class SessionRecap
             (string) ($record['table_id'] ?? ''),
             (string) ($record['draft'] ?? ''),
             new DateTimeImmutable((string) ($record['generated_at'] ?? 'now')),
-            (bool) ($record['keeper_edited'] ?? false)
+            (bool) ($record['keeper_edited'] ?? false),
+            is_array($record['contributions'] ?? null) ? $record['contributions'] : []
         );
     }
 
@@ -32,6 +34,8 @@ final class SessionRecap
     public function tableId(): string { return $this->tableId; }
     public function draft(): string { return $this->draft; }
     public function keeperEdited(): bool { return $this->keeperEdited; }
+    /** @return array<int,array<string,mixed>> */
+    public function contributions(): array { return $this->contributions; }
 
     public function revise(string $draft): void
     {
@@ -48,6 +52,7 @@ final class SessionRecap
             'draft' => $this->draft,
             'generated_at' => $this->generatedAt->format(DATE_ATOM),
             'keeper_edited' => $this->keeperEdited,
+            'contributions' => $this->contributions,
         ];
     }
 }

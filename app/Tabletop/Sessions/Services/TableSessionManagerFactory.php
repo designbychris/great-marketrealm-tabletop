@@ -11,6 +11,7 @@ use GreatMarketrealmTabletop\Tabletop\Sessions\Repositories\WordPressSessionReca
 use GreatMarketrealmTabletop\Tabletop\Battle\Repositories\WordPressBattleEventRepository;
 use GreatMarketrealmTabletop\Tabletop\Chronicle\Repositories\WordPressChamberChronicleRepository;
 use GreatMarketrealmTabletop\Tabletop\Encounters\Repositories\WordPressEncounterRepository;
+use GreatMarketrealmTabletop\Tables\Tokens\Repositories\WordPressTableTokenRepository;
 
 defined('ABSPATH') || exit;
 
@@ -25,7 +26,8 @@ final class TableSessionManagerFactory
             new SessionRecapBuilder(
                 new WordPressBattleEventRepository(),
                 new WordPressChamberChronicleRepository(),
-                new WordPressEncounterRepository()
+                new WordPressEncounterRepository(),
+                new WordPressTableTokenRepository()
             ),
             new WordPressSessionRecapRepository()
         );

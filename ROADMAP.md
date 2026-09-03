@@ -849,3 +849,6 @@ Encounters and Chronicle activity now remember the immutable active Session that
 - [x] View Recap reuses and expands the existing “Previously, in the MarketRealm…” record.
 - [x] Close Farewell dismisses the transient panel; refresh does not resurrect consumed farewell state.
 - [x] No additional Chronicle publication, Scene reset, or next-Session mutation.
+
+### IV.34.6A — The Chronicle Opens Its Pages ✅
+Carry Session recap evidence and character-attributed deeds across the Tabletop → Companion boundary.

@@ -1112,3 +1112,7 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - Added an accessible, remembered recap collapse/show control keyed to the immutable Session recap identity.
 
 - IV.34.5D — Pippin Finds His Voice: restored the IV.34.2 Companion Campaign client bridge after a stale JavaScript overwrite, corrected the recap persistence regression expectation, enlarged pixel Pippin into the recap speech-bubble presentation, and moved Choose Battlemap into Dungeon Master Controls.
+
+### Phase IV.34.6A — The Chronicle Opens Its Pages
+- Session recap projection now carries character-attributed recorded deeds.
+- Companion Session synchronisation now includes the Keeper recap and contribution ledger.
