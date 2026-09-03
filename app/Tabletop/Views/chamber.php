@@ -251,6 +251,24 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
         <?php endif; ?>
 
         <?php if ($state !== null) : ?>
+            <div class="gmrt-chamber__viewer" aria-label="Table role and status">
+                <span>
+                    <?php echo esc_html(
+                        $state->isDungeonMaster()
+                            ? 'Dungeon Master'
+                            : 'Adventurer'
+                    ); ?>
+                </span>
+                <small>
+                    Table <?php echo esc_html(
+                        (string) (
+                            $table['status']
+                            ?? 'unknown'
+                        )
+                    ); ?>
+                </small>
+            </div>
+
             <section class="gmrt-table-session" data-table-session aria-label="Table Session">
                 <?php if ($session !== null) : ?>
                     <div class="gmrt-table-session__identity">
@@ -286,23 +304,6 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                 </section>
             <?php endif; ?>
 
-            <div class="gmrt-chamber__viewer">
-                <span>
-                    <?php echo esc_html(
-                        $state->isDungeonMaster()
-                            ? 'Dungeon Master'
-                            : 'Adventurer'
-                    ); ?>
-                </span>
-                <small>
-                    Table <?php echo esc_html(
-                        (string) (
-                            $table['status']
-                            ?? 'unknown'
-                        )
-                    ); ?>
-                </small>
-            </div>
         <?php endif; ?>
     </header>
     <?php endif; ?>

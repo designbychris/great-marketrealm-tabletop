@@ -29,6 +29,17 @@ final class PreviouslyInMarketRealmRegressionTest extends TestCase
         self::assertStringContainsString("Pippin's field notes · Keeper draft", $source);
     }
 
+    public function test_viewer_status_lives_in_the_command_header_before_session_controls(): void
+    {
+        $source = $this->source('app/Tabletop/Views/chamber.php');
+        $viewer = strpos($source, 'class="gmrt-chamber__viewer" aria-label="Table role and status"');
+        $session = strpos($source, 'class="gmrt-table-session" data-table-session');
+
+        self::assertNotFalse($viewer);
+        self::assertNotFalse($session);
+        self::assertLessThan($session, $viewer);
+    }
+
     public function test_recap_is_not_companion_published_automatically(): void
     {
         $source = $this->source('app/Tabletop/Sessions/Services/SessionRecapBuilder.php');
