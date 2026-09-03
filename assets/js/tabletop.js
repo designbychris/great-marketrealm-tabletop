@@ -44,7 +44,54 @@
         }
     }
 
+    function sessionRecapStorageKey(recap) {
+        const root = document.querySelector('.gmrt-chamber');
+        const tableId = root?.dataset.tableId || 'table';
+        const recapId = recap?.dataset.sessionRecapId || 'latest';
+        return `gmrt:session-recap:${tableId}:${recapId}:collapsed`;
+    }
+
+    function setSessionRecapExpanded(recap, expanded, remember = true) {
+        if (!recap) return;
+        const toggle = recap.querySelector('[data-session-recap-toggle]');
+        const content = recap.querySelector('[data-session-recap-content]');
+        if (!toggle || !content) return;
+
+        recap.classList.toggle('is-collapsed', !expanded);
+        toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+        toggle.textContent = expanded ? 'Hide Recap' : 'Show Recap';
+        content.hidden = !expanded;
+
+        if (remember) {
+            try {
+                window.localStorage.setItem(sessionRecapStorageKey(recap), expanded ? '0' : '1');
+            } catch (error) {
+                // Storage can be unavailable in privacy-restricted browsers; the toggle still works.
+            }
+        }
+    }
+
+    function restoreSessionRecapPreference() {
+        const recap = document.querySelector('[data-session-recap]');
+        if (!recap) return;
+        let collapsed = false;
+        try {
+            collapsed = window.localStorage.getItem(sessionRecapStorageKey(recap)) === '1';
+        } catch (error) {
+            collapsed = false;
+        }
+        setSessionRecapExpanded(recap, !collapsed, false);
+    }
+
     document.addEventListener('click', (event) => {
+        const recapToggle = event.target.closest('[data-session-recap-toggle]');
+        if (recapToggle) {
+            event.preventDefault();
+            const recap = recapToggle.closest('[data-session-recap]');
+            setSessionRecapExpanded(recap, recapToggle.getAttribute('aria-expanded') !== 'true');
+            return;
+        }
+
         const atlasToggle = event.target.closest('[data-atlas-toggle]');
         if (atlasToggle) {
             event.preventDefault();
@@ -140,6 +187,7 @@
     }
 
     const tableId = root.dataset.tableId || '';
+    restoreSessionRecapPreference();
     const projectedSceneId = root.dataset.sceneId || '';
     const preparationSceneId = root.dataset.preparationSceneId || '';
     let selected = null;
@@ -331,31 +379,6 @@
             window.history.replaceState({}, '', onboardingUrl.toString());
         }
     }
-
-    // Phase IV.34.2 — The Table Remembers Tonight: Companion Campaign bridge.
-    document.querySelectorAll('[data-companion-campaign-link]').forEach((form) => {
-        form.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const tableId = form.dataset.tableId || '';
-            const campaignId = String(form.querySelector('[name="campaign_id"]')?.value || '');
-            const button = form.querySelector('button[type="submit"]');
-            const status = form.parentElement?.querySelector('[data-companion-campaign-status]');
-            if (!tableId || !campaignId) return;
-            if (button) button.disabled = true;
-            if (status) status.textContent = 'Pippin is joining the Table Atlas to the Companion Ledger…';
-            try {
-                const data = await request('gmrt_link_companion_campaign', { table_id: tableId, campaign_id: campaignId });
-                const count = Number(data.sessions_synchronised || 0);
-                if (status) status.textContent = count > 0
-                    ? `${data.message || 'Campaign linked.'} ${count} existing Session${count === 1 ? '' : 's'} synchronised.`
-                    : (data.message || 'Campaign linked.');
-                window.setTimeout(() => window.location.reload(), 650);
-            } catch (error) {
-                if (status) status.textContent = error.message || 'The Companion Campaign could not be linked.';
-                if (button) button.disabled = false;
-            }
-        });
-    });
 
     // Phase IV.33.2 — Campaign Shelf player administration.
     document.querySelectorAll('[data-campaign-invite-form]').forEach((form) => {

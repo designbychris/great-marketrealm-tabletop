@@ -833,3 +833,8 @@ Encounters and Chronicle activity now remember the immutable active Session that
 - [x] Persistent Keeper recap draft
 - [x] “Previously, in the MarketRealm…” Chamber presentation
 - [x] No automatic publication of Keeper narrative to shared Companion records
+
+### Phase IV.34.5C — Pippin Learns to Close the Book
+- [x] Command header order: Exploration Mode → Session controls → Table role/status.
+- [x] Canonical pixel Pippin integrated into the Session recap.
+- [x] Accessible Hide/Show recap control with per-Session remembered preference.

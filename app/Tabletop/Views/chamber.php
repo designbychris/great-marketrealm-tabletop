@@ -251,24 +251,6 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
         <?php endif; ?>
 
         <?php if ($state !== null) : ?>
-            <div class="gmrt-chamber__viewer" aria-label="Table role and status">
-                <span>
-                    <?php echo esc_html(
-                        $state->isDungeonMaster()
-                            ? 'Dungeon Master'
-                            : 'Adventurer'
-                    ); ?>
-                </span>
-                <small>
-                    Table <?php echo esc_html(
-                        (string) (
-                            $table['status']
-                            ?? 'unknown'
-                        )
-                    ); ?>
-                </small>
-            </div>
-
             <section class="gmrt-table-session" data-table-session aria-label="Table Session">
                 <?php if ($session !== null) : ?>
                     <div class="gmrt-table-session__identity">
@@ -294,13 +276,55 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                 <small class="gmrt-table-session__status" data-table-session-status role="status" aria-live="polite"></small>
             </section>
 
+            <div class="gmrt-chamber__viewer" aria-label="Table role and status">
+                <span>
+                    <?php echo esc_html(
+                        $state->isDungeonMaster()
+                            ? 'Dungeon Master'
+                            : 'Adventurer'
+                    ); ?>
+                </span>
+                <small>
+                    Table <?php echo esc_html(
+                        (string) (
+                            $table['status']
+                            ?? 'unknown'
+                        )
+                    ); ?>
+                </small>
+            </div>
+
             <?php if ($session === null && $sessionRecap !== null) : ?>
-                <section class="gmrt-session-recap" data-session-recap aria-labelledby="gmrt-session-recap-title">
-                    <p class="gmrt-session-recap__eyebrow">Pippin Peppercorn presents</p>
-                    <h2 id="gmrt-session-recap-title">Previously, in the MarketRealm…</h2>
-                    <p class="gmrt-session-recap__session">Session <?php echo esc_html((string) ($sessionRecap['number'] ?? '')); ?> · <?php echo esc_html((string) ($sessionRecap['title'] ?? 'The Adventure Continues')); ?></p>
-                    <div class="gmrt-session-recap__story"><?php echo nl2br(esc_html((string) ($sessionRecap['draft'] ?? ''))); ?></div>
-                    <small>Pippin's field notes · Keeper draft</small>
+                <section
+                    class="gmrt-session-recap"
+                    data-session-recap
+                    data-session-recap-id="<?php echo esc_attr((string) ($sessionRecap['session_id'] ?? '')); ?>"
+                    aria-labelledby="gmrt-session-recap-title"
+                >
+                    <div class="gmrt-session-recap__heading">
+                        <img
+                            class="gmrt-session-recap__pippin"
+                            src="<?php echo esc_url(GMRT_URL . 'assets/images/pippin-peppercorn-pixel.png'); ?>"
+                            alt=""
+                            aria-hidden="true"
+                        >
+                        <div class="gmrt-session-recap__titlecopy">
+                            <p class="gmrt-session-recap__eyebrow">Pippin Peppercorn presents</p>
+                            <h2 id="gmrt-session-recap-title">Previously, in the MarketRealm…</h2>
+                        </div>
+                        <button
+                            class="gmrt-session-recap__toggle"
+                            type="button"
+                            data-session-recap-toggle
+                            aria-expanded="true"
+                            aria-controls="gmrt-session-recap-content"
+                        >Hide Recap</button>
+                    </div>
+                    <div class="gmrt-session-recap__content" id="gmrt-session-recap-content" data-session-recap-content>
+                        <p class="gmrt-session-recap__session">Session <?php echo esc_html((string) ($sessionRecap['number'] ?? '')); ?> · <?php echo esc_html((string) ($sessionRecap['title'] ?? 'The Adventure Continues')); ?></p>
+                        <div class="gmrt-session-recap__story"><?php echo nl2br(esc_html((string) ($sessionRecap['draft'] ?? ''))); ?></div>
+                        <small>Pippin's field notes · Keeper draft</small>
+                    </div>
                 </section>
             <?php endif; ?>
 

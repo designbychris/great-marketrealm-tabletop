@@ -1096,3 +1096,8 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - Added persistent Session recap drafts built from Session-scoped Chamber Chronicle, Encounter, and Battle evidence.
 - Added the “Previously, in the MarketRealm…” Chamber presentation with Pippin field-note treatment.
 - Kept recap publication separate from Companion/Fellowship certified history pending Keeper approval workflow.
+
+### Phase IV.34.5C — Pippin Learns to Close the Book
+- Moved the stable Table role/status to the far-right end of the command header, after Session controls.
+- Added canonical pixel Pippin to the “Previously, in the MarketRealm…” presentation.
+- Added an accessible, remembered recap collapse/show control keyed to the immutable Session recap identity.

@@ -3,3 +3,10 @@
 Completed Tabletop Sessions now produce a persistent Keeper-draft recap assembled from records carrying that Session's immutable identity. The recap deliberately prefers bounded, meaningful Chronicle/Encounter/Battle facts over raw unscoped history and is presented in the Chamber under the literal heading “Previously, in the MarketRealm…”.
 
 This phase does not automatically publish narrative text to Companion or Fellowship records. Keeper review/publication remains a later explicit boundary.
+
+## IV.34.5C — Pippin Learns to Close the Book
+
+- Reorders the command header so Session controls precede the stable Dungeon Master / Adventurer status anchor.
+- Reuses the canonical packaged pixel Pippin beside the recap title.
+- Adds an accessible Hide Recap / Show Recap control with `aria-expanded` and `aria-controls`.
+- Remembers collapse preference per Table and immutable recap Session ID; a new Session recap therefore opens fresh by default.

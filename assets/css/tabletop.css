@@ -5494,3 +5494,52 @@
 .gmrt-session-recap__session { margin: .2rem 0 .65rem; font-weight: 700; }
 .gmrt-session-recap__story { display: grid; gap: .45rem; line-height: 1.55; }
 .gmrt-session-recap small { display: block; margin-top: .65rem; opacity: .72; }
+
+/* Phase IV.34.5C — Pippin Learns to Close the Book. */
+.gmrt-session-recap__heading {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: .75rem;
+}
+.gmrt-session-recap__pippin {
+    width: clamp(42px, 4.5vw, 64px);
+    height: auto;
+    image-rendering: pixelated;
+    align-self: center;
+}
+.gmrt-session-recap__titlecopy { min-width: 0; }
+.gmrt-session-recap__toggle {
+    align-self: center;
+    min-height: 36px;
+    padding: .38rem .6rem;
+    border: 2px solid currentColor;
+    background: rgba(48,41,31,.08);
+    color: inherit;
+    font: 700 .68rem ui-monospace, "Courier New", monospace;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    cursor: pointer;
+}
+.gmrt-session-recap__toggle:hover,
+.gmrt-session-recap__toggle:focus-visible { background: rgba(48,41,31,.16); }
+.gmrt-session-recap__content[hidden] { display: none; }
+.gmrt-session-recap.is-collapsed { padding-block: .55rem; }
+.gmrt-session-recap.is-collapsed .gmrt-session-recap__pippin { width: 38px; }
+.gmrt-session-recap.is-collapsed .gmrt-session-recap__eyebrow { display: none; }
+.gmrt-session-recap.is-collapsed h2 { font-size: 1rem; }
+
+/* The command header now ends with the stable viewer/status anchor. */
+.gmrt-chamber__masthead > .gmrt-chamber__viewer { border-right: 0; }
+.gmrt-table-session { border-right: 1px solid rgba(216,173,79,.28); }
+
+@media (max-width: 1120px) {
+    .gmrt-chamber__masthead { grid-template-columns: minmax(0, 1fr) auto; }
+    .gmrt-table-command__scene { grid-column: 1; }
+    .gmrt-table-session { grid-column: 1 / -1; }
+    .gmrt-chamber__masthead > .gmrt-chamber__viewer { grid-column: 2; grid-row: 2; }
+}
+@media (max-width: 640px) {
+    .gmrt-session-recap__heading { grid-template-columns: auto minmax(0, 1fr); }
+    .gmrt-session-recap__toggle { grid-column: 1 / -1; justify-self: stretch; }
+}
