@@ -81,6 +81,9 @@ final class BattleLogProjector
                 'occurred_at' => (string) (
                     $record['occurred_at'] ?? ''
                 ),
+                'session_id' => (string) (
+                    $record['session_id'] ?? ''
+                ),
             ];
         }
 
