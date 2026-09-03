@@ -57,6 +57,7 @@ final class TabletopAjaxController
                 'preparation' => $state->preparation(),
                 'thresholds' => $state->thresholds(),
                 'bestiary' => $state->bestiary(),
+                'session' => $state->session(),
                 'sync_revision' => $state->syncRevision(),
             ]);
         } catch (TabletopAccessDenied $exception) {

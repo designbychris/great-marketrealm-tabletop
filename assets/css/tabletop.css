@@ -5306,3 +5306,126 @@
     .gmrt-wayfinder { min-height: calc(100dvh - 72px); }
     .gmrt-wayfinder__scene::after { background: rgba(12,9,6,.68); }
 }
+
+/* Phase IV.33.4 — The First Map on the Table */
+.gmrt-first-map {
+    display: grid;
+    gap: .65rem;
+    margin: .2rem 0;
+    padding: .8rem;
+    border: 2px solid rgba(244,234,214,.22);
+}
+.gmrt-first-map legend {
+    padding: 0 .35rem;
+    font-weight: 800;
+}
+.gmrt-create-tabletop .gmrt-first-map__choice {
+    grid-template-columns: auto minmax(0,1fr);
+    align-items: start;
+    gap: .65rem;
+    padding: .7rem;
+    border: 2px solid rgba(244,234,214,.14);
+    background: rgba(16,13,10,.28);
+    cursor: pointer;
+}
+.gmrt-create-tabletop .gmrt-first-map__choice:has(input:checked) {
+    border-color: rgba(244,234,214,.72);
+    background: rgba(52,41,28,.8);
+    box-shadow: 3px 3px 0 #090806;
+}
+.gmrt-create-tabletop .gmrt-first-map__choice.is-unavailable {
+    opacity: .52;
+    cursor: not-allowed;
+}
+.gmrt-create-tabletop .gmrt-first-map__choice input {
+    width: auto;
+    margin-top: .2rem;
+    accent-color: currentColor;
+}
+.gmrt-first-map__choice span {
+    display: grid;
+    gap: .2rem;
+}
+.gmrt-first-map__choice small,
+.gmrt-first-map__atlas small {
+    font-weight: 400;
+    opacity: .78;
+}
+.gmrt-create-tabletop .gmrt-first-map__atlas select {
+    width: 100%;
+    box-sizing: border-box;
+    border: 2px solid rgba(244,234,214,.45);
+    border-radius: 0;
+    padding: .7rem;
+    background: #100d0a;
+    color: #f4ead6;
+    font: inherit;
+}
+.gmrt-first-map__atlas[hidden] { display: none !important; }
+
+/* ========================================================================== 
+   IV.34.1 — The Keeper Calls the Session
+   Persistent campaign Session lifecycle in the Table command header.
+   ========================================================================== */
+.gmrt-chamber__masthead {
+    grid-template-columns: minmax(0, 1fr) auto auto auto;
+}
+.gmrt-table-session {
+    min-width: 220px;
+    padding: .38rem .8rem;
+    border-right: 1px solid rgba(216,173,79,.28);
+    display: grid;
+    gap: .28rem;
+    align-items: center;
+}
+.gmrt-table-session__identity,
+.gmrt-table-session__start {
+    display: grid;
+    gap: .08rem;
+}
+.gmrt-table-session__identity > span,
+.gmrt-table-session__start > label {
+    color: #d8ad4f;
+    font: 700 .64rem ui-monospace, "Courier New", monospace;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+.gmrt-table-session__identity > strong {
+    color: #f4ead6;
+    font: 700 .78rem ui-monospace, "Courier New", monospace;
+}
+.gmrt-table-session__identity > small,
+.gmrt-table-session__status {
+    color: rgba(234,217,181,.68);
+    font: 600 .62rem ui-monospace, "Courier New", monospace;
+}
+.gmrt-table-session__start {
+    grid-template-columns: minmax(120px, 1fr) auto;
+    gap: .3rem;
+}
+.gmrt-table-session__start > label {
+    grid-column: 1 / -1;
+}
+.gmrt-table-session__start input {
+    min-width: 0;
+    padding: .32rem .42rem;
+}
+.gmrt-table-session__start button,
+.gmrt-table-session__end {
+    padding: .34rem .52rem;
+    font-size: .68rem;
+}
+.gmrt-table-session__identity--quiet > strong {
+    color: rgba(244,234,214,.74);
+}
+@media (max-width: 1120px) {
+    .gmrt-chamber__masthead { grid-template-columns: 1fr auto; }
+    .gmrt-table-command__scene,
+    .gmrt-table-session {
+        grid-column: 1 / -1;
+        border-inline: 0;
+        border-top: 1px solid rgba(216,173,79,.22);
+        padding-inline: 0;
+    }
+    .gmrt-table-command__scene { grid-row: auto; }
+}

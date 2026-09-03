@@ -815,3 +815,10 @@ Persistent Pippin Table Atlas: one Tabletop entrance for Keeper-owned campaigns,
 ### IV.33.4 — The First Map on the Table
 New Keeper-created campaigns now choose how their opening Scene arrives: preserve the certified blank Table, copy an owned uploaded Atlas map with its grid calibration, or enter directly at Pippin's existing Scene Forge on a fresh workbench. Atlas sources remain server-authorised to the current Keeper and the source Scene is never moved or mutated. **Built; awaiting automated and browser certification.**
 
+
+### Phase IV.34 — The Living Campaign
+- **IV.34.1 — The Keeper Calls the Session** — persistent numbered Session lifecycle, DM start/end authority, Living Table projection and between-session state. **CURRENT**
+- IV.34.2 — The Table Remembers Tonight — associate Chronicle, encounters and meaningful events with Sessions.
+- IV.34.3 — Previously, in the MarketRealm… — Session history and recap ledger.
+- IV.34.4 — Until Next Time — end-of-session continuity and safe closing state.
+- IV.34.5 — The Next Gathering — begin the next Session from the previous campaign state.

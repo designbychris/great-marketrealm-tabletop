@@ -23,9 +23,11 @@ use GreatMarketrealmTabletop\Tabletop\Tokens\Services\TableTokenRemoval;
 use GreatMarketrealmTabletop\Tabletop\Http\TestTableAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\CreateTabletopAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\RemoveTabletopAjaxController;
+use GreatMarketrealmTabletop\Tabletop\Http\TableSessionAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Campaigns\WordPressTabletopRemover;
 use GreatMarketrealmTabletop\Tabletop\Campaigns\TabletopCreator;
 use GreatMarketrealmTabletop\Tabletop\Campaigns\WordPressDungeonMasterPolicy;
+use GreatMarketrealmTabletop\Tabletop\Sessions\Services\TableSessionManagerFactory;
 use GreatMarketrealmTabletop\Tables\Services\TableRegistryFactory;
 use GreatMarketrealmTabletop\Tables\Scenes\Services\TableSceneManagerFactory;
 use GreatMarketrealmTabletop\Tabletop\Http\TargetingAjaxController;
@@ -108,6 +110,8 @@ final class TabletopServiceProvider
     private CreateTabletopAjaxController $createTabletopAjax;
 
     private RemoveTabletopAjaxController $removeTabletopAjax;
+
+    private TableSessionAjaxController $tableSessionAjax;
 
     private TargetingAjaxController $targetingAjax;
 
@@ -205,6 +209,10 @@ final class TabletopServiceProvider
 
         $this->removeTabletopAjax = new RemoveTabletopAjaxController(
             new WordPressTabletopRemover(TableRegistryFactory::make())
+        );
+
+        $this->tableSessionAjax = new TableSessionAjaxController(
+            TableSessionManagerFactory::make()
         );
 
         $this->targetingAjax = new TargetingAjaxController(
@@ -522,6 +530,16 @@ final class TabletopServiceProvider
         add_action(
             'wp_ajax_gmrt_remove_tabletop',
             [$this->removeTabletopAjax, 'remove']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_start_table_session',
+            [$this->tableSessionAjax, 'start']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_end_table_session',
+            [$this->tableSessionAjax, 'end']
         );
 
         add_action(

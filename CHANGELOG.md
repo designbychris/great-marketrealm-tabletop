@@ -1070,3 +1070,10 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - Carries Forge-first creation into the new campaign and opens the existing Scene Forge automatically, without adding a second Forge workflow.
 - Adds regression coverage for all three creation paths, Atlas ownership/cloning and Forge onboarding.
 
+
+## Phase IV.34.1 — The Keeper Calls the Session
+- Added persistent numbered Table Sessions with optional titles, start/end timestamps and active/ended lifecycle.
+- Added Keeper-only, nonce-protected Session start/end actions without changing campaign persistence or campaign status.
+- Projected the active Session through the Tabletop chamber/Living Table state so refreshes and other seated viewers follow the same Session lifecycle.
+- Added command-header Session controls/status and live lifecycle refresh handling.
+- Campaign removal now also purges Session records.

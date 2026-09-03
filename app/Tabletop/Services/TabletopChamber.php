@@ -41,6 +41,7 @@ use GreatMarketrealmTabletop\Tables\Tokens\Models\TableTokenType;
 use GreatMarketrealmTabletop\Tabletop\Atlas\Thresholds\Contracts\ThresholdRepository;
 use GreatMarketrealmTabletop\Tabletop\Bestiary\Contracts\BestiaryRepository;
 use GreatMarketrealmTabletop\Tabletop\Cartography\Contracts\DungeonForgeRepository;
+use GreatMarketrealmTabletop\Tabletop\Sessions\Contracts\TableSessionRepository;
 use RuntimeException;
 
 defined('ABSPATH') || exit;
@@ -75,7 +76,8 @@ final class TabletopChamber
         private ?ThresholdRepository $thresholds = null,
         private ?BestiaryRepository $bestiary = null,
         private ?EnvironmentalLightRepository $environmentalLights = null,
-        private ?DungeonForgeRepository $dungeonForge = null
+        private ?DungeonForgeRepository $dungeonForge = null,
+        private ?TableSessionRepository $sessions = null
     ) {}
 
     public function state(
@@ -545,7 +547,8 @@ $worldLightSourceModels[] = $environmentalLight;
                     static fn ($creature): array => $creature->toArray(),
                     $this->bestiary->all()
                 )
-                : []
+                : [],
+            $this->sessions?->currentForTable($tableId)?->toArray()
         );
     }
 }

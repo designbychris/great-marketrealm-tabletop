@@ -269,26 +269,67 @@
 
     const createTabletopForm = document.querySelector('[data-create-tabletop]');
     if (createTabletopForm) {
+        const atlasPicker = createTabletopForm.querySelector('[data-first-map-atlas]');
+        const syncFirstMapChoice = () => {
+            const selected = createTabletopForm.querySelector('[name="first_map"]:checked');
+            if (atlasPicker) atlasPicker.hidden = selected?.value !== 'atlas';
+        };
+        createTabletopForm.querySelectorAll('[name="first_map"]').forEach((choice) => {
+            choice.addEventListener('change', syncFirstMapChoice);
+        });
+        syncFirstMapChoice();
+
         createTabletopForm.addEventListener('submit', async (event) => {
             event.preventDefault();
             const button = createTabletopForm.querySelector('button[type="submit"]');
             const status = createTabletopForm.querySelector('[data-create-tabletop-status]');
             const form = new FormData(createTabletopForm);
+            const firstMap = String(form.get('first_map') || 'blank');
+            const atlasSource = String(form.get('atlas_source') || '');
+            const [sourceTableId = '', sourceSceneId = ''] = atlasSource.split('::', 2);
+            if (firstMap === 'atlas' && (!sourceTableId || !sourceSceneId)) {
+                if (status) status.textContent = 'Choose the saved Atlas map Pippin should place first.';
+                return;
+            }
             if (button) button.disabled = true;
-            if (status) status.textContent = 'Pippin is finding a suitable patch of table…';
+            if (status) status.textContent = firstMap === 'forge'
+                ? 'Pippin is clearing a workbench beside the Forge…'
+                : 'Pippin is finding a suitable patch of table…';
             try {
                 const data = await request('gmrt_create_tabletop', {
                     name: form.get('name') || '',
-                    description: form.get('description') || ''
+                    description: form.get('description') || '',
+                    first_map: firstMap,
+                    source_table_id: sourceTableId,
+                    source_scene_id: sourceSceneId
                 });
                 const url = new URL(window.location.href);
                 url.searchParams.set('table', data.table_id);
+                if (data.first_map === 'forge') {
+                    url.searchParams.set('first_map', 'forge');
+                } else {
+                    url.searchParams.delete('first_map');
+                }
                 window.location.assign(url.toString());
             } catch (error) {
                 if (status) status.textContent = error.message || 'The Tabletop could not be created.';
                 if (button) button.disabled = false;
             }
         });
+    }
+
+    // Phase IV.33.4 — a Forge-first campaign arrives with Pippin's workbench already open.
+    const onboardingUrl = new URL(window.location.href);
+    if (onboardingUrl.searchParams.get('first_map') === 'forge') {
+        const forge = document.querySelector('[data-dungeon-forge]');
+        if (forge) {
+            const keeperControls = forge.closest('[data-keeper-controls]');
+            if (keeperControls) keeperControls.open = true;
+            forge.open = true;
+            window.setTimeout(() => forge.scrollIntoView({ behavior: 'smooth', block: 'center' }), 180);
+            onboardingUrl.searchParams.delete('first_map');
+            window.history.replaceState({}, '', onboardingUrl.toString());
+        }
     }
 
     // Phase IV.33.2 — Campaign Shelf player administration.
@@ -365,6 +406,43 @@
             button.disabled = false;
         }
     });
+
+    // Phase IV.34.1 — The Keeper Calls the Session.
+    const startSessionForm = document.querySelector('[data-start-table-session]');
+    if (startSessionForm) {
+        startSessionForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const button = startSessionForm.querySelector('button[type="submit"]');
+            const sessionStatus = startSessionForm.closest('[data-table-session]')?.querySelector('[data-table-session-status]');
+            const title = String(startSessionForm.querySelector('[name="title"]')?.value || '').trim();
+            if (button) button.disabled = true;
+            if (sessionStatus) sessionStatus.textContent = 'The Keeper is calling the Session…';
+            try {
+                await request('gmrt_start_table_session', { title });
+                await replaceChamber('The Session has begun — the Table remembers tonight.', null);
+            } catch (error) {
+                if (sessionStatus) sessionStatus.textContent = error.message || 'The Session could not be started.';
+                if (button) button.disabled = false;
+            }
+        });
+    }
+
+    const endSessionButton = document.querySelector('[data-end-table-session]');
+    if (endSessionButton) {
+        endSessionButton.addEventListener('click', async () => {
+            const sessionStatus = endSessionButton.closest('[data-table-session]')?.querySelector('[data-table-session-status]');
+            if (!window.confirm('End the current Session? The campaign itself will remain active and can be resumed in a new Session later.')) return;
+            endSessionButton.disabled = true;
+            if (sessionStatus) sessionStatus.textContent = 'Closing the Session ledger…';
+            try {
+                await request('gmrt_end_table_session', {});
+                await replaceChamber('Until next time — this Session has concluded.', null);
+            } catch (error) {
+                if (sessionStatus) sessionStatus.textContent = error.message || 'The Session could not be ended.';
+                endSessionButton.disabled = false;
+            }
+        });
+    }
 
     const gatheringStatus = document.querySelector('[data-gathering-status]');
     let keeperSecretD20Result = null;
@@ -4996,6 +5074,23 @@
                 }
                 await replaceChamber(
                     'Passage Between Places — the Table carries you to a new Scene.',
+                    null
+                );
+                return;
+            }
+
+            const currentSessionId = String(root.dataset.sessionId || '');
+            const currentSessionStatus = String(root.dataset.sessionStatus || '');
+            const incomingSessionId = String(state.session?.id || '');
+            const incomingSessionStatus = String(state.session?.status || '');
+            if (
+                currentSessionId !== incomingSessionId
+                || currentSessionStatus !== incomingSessionStatus
+            ) {
+                await replaceChamber(
+                    incomingSessionId
+                        ? 'The Keeper has called the Session.'
+                        : 'The current Session has concluded.',
                     null
                 );
                 return;

@@ -24,6 +24,7 @@ $isPreparingScene = ! empty($preparation['active']);
 $tokens = $state?->tokens() ?? [];
 $members = $state?->members() ?? [];
 $encounter = $state?->encounter();
+$session = $state?->session();
 $vitality = $state?->vitality() ?? [];
 $deathSaves = $state?->deathSaves() ?? [];
 $conditions = $state?->conditions() ?? [];
@@ -89,6 +90,8 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
         $state?->syncRevision() ?? ''
     ); ?>"
     data-scene-id="<?php echo esc_attr((string) ($scene['id'] ?? '')); ?>"
+    data-session-id="<?php echo esc_attr((string) ($session['id'] ?? '')); ?>"
+    data-session-status="<?php echo esc_attr((string) ($session['status'] ?? '')); ?>"
     data-preparation-scene-id="<?php echo esc_attr((string) ($preparation['scene_id'] ?? '')); ?>"
 >
     <?php if ($adventurer !== null && $adventurerPlay !== []) : ?>
@@ -247,6 +250,31 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
         <?php endif; ?>
 
         <?php if ($state !== null) : ?>
+            <section class="gmrt-table-session" data-table-session aria-label="Table Session">
+                <?php if ($session !== null) : ?>
+                    <div class="gmrt-table-session__identity">
+                        <span>Session <?php echo esc_html((string) ($session['number'] ?? '')); ?> · In Progress</span>
+                        <strong><?php echo esc_html((string) ($session['title'] ?? 'Session')); ?></strong>
+                        <small>Called <?php echo esc_html(wp_date('j M Y · H:i', strtotime((string) ($session['started_at'] ?? 'now')))); ?></small>
+                    </div>
+                    <?php if ($state->isDungeonMaster()) : ?>
+                        <button type="button" class="gmrt-table-session__end" data-end-table-session>End Session</button>
+                    <?php endif; ?>
+                <?php elseif ($state->isDungeonMaster()) : ?>
+                    <form class="gmrt-table-session__start" data-start-table-session>
+                        <label for="gmrt-session-title">Call the Session</label>
+                        <input id="gmrt-session-title" name="title" type="text" maxlength="120" placeholder="Optional Session title">
+                        <button type="submit">Start Session</button>
+                    </form>
+                <?php else : ?>
+                    <div class="gmrt-table-session__identity gmrt-table-session__identity--quiet">
+                        <span>Between Sessions</span>
+                        <strong>The Keeper has not called today's Session yet.</strong>
+                    </div>
+                <?php endif; ?>
+                <small class="gmrt-table-session__status" data-table-session-status role="status" aria-live="polite"></small>
+            </section>
+
             <div class="gmrt-chamber__viewer">
                 <span>
                     <?php echo esc_html(
@@ -1017,12 +1045,48 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                 <?php endif; ?>
 
                 <?php if (! empty($campaignLobby['may_create'])) : ?>
+                    <?php $atlasScenes = is_array($campaignLobby['atlas_scenes'] ?? null) ? $campaignLobby['atlas_scenes'] : []; ?>
                     <form class="gmrt-create-tabletop" data-create-tabletop>
-                        <div><p class="gmrt-chamber__eyebrow">Set another road on the map</p><h3>Create a New Tabletop</h3></div>
+                        <div>
+                            <p class="gmrt-chamber__eyebrow">IV.33.4 · The First Map on the Table</p>
+                            <h3>Create a New Tabletop</h3>
+                            <p>Name the campaign, then tell Pippin how its first map should arrive.</p>
+                        </div>
                         <label><span>Campaign name</span><input type="text" name="name" maxlength="120" required placeholder="e.g. The Mystery of the Missing Marmalade"></label>
                         <label><span>Campaign description <small>(optional)</small></span><textarea name="description" maxlength="500" rows="3" placeholder="A short note about the adventure waiting at this Table…"></textarea></label>
-                        <button type="submit">Create Tabletop</button><span data-create-tabletop-status role="status" aria-live="polite"></span>
-                        <small>A fresh Table starts with a blank generated Scene. The Atlas and Pippin's Forge can furnish it next.</small>
+
+                        <fieldset class="gmrt-first-map" data-first-map-choices>
+                            <legend>The first map on the Table</legend>
+                            <label class="gmrt-first-map__choice">
+                                <input type="radio" name="first_map" value="blank" checked>
+                                <span><strong>Begin with a Blank Table</strong><small>Open a clean generated Scene and furnish it whenever you are ready.</small></span>
+                            </label>
+                            <label class="gmrt-first-map__choice<?php echo $atlasScenes === [] ? ' is-unavailable' : ''; ?>">
+                                <input type="radio" name="first_map" value="atlas"<?php echo $atlasScenes === [] ? ' disabled' : ''; ?>>
+                                <span><strong>Choose from the Atlas</strong><small><?php echo $atlasScenes === [] ? 'No reusable uploaded Atlas maps are available yet.' : 'Copy one of your saved uploaded maps and its grid calibration into the new campaign.'; ?></small></span>
+                            </label>
+                            <label class="gmrt-first-map__choice">
+                                <input type="radio" name="first_map" value="forge">
+                                <span><strong>Ask Pippin to Forge a Scene</strong><small>Enter the new campaign at Pippin's Scene Forge with a fresh workbench waiting.</small></span>
+                            </label>
+                        </fieldset>
+
+                        <?php if ($atlasScenes !== []) : ?>
+                            <label class="gmrt-first-map__atlas" data-first-map-atlas hidden>
+                                <span>Saved Atlas map</span>
+                                <select name="atlas_source">
+                                    <option value="">Choose a map…</option>
+                                    <?php foreach ($atlasScenes as $atlasScene) : ?>
+                                        <option value="<?php echo esc_attr((string) ($atlasScene['table_id'] ?? '') . '::' . (string) ($atlasScene['scene_id'] ?? '')); ?>">
+                                            <?php echo esc_html((string) ($atlasScene['table_name'] ?? 'Table') . ' — ' . (string) ($atlasScene['scene_name'] ?? 'Scene')); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <small>The original Scene stays exactly where it is; this creates an independent opening Scene using the same map surface and grid.</small>
+                            </label>
+                        <?php endif; ?>
+
+                        <button type="submit">Set the Table</button><span data-create-tabletop-status role="status" aria-live="polite"></span>
                     </form>
                 <?php endif; ?>
 

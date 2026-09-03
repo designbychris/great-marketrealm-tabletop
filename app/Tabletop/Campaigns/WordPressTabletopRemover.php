@@ -24,6 +24,7 @@ final class WordPressTabletopRemover
         'gmrt_table_scenes',
         'gmrt_table_tokens',
         'gmrt_table_encounters',
+        'gmrt_table_sessions',
         'gmrt_chamber_chronicle',
         'gmrt_dungeon_forge_plans',
         'gmrt_vision_barriers',
