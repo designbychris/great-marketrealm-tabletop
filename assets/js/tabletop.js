@@ -83,12 +83,70 @@
         setSessionRecapExpanded(recap, !collapsed, false);
     }
 
+    function sessionClosingStorageKey(tableId) {
+        return `gmrt:session-closing:${tableId || 'table'}`;
+    }
+
+    function rememberSessionClosing(tableId, sessionId) {
+        if (!sessionId) return;
+        try {
+            window.sessionStorage.setItem(sessionClosingStorageKey(tableId), sessionId);
+        } catch (error) {
+            // The farewell remains optional if browser storage is unavailable.
+        }
+    }
+
+    function revealFreshSessionClosing() {
+        const root = document.querySelector('.gmrt-chamber');
+        const closing = document.querySelector('[data-session-closing]');
+        if (!root || !closing) return;
+
+        let rememberedSessionId = '';
+        try {
+            const key = sessionClosingStorageKey(root.dataset.tableId || '');
+            rememberedSessionId = window.sessionStorage.getItem(key) || '';
+            if (rememberedSessionId !== '') {
+                window.sessionStorage.removeItem(key);
+            }
+        } catch (error) {
+            rememberedSessionId = '';
+        }
+
+        if (rememberedSessionId !== '' && rememberedSessionId === (closing.dataset.sessionClosingId || '')) {
+            closing.hidden = false;
+        }
+    }
+
     document.addEventListener('click', (event) => {
         const recapToggle = event.target.closest('[data-session-recap-toggle]');
         if (recapToggle) {
             event.preventDefault();
             const recap = recapToggle.closest('[data-session-recap]');
             setSessionRecapExpanded(recap, recapToggle.getAttribute('aria-expanded') !== 'true');
+            return;
+        }
+
+        const viewRecap = event.target.closest('[data-session-closing-view-recap]');
+        if (viewRecap) {
+            event.preventDefault();
+            const recap = document.querySelector('[data-session-recap]');
+            if (recap) {
+                setSessionRecapExpanded(recap, true);
+                const heading = recap.querySelector('#gmrt-session-recap-title');
+                recap.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+                if (heading instanceof HTMLElement) {
+                    heading.setAttribute('tabindex', '-1');
+                    heading.focus({ preventScroll: true });
+                }
+            }
+            return;
+        }
+
+        const dismissClosing = event.target.closest('[data-session-closing-dismiss]');
+        if (dismissClosing) {
+            event.preventDefault();
+            const closing = dismissClosing.closest('[data-session-closing]');
+            if (closing) closing.hidden = true;
             return;
         }
 
@@ -188,6 +246,7 @@
 
     const tableId = root.dataset.tableId || '';
     restoreSessionRecapPreference();
+    revealFreshSessionClosing();
     const projectedSceneId = root.dataset.sceneId || '';
     const preparationSceneId = root.dataset.preparationSceneId || '';
     let selected = null;
@@ -508,7 +567,9 @@
             endSessionButton.disabled = true;
             if (sessionStatus) sessionStatus.textContent = 'Closing the Session ledger…';
             try {
+                const endingSessionId = root.dataset.sessionId || '';
                 await request('gmrt_end_table_session', {});
+                rememberSessionClosing(tableId, endingSessionId);
                 await replaceChamber('Until next time — this Session has concluded.', null);
             } catch (error) {
                 if (sessionStatus) sessionStatus.textContent = error.message || 'The Session could not be ended.';

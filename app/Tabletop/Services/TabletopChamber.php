@@ -564,10 +564,17 @@ $worldLightSourceModels[] = $environmentalLight;
             if ($session->isActive()) { continue; }
             $recap = $this->sessionRecaps->find($tableId, $session->id());
             if ($recap !== null) {
+                $startedAt = $session->startedAt();
+                $endedAt = $session->endedAt();
+
                 return array_merge($recap->toArray(), [
                     'number' => $session->number(),
                     'title' => $session->title(),
-                    'ended_at' => $session->endedAt()?->format(DATE_ATOM),
+                    'started_at' => $startedAt->format(DATE_ATOM),
+                    'ended_at' => $endedAt?->format(DATE_ATOM),
+                    'duration_seconds' => $endedAt !== null
+                        ? max(0, $endedAt->getTimestamp() - $startedAt->getTimestamp())
+                        : 0,
                 ]);
             }
         }

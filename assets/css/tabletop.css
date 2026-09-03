@@ -5620,3 +5620,73 @@
     .gmrt-session-recap__toggle { justify-self: stretch; }
     .gmrt-session-recap__bubble { padding: .7rem .75rem; }
 }
+
+/* ========================================================================== 
+   IV.34.6 — Until Next Time
+   One-time Keeper farewell after a Session closes. The panel is deliberately
+   transient: long-term continuity remains the recap plus persistent Table.
+   ========================================================================== */
+.gmrt-session-closing {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 1rem;
+    margin-top: .2rem;
+    padding: .85rem 1rem;
+    border: 2px solid rgba(216,173,79,.72);
+    background: rgba(22,18,13,.94);
+    color: #f4ead6;
+    box-shadow: inset 0 0 0 2px rgba(216,173,79,.12);
+}
+.gmrt-session-closing[hidden] { display: none !important; }
+.gmrt-session-closing__copy { min-width: 0; }
+.gmrt-session-closing__eyebrow {
+    margin: 0 0 .18rem;
+    color: #d8ad4f;
+    font: 800 .68rem ui-monospace, "Courier New", monospace;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+.gmrt-session-closing h2 {
+    margin: 0 0 .32rem;
+    color: #fff5dc;
+    font-size: clamp(1.15rem, 2vw, 1.55rem);
+}
+.gmrt-session-closing__copy > p:not(.gmrt-session-closing__eyebrow) {
+    max-width: 78ch;
+    margin: 0;
+    color: rgba(244,234,214,.84);
+    line-height: 1.5;
+}
+.gmrt-session-closing__facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .35rem .85rem;
+    margin-top: .55rem;
+    color: rgba(234,217,181,.7);
+    font: 700 .67rem ui-monospace, "Courier New", monospace;
+}
+.gmrt-session-closing__facts span + span {
+    padding-left: .85rem;
+    border-left: 1px solid rgba(216,173,79,.35);
+}
+.gmrt-session-closing__actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: .45rem;
+    flex-wrap: wrap;
+}
+.gmrt-session-closing__actions button {
+    min-height: 38px;
+    padding: .42rem .66rem;
+    font-size: .68rem;
+}
+@media (max-width: 760px) {
+    .gmrt-session-closing { grid-template-columns: 1fr; }
+    .gmrt-session-closing__actions { justify-content: flex-start; }
+    .gmrt-session-closing__actions button { flex: 1 1 150px; }
+    .gmrt-session-closing__facts { display: grid; gap: .2rem; }
+    .gmrt-session-closing__facts span + span { padding-left: 0; border-left: 0; }
+}

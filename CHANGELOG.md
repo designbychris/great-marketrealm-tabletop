@@ -1,3 +1,12 @@
+## Phase IV.34.6 — Until Next Time
+
+- Adds a one-time Keeper closing moment immediately after a Session is ended.
+- Projects authoritative Session start/end timestamps and calculated duration into the latest recap presentation.
+- Confirms that ending a Session does not end the campaign or reset the Table.
+- Adds **View Recap** to expand/focus the existing “Previously, in the MarketRealm…” recap and **Close Farewell** to dismiss the transient closing panel.
+- Consumes the browser Session-closing marker after presentation so old farewells do not reappear on later refreshes.
+- Keeps Companion/Fellowship publication, campaign archival and next-Session resume behaviour outside this phase.
+
 ## Phase IV.34.2 — The Table Remembers Tonight
 
 - Adds Pippin's Table Atlas control for linking an owned Tabletop to an active Dungeon Master Companion Campaign.

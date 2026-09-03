@@ -822,7 +822,7 @@ New Keeper-created campaigns now choose how their opening Scene arrives: preserv
 - IV.34.3 — The Fellowship Remembers — publish the safe shared Session projection into the linked Fellowship Company Chronicle.
 - IV.34.4 — Deeds of the Session — associate Chronicle, encounters and meaningful Table events with Session identity.
 - IV.34.5 — Previously, in the MarketRealm… — build the editable Session recap from recorded deeds.
-- IV.34.6 — Until Next Time — end-of-session continuity and safe closing state.
+- [x] **IV.34.6 — Until Next Time** — transient Keeper farewell after Session closure, authoritative timing/duration projection, explicit campaign-continuity reassurance, and a direct route back to the existing recap without creating a second history surface. **IMPLEMENTED / awaiting automated and browser certification**
 - IV.34.7 — The Next Gathering — begin the next Session from the previous campaign state.
 
 ### Phase IV.34.4 — Deeds of the Session — IMPLEMENTED
@@ -840,3 +840,12 @@ Encounters and Chronicle activity now remember the immutable active Session that
 - [x] Accessible Hide/Show recap control with per-Session remembered preference.
 
 - IV.34.5D — Pippin Finds His Voice: restored the IV.34.2 Companion Campaign client bridge after a stale JavaScript overwrite, corrected the recap persistence regression expectation, enlarged pixel Pippin into the recap speech-bubble presentation, and moved Choose Battlemap into Dungeon Master Controls.
+
+
+### Phase IV.34.6 — Until Next Time
+- [x] Completed Session projection carries start/end timestamps and calculated duration.
+- [x] Ending a Session reveals a one-time Keeper farewell after the live Chamber refresh.
+- [x] Farewell explicitly preserves the campaign/Table rather than implying campaign completion.
+- [x] View Recap reuses and expands the existing “Previously, in the MarketRealm…” record.
+- [x] Close Farewell dismisses the transient panel; refresh does not resurrect consumed farewell state.
+- [x] No additional Chronicle publication, Scene reset, or next-Session mutation.

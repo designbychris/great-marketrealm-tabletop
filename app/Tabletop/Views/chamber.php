@@ -26,6 +26,19 @@ $members = $state?->members() ?? [];
 $encounter = $state?->encounter();
 $session = $state?->session();
 $sessionRecap = $state?->sessionRecap();
+$sessionRecapDuration = '';
+if ($sessionRecap !== null) {
+    $durationSeconds = max(0, (int) ($sessionRecap['duration_seconds'] ?? 0));
+    $durationHours = intdiv($durationSeconds, 3600);
+    $durationMinutes = intdiv($durationSeconds % 3600, 60);
+    if ($durationHours > 0) {
+        $sessionRecapDuration = sprintf('%dh %02dm', $durationHours, $durationMinutes);
+    } elseif ($durationMinutes > 0) {
+        $sessionRecapDuration = sprintf('%dm', $durationMinutes);
+    } else {
+        $sessionRecapDuration = '< 1m';
+    }
+}
 $vitality = $state?->vitality() ?? [];
 $deathSaves = $state?->deathSaves() ?? [];
 $conditions = $state?->conditions() ?? [];
@@ -293,6 +306,35 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                     ); ?>
                 </small>
             </div>
+
+            <?php if ($session === null && $sessionRecap !== null && $state->isDungeonMaster()) : ?>
+                <section
+                    class="gmrt-session-closing"
+                    data-session-closing
+                    data-session-closing-id="<?php echo esc_attr((string) ($sessionRecap['session_id'] ?? '')); ?>"
+                    aria-labelledby="gmrt-session-closing-title"
+                    hidden
+                >
+                    <div class="gmrt-session-closing__copy">
+                        <p class="gmrt-session-closing__eyebrow">Session <?php echo esc_html((string) ($sessionRecap['number'] ?? '')); ?> concluded</p>
+                        <h2 id="gmrt-session-closing-title" tabindex="-1">Until Next Time…</h2>
+                        <p>The deeds of the Table have been recorded. Pippin has filed the Keeper draft, and the campaign remains active exactly where you left it.</p>
+                        <div class="gmrt-session-closing__facts" aria-label="Completed Session details">
+                            <span><strong><?php echo esc_html((string) ($sessionRecap['title'] ?? 'The Adventure Continues')); ?></strong></span>
+                            <?php if (! empty($sessionRecap['ended_at'])) : ?>
+                                <span>Ended <?php echo esc_html(wp_date('j M Y · H:i', strtotime((string) $sessionRecap['ended_at']))); ?></span>
+                            <?php endif; ?>
+                            <?php if ($sessionRecapDuration !== '') : ?>
+                                <span>Duration <?php echo esc_html($sessionRecapDuration); ?></span>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    <div class="gmrt-session-closing__actions">
+                        <button type="button" data-session-closing-view-recap>View Recap</button>
+                        <button type="button" data-session-closing-dismiss>Close Farewell</button>
+                    </div>
+                </section>
+            <?php endif; ?>
 
             <?php if ($session === null && $sessionRecap !== null) : ?>
                 <section
