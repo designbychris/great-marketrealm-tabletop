@@ -5464,7 +5464,11 @@
 
 
 /* Phase IV.34.5 — Previously, in the MarketRealm… */
-.gmrt-session-recap { grid-column: 1 / -1; padding: .9rem 1rem; border: 3px solid var(--gmrt-ink, #30291f); background: rgba(255,248,224,.94); box-shadow: inset 0 0 0 2px rgba(48,41,31,.12); }
+.gmrt-session-recap { grid-column: 1 / -1; padding: .9rem 1rem; border: 3px solid var(--gmrt-ink, #30291f); background: rgba(255,248,224,.94); color: var(--gmrt-ink, #30291f); box-shadow: inset 0 0 0 2px rgba(48,41,31,.12); }
+.gmrt-session-recap h2,
+.gmrt-session-recap p,
+.gmrt-session-recap small,
+.gmrt-session-recap__story { color: inherit; }
 .gmrt-session-recap__eyebrow { margin: 0 0 .15rem; font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; }
 .gmrt-session-recap h2 { margin: 0; font-size: clamp(1.05rem,2vw,1.45rem); }
 .gmrt-session-recap__session { margin: .2rem 0 .65rem; font-weight: 700; }

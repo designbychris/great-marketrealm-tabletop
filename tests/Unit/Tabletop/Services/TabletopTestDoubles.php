@@ -156,6 +156,16 @@ final class ChamberEncounters implements \GreatMarketrealmTabletop\Tabletop\Enco
         ));
     }
 
+    public function forSession(string $tableId, string $sessionId): array
+    {
+        return array_values(array_filter(
+            $this->items,
+            static fn ($encounter): bool =>
+                $encounter->tableId() === $tableId
+                && $encounter->sessionId() === $sessionId
+        ));
+    }
+
     public function find(string $tableId, string $encounterId): ?\GreatMarketrealmTabletop\Tabletop\Encounters\Models\Encounter
     {
         $encounter = $this->items[$encounterId] ?? null;
