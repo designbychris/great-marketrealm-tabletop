@@ -376,7 +376,8 @@
 
         const placedLabel = furniturePlacement.label;
         try {
-            const response = await fetch(window.location.href, {
+            const furniturePlacementUrl = window.location.toString();
+            const response = await fetch(furniturePlacementUrl, {
                 method: 'POST',
                 credentials: 'same-origin',
                 headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'},
