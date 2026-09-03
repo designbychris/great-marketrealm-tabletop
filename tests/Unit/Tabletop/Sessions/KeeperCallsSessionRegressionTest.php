@@ -27,7 +27,7 @@ final class KeeperCallsSessionRegressionTest extends TestCase
     {
         $manager = $this->source('app/Tabletop/Sessions/Services/TableSessionManager.php');
         self::assertStringContainsString('dungeonMasterUserId() !== $userId', $manager);
-        self::assertStringContainsString("'Session ' . $number", $manager);
+        self::assertStringContainsString("'Session ' . \$number", $manager);
         self::assertStringContainsString('$past->number() + 1', $manager);
         self::assertStringContainsString('A Session is already in progress at this Table.', $manager);
         self::assertStringContainsString('There is no active Session to end.', $manager);
