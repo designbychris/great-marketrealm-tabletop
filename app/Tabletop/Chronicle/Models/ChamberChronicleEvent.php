@@ -21,7 +21,8 @@ final class ChamberChronicleEvent
         private string $action,
         private string $summary,
         private DateTimeImmutable $occurredAt,
-        private array $payload = []
+        private array $payload = [],
+        private string $sessionId = ''
     ) {
         if (trim($id) === '' || trim($tableId) === '' || $userId < 1 || trim($characterId) === '' || trim($summary) === '') {
             throw new InvalidArgumentException('A Chamber Chronicle event requires stable Table, adventurer, and summary context.');
@@ -41,8 +42,16 @@ final class ChamberChronicleEvent
             (string) ($record['action'] ?? 'roll'),
             (string) ($record['summary'] ?? ''),
             new DateTimeImmutable((string) ($record['occurred_at'] ?? 'now')),
-            is_array($record['payload'] ?? null) ? $record['payload'] : []
+            is_array($record['payload'] ?? null) ? $record['payload'] : [],
+            (string) ($record['session_id'] ?? '')
         );
+    }
+
+    public function sessionId(): string { return $this->sessionId; }
+
+    public function withSessionId(string $sessionId): self
+    {
+        return new self($this->id, $this->tableId, $this->userId, $this->characterId, $this->characterName, $this->kind, $this->action, $this->summary, $this->occurredAt, $this->payload, trim($sessionId));
     }
 
     /** @return array<string,mixed> */
@@ -59,6 +68,7 @@ final class ChamberChronicleEvent
             'summary' => $this->summary,
             'occurred_at' => $this->occurredAt->format(DATE_ATOM),
             'payload' => $this->payload,
+            'session_id' => $this->sessionId,
         ];
     }
 }

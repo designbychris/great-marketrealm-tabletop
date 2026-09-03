@@ -824,3 +824,6 @@ New Keeper-created campaigns now choose how their opening Scene arrives: preserv
 - IV.34.5 — Previously, in the MarketRealm… — build the editable Session recap from recorded deeds.
 - IV.34.6 — Until Next Time — end-of-session continuity and safe closing state.
 - IV.34.7 — The Next Gathering — begin the next Session from the previous campaign state.
+
+### Phase IV.34.4 — Deeds of the Session — IMPLEMENTED
+Encounters and Chronicle activity now remember the immutable active Session that witnessed them, giving later recap/history phases reliable Session-scoped source material without exposing Keeper-secret rolls.

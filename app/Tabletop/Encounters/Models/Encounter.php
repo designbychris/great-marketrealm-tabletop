@@ -25,7 +25,8 @@ final class Encounter
         private int $turnIndex,
         private int $revision,
         private DateTimeImmutable $createdAt,
-        private TurnEconomy $turnEconomy
+        private TurnEconomy $turnEconomy,
+        private string $sessionId = ''
     ) {}
 
     public static function prepare(
@@ -33,7 +34,8 @@ final class Encounter
         string $tableId,
         string $sceneId,
         string $name,
-        DateTimeImmutable $createdAt
+        DateTimeImmutable $createdAt,
+        string $sessionId = ''
     ): self {
         foreach ([$id, $tableId, $sceneId, $name] as $value) {
             if (trim($value) === '') {
@@ -54,7 +56,8 @@ final class Encounter
             0,
             1,
             $createdAt,
-            new TurnEconomy()
+            new TurnEconomy(),
+            trim($sessionId)
         );
     }
 
@@ -84,7 +87,8 @@ final class Encounter
                 is_array($record['turn_economy'] ?? null)
                     ? $record['turn_economy']
                     : []
-            )
+            ),
+            (string) ($record['session_id'] ?? '')
         );
     }
 
@@ -258,6 +262,7 @@ final class Encounter
     public function round(): int { return $this->round; }
     public function turnIndex(): int { return $this->turnIndex; }
     public function revision(): int { return $this->revision; }
+    public function sessionId(): string { return $this->sessionId; }
 
     public function turnEconomy(): TurnEconomy
     {
@@ -321,6 +326,7 @@ final class Encounter
             'revision' => $this->revision,
             'created_at' => $this->createdAt->format(DATE_ATOM),
             'turn_economy' => $this->turnEconomy->toArray(),
+            'session_id' => $this->sessionId,
         ];
     }
 

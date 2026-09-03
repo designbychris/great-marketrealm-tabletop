@@ -6,6 +6,7 @@ namespace GreatMarketrealmTabletop\Tabletop\Battle\Repositories;
 
 use GreatMarketrealmTabletop\Tabletop\Battle\Contracts\BattleEventRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Models\BattleEvent;
+use GreatMarketrealmTabletop\Tabletop\Sessions\Repositories\WordPressTableSessionRepository;
 
 defined('ABSPATH') || exit;
 
@@ -31,8 +32,29 @@ final class WordPressBattleEventRepository implements BattleEventRepository
         return $events;
     }
 
+    /** @return array<int,BattleEvent> */
+    public function forSession(string $tableId, string $sessionId): array
+    {
+        $events = [];
+        foreach (($this->records()[$tableId] ?? []) as $encounterRecords) {
+            foreach ((array) $encounterRecords as $record) {
+                if (is_array($record) && (string) ($record['session_id'] ?? '') === $sessionId) {
+                    $events[] = BattleEvent::reconstitute($record);
+                }
+            }
+        }
+        return $events;
+    }
+
     public function append(BattleEvent $event): void
     {
+        if ($event->sessionId() === '') {
+            $initial = $event->toArray();
+            $session = (new WordPressTableSessionRepository())->currentForTable((string) ($initial['table_id'] ?? ''));
+            if ($session !== null) {
+                $event = $event->withSessionId($session->id());
+            }
+        }
         $record = $event->toArray();
         $records = $this->records();
 

@@ -6,6 +6,7 @@ namespace GreatMarketrealmTabletop\Tabletop\Chronicle\Repositories;
 
 use GreatMarketrealmTabletop\Tabletop\Chronicle\Contracts\ChamberChronicleRepository;
 use GreatMarketrealmTabletop\Tabletop\Chronicle\Models\ChamberChronicleEvent;
+use GreatMarketrealmTabletop\Tabletop\Sessions\Repositories\WordPressTableSessionRepository;
 
 defined('ABSPATH') || exit;
 
@@ -24,8 +25,21 @@ final class WordPressChamberChronicleRepository implements ChamberChronicleRepos
         return $events;
     }
 
+    /** @return array<int,ChamberChronicleEvent> */
+    public function forSession(string $tableId, string $sessionId): array
+    {
+        return array_values(array_filter($this->forTable($tableId), static fn (ChamberChronicleEvent $event): bool => $event->sessionId() === $sessionId));
+    }
+
     public function append(ChamberChronicleEvent $event): void
     {
+        if ($event->sessionId() === '') {
+            $record = $event->toArray();
+            $session = (new WordPressTableSessionRepository())->currentForTable((string) ($record['table_id'] ?? ''));
+            if ($session !== null) {
+                $event = $event->withSessionId($session->id());
+            }
+        }
         $record = $event->toArray();
         $records = $this->records();
         $records[(string) $record['table_id']][] = $record;

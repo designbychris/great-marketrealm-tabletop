@@ -20,7 +20,8 @@ final class BattleEvent
         private int $round,
         private int $turnIndex,
         private DateTimeImmutable $occurredAt,
-        private array $payload = []
+        private array $payload = [],
+        private string $sessionId = ''
     ) {
         foreach (
             [$id, $tableId, $encounterId, $type, $tokenId]
@@ -50,8 +51,16 @@ final class BattleEvent
             ),
             is_array($record['payload'] ?? null)
                 ? $record['payload']
-                : []
+                : [],
+            (string) ($record['session_id'] ?? '')
         );
+    }
+
+    public function sessionId(): string { return $this->sessionId; }
+
+    public function withSessionId(string $sessionId): self
+    {
+        return new self($this->id, $this->tableId, $this->encounterId, $this->type, $this->tokenId, $this->round, $this->turnIndex, $this->occurredAt, $this->payload, trim($sessionId));
     }
 
     public function encounterId(): string
@@ -72,6 +81,7 @@ final class BattleEvent
             'turn_index' => $this->turnIndex,
             'occurred_at' => $this->occurredAt->format(DATE_ATOM),
             'payload' => $this->payload,
+            'session_id' => $this->sessionId,
         ];
     }
 }

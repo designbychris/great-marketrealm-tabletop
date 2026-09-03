@@ -18,6 +18,7 @@ use GreatMarketrealmTabletop\Tables\Memberships\Contracts\TableMembershipReposit
 use GreatMarketrealmTabletop\Tables\Models\TableStatus;
 use GreatMarketrealmTabletop\Tables\Scenes\Contracts\TableSceneRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Contracts\TableTokenRepository;
+use GreatMarketrealmTabletop\Tabletop\Sessions\Contracts\TableSessionRepository;
 use RuntimeException;
 
 defined('ABSPATH') || exit;
@@ -33,7 +34,8 @@ final class EncounterManager
         private EncounterIdGenerator $ids,
         private TableClock $clock,
         private EncounterControlPolicy $policy,
-        private ?ConditionLifecycle $conditionLifecycle = null
+        private ?ConditionLifecycle $conditionLifecycle = null,
+        private ?TableSessionRepository $sessions = null
     ) {}
 
     public function prepare(
@@ -68,7 +70,8 @@ final class EncounterManager
             $tableId,
             $sceneId,
             $name,
-            $this->clock->now()
+            $this->clock->now(),
+            $this->sessions?->currentForTable($tableId)?->id() ?? ''
         );
 
         $this->encounters->save($encounter);
@@ -121,7 +124,8 @@ final class EncounterManager
             $tableId,
             $scene->id(),
             trim($name) !== '' ? trim($name) : 'A Sudden Encounter',
-            $this->clock->now()
+            $this->clock->now(),
+            $this->sessions?->currentForTable($tableId)?->id() ?? ''
         );
         $seen = [];
 

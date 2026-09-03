@@ -1086,3 +1086,8 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - Projected the active Session through the Tabletop chamber/Living Table state so refreshes and other seated viewers follow the same Session lifecycle.
 - Added command-header Session controls/status and live lifecycle refresh handling.
 - Campaign removal now also purges Session records.
+
+## Phase IV.34.4 — Deeds of the Session
+- Bound new Encounters, Battle Chronicle events, and Chamber Chronicle events to the active immutable Tabletop Session ID.
+- Added Session-scoped Chronicle retrieval seams for future recap generation.
+- Preserved historic/out-of-session records and the secrecy of Keeper-only rolls.

@@ -11,6 +11,7 @@ use GreatMarketrealmTabletop\Tables\Repositories\WordPressTableRepository;
 use GreatMarketrealmTabletop\Tables\Scenes\Repositories\WordPressTableSceneRepository;
 use GreatMarketrealmTabletop\Tables\Services\SystemTableClock;
 use GreatMarketrealmTabletop\Tables\Tokens\Repositories\WordPressTableTokenRepository;
+use GreatMarketrealmTabletop\Tabletop\Sessions\Repositories\WordPressTableSessionRepository;
 
 defined('ABSPATH') || exit;
 
@@ -27,7 +28,8 @@ final class EncounterManagerFactory
             new UuidEncounterIdGenerator(),
             new SystemTableClock(),
             new EncounterControlPolicy(),
-            ConditionManagerFactory::lifecycle()
+            ConditionManagerFactory::lifecycle(),
+            new WordPressTableSessionRepository()
         );
     }
 }

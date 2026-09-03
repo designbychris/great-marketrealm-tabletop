@@ -24,6 +24,7 @@ final class ChamberChronicleProjector
                 'user_id' => (int) ($record['user_id'] ?? 0),
                 'summary' => (string) ($record['summary'] ?? ''),
                 'occurred_at' => (string) ($record['occurred_at'] ?? ''),
+                'session_id' => (string) ($record['session_id'] ?? ''),
             ];
         }, $events);
 
