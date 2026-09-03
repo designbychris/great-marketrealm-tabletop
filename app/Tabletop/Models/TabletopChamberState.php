@@ -34,7 +34,8 @@ final class TabletopChamberState
         private array $preparation = [],
         private array $thresholds = [],
         private array $bestiary = [],
-        private ?array $session = null
+        private ?array $session = null,
+        private ?array $sessionRecap = null
     ) {}
 
     /** @return array<string,mixed> */
@@ -133,6 +134,12 @@ final class TabletopChamberState
         return $this->session;
     }
 
+    /** @return array<string,mixed>|null */
+    public function sessionRecap(): ?array
+    {
+        return $this->sessionRecap;
+    }
+
     /** @return array<string,mixed> */
     public function preparation(): array
     {
@@ -197,6 +204,7 @@ final class TabletopChamberState
             'thresholds' => $this->thresholds,
             'dungeon_forge' => $this->integrations['dungeon_forge'] ?? [],
             'session' => $this->session,
+            'session_recap' => $this->sessionRecap,
         ];
 
         return hash(

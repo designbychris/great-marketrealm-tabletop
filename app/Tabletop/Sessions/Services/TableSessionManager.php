@@ -10,6 +10,7 @@ use GreatMarketrealmTabletop\Tabletop\Sessions\Contracts\TableSessionRepository;
 use GreatMarketrealmTabletop\Tabletop\Sessions\Exceptions\SessionControlDenied;
 use GreatMarketrealmTabletop\Tabletop\Sessions\Models\TableSession;
 use GreatMarketrealmTabletop\Tabletop\Sessions\Models\TableSessionStatus;
+use GreatMarketrealmTabletop\Tabletop\Sessions\Repositories\WordPressSessionRecapRepository;
 use RuntimeException;
 
 defined('ABSPATH') || exit;
@@ -19,7 +20,9 @@ final class TableSessionManager
     public function __construct(
         private TableRepository $tables,
         private TableSessionRepository $sessions,
-        private TableClock $clock
+        private TableClock $clock,
+        private ?SessionRecapBuilder $recapBuilder = null,
+        private ?WordPressSessionRecapRepository $recaps = null
     ) {}
 
     public function start(string $tableId, int $userId, string $title = ''): TableSession
@@ -63,6 +66,9 @@ final class TableSessionManager
 
         $session->end($this->clock->now());
         $this->sessions->save($session);
+        if ($this->recapBuilder !== null && $this->recaps !== null) {
+            $this->recaps->save($this->recapBuilder->build($session));
+        }
         return $session;
     }
 

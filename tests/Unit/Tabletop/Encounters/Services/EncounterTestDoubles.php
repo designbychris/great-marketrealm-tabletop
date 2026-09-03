@@ -71,6 +71,10 @@ final class EncounterStore implements EncounterRepository
     {
         return array_values(array_filter($this->items, static fn (Encounter $encounter): bool => $encounter->tableId() === $tableId && $encounter->sceneId() === $sceneId));
     }
+    public function forSession(string $tableId, string $sessionId): array
+    {
+        return array_values(array_filter($this->items, static fn (Encounter $encounter): bool => $encounter->tableId() === $tableId && $encounter->sessionId() === $sessionId));
+    }
     public function find(string $tableId, string $encounterId): ?Encounter
     {
         $encounter = $this->items[$encounterId] ?? null;

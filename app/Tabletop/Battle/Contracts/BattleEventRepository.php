@@ -16,5 +16,8 @@ interface BattleEventRepository
         string $encounterId
     ): array;
 
+    /** @return array<int,BattleEvent> */
+    public function forSession(string $tableId, string $sessionId): array;
+
     public function append(BattleEvent $event): void;
 }

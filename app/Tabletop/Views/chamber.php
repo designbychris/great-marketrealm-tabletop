@@ -25,6 +25,7 @@ $tokens = $state?->tokens() ?? [];
 $members = $state?->members() ?? [];
 $encounter = $state?->encounter();
 $session = $state?->session();
+$sessionRecap = $state?->sessionRecap();
 $vitality = $state?->vitality() ?? [];
 $deathSaves = $state?->deathSaves() ?? [];
 $conditions = $state?->conditions() ?? [];
@@ -274,6 +275,16 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                 <?php endif; ?>
                 <small class="gmrt-table-session__status" data-table-session-status role="status" aria-live="polite"></small>
             </section>
+
+            <?php if ($session === null && $sessionRecap !== null) : ?>
+                <section class="gmrt-session-recap" data-session-recap aria-labelledby="gmrt-session-recap-title">
+                    <p class="gmrt-session-recap__eyebrow">Pippin Peppercorn presents</p>
+                    <h2 id="gmrt-session-recap-title">Previously, in the MarketRealm…</h2>
+                    <p class="gmrt-session-recap__session">Session <?php echo esc_html((string) ($sessionRecap['number'] ?? '')); ?> · <?php echo esc_html((string) ($sessionRecap['title'] ?? 'The Adventure Continues')); ?></p>
+                    <div class="gmrt-session-recap__story"><?php echo nl2br(esc_html((string) ($sessionRecap['draft'] ?? ''))); ?></div>
+                    <small>Pippin's field notes · Keeper draft</small>
+                </section>
+            <?php endif; ?>
 
             <div class="gmrt-chamber__viewer">
                 <span>

@@ -827,3 +827,9 @@ New Keeper-created campaigns now choose how their opening Scene arrives: preserv
 
 ### Phase IV.34.4 — Deeds of the Session — IMPLEMENTED
 Encounters and Chronicle activity now remember the immutable active Session that witnessed them, giving later recap/history phases reliable Session-scoped source material without exposing Keeper-secret rolls.
+
+### Phase IV.34.5 — Previously, in the MarketRealm…
+- [x] Session-scoped recap evidence collector
+- [x] Persistent Keeper recap draft
+- [x] “Previously, in the MarketRealm…” Chamber presentation
+- [x] No automatic publication of Keeper narrative to shared Companion records

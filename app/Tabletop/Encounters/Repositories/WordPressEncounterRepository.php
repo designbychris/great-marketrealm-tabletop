@@ -27,6 +27,20 @@ final class WordPressEncounterRepository implements EncounterRepository
         return $encounters;
     }
 
+    /** @return array<int,Encounter> */
+    public function forSession(string $tableId, string $sessionId): array
+    {
+        $matches = [];
+        foreach ($this->records()[$tableId] ?? [] as $records) {
+            foreach ((array) $records as $record) {
+                if (is_array($record) && (string) ($record['session_id'] ?? '') === $sessionId) {
+                    $matches[] = Encounter::reconstitute($record);
+                }
+            }
+        }
+        return $matches;
+    }
+
     public function find(string $tableId, string $encounterId): ?Encounter
     {
         foreach ($this->records()[$tableId] ?? [] as $records) {

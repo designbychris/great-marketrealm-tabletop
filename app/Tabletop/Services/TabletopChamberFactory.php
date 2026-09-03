@@ -33,6 +33,7 @@ use GreatMarketrealmTabletop\Tabletop\Atlas\Thresholds\Repositories\WordPressThr
 use GreatMarketrealmTabletop\Tabletop\Bestiary\Services\BestiaryRepositoryFactory;
 use GreatMarketrealmTabletop\Tabletop\Cartography\Repositories\WordPressDungeonForgeRepository;
 use GreatMarketrealmTabletop\Tabletop\Sessions\Repositories\WordPressTableSessionRepository;
+use GreatMarketrealmTabletop\Tabletop\Sessions\Repositories\WordPressSessionRecapRepository;
 
 defined('ABSPATH') || exit;
 
@@ -69,7 +70,8 @@ final class TabletopChamberFactory
             BestiaryRepositoryFactory::make(),
             new WordPressEnvironmentalLightRepository(),
             new WordPressDungeonForgeRepository(),
-            new WordPressTableSessionRepository()
+            new WordPressTableSessionRepository(),
+            new WordPressSessionRecapRepository()
         );
     }
 }

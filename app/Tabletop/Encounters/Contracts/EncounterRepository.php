@@ -13,6 +13,9 @@ interface EncounterRepository
     /** @return array<int,Encounter> */
     public function forScene(string $tableId, string $sceneId): array;
 
+    /** @return array<int,Encounter> */
+    public function forSession(string $tableId, string $sessionId): array;
+
     public function find(string $tableId, string $encounterId): ?Encounter;
 
     public function currentForScene(

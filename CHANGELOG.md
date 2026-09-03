@@ -1091,3 +1091,8 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - Bound new Encounters, Battle Chronicle events, and Chamber Chronicle events to the active immutable Tabletop Session ID.
 - Added Session-scoped Chronicle retrieval seams for future recap generation.
 - Preserved historic/out-of-session records and the secrecy of Keeper-only rolls.
+
+### Phase IV.34.5 — Previously, in the MarketRealm…
+- Added persistent Session recap drafts built from Session-scoped Chamber Chronicle, Encounter, and Battle evidence.
+- Added the “Previously, in the MarketRealm…” Chamber presentation with Pippin field-note treatment.
+- Kept recap publication separate from Companion/Fellowship certified history pending Keeper approval workflow.

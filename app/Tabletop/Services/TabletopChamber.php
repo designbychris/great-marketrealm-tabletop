@@ -42,6 +42,7 @@ use GreatMarketrealmTabletop\Tabletop\Atlas\Thresholds\Contracts\ThresholdReposi
 use GreatMarketrealmTabletop\Tabletop\Bestiary\Contracts\BestiaryRepository;
 use GreatMarketrealmTabletop\Tabletop\Cartography\Contracts\DungeonForgeRepository;
 use GreatMarketrealmTabletop\Tabletop\Sessions\Contracts\TableSessionRepository;
+use GreatMarketrealmTabletop\Tabletop\Sessions\Repositories\WordPressSessionRecapRepository;
 use RuntimeException;
 
 defined('ABSPATH') || exit;
@@ -77,7 +78,8 @@ final class TabletopChamber
         private ?BestiaryRepository $bestiary = null,
         private ?EnvironmentalLightRepository $environmentalLights = null,
         private ?DungeonForgeRepository $dungeonForge = null,
-        private ?TableSessionRepository $sessions = null
+        private ?TableSessionRepository $sessions = null,
+        private ?WordPressSessionRecapRepository $sessionRecaps = null
     ) {}
 
     public function state(
@@ -548,7 +550,28 @@ $worldLightSourceModels[] = $environmentalLight;
                     $this->bestiary->all()
                 )
                 : [],
-            $this->sessions?->currentForTable($tableId)?->toArray()
+            $this->sessions?->currentForTable($tableId)?->toArray(),
+            $this->latestRecap($tableId)
         );
     }
+    /** @return array<string,mixed>|null */
+    private function latestRecap(string $tableId): ?array
+    {
+        if ($this->sessions === null || $this->sessionRecaps === null) {
+            return null;
+        }
+        foreach (array_reverse($this->sessions->forTable($tableId)) as $session) {
+            if ($session->isActive()) { continue; }
+            $recap = $this->sessionRecaps->find($tableId, $session->id());
+            if ($recap !== null) {
+                return array_merge($recap->toArray(), [
+                    'number' => $session->number(),
+                    'title' => $session->title(),
+                    'ended_at' => $session->endedAt()?->format(DATE_ATOM),
+                ]);
+            }
+        }
+        return null;
+    }
+
 }

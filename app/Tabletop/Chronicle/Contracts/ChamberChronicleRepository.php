@@ -13,5 +13,8 @@ interface ChamberChronicleRepository
     /** @return array<int,ChamberChronicleEvent> */
     public function forTable(string $tableId): array;
 
+    /** @return array<int,ChamberChronicleEvent> */
+    public function forSession(string $tableId, string $sessionId): array;
+
     public function append(ChamberChronicleEvent $event): void;
 }
