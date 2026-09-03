@@ -3680,6 +3680,7 @@
     gap: .55rem;
     padding: .6rem;
 }
+.gmrt-keeper-controls__body > .gmrt-keeper-controls__scene-tools,
 .gmrt-keeper-controls__body > .gmrt-fog-controls,
 .gmrt-keeper-controls__body > .gmrt-lantern-rack,
 .gmrt-keeper-controls__body > .gmrt-vision-controls,
@@ -5488,29 +5489,74 @@
 
 
 /* Phase IV.34.5 — Previously, in the MarketRealm… */
-.gmrt-session-recap { grid-column: 1 / -1; padding: .9rem 1rem; border: 3px solid var(--gmrt-ink, #30291f); background: rgba(255,248,224,.94); color: var(--gmrt-ink, #30291f); box-shadow: inset 0 0 0 2px rgba(48,41,31,.12); }
+.gmrt-session-recap {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: clamp(112px, 10vw, 158px) minmax(0, 1fr);
+    align-items: stretch;
+    gap: .9rem;
+    padding: .7rem .8rem;
+    color: var(--gmrt-ink, #30291f);
+}
+.gmrt-session-recap__portrait {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    min-height: 138px;
+    padding: .15rem .1rem 0;
+}
+.gmrt-session-recap__pippin {
+    display: block;
+    width: auto;
+    height: clamp(118px, 11vw, 158px);
+    max-width: 100%;
+    image-rendering: pixelated;
+    object-fit: contain;
+    object-position: center bottom;
+}
+.gmrt-session-recap__bubble {
+    position: relative;
+    min-width: 0;
+    padding: .9rem 1rem;
+    border: 3px solid var(--gmrt-ink, #30291f);
+    background: rgba(255,248,224,.96);
+    box-shadow: inset 0 0 0 2px rgba(48,41,31,.12);
+}
+.gmrt-session-recap__bubble::before,
+.gmrt-session-recap__bubble::after {
+    content: "";
+    position: absolute;
+    top: 34px;
+    width: 0;
+    height: 0;
+    border-style: solid;
+}
+.gmrt-session-recap__bubble::before {
+    left: -18px;
+    border-width: 11px 18px 11px 0;
+    border-color: transparent var(--gmrt-ink, #30291f) transparent transparent;
+}
+.gmrt-session-recap__bubble::after {
+    left: -13px;
+    border-width: 8px 14px 8px 0;
+    border-color: transparent rgba(255,248,224,.96) transparent transparent;
+}
 .gmrt-session-recap__eyebrow { margin: 0 0 .15rem; font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; }
 .gmrt-session-recap h2 { margin: 0; font-size: clamp(1.05rem,2vw,1.45rem); }
 .gmrt-session-recap__session { margin: .2rem 0 .65rem; font-weight: 700; }
 .gmrt-session-recap__story { display: grid; gap: .45rem; line-height: 1.55; }
 .gmrt-session-recap small { display: block; margin-top: .65rem; opacity: .72; }
 
-/* Phase IV.34.5C — Pippin Learns to Close the Book. */
+/* Phase IV.34.5C/D — Pippin Learns to Close the Book and Finds His Voice. */
 .gmrt-session-recap__heading {
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    align-items: center;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
     gap: .75rem;
-}
-.gmrt-session-recap__pippin {
-    width: clamp(42px, 4.5vw, 64px);
-    height: auto;
-    image-rendering: pixelated;
-    align-self: center;
 }
 .gmrt-session-recap__titlecopy { min-width: 0; }
 .gmrt-session-recap__toggle {
-    align-self: center;
+    align-self: start;
     min-height: 36px;
     padding: .38rem .6rem;
     border: 2px solid currentColor;
@@ -5524,14 +5570,37 @@
 .gmrt-session-recap__toggle:hover,
 .gmrt-session-recap__toggle:focus-visible { background: rgba(48,41,31,.16); }
 .gmrt-session-recap__content[hidden] { display: none; }
-.gmrt-session-recap.is-collapsed { padding-block: .55rem; }
-.gmrt-session-recap.is-collapsed .gmrt-session-recap__pippin { width: 38px; }
+.gmrt-session-recap.is-collapsed {
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: .55rem;
+    padding-block: .35rem;
+}
+.gmrt-session-recap.is-collapsed .gmrt-session-recap__portrait { min-height: 48px; }
+.gmrt-session-recap.is-collapsed .gmrt-session-recap__pippin { height: 46px; }
+.gmrt-session-recap.is-collapsed .gmrt-session-recap__bubble { padding: .45rem .6rem; }
+.gmrt-session-recap.is-collapsed .gmrt-session-recap__bubble::before,
+.gmrt-session-recap.is-collapsed .gmrt-session-recap__bubble::after { top: 13px; }
 .gmrt-session-recap.is-collapsed .gmrt-session-recap__eyebrow { display: none; }
 .gmrt-session-recap.is-collapsed h2 { font-size: 1rem; }
 
 /* The command header now ends with the stable viewer/status anchor. */
 .gmrt-chamber__masthead > .gmrt-chamber__viewer { border-right: 0; }
 .gmrt-table-session { border-right: 1px solid rgba(216,173,79,.28); }
+
+/* IV.34.5D — scene selection belongs with the rest of the Keeper controls. */
+.gmrt-keeper-controls__scene-tools {
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    flex-wrap: wrap;
+    padding: .55rem .7rem;
+    border: 1px solid rgba(244,234,214,.2);
+    border-radius: 9px;
+}
+.gmrt-keeper-controls__scene-tools > span {
+    color: rgba(244,234,214,.72);
+    font-size: .72rem;
+}
 
 @media (max-width: 1120px) {
     .gmrt-chamber__masthead { grid-template-columns: minmax(0, 1fr) auto; }
@@ -5540,6 +5609,14 @@
     .gmrt-chamber__masthead > .gmrt-chamber__viewer { grid-column: 2; grid-row: 2; }
 }
 @media (max-width: 640px) {
-    .gmrt-session-recap__heading { grid-template-columns: auto minmax(0, 1fr); }
-    .gmrt-session-recap__toggle { grid-column: 1 / -1; justify-self: stretch; }
+    .gmrt-session-recap {
+        grid-template-columns: 72px minmax(0, 1fr);
+        gap: .55rem;
+        padding-inline: .35rem;
+    }
+    .gmrt-session-recap__portrait { min-height: 112px; }
+    .gmrt-session-recap__pippin { height: 104px; }
+    .gmrt-session-recap__heading { grid-template-columns: minmax(0, 1fr); }
+    .gmrt-session-recap__toggle { justify-self: stretch; }
+    .gmrt-session-recap__bubble { padding: .7rem .75rem; }
 }

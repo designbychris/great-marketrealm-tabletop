@@ -301,29 +301,32 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                     data-session-recap-id="<?php echo esc_attr((string) ($sessionRecap['session_id'] ?? '')); ?>"
                     aria-labelledby="gmrt-session-recap-title"
                 >
-                    <div class="gmrt-session-recap__heading">
+                    <div class="gmrt-session-recap__portrait" aria-hidden="true">
                         <img
                             class="gmrt-session-recap__pippin"
                             src="<?php echo esc_url(GMRT_URL . 'assets/images/pippin-peppercorn-pixel.png'); ?>"
                             alt=""
-                            aria-hidden="true"
                         >
-                        <div class="gmrt-session-recap__titlecopy">
-                            <p class="gmrt-session-recap__eyebrow">Pippin Peppercorn presents</p>
-                            <h2 id="gmrt-session-recap-title">Previously, in the MarketRealm…</h2>
-                        </div>
-                        <button
-                            class="gmrt-session-recap__toggle"
-                            type="button"
-                            data-session-recap-toggle
-                            aria-expanded="true"
-                            aria-controls="gmrt-session-recap-content"
-                        >Hide Recap</button>
                     </div>
-                    <div class="gmrt-session-recap__content" id="gmrt-session-recap-content" data-session-recap-content>
-                        <p class="gmrt-session-recap__session">Session <?php echo esc_html((string) ($sessionRecap['number'] ?? '')); ?> · <?php echo esc_html((string) ($sessionRecap['title'] ?? 'The Adventure Continues')); ?></p>
-                        <div class="gmrt-session-recap__story"><?php echo nl2br(esc_html((string) ($sessionRecap['draft'] ?? ''))); ?></div>
-                        <small>Pippin's field notes · Keeper draft</small>
+                    <div class="gmrt-session-recap__bubble">
+                        <div class="gmrt-session-recap__heading">
+                            <div class="gmrt-session-recap__titlecopy">
+                                <p class="gmrt-session-recap__eyebrow">Pippin Peppercorn presents</p>
+                                <h2 id="gmrt-session-recap-title">Previously, in the MarketRealm…</h2>
+                            </div>
+                            <button
+                                class="gmrt-session-recap__toggle"
+                                type="button"
+                                data-session-recap-toggle
+                                aria-expanded="true"
+                                aria-controls="gmrt-session-recap-content"
+                            >Hide Recap</button>
+                        </div>
+                        <div class="gmrt-session-recap__content" id="gmrt-session-recap-content" data-session-recap-content>
+                            <p class="gmrt-session-recap__session">Session <?php echo esc_html((string) ($sessionRecap['number'] ?? '')); ?> · <?php echo esc_html((string) ($sessionRecap['title'] ?? 'The Adventure Continues')); ?></p>
+                            <div class="gmrt-session-recap__story"><?php echo nl2br(esc_html((string) ($sessionRecap['draft'] ?? ''))); ?></div>
+                            <small>Pippin's field notes · Keeper draft</small>
+                        </div>
                     </div>
                 </section>
             <?php endif; ?>
@@ -1209,16 +1212,6 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                             data-remove-selected-token
                             hidden
                         >Remove from Chamber</button>
-                        <?php if ($state->isDungeonMaster()) : ?>
-                            <button
-                                type="button"
-                                class="gmrt-cartographer-button"
-                                data-choose-battlemap
-                            >
-                                Choose Battlemap
-                            </button>
-                        <?php endif; ?>
-
                     <span>
                         <?php echo esc_html(
                             (string) $scene['grid_type']
@@ -1239,6 +1232,17 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                     <details class="gmrt-keeper-controls" data-keeper-controls>
                         <summary>Dungeon Master Controls</summary>
                         <div class="gmrt-keeper-controls__body">
+                    <div class="gmrt-keeper-controls__scene-tools">
+                        <strong>The Battlemap</strong>
+                        <span>Change the Scene artwork used at this Table.</span>
+                        <button
+                            type="button"
+                            class="gmrt-cartographer-button"
+                            data-choose-battlemap
+                        >
+                            Choose Battlemap
+                        </button>
+                    </div>
                     <div class="gmrt-fog-controls">
                         <strong>The Veil of the Unknown</strong>
                         <label>

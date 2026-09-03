@@ -1101,3 +1101,5 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - Moved the stable Table role/status to the far-right end of the command header, after Session controls.
 - Added canonical pixel Pippin to the “Previously, in the MarketRealm…” presentation.
 - Added an accessible, remembered recap collapse/show control keyed to the immutable Session recap identity.
+
+- IV.34.5D — Pippin Finds His Voice: restored the IV.34.2 Companion Campaign client bridge after a stale JavaScript overwrite, corrected the recap persistence regression expectation, enlarged pixel Pippin into the recap speech-bubble presentation, and moved Choose Battlemap into Dungeon Master Controls.

@@ -838,3 +838,5 @@ Encounters and Chronicle activity now remember the immutable active Session that
 - [x] Command header order: Exploration Mode → Session controls → Table role/status.
 - [x] Canonical pixel Pippin integrated into the Session recap.
 - [x] Accessible Hide/Show recap control with per-Session remembered preference.
+
+- IV.34.5D — Pippin Finds His Voice: restored the IV.34.2 Companion Campaign client bridge after a stale JavaScript overwrite, corrected the recap persistence regression expectation, enlarged pixel Pippin into the recap speech-bubble presentation, and moved Choose Battlemap into Dungeon Master Controls.

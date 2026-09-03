@@ -45,6 +45,7 @@ final class PreviouslyInMarketRealmRegressionTest extends TestCase
         $source = $this->source('app/Tabletop/Views/chamber.php');
         self::assertStringContainsString("assets/images/pippin-peppercorn-pixel.png", $source);
         self::assertStringContainsString('gmrt-session-recap__pippin', $source);
+        self::assertStringContainsString('gmrt-session-recap__bubble', $source);
     }
 
     public function test_recap_has_an_accessible_show_hide_control(): void
@@ -60,9 +61,23 @@ final class PreviouslyInMarketRealmRegressionTest extends TestCase
     {
         $source = $this->source('assets/js/tabletop.js');
         self::assertStringContainsString('sessionRecapStorageKey', $source);
-        self::assertStringContainsString('data.sessionRecapId', $source);
+        self::assertStringContainsString('dataset.sessionRecapId', $source);
         self::assertStringContainsString('window.localStorage.setItem', $source);
         self::assertStringContainsString('restoreSessionRecapPreference()', $source);
+    }
+
+
+    public function test_choose_battlemap_lives_inside_dungeon_master_controls(): void
+    {
+        $source = $this->source('app/Tabletop/Views/chamber.php');
+        $controls = strpos($source, 'class="gmrt-keeper-controls__body"');
+        $battlemap = strpos($source, 'data-choose-battlemap');
+        $boardHeading = strpos($source, 'class="gmrt-board__heading"');
+
+        self::assertNotFalse($controls);
+        self::assertNotFalse($battlemap);
+        self::assertNotFalse($boardHeading);
+        self::assertGreaterThan($controls, $battlemap);
     }
 
     public function test_recap_is_not_companion_published_automatically(): void
