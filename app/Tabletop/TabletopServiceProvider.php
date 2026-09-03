@@ -24,6 +24,9 @@ use GreatMarketrealmTabletop\Tabletop\Http\TestTableAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\CreateTabletopAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\RemoveTabletopAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\TableSessionAjaxController;
+use GreatMarketrealmTabletop\Tabletop\Http\CompanionCampaignAjaxController;
+use GreatMarketrealmTabletop\Integration\Companion\CompanionCampaignBridge;
+use GreatMarketrealmTabletop\Tabletop\Sessions\Repositories\WordPressTableSessionRepository;
 use GreatMarketrealmTabletop\Tabletop\Campaigns\WordPressTabletopRemover;
 use GreatMarketrealmTabletop\Tabletop\Campaigns\TabletopCreator;
 use GreatMarketrealmTabletop\Tabletop\Campaigns\WordPressDungeonMasterPolicy;
@@ -112,6 +115,8 @@ final class TabletopServiceProvider
     private RemoveTabletopAjaxController $removeTabletopAjax;
 
     private TableSessionAjaxController $tableSessionAjax;
+
+    private CompanionCampaignAjaxController $companionCampaignAjax;
 
     private TargetingAjaxController $targetingAjax;
 
@@ -211,8 +216,15 @@ final class TabletopServiceProvider
             new WordPressTabletopRemover(TableRegistryFactory::make())
         );
 
+        $companionCampaignBridge = new CompanionCampaignBridge();
         $this->tableSessionAjax = new TableSessionAjaxController(
-            TableSessionManagerFactory::make()
+            TableSessionManagerFactory::make(),
+            $companionCampaignBridge
+        );
+        $this->companionCampaignAjax = new CompanionCampaignAjaxController(
+            new WordPressTableRepository(),
+            new WordPressTableSessionRepository(),
+            $companionCampaignBridge
         );
 
         $this->targetingAjax = new TargetingAjaxController(
@@ -530,6 +542,11 @@ final class TabletopServiceProvider
         add_action(
             'wp_ajax_gmrt_remove_tabletop',
             [$this->removeTabletopAjax, 'remove']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_link_companion_campaign',
+            [$this->companionCampaignAjax, 'link']
         );
 
         add_action(

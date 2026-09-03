@@ -13,6 +13,7 @@ use GreatMarketrealmTabletop\Tables\Memberships\Presentation\TableMemberProjecto
 use GreatMarketrealmTabletop\Tables\Memberships\Models\TableMemberStatus;
 use GreatMarketrealmTabletop\Tables\Services\TableRegistryFactory;
 use GreatMarketrealmTabletop\Tabletop\Campaigns\WordPressDungeonMasterPolicy;
+use GreatMarketrealmTabletop\Integration\Companion\CompanionCampaignBridge;
 
 defined('ABSPATH') || exit;
 
@@ -68,6 +69,8 @@ final class TabletopShortcode
                 : null;
             $registry = TableRegistryFactory::make();
             $campaigns = [];
+            $companionBridge = new CompanionCampaignBridge();
+            $companionCampaigns = $companionBridge->campaignsForKeeper($userId);
 
             foreach ($registry->all() as $table) {
                 $member = $this->members?->find($table->id(), $userId);
@@ -96,6 +99,7 @@ final class TabletopShortcode
                     'is_owner' => $isOwner,
                     'membership_status' => $memberStatus,
                     'last_visited' => $table->lastHeartbeatAt()?->format(DATE_ATOM),
+                    'companion_campaign' => $isOwner ? $companionBridge->linkedCampaign($table->id(), $userId) : null,
                 ];
             }
 
@@ -113,6 +117,7 @@ final class TabletopShortcode
                     'may_create' => (new WordPressDungeonMasterPolicy())->mayCreate($userId),
                     'tables' => $campaigns,
                     'art_url' => GMRT_URL . 'assets/images/pippin-peppercorn-cartographer.png',
+                    'companion_campaigns' => $companionCampaigns,
                 ]
             );
         }

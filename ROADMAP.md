@@ -817,8 +817,10 @@ New Keeper-created campaigns now choose how their opening Scene arrives: preserv
 
 
 ### Phase IV.34 — The Living Campaign
-- **IV.34.1 — The Keeper Calls the Session** — persistent numbered Session lifecycle, DM start/end authority, Living Table projection and between-session state. **CURRENT**
-- IV.34.2 — The Table Remembers Tonight — associate Chronicle, encounters and meaningful events with Sessions.
-- IV.34.3 — Previously, in the MarketRealm… — Session history and recap ledger.
-- IV.34.4 — Until Next Time — end-of-session continuity and safe closing state.
-- IV.34.5 — The Next Gathering — begin the next Session from the previous campaign state.
+- [x] **IV.34.1 — The Keeper Calls the Session** — persistent numbered Session lifecycle, DM start/end authority, Living Table projection and between-session state. Browser-certified.
+- [x] **IV.34.2 — The Table Remembers Tonight** — link a Tabletop to its canonical Companion Campaign and synchronise actual play Sessions into the DM Session Ledger with authoritative timestamps and duration. **IMPLEMENTED / browser certification pending**
+- IV.34.3 — The Fellowship Remembers — publish the safe shared Session projection into the linked Fellowship Company Chronicle.
+- IV.34.4 — Deeds of the Session — associate Chronicle, encounters and meaningful Table events with Session identity.
+- IV.34.5 — Previously, in the MarketRealm… — build the editable Session recap from recorded deeds.
+- IV.34.6 — Until Next Time — end-of-session continuity and safe closing state.
+- IV.34.7 — The Next Gathering — begin the next Session from the previous campaign state.

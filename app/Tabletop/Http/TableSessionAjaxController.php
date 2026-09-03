@@ -6,13 +6,17 @@ namespace GreatMarketrealmTabletop\Tabletop\Http;
 
 use GreatMarketrealmTabletop\Tabletop\Sessions\Exceptions\SessionControlDenied;
 use GreatMarketrealmTabletop\Tabletop\Sessions\Services\TableSessionManager;
+use GreatMarketrealmTabletop\Integration\Companion\CompanionCampaignBridge;
 use Throwable;
 
 defined('ABSPATH') || exit;
 
 final class TableSessionAjaxController
 {
-    public function __construct(private TableSessionManager $sessions) {}
+    public function __construct(
+        private TableSessionManager $sessions,
+        private CompanionCampaignBridge $companion
+    ) {}
 
     public function start(): void
     {
@@ -37,7 +41,10 @@ final class TableSessionAjaxController
     {
         try {
             $session = $callback();
-            wp_send_json_success(['session' => $session->toArray()]);
+            wp_send_json_success([
+                'session' => $session->toArray(),
+                'companion' => $this->companion->synchronise($session, get_current_user_id()),
+            ]);
         } catch (SessionControlDenied $exception) {
             wp_send_json_error(['message' => $exception->getMessage()], 403);
         } catch (Throwable $exception) {

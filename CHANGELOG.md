@@ -1,3 +1,12 @@
+## Phase IV.34.2 — The Table Remembers Tonight
+
+- Adds Pippin's Table Atlas control for linking an owned Tabletop to an active Dungeon Master Companion Campaign.
+- Uses explicit cross-plugin WordPress contracts; Tabletop does not load or mutate Companion classes directly.
+- Backfills existing persistent Tabletop Sessions into the Companion Session Ledger when a campaign link is established.
+- Synchronises each future Session start/end to the same Companion Ledger identity.
+- Projects the Companion Campaign and linked Fellowship name back into the Table Atlas.
+- Keeps the Fellowship Company Chronicle publication boundary for IV.34.3.
+
 - IV.32.6A polish: removed the in-Chamber masthead from Door/invitation threshold states and made both cinematic thresholds fill the remaining viewport beneath the site header without a bottom gap.
 ## Phase IV.32.4C — The Keeper Lights the Pixels
 

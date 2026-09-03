@@ -994,6 +994,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                 </header>
 
                 <?php $campaignTables = is_array($campaignLobby['tables'] ?? null) ? $campaignLobby['tables'] : []; ?>
+                <?php $companionCampaigns = is_array($campaignLobby['companion_campaigns'] ?? null) ? $campaignLobby['companion_campaigns'] : []; ?>
                 <?php if ($campaignTables !== []) : ?>
                     <div class="gmrt-campaign-lobby__shelf" aria-label="Your Tabletop campaigns">
                         <?php foreach ($campaignTables as $campaignTable) : ?>
@@ -1013,6 +1014,32 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                 </a>
 
                                 <?php if ($isOwner) : ?>
+                                    <?php $linkedCompanionCampaign = is_array($campaignTable['companion_campaign'] ?? null) ? $campaignTable['companion_campaign'] : null; ?>
+                                    <details class="gmrt-campaign-card__companion"<?php echo $linkedCompanionCampaign === null ? ' open' : ''; ?>>
+                                        <summary>Companion Campaign <span><?php echo esc_html($linkedCompanionCampaign !== null ? 'Linked' : 'Not linked'); ?></span></summary>
+                                        <div class="gmrt-campaign-card__companion-body">
+                                            <?php if ($linkedCompanionCampaign !== null) : ?>
+                                                <p><strong><?php echo esc_html((string) ($linkedCompanionCampaign['name'] ?? 'Companion Campaign')); ?></strong><?php if ((string) ($linkedCompanionCampaign['fellowship_name'] ?? '') !== '') : ?><br><small>Fellowship · <?php echo esc_html((string) $linkedCompanionCampaign['fellowship_name']); ?></small><?php endif; ?></p>
+                                            <?php endif; ?>
+                                            <?php if ($companionCampaigns !== []) : ?>
+                                                <form data-companion-campaign-link data-table-id="<?php echo esc_attr((string) ($campaignTable['id'] ?? '')); ?>">
+                                                    <label><span><?php echo $linkedCompanionCampaign !== null ? 'Change linked Campaign' : 'Link to the DM Companion'; ?></span>
+                                                        <select name="campaign_id" required>
+                                                            <option value="">Choose a Companion Campaign…</option>
+                                                            <?php foreach ($companionCampaigns as $companionCampaign) : ?>
+                                                                <option value="<?php echo esc_attr((string) ($companionCampaign['id'] ?? '')); ?>" <?php selected((string) ($linkedCompanionCampaign['id'] ?? ''), (string) ($companionCampaign['id'] ?? '')); ?>><?php echo esc_html((string) ($companionCampaign['name'] ?? 'Untitled Campaign')); ?><?php if ((string) ($companionCampaign['fellowship_name'] ?? '') !== '') : ?> — <?php echo esc_html((string) $companionCampaign['fellowship_name']); ?><?php endif; ?></option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </label>
+                                                    <button type="submit">Link Campaign</button>
+                                                </form>
+                                                <span data-companion-campaign-status role="status" aria-live="polite"></span>
+                                                <small>Existing Tabletop Sessions are copied into the Companion Session Ledger when the link is made.</small>
+                                            <?php else : ?>
+                                                <p><small>No active DM Companion Campaigns are available. The Tabletop can still be played independently.</small></p>
+                                            <?php endif; ?>
+                                        </div>
+                                    </details>
                                     <?php $campaignRoster = is_array($campaignTable['roster'] ?? null) ? $campaignTable['roster'] : []; ?>
                                     <?php $campaignPlayers = array_values(array_filter($campaignRoster, static fn ($member): bool => ($member['role'] ?? '') === 'player' && ($member['status'] ?? '') !== 'left')); ?>
                                     <details class="gmrt-campaign-card__doors">

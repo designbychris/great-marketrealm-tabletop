@@ -332,6 +332,31 @@
         }
     }
 
+    // Phase IV.34.2 — The Table Remembers Tonight: Companion Campaign bridge.
+    document.querySelectorAll('[data-companion-campaign-link]').forEach((form) => {
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const tableId = form.dataset.tableId || '';
+            const campaignId = String(form.querySelector('[name="campaign_id"]')?.value || '');
+            const button = form.querySelector('button[type="submit"]');
+            const status = form.parentElement?.querySelector('[data-companion-campaign-status]');
+            if (!tableId || !campaignId) return;
+            if (button) button.disabled = true;
+            if (status) status.textContent = 'Pippin is joining the Table Atlas to the Companion Ledger…';
+            try {
+                const data = await request('gmrt_link_companion_campaign', { table_id: tableId, campaign_id: campaignId });
+                const count = Number(data.sessions_synchronised || 0);
+                if (status) status.textContent = count > 0
+                    ? `${data.message || 'Campaign linked.'} ${count} existing Session${count === 1 ? '' : 's'} synchronised.`
+                    : (data.message || 'Campaign linked.');
+                window.setTimeout(() => window.location.reload(), 650);
+            } catch (error) {
+                if (status) status.textContent = error.message || 'The Companion Campaign could not be linked.';
+                if (button) button.disabled = false;
+            }
+        });
+    });
+
     // Phase IV.33.2 — Campaign Shelf player administration.
     document.querySelectorAll('[data-campaign-invite-form]').forEach((form) => {
         form.addEventListener('submit', async (event) => {

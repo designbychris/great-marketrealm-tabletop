@@ -5429,3 +5429,35 @@
     }
     .gmrt-table-command__scene { grid-row: auto; }
 }
+
+/* IV.34.2 — The Table Remembers Tonight: Companion Campaign link. */
+.gmrt-campaign-card__companion {
+    margin-top: .85rem;
+    border-top: 2px solid rgba(244,234,214,.18);
+    padding-top: .7rem;
+}
+.gmrt-campaign-card__companion summary {
+    cursor: pointer;
+    font-weight: 800;
+}
+.gmrt-campaign-card__companion summary span {
+    opacity: .72;
+    font-size: .82em;
+    margin-left: .35rem;
+}
+.gmrt-campaign-card__companion-body {
+    display: grid;
+    gap: .65rem;
+    margin-top: .75rem;
+}
+.gmrt-campaign-card__companion-body form,
+.gmrt-campaign-card__companion-body label {
+    display: grid;
+    gap: .4rem;
+}
+.gmrt-campaign-card__companion-body select {
+    width: 100%;
+}
+.gmrt-campaign-card__companion-body small {
+    opacity: .76;
+}
