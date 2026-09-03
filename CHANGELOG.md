@@ -1133,3 +1133,11 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - Adds Decorative, Structural and Interactive object categories.
 - Adds an explicit Scene Object repository contract and WordPress persistence boundary at `gmrt_scene_objects`.
 - Keeps the first pass architectural: Keeper furniture palette and interactive placement follow in IV.35.2.
+
+## Phase IV.35.2 — The Keeper's Furniture Palette
+
+- Adds the first DM Scene Object palette with Table, Chair, Chest, Barrel, Crate and Bookshelf furnishings.
+- Persists click-to-place furniture to the exact Table + Scene using normalised battlefield coordinates, including Atlas preparation Scenes Behind the Curtain.
+- Renders Scene Objects as a dedicated pixel world layer beneath tokens and Fog-sensitive presentation.
+- Keeps live furniture updates on the established Living Table heartbeat/fragment boundary rather than creating another poller.
+- Declares every furnishing Mimic-capable in preparation for a future Bestiary-backed Convert to Mimic workflow.

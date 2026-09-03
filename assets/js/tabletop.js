@@ -256,6 +256,7 @@
     let thresholdPlacement = null;
     let bestiaryPlacement = null;
     let keeperLightPlacement = null;
+    let furniturePlacement = null;
     // The fog renderer runs during boot before the Lantern Rack event bindings are
     // installed, so the roster reference must exist before that first render.
     const keeperLightRoster = document.querySelector('[data-keeper-light-roster]');
@@ -303,6 +304,94 @@
 
         return data.data;
     }
+
+    const furniturePalette = document.querySelector('[data-furniture-palette]');
+    const furnitureStatus = document.querySelector('[data-furniture-status]');
+    const furnitureCancel = document.querySelector('[data-furniture-cancel]');
+    const furnitureButtons = Array.from(document.querySelectorAll('[data-furniture-kind]'));
+
+    function syncSceneObjectLayer(incomingDocument) {
+        const currentLayer = document.querySelector('[data-scene-object-layer]');
+        const incomingLayer = incomingDocument?.querySelector('[data-scene-object-layer]');
+        if (!currentLayer || !incomingLayer) return;
+        currentLayer.replaceChildren(...incomingLayer.childNodes);
+    }
+
+    async function refreshSceneObjectLayer() {
+        const data = await request('gmrt_tabletop_fragment', {});
+        const html = typeof data.html === 'string' ? data.html : '';
+        if (!html) return;
+        syncSceneObjectLayer(new DOMParser().parseFromString(html, 'text/html'));
+    }
+
+    function finishFurniturePlacement(message) {
+        furniturePlacement = null;
+        board?.classList.remove('is-furniture-placing');
+        furnitureButtons.forEach((button) => {
+            button.classList.remove('is-selected');
+            button.setAttribute('aria-pressed', 'false');
+        });
+        if (furnitureCancel) furnitureCancel.disabled = true;
+        if (furnitureStatus && message) furnitureStatus.textContent = message;
+    }
+
+    furnitureButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+            furniturePlacement = {
+                kind: String(button.dataset.furnitureKind || ''),
+                label: String(button.dataset.furnitureLabel || 'Furniture')
+            };
+            furnitureButtons.forEach((choice) => {
+                const active = choice === button;
+                choice.classList.toggle('is-selected', active);
+                choice.setAttribute('aria-pressed', active ? 'true' : 'false');
+            });
+            board?.classList.add('is-furniture-placing');
+            if (furnitureCancel) furnitureCancel.disabled = false;
+            if (furnitureStatus) {
+                furnitureStatus.textContent = furniturePlacement.label + ' selected — click the map to place it.';
+            }
+        });
+    });
+
+    furnitureCancel?.addEventListener('click', () => {
+        finishFurniturePlacement('Placement cancelled. Pippin has put the tape measure away.');
+    });
+
+    board?.addEventListener('click', async (event) => {
+        if (!furniturePlacement || !furniturePalette) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+
+        const rect = board.getBoundingClientRect();
+        const x = Math.max(0, Math.min(1, (event.clientX - rect.left) / Math.max(1, rect.width)));
+        const y = Math.max(0, Math.min(1, (event.clientY - rect.top) / Math.max(1, rect.height)));
+        const body = new URLSearchParams();
+        body.set('gmrt_scene_object_action', 'place');
+        body.set('gmrt_scene_object_nonce', furniturePalette.dataset.sceneObjectNonce || '');
+        body.set('gmrt_scene_object_scene_id', projectedSceneId);
+        body.set('gmrt_scene_object_kind', furniturePlacement.kind);
+        body.set('x', String(x));
+        body.set('y', String(y));
+
+        const placedLabel = furniturePlacement.label;
+        try {
+            const response = await fetch(window.location.href, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'},
+                body
+            });
+            if (!response.ok) throw new Error('The furnishing could not be placed.');
+            const html = await response.text();
+            syncSceneObjectLayer(new DOMParser().parseFromString(html, 'text/html'));
+            finishFurniturePlacement(placedLabel + ' placed. Pippin has marked it on the map.');
+        } catch (error) {
+            if (furnitureStatus) {
+                furnitureStatus.textContent = error.message || 'The furnishing could not be placed.';
+            }
+        }
+    }, true);
 
     async function replaceLifecycle(message) {
         const liveStatus = document.querySelector('#gmrt-tabletop-status');
@@ -5322,6 +5411,7 @@
             renderFootsteps(state.footsteps || []);
             renderFog(state.fog || {});
             renderVisionLayer(state.vision_layer || []);
+            await refreshSceneObjectLayer();
 
             const combatantStates =
                 state.combatant_states || {};

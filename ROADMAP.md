@@ -871,3 +871,13 @@ Carry Session recap evidence and character-attributed deeds across the Tabletop 
 - [ ] **IV.35.5 — Please Do Not Open the Chest** — interactive object state and safe Keeper/player interaction boundaries.
 - [ ] **IV.35.6 — The Furnishings of the MarketRealm** — themed SNES-era furniture library.
 - [ ] **IV.35.7 — The Forge Learns Interior Design** — Dungeon Forge object seeding and furnishing polish.
+
+## Phase IV.35.2 — The Keeper's Furniture Palette
+
+- [x] DM-only six-piece Furniture Palette: Table, Chair, Chest, Barrel, Crate and Bookshelf.
+- [x] Click-to-place furniture using normalised Scene coordinates and the IV.35.1 Scene Object repository.
+- [x] Bind placement to the exact live or Behind-the-Curtain Scene; no cross-Scene furniture leakage.
+- [x] Render persistent furniture on a dedicated world-object layer beneath miniatures and the Living Veil.
+- [x] Reuse the existing Living Table heartbeat/fragment boundary; no second polling loop.
+- [x] Mark every furnishing as Mimic-capable so future Convert to Mimic can choose a Bestiary Mimic for any object disguise.
+- [ ] IV.35.3 — Pippin Rearranges the Furniture: select, move, rotate, scale, duplicate and remove Scene Objects.

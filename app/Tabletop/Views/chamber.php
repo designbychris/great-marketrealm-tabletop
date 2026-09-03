@@ -3,6 +3,9 @@
 use GreatMarketrealmTabletop\Tabletop\Models\TabletopChamberState;
 use GreatMarketrealmTabletop\Tabletop\Presentation\CompanionTokenImageSource;
 use GreatMarketrealmTabletop\Tables\Memberships\Models\TableColourPalette;
+use GreatMarketrealmTabletop\Tabletop\SceneObjects\FurnitureCatalogue;
+use GreatMarketrealmTabletop\Tabletop\SceneObjects\Models\SceneObject;
+use GreatMarketrealmTabletop\Tabletop\SceneObjects\Repositories\WordPressSceneObjectRepository;
 
 defined('ABSPATH') || exit;
 
@@ -20,6 +23,80 @@ $scenes = $state?->scenes() ?? [];
 $preparation = $state?->preparation() ?? [];
 $thresholds = $state?->thresholds() ?? [];
 $bestiary = $state?->bestiary() ?? [];
+$furnitureCatalogue = new FurnitureCatalogue();
+$sceneObjectRepository = new WordPressSceneObjectRepository();
+$sceneObjectPlacementNotice = '';
+
+/*
+ * IV.35.2 — The Keeper's Furniture Palette.
+ *
+ * Placement is processed through the already-rendered authenticated Chamber
+ * rather than introducing another poller or parallel state channel. The
+ * projected Scene identity is authoritative, including Behind the Curtain.
+ */
+if (
+    $state !== null
+    && $state->isDungeonMaster()
+    && is_array($scene)
+    && isset($_POST['gmrt_scene_object_action'])
+    && sanitize_key((string) wp_unslash($_POST['gmrt_scene_object_action'])) === 'place'
+) {
+    $submittedNonce = isset($_POST['gmrt_scene_object_nonce'])
+        ? sanitize_text_field(wp_unslash((string) $_POST['gmrt_scene_object_nonce']))
+        : '';
+    $submittedSceneId = isset($_POST['gmrt_scene_object_scene_id'])
+        ? sanitize_text_field(wp_unslash((string) $_POST['gmrt_scene_object_scene_id']))
+        : '';
+    $projectedSceneId = (string) ($scene['id'] ?? '');
+    $kind = isset($_POST['gmrt_scene_object_kind'])
+        ? sanitize_key(wp_unslash((string) $_POST['gmrt_scene_object_kind']))
+        : '';
+    $definition = $furnitureCatalogue->find($kind);
+
+    if (
+        $submittedNonce !== ''
+        && wp_verify_nonce($submittedNonce, 'gmrt_scene_object_place')
+        && $submittedSceneId !== ''
+        && hash_equals($projectedSceneId, $submittedSceneId)
+        && is_array($definition)
+    ) {
+        $x = isset($_POST['x']) ? (float) wp_unslash((string) $_POST['x']) : 0.5;
+        $y = isset($_POST['y']) ? (float) wp_unslash((string) $_POST['y']) : 0.5;
+        $x = max(0.0, min(1.0, $x));
+        $y = max(0.0, min(1.0, $y));
+
+        $sceneObjectRepository->save(new SceneObject(
+            wp_generate_uuid4(),
+            (string) ($table['id'] ?? ''),
+            $projectedSceneId,
+            $kind,
+            (string) ($definition['category'] ?? 'decorative'),
+            $x,
+            $y,
+            0,
+            1.0,
+            [],
+            [
+                'label' => (string) ($definition['label'] ?? ucfirst($kind)),
+                'width_units' => (float) ($definition['width_units'] ?? 1.0),
+                'height_units' => (float) ($definition['height_units'] ?? 1.0),
+                'mimic_capable' => ! empty($definition['mimic_capable']),
+            ]
+        ));
+        $sceneObjectPlacementNotice = sprintf(
+            '%s placed. Pippin has measured it twice.',
+            (string) ($definition['label'] ?? 'Furniture')
+        );
+    }
+}
+
+$sceneObjects = [];
+if (is_array($scene) && ! empty($table['id']) && ! empty($scene['id'])) {
+    $sceneObjects = $sceneObjectRepository->forScene(
+        (string) $table['id'],
+        (string) $scene['id']
+    );
+}
 $isPreparingScene = ! empty($preparation['active']);
 $tokens = $state?->tokens() ?? [];
 $members = $state?->members() ?? [];
@@ -39,9 +116,6 @@ if ($sessionRecap !== null) {
         $sessionRecapDuration = '< 1m';
     }
 }
-$nextSessionNumber = $sessionRecap !== null
-    ? max(1, (int) ($sessionRecap['number'] ?? 0) + 1)
-    : 1;
 $vitality = $state?->vitality() ?? [];
 $deathSaves = $state?->deathSaves() ?? [];
 $conditions = $state?->conditions() ?? [];
@@ -277,19 +351,6 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                     <?php if ($state->isDungeonMaster()) : ?>
                         <button type="button" class="gmrt-table-session__end" data-end-table-session>End Session</button>
                     <?php endif; ?>
-                <?php elseif ($state->isDungeonMaster() && $sessionRecap !== null) : ?>
-                    <div class="gmrt-table-session__next" data-next-gathering>
-                        <div class="gmrt-table-session__next-copy">
-                            <span>The Next Gathering</span>
-                            <strong>The Table remembers where you left it.</strong>
-                            <small>Session <?php echo esc_html((string) $nextSessionNumber); ?> will continue from the persistent campaign state below.</small>
-                        </div>
-                        <form class="gmrt-table-session__start gmrt-table-session__start--next" data-start-table-session>
-                            <label for="gmrt-session-title">Call Session <?php echo esc_html((string) $nextSessionNumber); ?></label>
-                            <input id="gmrt-session-title" name="title" type="text" maxlength="120" placeholder="Optional Session title">
-                            <button type="submit">Call the Next Gathering</button>
-                        </form>
-                    </div>
                 <?php elseif ($state->isDungeonMaster()) : ?>
                     <form class="gmrt-table-session__start" data-start-table-session>
                         <label for="gmrt-session-title">Call the Session</label>
@@ -299,9 +360,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                 <?php else : ?>
                     <div class="gmrt-table-session__identity gmrt-table-session__identity--quiet">
                         <span>Between Sessions</span>
-                        <strong><?php echo $sessionRecap !== null
-                            ? 'The next gathering awaits the Keeper.'
-                            : "The Keeper has not called today's Session yet."; ?></strong>
+                        <strong>The Keeper has not called today's Session yet.</strong>
                     </div>
                 <?php endif; ?>
                 <small class="gmrt-table-session__status" data-table-session-status role="status" aria-live="polite"></small>
@@ -354,9 +413,9 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                 </section>
             <?php endif; ?>
 
-            <?php if ($sessionRecap !== null) : ?>
+            <?php if ($session === null && $sessionRecap !== null) : ?>
                 <section
-                    class="gmrt-session-recap<?php echo $session !== null ? ' gmrt-session-recap--previous' : ''; ?>"
+                    class="gmrt-session-recap"
                     data-session-recap
                     data-session-recap-id="<?php echo esc_attr((string) ($sessionRecap['session_id'] ?? '')); ?>"
                     aria-labelledby="gmrt-session-recap-title"
@@ -371,7 +430,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                     <div class="gmrt-session-recap__bubble">
                         <div class="gmrt-session-recap__heading">
                             <div class="gmrt-session-recap__titlecopy">
-                                <p class="gmrt-session-recap__eyebrow"><?php echo $session !== null ? 'Previous Session · Pippin Peppercorn presents' : 'Pippin Peppercorn presents'; ?></p>
+                                <p class="gmrt-session-recap__eyebrow">Pippin Peppercorn presents</p>
                                 <h2 id="gmrt-session-recap-title">Previously, in the MarketRealm…</h2>
                             </div>
                             <button
@@ -1495,6 +1554,42 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                     </details>
                 <?php endif; ?>
 
+                <?php if ($state !== null && $state->isDungeonMaster() && is_array($scene)) : ?>
+                    <section
+                        class="gmrt-furniture-palette"
+                        data-furniture-palette
+                        data-scene-object-nonce="<?php echo esc_attr(wp_create_nonce('gmrt_scene_object_place')); ?>"
+                        aria-labelledby="gmrt-furniture-palette-title"
+                    >
+                        <header class="gmrt-furniture-palette__heading">
+                            <span class="gmrt-furniture-palette__mark" aria-hidden="true">▦</span>
+                            <div>
+                                <strong id="gmrt-furniture-palette-title">The Keeper's Furniture Palette</strong>
+                                <small>Choose a furnishing, then click the map to place it.</small>
+                            </div>
+                        </header>
+                        <div class="gmrt-furniture-palette__choices" role="group" aria-label="Furniture to place">
+                            <?php foreach ($furnitureCatalogue->all() as $furnitureKind => $furnitureDefinition) : ?>
+                                <button
+                                    type="button"
+                                    class="gmrt-furniture-choice gmrt-furniture-choice--<?php echo esc_attr($furnitureKind); ?>"
+                                    data-furniture-kind="<?php echo esc_attr($furnitureKind); ?>"
+                                    data-furniture-label="<?php echo esc_attr((string) $furnitureDefinition['label']); ?>"
+                                    aria-pressed="false"
+                                    title="<?php echo esc_attr((string) $furnitureDefinition['description']); ?>"
+                                >
+                                    <span class="gmrt-furniture-choice__sprite" aria-hidden="true"></span>
+                                    <span><?php echo esc_html((string) $furnitureDefinition['label']); ?></span>
+                                </button>
+                            <?php endforeach; ?>
+                            <button type="button" class="gmrt-furniture-palette__cancel" data-furniture-cancel disabled>Cancel placement</button>
+                        </div>
+                        <p class="gmrt-furniture-palette__status" data-furniture-status role="status" aria-live="polite">
+                            <?php echo esc_html($sceneObjectPlacementNotice !== '' ? $sceneObjectPlacementNotice : 'Pippin has sharpened the measuring pencil.'); ?>
+                        </p>
+                    </section>
+                <?php endif; ?>
+
                 <div class="gmrt-board__lens-stage" data-lens-stage>
                     <nav
                         class="gmrt-board__lens-controls"
@@ -1635,6 +1730,28 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                             <?php endforeach; ?>
                         </div>
                     <?php endif; ?>
+
+                    <div class="gmrt-scene-object-layer" data-scene-object-layer aria-label="Scene furnishings">
+                        <?php foreach ($sceneObjects as $sceneObject) :
+                            $object = $sceneObject->toArray();
+                            $objectProperties = is_array($object['properties'] ?? null) ? $object['properties'] : [];
+                            $objectKind = sanitize_html_class((string) ($object['kind'] ?? 'object'));
+                            $objectLabel = (string) ($objectProperties['label'] ?? ucfirst($objectKind));
+                            $objectWidth = max(0.25, (float) ($objectProperties['width_units'] ?? 1.0));
+                            $objectHeight = max(0.25, (float) ($objectProperties['height_units'] ?? 1.0));
+                        ?>
+                            <div
+                                class="gmrt-scene-object gmrt-scene-object--<?php echo esc_attr($objectKind); ?>"
+                                data-scene-object-id="<?php echo esc_attr((string) ($object['id'] ?? '')); ?>"
+                                data-scene-object-kind="<?php echo esc_attr($objectKind); ?>"
+                                data-mimic-capable="<?php echo ! empty($objectProperties['mimic_capable']) ? 'true' : 'false'; ?>"
+                                style="--gmrt-object-x: <?php echo esc_attr((string) ((float) ($object['x'] ?? 0) * 100)); ?>%; --gmrt-object-y: <?php echo esc_attr((string) ((float) ($object['y'] ?? 0) * 100)); ?>%; --gmrt-object-rotation: <?php echo esc_attr((string) ((int) ($object['rotation'] ?? 0))); ?>deg; --gmrt-object-scale: <?php echo esc_attr((string) ((float) ($object['scale'] ?? 1))); ?>; --gmrt-object-width-units: <?php echo esc_attr((string) $objectWidth); ?>; --gmrt-object-height-units: <?php echo esc_attr((string) $objectHeight); ?>;"
+                                role="img"
+                                aria-label="<?php echo esc_attr($objectLabel); ?>"
+                                title="<?php echo esc_attr($objectLabel); ?>"
+                            ><span aria-hidden="true"></span></div>
+                        <?php endforeach; ?>
+                    </div>
 
                     <div
                         class="gmrt-board__tokens"

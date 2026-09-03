@@ -5691,55 +5691,87 @@
     .gmrt-session-closing__facts span + span { padding-left: 0; border-left: 0; }
 }
 
+/* ==========================================================================
+   IV.35.2 — The Keeper's Furniture Palette
+   ========================================================================== */
+.gmrt-furniture-palette {
+    margin: 0 0 .85rem;
+    padding: .75rem;
+    border: 3px solid #2c2117;
+    border-radius: 4px;
+    background: linear-gradient(180deg, #ead6a7, #caa96b);
+    box-shadow: inset 0 0 0 2px rgba(255,255,255,.28), 4px 4px 0 rgba(19,12,8,.35);
+    color: #24170f;
+}
+.gmrt-furniture-palette__heading { display:flex; gap:.65rem; align-items:center; margin-bottom:.65rem; }
+.gmrt-furniture-palette__heading strong { display:block; font-size:.95rem; text-transform:uppercase; letter-spacing:.055em; }
+.gmrt-furniture-palette__heading small { display:block; margin-top:.15rem; opacity:.78; }
+.gmrt-furniture-palette__mark { display:grid; place-items:center; width:2rem; height:2rem; border:2px solid #3b2818; background:#74512d; color:#f4dc8e; box-shadow:2px 2px 0 #26180e; }
+.gmrt-furniture-palette__choices { display:flex; flex-wrap:wrap; gap:.45rem; align-items:stretch; }
+.gmrt-furniture-choice,
+.gmrt-furniture-palette__cancel {
+    min-height:3.25rem;
+    border:2px solid #2d2117;
+    border-radius:3px;
+    background:#5b3d25;
+    color:#fff1ce;
+    box-shadow:2px 2px 0 #21150d;
+    cursor:pointer;
+}
+.gmrt-furniture-choice { min-width:5.5rem; padding:.35rem .55rem; display:grid; grid-template-columns:1.65rem 1fr; align-items:center; gap:.4rem; text-align:left; }
+.gmrt-furniture-choice:hover,
+.gmrt-furniture-choice:focus-visible,
+.gmrt-furniture-choice.is-selected { outline:none; background:#775431; transform:translate(-1px,-1px); box-shadow:3px 3px 0 #21150d; }
+.gmrt-furniture-choice__sprite { position:relative; display:block; width:1.55rem; height:1.35rem; image-rendering:pixelated; }
+.gmrt-furniture-choice__sprite::before,
+.gmrt-furniture-choice__sprite::after { content:""; position:absolute; box-sizing:border-box; }
+.gmrt-furniture-choice--table .gmrt-furniture-choice__sprite::before { left:1px; right:1px; top:3px; height:6px; border:2px solid #2b190d; background:#b47a3d; box-shadow:2px 2px 0 #6b4021; }
+.gmrt-furniture-choice--table .gmrt-furniture-choice__sprite::after { left:4px; top:9px; width:3px; height:8px; background:#553018; box-shadow:12px 0 0 #553018; }
+.gmrt-furniture-choice--chair .gmrt-furniture-choice__sprite::before { left:5px; top:1px; width:12px; height:12px; border:2px solid #3a2213; border-bottom-width:5px; background:#a96f35; }
+.gmrt-furniture-choice--chair .gmrt-furniture-choice__sprite::after { left:6px; top:13px; width:3px; height:5px; background:#4d2c16; box-shadow:8px 0 0 #4d2c16; }
+.gmrt-furniture-choice--chest .gmrt-furniture-choice__sprite::before { left:2px; top:5px; width:21px; height:13px; border:2px solid #39200f; border-radius:5px 5px 1px 1px; background:#965f2c; box-shadow:inset 0 4px 0 #bd8243; }
+.gmrt-furniture-choice--chest .gmrt-furniture-choice__sprite::after { left:11px; top:10px; width:4px; height:5px; background:#d6ad47; border:1px solid #4c3516; }
+.gmrt-furniture-choice--barrel .gmrt-furniture-choice__sprite::before { left:5px; top:1px; width:16px; height:18px; border:2px solid #362113; border-radius:7px; background:#8d5e32; box-shadow:inset 0 4px 0 #b77a40, inset 0 -4px 0 #68401f; }
+.gmrt-furniture-choice--barrel .gmrt-furniture-choice__sprite::after { left:4px; top:6px; width:18px; height:2px; background:#433a30; box-shadow:0 7px 0 #433a30; }
+.gmrt-furniture-choice--crate .gmrt-furniture-choice__sprite::before { left:3px; top:2px; width:19px; height:18px; border:2px solid #3b2413; background:#a36d35; box-shadow:inset 3px 0 0 #c58d4d, inset -3px 0 0 #724720; }
+.gmrt-furniture-choice--crate .gmrt-furniture-choice__sprite::after { left:5px; top:9px; width:15px; height:3px; background:#59351a; transform:rotate(-35deg); }
+.gmrt-furniture-choice--bookshelf .gmrt-furniture-choice__sprite::before { left:3px; top:1px; width:20px; height:20px; border:2px solid #352013; background:#6f4729; box-shadow:inset 0 5px 0 #34261c, inset 0 10px 0 #8e6846, inset 0 15px 0 #34261c; }
+.gmrt-furniture-choice--bookshelf .gmrt-furniture-choice__sprite::after { left:6px; top:4px; width:3px; height:4px; background:#c0553f; box-shadow:4px 0 #55789a, 8px 0 #d0a24a, 2px 10px #587c47, 7px 10px #9962a7, 11px 10px #d8b15b; }
+.gmrt-furniture-palette__cancel { padding:.35rem .7rem; background:#3f3530; }
+.gmrt-furniture-palette__cancel:disabled { opacity:.45; cursor:default; box-shadow:none; }
+.gmrt-furniture-palette__status { margin:.55rem 0 0; min-height:1.25em; font-size:.78rem; }
+.gmrt-board__viewport.is-furniture-placing { cursor:crosshair; }
 
-/* Phase IV.34.7 — The Next Gathering */
-.gmrt-table-session__next {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(280px, .9fr);
-    gap: .8rem;
-    align-items: center;
-    width: 100%;
+.gmrt-board__viewport { --gmrt-battlefield-z-objects: 5; }
+.gmrt-scene-object-layer { position:absolute; inset:0; z-index:var(--gmrt-battlefield-z-objects); pointer-events:none; }
+.gmrt-scene-object {
+    position:absolute;
+    left:var(--gmrt-object-x);
+    top:var(--gmrt-object-y);
+    width:calc(var(--gmrt-grid-size) * var(--gmrt-object-width-units) * var(--gmrt-object-scale));
+    height:calc(var(--gmrt-grid-size) * var(--gmrt-object-height-units) * var(--gmrt-object-scale));
+    min-width:18px;
+    min-height:18px;
+    transform:translate(-50%,-50%) rotate(var(--gmrt-object-rotation));
+    image-rendering:pixelated;
+    filter:drop-shadow(2px 3px 0 rgba(0,0,0,.46));
 }
-.gmrt-table-session__next-copy {
-    display: grid;
-    gap: .18rem;
-    min-width: 0;
-}
-.gmrt-table-session__next-copy > span {
-    color: #f3cb68;
-    font-size: .68rem;
-    font-weight: 800;
-    letter-spacing: .09em;
-    text-transform: uppercase;
-}
-.gmrt-table-session__next-copy > strong {
-    color: #fff4df;
-    font-size: .9rem;
-}
-.gmrt-table-session__next-copy > small {
-    color: rgba(255, 244, 223, .72);
-    line-height: 1.35;
-}
-.gmrt-table-session__start--next {
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: end;
-}
-.gmrt-table-session__start--next > label {
-    grid-column: 1 / -1;
-}
-.gmrt-session-recap--previous {
-    border-color: rgba(216, 173, 79, .5);
-}
-@media (max-width: 900px) {
-    .gmrt-table-session__next {
-        grid-template-columns: 1fr;
-    }
-}
-@media (max-width: 620px) {
-    .gmrt-table-session__start--next {
-        grid-template-columns: 1fr;
-    }
-    .gmrt-table-session__start--next > label {
-        grid-column: auto;
-    }
+.gmrt-scene-object > span,
+.gmrt-scene-object > span::before,
+.gmrt-scene-object > span::after { position:absolute; box-sizing:border-box; content:""; }
+.gmrt-scene-object > span { inset:8%; border:2px solid #2f1c0f; background:#976036; }
+.gmrt-scene-object--table > span { inset:18% 4% 28%; background:#a66d37; box-shadow:inset 0 4px 0 #c58a4a; }
+.gmrt-scene-object--table > span::before { left:4%; bottom:-42%; width:12%; height:45%; background:#4e2c17; box-shadow:650% 0 0 #4e2c17; }
+.gmrt-scene-object--chair > span { inset:5% 14% 30%; background:#9f6834; border-bottom-width:5px; }
+.gmrt-scene-object--chair > span::before { left:7%; bottom:-52%; width:18%; height:55%; background:#4e2c17; box-shadow:365% 0 0 #4e2c17; }
+.gmrt-scene-object--chest > span { inset:17% 4% 12%; border-radius:18% 18% 3px 3px; background:#8b5528; box-shadow:inset 0 22% 0 #bd7d3c; }
+.gmrt-scene-object--chest > span::after { left:44%; top:43%; width:12%; height:26%; border:1px solid #503812; background:#d1a944; }
+.gmrt-scene-object--barrel > span { inset:4% 12%; border-radius:44%; background:#87572f; box-shadow:inset 0 18% 0 #b4773d, inset 0 -18% 0 #65401f; }
+.gmrt-scene-object--barrel > span::after { left:-5%; right:-5%; top:28%; height:8%; background:#41382f; box-shadow:0 390% 0 #41382f; }
+.gmrt-scene-object--crate > span { inset:5%; background:#a66d35; box-shadow:inset 10% 0 #c08a4d, inset -10% 0 #774922; }
+.gmrt-scene-object--crate > span::after { left:8%; top:45%; width:84%; height:10%; background:#59341a; transform:rotate(-32deg); }
+.gmrt-scene-object--bookshelf > span { inset:2%; background:#6f4729; box-shadow:inset 0 18% #34261c, inset 0 36% #956c47, inset 0 52% #34261c, inset 0 70% #8b6242, inset 0 86% #34261c; }
+
+@media (max-width: 720px) {
+    .gmrt-furniture-choice { min-width:calc(50% - .25rem); }
 }
