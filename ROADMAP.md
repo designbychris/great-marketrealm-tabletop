@@ -862,3 +862,12 @@ Carry Session recap evidence and character-attributed deeds across the Tabletop 
 - [x] No Scene, token, Fog, door, light, Atlas, campaign or Companion-link reset is introduced.
 - [ ] Automated/server certification.
 - [ ] Browser certification.
+
+## Phase IV.35 — Pippin Furnishes the Dungeon
+- [x] **IV.35.1 — The Object Layer** — first-class persistent Scene Objects, normalised transforms, state/property seams, categories and WordPress repository boundary.
+- [ ] **IV.35.2 — The Keeper's Furniture Palette** — Keeper-facing catalogue and placement workflow for the first furniture set.
+- [ ] **IV.35.3 — Pippin Rearranges the Furniture** — move, rotate, scale, duplicate and remove placed objects.
+- [ ] **IV.35.4 — Things That Get in the Way** — collision, cover and vision behaviour.
+- [ ] **IV.35.5 — Please Do Not Open the Chest** — interactive object state and safe Keeper/player interaction boundaries.
+- [ ] **IV.35.6 — The Furnishings of the MarketRealm** — themed SNES-era furniture library.
+- [ ] **IV.35.7 — The Forge Learns Interior Design** — Dungeon Forge object seeding and furnishing polish.

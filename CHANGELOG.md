@@ -1124,3 +1124,12 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 ### Phase IV.34.6A — The Chronicle Opens Its Pages
 - Session recap projection now carries character-attributed recorded deeds.
 - Companion Session synchronisation now includes the Keeper recap and contribution ledger.
+
+## Phase IV.35 — Pippin Furnishes the Dungeon
+
+### IV.35.1 — The Object Layer
+- Establishes persistent Scene Objects as a dedicated Scene-owned layer rather than baking furniture into battlemap artwork.
+- Adds stable object identity, normalised placement, rotation, scale, state and future behaviour/property seams.
+- Adds Decorative, Structural and Interactive object categories.
+- Adds an explicit Scene Object repository contract and WordPress persistence boundary at `gmrt_scene_objects`.
+- Keeps the first pass architectural: Keeper furniture palette and interactive placement follow in IV.35.2.
