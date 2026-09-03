@@ -1,3 +1,11 @@
+## Phase IV.34.7 — The Next Gathering
+
+- Adds a dedicated between-Sessions **The Next Gathering** handover after a completed Session.
+- Derives the next visible Session number from the latest completed Session while reusing the existing authoritative Call Session action.
+- Keeps the latest “Previously, in the MarketRealm…” recap available after the next Session begins and labels it as the Previous Session.
+- Starts no new persistence domain and performs no Scene, token, Fog, door, light, Atlas, campaign or Companion-link reset.
+- Adds regression protection for the handover, persistent recap context and reset-free Session start boundary.
+
 ## Phase IV.34.6 — Until Next Time
 
 - Adds a one-time Keeper closing moment immediately after a Session is ended.

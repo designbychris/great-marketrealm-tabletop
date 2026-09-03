@@ -39,6 +39,9 @@ if ($sessionRecap !== null) {
         $sessionRecapDuration = '< 1m';
     }
 }
+$nextSessionNumber = $sessionRecap !== null
+    ? max(1, (int) ($sessionRecap['number'] ?? 0) + 1)
+    : 1;
 $vitality = $state?->vitality() ?? [];
 $deathSaves = $state?->deathSaves() ?? [];
 $conditions = $state?->conditions() ?? [];
@@ -274,6 +277,19 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                     <?php if ($state->isDungeonMaster()) : ?>
                         <button type="button" class="gmrt-table-session__end" data-end-table-session>End Session</button>
                     <?php endif; ?>
+                <?php elseif ($state->isDungeonMaster() && $sessionRecap !== null) : ?>
+                    <div class="gmrt-table-session__next" data-next-gathering>
+                        <div class="gmrt-table-session__next-copy">
+                            <span>The Next Gathering</span>
+                            <strong>The Table remembers where you left it.</strong>
+                            <small>Session <?php echo esc_html((string) $nextSessionNumber); ?> will continue from the persistent campaign state below.</small>
+                        </div>
+                        <form class="gmrt-table-session__start gmrt-table-session__start--next" data-start-table-session>
+                            <label for="gmrt-session-title">Call Session <?php echo esc_html((string) $nextSessionNumber); ?></label>
+                            <input id="gmrt-session-title" name="title" type="text" maxlength="120" placeholder="Optional Session title">
+                            <button type="submit">Call the Next Gathering</button>
+                        </form>
+                    </div>
                 <?php elseif ($state->isDungeonMaster()) : ?>
                     <form class="gmrt-table-session__start" data-start-table-session>
                         <label for="gmrt-session-title">Call the Session</label>
@@ -283,7 +299,9 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                 <?php else : ?>
                     <div class="gmrt-table-session__identity gmrt-table-session__identity--quiet">
                         <span>Between Sessions</span>
-                        <strong>The Keeper has not called today's Session yet.</strong>
+                        <strong><?php echo $sessionRecap !== null
+                            ? 'The next gathering awaits the Keeper.'
+                            : "The Keeper has not called today's Session yet."; ?></strong>
                     </div>
                 <?php endif; ?>
                 <small class="gmrt-table-session__status" data-table-session-status role="status" aria-live="polite"></small>
@@ -336,9 +354,9 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                 </section>
             <?php endif; ?>
 
-            <?php if ($session === null && $sessionRecap !== null) : ?>
+            <?php if ($sessionRecap !== null) : ?>
                 <section
-                    class="gmrt-session-recap"
+                    class="gmrt-session-recap<?php echo $session !== null ? ' gmrt-session-recap--previous' : ''; ?>"
                     data-session-recap
                     data-session-recap-id="<?php echo esc_attr((string) ($sessionRecap['session_id'] ?? '')); ?>"
                     aria-labelledby="gmrt-session-recap-title"
@@ -353,7 +371,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                     <div class="gmrt-session-recap__bubble">
                         <div class="gmrt-session-recap__heading">
                             <div class="gmrt-session-recap__titlecopy">
-                                <p class="gmrt-session-recap__eyebrow">Pippin Peppercorn presents</p>
+                                <p class="gmrt-session-recap__eyebrow"><?php echo $session !== null ? 'Previous Session · Pippin Peppercorn presents' : 'Pippin Peppercorn presents'; ?></p>
                                 <h2 id="gmrt-session-recap-title">Previously, in the MarketRealm…</h2>
                             </div>
                             <button

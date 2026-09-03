@@ -5690,3 +5690,56 @@
     .gmrt-session-closing__facts { display: grid; gap: .2rem; }
     .gmrt-session-closing__facts span + span { padding-left: 0; border-left: 0; }
 }
+
+
+/* Phase IV.34.7 — The Next Gathering */
+.gmrt-table-session__next {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, .9fr);
+    gap: .8rem;
+    align-items: center;
+    width: 100%;
+}
+.gmrt-table-session__next-copy {
+    display: grid;
+    gap: .18rem;
+    min-width: 0;
+}
+.gmrt-table-session__next-copy > span {
+    color: #f3cb68;
+    font-size: .68rem;
+    font-weight: 800;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+}
+.gmrt-table-session__next-copy > strong {
+    color: #fff4df;
+    font-size: .9rem;
+}
+.gmrt-table-session__next-copy > small {
+    color: rgba(255, 244, 223, .72);
+    line-height: 1.35;
+}
+.gmrt-table-session__start--next {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+}
+.gmrt-table-session__start--next > label {
+    grid-column: 1 / -1;
+}
+.gmrt-session-recap--previous {
+    border-color: rgba(216, 173, 79, .5);
+}
+@media (max-width: 900px) {
+    .gmrt-table-session__next {
+        grid-template-columns: 1fr;
+    }
+}
+@media (max-width: 620px) {
+    .gmrt-table-session__start--next {
+        grid-template-columns: 1fr;
+    }
+    .gmrt-table-session__start--next > label {
+        grid-column: auto;
+    }
+}

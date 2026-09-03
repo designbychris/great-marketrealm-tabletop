@@ -823,7 +823,7 @@ New Keeper-created campaigns now choose how their opening Scene arrives: preserv
 - IV.34.4 — Deeds of the Session — associate Chronicle, encounters and meaningful Table events with Session identity.
 - IV.34.5 — Previously, in the MarketRealm… — build the editable Session recap from recorded deeds.
 - [x] **IV.34.6 — Until Next Time** — transient Keeper farewell after Session closure, authoritative timing/duration projection, explicit campaign-continuity reassurance, and a direct route back to the existing recap without creating a second history surface. **IMPLEMENTED / awaiting automated and browser certification**
-- IV.34.7 — The Next Gathering — begin the next Session from the previous campaign state.
+- [x] **IV.34.7 — The Next Gathering** — return to the persistent Table from the previous Session, carry forward Pippin's recap as historical context, and call the next numbered Session without resetting campaign state. **IMPLEMENTED / awaiting automated and browser certification**
 
 ### Phase IV.34.4 — Deeds of the Session — IMPLEMENTED
 Encounters and Chronicle activity now remember the immutable active Session that witnessed them, giving later recap/history phases reliable Session-scoped source material without exposing Keeper-secret rolls.
@@ -852,3 +852,13 @@ Encounters and Chronicle activity now remember the immutable active Session that
 
 ### IV.34.6A — The Chronicle Opens Its Pages ✅
 Carry Session recap evidence and character-attributed deeds across the Tabletop → Companion boundary.
+
+
+### Phase IV.34.7 — The Next Gathering
+- [x] Keeper between-Session handover identifies the next numbered Session.
+- [x] Reuses the authoritative existing Call Session lifecycle.
+- [x] Previous completed recap remains available during the new active Session.
+- [x] Previous recap is explicitly historical and does not become the new Session recording boundary.
+- [x] No Scene, token, Fog, door, light, Atlas, campaign or Companion-link reset is introduced.
+- [ ] Automated/server certification.
+- [ ] Browser certification.
