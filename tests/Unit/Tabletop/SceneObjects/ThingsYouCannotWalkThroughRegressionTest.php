@@ -49,12 +49,12 @@ final class ThingsYouCannotWalkThroughRegressionTest extends TestCase
         self::assertStringContainsString('Pippin refuses to draw the token inside the furniture.', $js);
     }
 
-    public function test_collision_is_movement_only_and_does_not_preempt_later_cover_or_light_phases(): void
+    public function test_collision_remains_movement_only_when_cover_and_vision_traits_arrive(): void
     {
         $js = file_get_contents($this->root('assets/js/tabletop.js'));
         $catalogue = file_get_contents($this->root('app/Tabletop/SceneObjects/FurnitureCatalogue.php'));
 
-        self::assertStringNotContainsString('blocks_vision', $catalogue);
+        self::assertStringContainsString("'blocks_vision' => \$blocksVision", $catalogue);
         self::assertStringNotContainsString('light_occlusion', $catalogue);
         self::assertStringNotContainsString('cover_value', $catalogue);
         self::assertStringContainsString("request('gmrt_move_token'", $js);
