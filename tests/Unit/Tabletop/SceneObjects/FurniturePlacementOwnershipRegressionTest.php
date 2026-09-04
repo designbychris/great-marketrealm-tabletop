@@ -27,7 +27,7 @@ final class FurniturePlacementOwnershipRegressionTest extends TestCase
         self::assertStringContainsString("board?.addEventListener('pointerdown', async (event) => {", $placement);
         self::assertStringContainsString('if (event.button !== 0) return;', $placement);
         self::assertStringContainsString('event.stopImmediatePropagation();', $placement);
-        self::assertStringContainsString('const point = coordinatesFromPointer(event);', $placement);
+        self::assertStringContainsString('const point = furniturePoint(coordinatesFromPointer(event));', $placement);
         self::assertStringNotContainsString("board?.addEventListener('click', async (event) => {", $placement);
 
         $lensGuard = substr($js, strpos($js, "lensStage?.addEventListener('pointerdown'"), 650);
