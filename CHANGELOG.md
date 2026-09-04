@@ -1160,3 +1160,8 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - Renders Scene Objects as a dedicated pixel world layer beneath tokens and Fog-sensitive presentation.
 - Keeps live furniture updates on the established Living Table heartbeat/fragment boundary rather than creating another poller.
 - Declares every furnishing Mimic-capable in preparation for a future Bestiary-backed Convert to Mimic workflow.
+
+### Phase IV.35.3B.1 — Pippin Refuses to Align the Chairs
+- Adds a Keeper-only Snap to Grid toggle to Furniture controls, enabled by default.
+- Furniture placement and dragging share the same grid-aware coordinate snapping while free placement remains available when disabled.
+- Keeps snapping as transient authoring UI state; persisted Scene Objects retain only their final normalized coordinates.

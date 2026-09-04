@@ -5769,6 +5769,9 @@
 .gmrt-furniture-editor__tools button:disabled { opacity:.42; cursor:default; box-shadow:none; }
 .gmrt-furniture-editor__tools button:not(:disabled):hover,
 .gmrt-furniture-editor__tools button:not(:disabled):focus-visible { outline:2px solid #fff1ce; outline-offset:1px; }
+.gmrt-furniture-snap { display:flex; align-items:center; gap:.45rem; flex-wrap:wrap; margin:.55rem 0; font-size:.78rem; cursor:pointer; }
+.gmrt-furniture-snap input { width:auto; accent-color:currentColor; }
+.gmrt-furniture-snap small { flex-basis:100%; opacity:.72; padding-left:1.45rem; }
 .gmrt-furniture-editor__delete:not(:disabled) { background:#6d2d24; }
 .gmrt-board__viewport.is-furniture-moving { cursor:grabbing; }
 

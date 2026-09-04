@@ -894,3 +894,5 @@ Carry Session recap evidence and character-attributed deeds across the Tabletop 
 - [x] Server certification: 965 tests / 2,936 assertions.
 - [x] Browser certification: placement and persisted furniture confirmed in the live Chamber.
 - [ ] IV.35.3B — select, move, rotate, scale, duplicate and remove Scene Objects.
+
+- [x] **IV.35.3B.1 — Pippin Refuses to Align the Chairs** — Keeper furniture may snap placement and dragging to calibrated Scene grid centres by default, with an authoring toggle for free placement.

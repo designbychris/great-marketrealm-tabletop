@@ -59,4 +59,23 @@ final class PippinRearrangesFurnitureRegressionTest extends TestCase
         self::assertStringContainsString('.gmrt-scene-object-layer.is-keeper-editable .gmrt-scene-object { pointer-events:auto; cursor:grab; }', $css);
         self::assertStringNotContainsString('setInterval(refreshSceneObjectLayer', $js);
     }
+
+    public function test_keeper_can_toggle_grid_snapping_for_furniture_placement_and_dragging(): void
+    {
+        $view = file_get_contents($this->root('app/Tabletop/Views/chamber.php'));
+        $js = file_get_contents($this->root('assets/js/tabletop.js'));
+
+        self::assertStringContainsString('data-furniture-snap checked', $view);
+        self::assertStringContainsString('data-scene-width=', $view);
+        self::assertStringContainsString('data-scene-height=', $view);
+        self::assertStringContainsString('data-grid-size=', $view);
+        self::assertStringContainsString('data-grid-offset-x=', $view);
+        self::assertStringContainsString('data-grid-offset-y=', $view);
+        self::assertStringContainsString("const furnitureSnap = document.querySelector('[data-furniture-snap]')", $js);
+        self::assertStringContainsString('function furniturePoint(point)', $js);
+        self::assertStringContainsString("if (!furnitureSnap?.checked || !furniturePalette) return point;", $js);
+        self::assertSame(2, substr_count($js, 'furniturePoint(coordinatesFromPointer(event))'));
+        self::assertStringContainsString('Snap to Grid disabled. Pippin is trying not to look.', $js);
+        self::assertStringNotContainsString("body.set('gmrt_scene_object_snap'", $js);
+    }
 }

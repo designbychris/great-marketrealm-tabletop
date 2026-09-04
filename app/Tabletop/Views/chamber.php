@@ -1640,6 +1640,11 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                         class="gmrt-furniture-palette"
                         data-furniture-palette
                         data-scene-object-nonce="<?php echo esc_attr(wp_create_nonce('gmrt_scene_object_author')); ?>"
+                        data-scene-width="<?php echo esc_attr((string) max(1, (int) ($scene['width'] ?? 1))); ?>"
+                        data-scene-height="<?php echo esc_attr((string) max(1, (int) ($scene['height'] ?? 1))); ?>"
+                        data-grid-size="<?php echo esc_attr((string) max(1, (int) ($scene['grid_size'] ?? 1))); ?>"
+                        data-grid-offset-x="<?php echo esc_attr((string) ((int) ($scene['grid_offset_x'] ?? 0))); ?>"
+                        data-grid-offset-y="<?php echo esc_attr((string) ((int) ($scene['grid_offset_y'] ?? 0))); ?>"
                         aria-labelledby="gmrt-furniture-palette-title"
                     >
                         <header class="gmrt-furniture-palette__heading">
@@ -1649,6 +1654,11 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                 <small>Choose a furnishing to place, or select one already on the map to rearrange it.</small>
                             </div>
                         </header>
+                        <label class="gmrt-furniture-snap">
+                            <input type="checkbox" data-furniture-snap checked>
+                            <span>Snap to Grid</span>
+                            <small>Turn off for free placement and delightfully crooked chairs.</small>
+                        </label>
                         <div class="gmrt-furniture-palette__choices" role="group" aria-label="Furniture to place">
                             <?php foreach ($furnitureCatalogue->all() as $furnitureKind => $furnitureDefinition) : ?>
                                 <button

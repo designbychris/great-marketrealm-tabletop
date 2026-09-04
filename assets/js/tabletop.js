@@ -308,6 +308,7 @@
     const furniturePalette = document.querySelector('[data-furniture-palette]');
     const furnitureStatus = document.querySelector('[data-furniture-status]');
     const furnitureCancel = document.querySelector('[data-furniture-cancel]');
+    const furnitureSnap = document.querySelector('[data-furniture-snap]');
     const furnitureButtons = Array.from(document.querySelectorAll('[data-furniture-kind]'));
     const furnitureSelection = document.querySelector('[data-furniture-selection]');
     const furnitureRotateButtons = Array.from(document.querySelectorAll('[data-scene-object-rotate]'));
@@ -402,6 +403,36 @@
         }
     }
 
+    function furniturePoint(point) {
+        if (!furnitureSnap?.checked || !furniturePalette) return point;
+
+        const width = Math.max(1, Number(furniturePalette.dataset.sceneWidth || 1));
+        const height = Math.max(1, Number(furniturePalette.dataset.sceneHeight || 1));
+        const grid = Math.max(1, Number(furniturePalette.dataset.gridSize || 1));
+        const offsetX = Number(furniturePalette.dataset.gridOffsetX || 0);
+        const offsetY = Number(furniturePalette.dataset.gridOffsetY || 0);
+
+        const snapAxis = (value, extent, offset) => {
+            const source = value * extent;
+            const index = Math.round(((source - offset) / grid) - 0.5);
+            const snapped = offset + ((index + 0.5) * grid);
+            return Math.max(0, Math.min(1, snapped / extent));
+        };
+
+        return {
+            x: snapAxis(point.x, width, offsetX),
+            y: snapAxis(point.y, height, offsetY)
+        };
+    }
+
+    furnitureSnap?.addEventListener('change', () => {
+        if (furnitureStatus) {
+            furnitureStatus.textContent = furnitureSnap.checked
+                ? 'Snap to Grid enabled. Pippin has restored order.'
+                : 'Snap to Grid disabled. Pippin is trying not to look.';
+        }
+    });
+
     function finishFurniturePlacement(message) {
         furniturePlacement = null;
         board?.classList.remove('is-furniture-placing');
@@ -447,7 +478,7 @@
         event.preventDefault();
         event.stopImmediatePropagation();
 
-        const point = coordinatesFromPointer(event);
+        const point = furniturePoint(coordinatesFromPointer(event));
         const placedLabel = furniturePlacement.label;
         const placed = await submitSceneObjectAction('place', {
             gmrt_scene_object_kind: furniturePlacement.kind,
@@ -488,7 +519,7 @@
     window.addEventListener('pointermove', (event) => {
         if (!sceneObjectDrag) return;
         event.preventDefault();
-        const point = coordinatesFromPointer(event);
+        const point = furniturePoint(coordinatesFromPointer(event));
         sceneObjectDrag.object.dataset.sceneObjectX = String(point.x);
         sceneObjectDrag.object.dataset.sceneObjectY = String(point.y);
         sceneObjectDrag.object.style.setProperty('--gmrt-object-x', String(point.x * 100) + '%');
