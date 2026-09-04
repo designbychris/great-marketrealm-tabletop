@@ -1,3 +1,11 @@
+
+### Phase IV.35.4B.1 — The Bookshelf Blocks the View
+- **Implemented; awaiting server and browser certification.**
+- Scene Object `blocks_vision` geometry now participates in the server-authoritative Living Veil using persisted position, rotation, scale and catalogue footprint.
+- Existing furniture is backfilled from catalogue defaults.
+- Player-visible token projection remains governed by server Fog/LOS state; Scene Objects are not duplicated into hand-authored Vision Barrier persistence.
+- Physical light attenuation remains reserved for IV.35.4C.
+
 - IV.32.6A polish: removed the in-Chamber masthead from Door/invitation threshold states and made both cinematic thresholds fill the remaining viewport beneath the site header without a bottom gap.
 - IV.32.4A final browser polish: Guild Diceworks now spans the full Turn of Battle grid so certified attack results no longer collapse into the narrow status column.
 

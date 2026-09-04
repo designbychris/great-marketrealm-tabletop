@@ -1,3 +1,11 @@
+
+## Phase IV.35.4B.1 — The Bookshelf Blocks the View
+
+- Bridges Scene Object `blocks_vision` traits into the server-authoritative Living Veil.
+- Adds rotated/scaled Scene Object sight geometry without duplicating furnishings into the Vision Barrier repository.
+- Filters both normal character sight and viewer LOS used by shared illumination; actual light attenuation remains IV.35.4C.
+- Existing Bookshelves inherit catalogue vision behaviour without migration.
+
 ## Phase IV.35.3A — Pippin Discovers the Table Is Nailed to the Floor
 
 ## Phase IV.35.3B — Pippin Rearranges the Furniture

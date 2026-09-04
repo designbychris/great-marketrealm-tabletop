@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace GreatMarketrealmTabletop\Tabletop\Fog\Services;
@@ -9,7 +10,8 @@ use GreatMarketrealmTabletop\Tables\Tokens\Models\TableTokenType;
 use GreatMarketrealmTabletop\Tabletop\Fog\Models\FogOfWarState;
 use GreatMarketrealmTabletop\Tabletop\Light\Models\DroppedLight;
 use GreatMarketrealmTabletop\Tabletop\Light\Models\MagicalLight;
-use GreatMarketrealmTabletop\Tabletop\Light\Models\EnvironmentalLight;
+use GreatMarketrealmTabletop\Tabletop\SceneObjects\Repositories\WordPressSceneObjectRepository;
+use GreatMarketrealmTabletop\Tabletop\SceneObjects\SceneObjectVisionProjector;
 use DateTimeImmutable;
 
 defined('ABSPATH') || exit;
@@ -32,6 +34,23 @@ final class FogOfWarProjector
         $visible = [];
         $visionOrigins = [];
         $viewerLineOfSight = [];
+        $sceneObjects = [];
+        $sceneObjectVision = new SceneObjectVisionProjector();
+
+        // Scene Objects already persist by exact Table + Scene identity. The
+        // Living Veil reads the same authoritative records rather than copying
+        // furniture into the Keeper's hand-drawn Vision Barrier repository.
+        foreach ($tokens as $candidate) {
+            if (! $candidate instanceof TableToken) {
+                continue;
+            }
+
+            $sceneObjects = (new WordPressSceneObjectRepository())->forScene(
+                $candidate->tableId(),
+                $scene->id()
+            );
+            break;
+        }
 
         foreach ($tokens as $token) {
             if (
@@ -62,22 +81,34 @@ final class FogOfWarProjector
             ];
 
             $mapper = new FogCellMapper();
-            $visible = array_merge(
-                $visible,
-                $mapper->visibleAround(
-                    $scene,
-                    $token,
-                    $barriers,
-                    $visionRadius
-                )
+            $tokenVisible = $mapper->visibleAround(
+                $scene,
+                $token,
+                $barriers,
+                $visionRadius
             );
+            $tokenVisible = $sceneObjectVision->filterVisibleCells(
+                $scene,
+                $token,
+                $tokenVisible,
+                $sceneObjects
+            );
+            $visible = array_merge($visible, $tokenVisible);
 
             // Shared illumination may be seen beyond the adventurer's natural
             // sight radius, but only where the viewer has an unobstructed line
-            // of sight. This remains server-authoritative.
+            // of sight. Scene Object vision blockers participate here too;
+            // light attenuation itself remains a separate IV.35.4C concern.
+            $viewerSight = $mapper->visibleAround($scene, $token, $barriers, 60);
+            $viewerSight = $sceneObjectVision->filterVisibleCells(
+                $scene,
+                $token,
+                $viewerSight,
+                $sceneObjects
+            );
             $viewerLineOfSight = array_merge(
                 $viewerLineOfSight,
-                $mapper->visibleAround($scene, $token, $barriers, 60)
+                $viewerSight
             );
         }
 
@@ -89,24 +120,7 @@ final class FogOfWarProjector
             $sourceKind = 'carried';
             $brightFeet = 20;
             $dimFeet = 20;
-            if ($lightSource instanceof EnvironmentalLight) {
-                if (! $lightSource->lit()) {
-                    if ($dungeonMaster) {
-                        $safeLightSources[] = ['x'=>$lightSource->x(),'y'=>$lightSource->y(),'token_id'=>$lightSource->id(),'range_feet'=>0,'bright_light_feet'=>0,'dim_light_feet'=>0,'shared'=>false,'source_kind'=>'environmental','environmental_kind'=>$lightSource->kind(),'label'=>$lightSource->label(),'lit'=>false];
-                    }
-                    continue;
-                }
-                $sourceKind = 'environmental';
-                $brightFeet = $lightSource->brightFeet();
-                $dimFeet = $lightSource->dimFeet();
-                $environmentalKind = $lightSource->kind();
-                $environmentalLabel = $lightSource->label();
-                $lightSource = TableToken::create(
-                    $lightSource->id(), $lightSource->tableId(), $lightSource->sceneId(),
-                    $environmentalLabel, TableTokenType::OBJECT, 'keeper-light-' . $environmentalKind, null,
-                    $lightSource->x(), $lightSource->y(), 1, 1, 'visible', new DateTimeImmutable()
-                );
-            } elseif ($lightSource instanceof DroppedLight) {
+            if ($lightSource instanceof DroppedLight) {
                 $sourceKind = 'dropped';
                 $lightSource = TableToken::create(
                     $lightSource->id(), $lightSource->tableId(), $lightSource->sceneId(),
@@ -146,9 +160,6 @@ final class FogOfWarProjector
                     'dim_light_feet' => $dimFeet,
                     'shared' => true,
                     'source_kind' => $sourceKind,
-                    'environmental_kind' => $environmentalKind ?? '',
-                    'label' => $environmentalLabel ?? '',
-                    'lit' => true,
                 ];
             }
         }
@@ -177,7 +188,7 @@ final class FogOfWarProjector
             'vision_origins' => $visionOrigins,
             'light_sources' => array_values($lightSources),
             'viewer_carried_light' => $ownLightSources !== [],
-            'has_blockers' => $barriers !== [],
+            'has_blockers' => $barriers !== [] || $sceneObjects !== [],
         ];
     }
 
