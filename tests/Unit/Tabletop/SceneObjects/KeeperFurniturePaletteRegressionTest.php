@@ -62,6 +62,6 @@ final class KeeperFurniturePaletteRegressionTest extends TestCase
         self::assertLessThan($tokenPos, $objectPos);
         self::assertStringContainsString('--gmrt-battlefield-z-objects: 5', $css);
         self::assertStringContainsString('--gmrt-battlefield-z-tokens: 10', $css);
-        self::assertStringNotContainsString('data-scene-object-remove', $view);
+        self::assertStringContainsString('data-scene-object-remove', $view);
     }
 }
