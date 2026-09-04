@@ -10,7 +10,7 @@ final class ThingsYouCannotWalkThroughRegressionTest extends TestCase
 {
     private function root(string $path): string
     {
-        return dirname(__DIR__, 5) . '/' . ltrim($path, '/');
+        return dirname(__DIR__, 4) . '/' . ltrim($path, '/');
     }
 
     public function test_catalogue_declares_explicit_movement_blockers_without_using_category_as_collision(): void
