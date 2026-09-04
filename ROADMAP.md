@@ -867,8 +867,11 @@ Carry Session recap evidence and character-attributed deeds across the Tabletop 
 - [x] **IV.35.1 — The Object Layer** — first-class persistent Scene Objects, normalised transforms, state/property seams, categories and WordPress repository boundary.
 - [x] **IV.35.2 — The Keeper's Furniture Palette** — Keeper-facing catalogue and first furniture set. **Server certified: 964 tests / 2,928 assertions; browser placement corrective continues in IV.35.3A.**
 - [x] **IV.35.3A — Pippin Discovers the Table Is Nailed to the Floor** — make Scene Object placement own the battlefield pointer before Lens/tokens/Fog/cartography can consume it. **SERVER + BROWSER CERTIFIED: 965 tests / 2,936 assertions.**
-- [x] **IV.35.3B — Pippin Rearranges the Furniture** — move, rotate, scale, duplicate and remove placed objects, with the Palette consolidated into Dungeon Master Controls. **IMPLEMENTED / awaiting server and browser certification.**
-- [ ] **IV.35.4 — Things That Get in the Way** — collision, cover and vision behaviour.
+- [x] **IV.35.3B — Pippin Rearranges the Furniture** — move, rotate, scale, duplicate and remove placed objects, with the Palette consolidated into Dungeon Master Controls. **SERVER + BROWSER CERTIFIED — 968 tests / 2,961 assertions.**
+- [ ] **IV.35.4 — Things That Get in the Way** — collision, cover, vision and light-obstruction behaviour.
+  - [x] **IV.35.4A — Things You Cannot Walk Through** — explicit Scene Object movement blocking with rotated/scaled footprint collision and swept token movement. **IMPLEMENTED / awaiting server and browser certification.**
+  - [ ] **IV.35.4B — Things You Can Hide Behind** — cover and vision obstruction.
+  - [ ] **IV.35.4C — Things That Cast Shadows** — light blocking and attenuation.
 - [ ] **IV.35.5 — Please Do Not Open the Chest** — interactive object state and safe Keeper/player interaction boundaries.
 - [ ] **IV.35.6 — The Furnishings of the MarketRealm** — themed SNES-era furniture library.
 - [ ] **IV.35.7 — The Forge Learns Interior Design** — Dungeon Forge object seeding and furnishing polish.
@@ -893,6 +896,6 @@ Carry Session recap evidence and character-attributed deeds across the Tabletop 
 - [x] Preserve IV.35.2 persistence, exact Scene identity, Mimic-capable metadata and Living Table refresh behaviour.
 - [x] Server certification: 965 tests / 2,936 assertions.
 - [x] Browser certification: placement and persisted furniture confirmed in the live Chamber.
-- [ ] IV.35.3B — select, move, rotate, scale, duplicate and remove Scene Objects.
+- [x] IV.35.3B — select, move, rotate, scale, duplicate and remove Scene Objects. **SERVER + BROWSER CERTIFIED.**
 
-- [x] **IV.35.3B.1 — Pippin Refuses to Align the Chairs** — Keeper furniture may snap placement and dragging to calibrated Scene grid centres by default, with an authoring toggle for free placement.
+- [x] **IV.35.3B.1 — Pippin Refuses to Align the Chairs** — Keeper furniture may snap placement and dragging to calibrated Scene grid centres by default, with an authoring toggle for free placement. **SERVER + BROWSER CERTIFIED — 969 tests / 2,973 assertions.**

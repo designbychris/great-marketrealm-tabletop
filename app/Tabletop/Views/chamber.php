@@ -84,6 +84,7 @@ if (
                         'label' => (string) ($definition['label'] ?? ucfirst($kind)),
                         'width_units' => (float) ($definition['width_units'] ?? 1.0),
                         'height_units' => (float) ($definition['height_units'] ?? 1.0),
+                        'blocks_movement' => ! empty($definition['blocks_movement']),
                         'mimic_capable' => ! empty($definition['mimic_capable']),
                     ]
                 ));
@@ -1851,9 +1852,13 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                             $object = $sceneObject->toArray();
                             $objectProperties = is_array($object['properties'] ?? null) ? $object['properties'] : [];
                             $objectKind = sanitize_html_class((string) ($object['kind'] ?? 'object'));
+                            $objectDefinition = $furnitureCatalogue->find($objectKind) ?? [];
                             $objectLabel = (string) ($objectProperties['label'] ?? ucfirst($objectKind));
-                            $objectWidth = max(0.25, (float) ($objectProperties['width_units'] ?? 1.0));
-                            $objectHeight = max(0.25, (float) ($objectProperties['height_units'] ?? 1.0));
+                            $objectWidth = max(0.25, (float) ($objectProperties['width_units'] ?? ($objectDefinition['width_units'] ?? 1.0)));
+                            $objectHeight = max(0.25, (float) ($objectProperties['height_units'] ?? ($objectDefinition['height_units'] ?? 1.0)));
+                            $objectBlocksMovement = array_key_exists('blocks_movement', $objectProperties)
+                                ? ! empty($objectProperties['blocks_movement'])
+                                : ! empty($objectDefinition['blocks_movement']);
                         ?>
                             <div
                                 class="gmrt-scene-object gmrt-scene-object--<?php echo esc_attr($objectKind); ?>"
@@ -1864,6 +1869,9 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                 data-scene-object-y="<?php echo esc_attr((string) ((float) ($object['y'] ?? 0))); ?>"
                                 data-scene-object-rotation="<?php echo esc_attr((string) ((int) ($object['rotation'] ?? 0))); ?>"
                                 data-scene-object-scale="<?php echo esc_attr((string) ((float) ($object['scale'] ?? 1))); ?>"
+                                data-scene-object-width-units="<?php echo esc_attr((string) $objectWidth); ?>"
+                                data-scene-object-height-units="<?php echo esc_attr((string) $objectHeight); ?>"
+                                data-blocks-movement="<?php echo $objectBlocksMovement ? 'true' : 'false'; ?>"
                                 data-mimic-capable="<?php echo ! empty($objectProperties['mimic_capable']) ? 'true' : 'false'; ?>"
                                 style="--gmrt-object-x: <?php echo esc_attr((string) ((float) ($object['x'] ?? 0) * 100)); ?>%; --gmrt-object-y: <?php echo esc_attr((string) ((float) ($object['y'] ?? 0) * 100)); ?>%; --gmrt-object-rotation: <?php echo esc_attr((string) ((int) ($object['rotation'] ?? 0))); ?>deg; --gmrt-object-scale: <?php echo esc_attr((string) ((float) ($object['scale'] ?? 1))); ?>; --gmrt-object-width-units: <?php echo esc_attr((string) $objectWidth); ?>; --gmrt-object-height-units: <?php echo esc_attr((string) $objectHeight); ?>;"
                                 role="<?php echo $state->isDungeonMaster() ? 'button' : 'img'; ?>"

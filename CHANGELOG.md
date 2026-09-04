@@ -1165,3 +1165,12 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - Adds a Keeper-only Snap to Grid toggle to Furniture controls, enabled by default.
 - Furniture placement and dragging share the same grid-aware coordinate snapping while free placement remains available when disabled.
 - Keeps snapping as transient authoring UI state; persisted Scene Objects retain only their final normalized coordinates.
+
+
+### Phase IV.35.4A — Things You Cannot Walk Through
+- Adds explicit `blocks_movement` behaviour to catalogue Scene Objects without coupling collision to object category.
+- Makes Table, Chest, Barrel, Crate and Bookshelf solid while Chair remains passable decorative clutter.
+- Applies collision to token drag, click-to-move and keyboard movement using rotated/scaled furnishing footprints.
+- Sweeps token movement paths so a token cannot jump through a blocker to a clear destination on the far side.
+- Backfills collision behaviour for furnishings placed before IV.35.4A from the current catalogue definition.
+- Leaves cover, vision and light occlusion untouched for IV.35.4B/C.

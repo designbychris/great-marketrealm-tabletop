@@ -26,6 +26,7 @@ final class FurnitureCatalogue
                 SceneObjectCategory::STRUCTURAL,
                 2.0,
                 1.0,
+                true,
                 'A sturdy dungeon table. Number of legs not contractually guaranteed.'
             ),
             'chair' => $this->definition(
@@ -33,6 +34,7 @@ final class FurnitureCatalogue
                 SceneObjectCategory::DECORATIVE,
                 0.75,
                 0.75,
+                false,
                 'A suspiciously conventional place to sit.'
             ),
             'chest' => $this->definition(
@@ -40,6 +42,7 @@ final class FurnitureCatalogue
                 SceneObjectCategory::INTERACTIVE,
                 1.0,
                 0.75,
+                true,
                 'Storage, treasure, or an extremely poor life decision.'
             ),
             'barrel' => $this->definition(
@@ -47,6 +50,7 @@ final class FurnitureCatalogue
                 SceneObjectCategory::STRUCTURAL,
                 0.9,
                 0.9,
+                true,
                 'A stout barrel for provisions, brine, or ominous silence.'
             ),
             'crate' => $this->definition(
@@ -54,6 +58,7 @@ final class FurnitureCatalogue
                 SceneObjectCategory::STRUCTURAL,
                 1.0,
                 1.0,
+                true,
                 'A stackable wooden crate with absolutely no promises about contents.'
             ),
             'bookshelf' => $this->definition(
@@ -61,6 +66,7 @@ final class FurnitureCatalogue
                 SceneObjectCategory::STRUCTURAL,
                 1.5,
                 0.6,
+                true,
                 'A shelf of books, ledgers, maps and future bad ideas.'
             ),
         ];
@@ -79,6 +85,7 @@ final class FurnitureCatalogue
         string $category,
         float $widthUnits,
         float $heightUnits,
+        bool $blocksMovement,
         string $description
     ): array {
         return [
@@ -87,6 +94,7 @@ final class FurnitureCatalogue
             'width_units' => $widthUnits,
             'height_units' => $heightUnits,
             'description' => $description,
+            'blocks_movement' => $blocksMovement,
             'mimic_capable' => true,
         ];
     }

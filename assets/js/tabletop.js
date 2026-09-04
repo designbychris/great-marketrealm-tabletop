@@ -5382,8 +5382,148 @@
         };
     }
 
+    function tokenPoint(token) {
+        const x = parseFloat(token.style.getPropertyValue('--gmrt-token-x')) / 100;
+        const y = parseFloat(token.style.getPropertyValue('--gmrt-token-y')) / 100;
+        return {
+            x: Number.isFinite(x) ? x : 0.5,
+            y: Number.isFinite(y) ? y : 0.5
+        };
+    }
+
+    function rectangleCorners(cx, cy, width, height, rotationDegrees = 0) {
+        const halfWidth = Math.max(0, width) / 2;
+        const halfHeight = Math.max(0, height) / 2;
+        const radians = rotationDegrees * Math.PI / 180;
+        const cosine = Math.cos(radians);
+        const sine = Math.sin(radians);
+
+        return [
+            [-halfWidth, -halfHeight],
+            [halfWidth, -halfHeight],
+            [halfWidth, halfHeight],
+            [-halfWidth, halfHeight]
+        ].map(([x, y]) => ({
+            x: cx + x * cosine - y * sine,
+            y: cy + x * sine + y * cosine
+        }));
+    }
+
+    function polygonsOverlap(first, second) {
+        const polygons = [first, second];
+        const epsilon = 0.35;
+
+        for (const polygon of polygons) {
+            for (let index = 0; index < polygon.length; index += 1) {
+                const current = polygon[index];
+                const next = polygon[(index + 1) % polygon.length];
+                const axis = {
+                    x: -(next.y - current.y),
+                    y: next.x - current.x
+                };
+                const length = Math.hypot(axis.x, axis.y) || 1;
+                axis.x /= length;
+                axis.y /= length;
+
+                const project = (points) => points.reduce((range, point) => {
+                    const value = point.x * axis.x + point.y * axis.y;
+                    return {
+                        min: Math.min(range.min, value),
+                        max: Math.max(range.max, value)
+                    };
+                }, {min: Infinity, max: -Infinity});
+
+                const a = project(first);
+                const b = project(second);
+                if (a.max <= b.min + epsilon || b.max <= a.min + epsilon) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    function tokenCollidesWithFurniture(token, point) {
+        const battlemap = board.querySelector('[data-battlemap-image]');
+        const rect = (battlemap || board).getBoundingClientRect();
+        const tokenWidth = Math.max(1, token.offsetWidth);
+        const tokenHeight = Math.max(1, token.offsetHeight);
+        const tokenPolygon = rectangleCorners(
+            rect.left + point.x * rect.width,
+            rect.top + point.y * rect.height,
+            tokenWidth,
+            tokenHeight
+        );
+
+        return Array.from(document.querySelectorAll('[data-scene-object-id][data-blocks-movement="true"]'))
+            .some((object) => {
+                const objectX = Number(object.dataset.sceneObjectX || 0.5);
+                const objectY = Number(object.dataset.sceneObjectY || 0.5);
+                const objectWidth = Math.max(1, object.offsetWidth);
+                const objectHeight = Math.max(1, object.offsetHeight);
+                const rotation = Number(object.dataset.sceneObjectRotation || 0);
+                const objectPolygon = rectangleCorners(
+                    rect.left + objectX * rect.width,
+                    rect.top + objectY * rect.height,
+                    objectWidth,
+                    objectHeight,
+                    rotation
+                );
+                return polygonsOverlap(tokenPolygon, objectPolygon);
+            });
+    }
+
+    function movementPathBlocked(token, from, to) {
+        const battlemap = board.querySelector('[data-battlemap-image]');
+        const rect = (battlemap || board).getBoundingClientRect();
+        const distancePixels = Math.hypot(
+            (to.x - from.x) * rect.width,
+            (to.y - from.y) * rect.height
+        );
+        const stride = Math.max(4, Math.min(token.offsetWidth, token.offsetHeight) / 3);
+        const steps = Math.max(1, Math.ceil(distancePixels / stride));
+
+        let escapedInitialOverlap = !tokenCollidesWithFurniture(token, from);
+
+        for (let step = 1; step <= steps; step += 1) {
+            const progress = step / steps;
+            const point = {
+                x: from.x + (to.x - from.x) * progress,
+                y: from.y + (to.y - from.y) * progress
+            };
+            const collides = tokenCollidesWithFurniture(token, point);
+
+            // A Keeper may move furniture onto an existing token. Never trap that
+            // token forever: allow it to leave the pre-existing overlap, then begin
+            // enforcing collision normally as soon as it reaches clear floor.
+            if (!escapedInitialOverlap) {
+                if (!collides) escapedInitialOverlap = true;
+                continue;
+            }
+
+            if (collides) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     async function moveSelected(x, y) {
         if (!selected || !tableId) {
+            return;
+        }
+
+        const destination = {
+            x: Math.max(0, Math.min(1, Number(x))),
+            y: Math.max(0, Math.min(1, Number(y)))
+        };
+        const origin = tokenPoint(selected);
+        if (movementPathBlocked(selected, origin, destination)) {
+            selected.classList.add('is-movement-blocked');
+            window.setTimeout(() => selected?.classList.remove('is-movement-blocked'), 260);
+            say('That route is blocked by the furnishings. Pippin refuses to draw the token inside the furniture.');
             return;
         }
 
@@ -5393,8 +5533,8 @@
         try {
             const data = await request('gmrt_move_token', {
                 token_id: tokenId,
-                x: x,
-                y: y,
+                x: destination.x,
+                y: destination.y,
                 revision: revision
             });
 
@@ -5743,7 +5883,9 @@
             pointerId: null,
             startX: 0,
             startY: 0,
-            threshold: 3
+            threshold: 3,
+            lastValidPoint: null,
+            blocked: false
         };
 
         token.addEventListener('pointerdown', (event) => {
@@ -5756,6 +5898,8 @@
             tokenDrag.pointerId = event.pointerId;
             tokenDrag.startX = event.clientX;
             tokenDrag.startY = event.clientY;
+            tokenDrag.lastValidPoint = tokenPoint(token);
+            tokenDrag.blocked = false;
             token.setPointerCapture(event.pointerId);
         });
 
@@ -5783,6 +5927,17 @@
             event.stopPropagation();
 
             const point = coordinatesFromPointer(event);
+            const from = tokenDrag.lastValidPoint || tokenPoint(token);
+            if (movementPathBlocked(token, from, point)) {
+                tokenDrag.blocked = true;
+                token.classList.add('is-movement-blocked');
+                say('Blocked by furniture. Pippin says the map is quite clear on this point.');
+                return;
+            }
+
+            tokenDrag.blocked = false;
+            token.classList.remove('is-movement-blocked');
+            tokenDrag.lastValidPoint = point;
             token.style.setProperty(
                 '--gmrt-token-x',
                 (point.x * 100) + '%'
@@ -5818,8 +5973,11 @@
             if (moved) {
                 event.preventDefault();
                 event.stopPropagation();
-                const point = coordinatesFromPointer(event);
+                const point = tokenDrag.lastValidPoint || tokenPoint(token);
+                token.classList.remove('is-movement-blocked');
                 moveSelected(point.x, point.y);
+                tokenDrag.lastValidPoint = null;
+                tokenDrag.blocked = false;
             }
         };
 

@@ -271,6 +271,12 @@
     box-shadow: 0 8px 22px rgba(0, 0, 0, .65);
 }
 
+.gmrt-token.is-movement-blocked {
+    outline:2px dashed rgba(255,216,133,.98);
+    outline-offset:3px;
+    filter:drop-shadow(0 0 5px rgba(255,187,82,.92));
+}
+
 .gmrt-token:focus-visible,
 .gmrt-token.is-selected {
     outline: 3px solid currentColor;
