@@ -5052,7 +5052,10 @@
             targetLine.classList.remove(
                 'is-visible',
                 'is-long-range',
-                'is-out-of-range'
+                'is-out-of-range',
+                'has-object-cover',
+                'is-full-object-cover',
+                'is-object-vision-blocked'
             );
         }
 
@@ -5134,6 +5137,80 @@
         );
     }
 
+    function segmentsIntersect(a, b, c, d) {
+        const cross = (p, q, r) => (q.x - p.x) * (r.y - p.y) - (q.y - p.y) * (r.x - p.x);
+        const abC = cross(a, b, c);
+        const abD = cross(a, b, d);
+        const cdA = cross(c, d, a);
+        const cdB = cross(c, d, b);
+        return ((abC > 0 && abD < 0) || (abC < 0 && abD > 0))
+            && ((cdA > 0 && cdB < 0) || (cdA < 0 && cdB > 0));
+    }
+
+    function lineIntersectsPolygon(start, end, polygon) {
+        for (let index = 0; index < polygon.length; index += 1) {
+            if (segmentsIntersect(
+                start,
+                end,
+                polygon[index],
+                polygon[(index + 1) % polygon.length]
+            )) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function sceneObjectCoverBetween(attacker, target) {
+        const attackerRect = attacker.getBoundingClientRect();
+        const targetRect = target.getBoundingClientRect();
+        const start = {
+            x: attackerRect.left + attackerRect.width / 2,
+            y: attackerRect.top + attackerRect.height / 2
+        };
+        const end = {
+            x: targetRect.left + targetRect.width / 2,
+            y: targetRect.top + targetRect.height / 2
+        };
+        const battlemap = board.querySelector('[data-battlemap-image]');
+        const mapRect = (battlemap || board).getBoundingClientRect();
+        const coverRank = {none: 0, half: 1, three_quarters: 2, full: 3};
+        let result = {cover: 'none', blocksVision: false};
+
+        document.querySelectorAll('[data-scene-object-id][data-object-cover]').forEach((object) => {
+            const cover = String(object.dataset.objectCover || 'none');
+            if (!coverRank[cover]) return;
+            const objectX = Number(object.dataset.sceneObjectX || 0.5);
+            const objectY = Number(object.dataset.sceneObjectY || 0.5);
+            const rotation = Number(object.dataset.sceneObjectRotation || 0);
+            const polygon = rectangleCorners(
+                mapRect.left + objectX * mapRect.width,
+                mapRect.top + objectY * mapRect.height,
+                Math.max(1, object.offsetWidth),
+                Math.max(1, object.offsetHeight),
+                rotation
+            );
+            if (!lineIntersectsPolygon(start, end, polygon)) return;
+            if ((coverRank[cover] || 0) > (coverRank[result.cover] || 0)) {
+                result = {
+                    cover,
+                    blocksVision: object.dataset.blocksVision === 'true'
+                };
+            } else if (object.dataset.blocksVision === 'true') {
+                result.blocksVision = true;
+            }
+        });
+
+        return result;
+    }
+
+    function coverLabel(cover) {
+        if (cover === 'half') return 'HALF COVER';
+        if (cover === 'three_quarters') return '3/4 COVER';
+        if (cover === 'full') return 'FULL COVER';
+        return '';
+    }
+
     async function updateTargeting() {
         if (
             !attackTarget
@@ -5184,6 +5261,24 @@
                 label += ' · ' + rollMode.toUpperCase();
             }
 
+            const attackerId = deedsPanel?.dataset.currentToken || '';
+            const attacker = attackerId !== ''
+                ? document.querySelector('[data-token-id="' + CSS.escape(attackerId) + '"]')
+                : null;
+            const target = document.querySelector(
+                '[data-token-id="' + CSS.escape(String(attackTarget.value)) + '"]'
+            );
+            const objectCover = attacker && target
+                ? sceneObjectCoverBetween(attacker, target)
+                : {cover: 'none', blocksVision: false};
+            const tacticalCoverLabel = coverLabel(objectCover.cover);
+            if (tacticalCoverLabel) {
+                label += ' · ' + tacticalCoverLabel;
+            }
+            if (objectCover.blocksVision) {
+                label += ' · OBSCURED';
+            }
+
             if (rangeStatus) {
                 rangeStatus.textContent = label;
                 rangeStatus.className =
@@ -5196,6 +5291,11 @@
                 attackTarget.value,
                 range.range_status || ''
             );
+            if (targetLine) {
+                targetLine.classList.toggle('has-object-cover', objectCover.cover !== 'none');
+                targetLine.classList.toggle('is-full-object-cover', objectCover.cover === 'full');
+                targetLine.classList.toggle('is-object-vision-blocked', objectCover.blocksVision);
+            }
 
             const button = attackButton();
             if (button) {

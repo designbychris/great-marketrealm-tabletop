@@ -1174,3 +1174,12 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - Sweeps token movement paths so a token cannot jump through a blocker to a clear destination on the far side.
 - Backfills collision behaviour for furnishings placed before IV.35.4A from the current catalogue definition.
 - Leaves cover, vision and light occlusion untouched for IV.35.4B/C.
+
+
+### Phase IV.35.4B — Things You Can Hide Behind
+- Adds explicit Scene Object cover and vision-blocking traits independent from movement collision.
+- Gives the first furniture catalogue none/half/three-quarters/full cover defaults, with Bookshelf acting as the first full vision blocker.
+- Backfills older placed furniture from current catalogue definitions without requiring Scene Object replacement.
+- Measures targeting lines against rotated/scaled furnishing footprints and reports the strongest intervening cover in the existing target status.
+- Keeps cover descriptive rather than silently changing Companion-certified attack or AC mechanics.
+- Preserves server-authoritative Fog/LOS for the focused IV.35.4B.1 vision bridge and leaves light attenuation for IV.35.4C.

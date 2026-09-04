@@ -27,6 +27,8 @@ final class FurnitureCatalogue
                 2.0,
                 1.0,
                 true,
+                'half',
+                false,
                 'A sturdy dungeon table. Number of legs not contractually guaranteed.'
             ),
             'chair' => $this->definition(
@@ -34,6 +36,8 @@ final class FurnitureCatalogue
                 SceneObjectCategory::DECORATIVE,
                 0.75,
                 0.75,
+                false,
+                'none',
                 false,
                 'A suspiciously conventional place to sit.'
             ),
@@ -43,6 +47,8 @@ final class FurnitureCatalogue
                 1.0,
                 0.75,
                 true,
+                'half',
+                false,
                 'Storage, treasure, or an extremely poor life decision.'
             ),
             'barrel' => $this->definition(
@@ -51,6 +57,8 @@ final class FurnitureCatalogue
                 0.9,
                 0.9,
                 true,
+                'half',
+                false,
                 'A stout barrel for provisions, brine, or ominous silence.'
             ),
             'crate' => $this->definition(
@@ -59,6 +67,8 @@ final class FurnitureCatalogue
                 1.0,
                 1.0,
                 true,
+                'three_quarters',
+                false,
                 'A stackable wooden crate with absolutely no promises about contents.'
             ),
             'bookshelf' => $this->definition(
@@ -66,6 +76,8 @@ final class FurnitureCatalogue
                 SceneObjectCategory::STRUCTURAL,
                 1.5,
                 0.6,
+                true,
+                'full',
                 true,
                 'A shelf of books, ledgers, maps and future bad ideas.'
             ),
@@ -86,6 +98,8 @@ final class FurnitureCatalogue
         float $widthUnits,
         float $heightUnits,
         bool $blocksMovement,
+        string $cover,
+        bool $blocksVision,
         string $description
     ): array {
         return [
@@ -95,6 +109,8 @@ final class FurnitureCatalogue
             'height_units' => $heightUnits,
             'description' => $description,
             'blocks_movement' => $blocksMovement,
+            'cover' => $cover,
+            'blocks_vision' => $blocksVision,
             'mimic_capable' => true,
         ];
     }

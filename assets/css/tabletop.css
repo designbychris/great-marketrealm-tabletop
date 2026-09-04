@@ -5822,3 +5822,15 @@
 @media (max-width: 720px) {
     .gmrt-furniture-choice { min-width:calc(50% - .25rem); }
 }
+
+/* Phase IV.35.4B — Things You Can Hide Behind */
+.gmrt-target-line.has-object-cover {
+    stroke-dasharray: 7 5;
+    stroke-width: 4;
+}
+
+.gmrt-target-line.is-full-object-cover,
+.gmrt-target-line.is-object-vision-blocked {
+    stroke-dasharray: 3 4;
+    opacity: .72;
+}
