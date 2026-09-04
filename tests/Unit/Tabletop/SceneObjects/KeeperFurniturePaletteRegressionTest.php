@@ -41,7 +41,7 @@ final class KeeperFurniturePaletteRegressionTest extends TestCase
     {
         $js = file_get_contents($this->root('assets/js/tabletop.js'));
 
-        self::assertStringContainsString("body.set('gmrt_scene_object_action', 'place')", $js);
+        self::assertStringContainsString("submitSceneObjectAction('place'", $js);
         self::assertStringContainsString("body.set('gmrt_scene_object_scene_id', projectedSceneId)", $js);
         self::assertStringContainsString('(event.clientX - rect.left) / Math.max(1, rect.width)', $js);
         self::assertStringContainsString('(event.clientY - rect.top) / Math.max(1, rect.height)', $js);
