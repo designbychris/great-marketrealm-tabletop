@@ -865,8 +865,9 @@ Carry Session recap evidence and character-attributed deeds across the Tabletop 
 
 ## Phase IV.35 — Pippin Furnishes the Dungeon
 - [x] **IV.35.1 — The Object Layer** — first-class persistent Scene Objects, normalised transforms, state/property seams, categories and WordPress repository boundary.
-- [ ] **IV.35.2 — The Keeper's Furniture Palette** — Keeper-facing catalogue and placement workflow for the first furniture set.
-- [ ] **IV.35.3 — Pippin Rearranges the Furniture** — move, rotate, scale, duplicate and remove placed objects.
+- [x] **IV.35.2 — The Keeper's Furniture Palette** — Keeper-facing catalogue and first furniture set. **Server certified: 964 tests / 2,928 assertions; browser placement corrective continues in IV.35.3A.**
+- [ ] **IV.35.3A — Pippin Discovers the Table Is Nailed to the Floor** — make Scene Object placement own the battlefield pointer before Lens/tokens/Fog/cartography can consume it. **IMPLEMENTED / awaiting server and browser certification.**
+- [ ] **IV.35.3B — Pippin Rearranges the Furniture** — move, rotate, scale, duplicate and remove placed objects.
 - [ ] **IV.35.4 — Things That Get in the Way** — collision, cover and vision behaviour.
 - [ ] **IV.35.5 — Please Do Not Open the Chest** — interactive object state and safe Keeper/player interaction boundaries.
 - [ ] **IV.35.6 — The Furnishings of the MarketRealm** — themed SNES-era furniture library.
@@ -881,3 +882,15 @@ Carry Session recap evidence and character-attributed deeds across the Tabletop 
 - [x] Reuse the existing Living Table heartbeat/fragment boundary; no second polling loop.
 - [x] Mark every furnishing as Mimic-capable so future Convert to Mimic can choose a Bestiary Mimic for any object disguise.
 - [ ] IV.35.3 — Pippin Rearranges the Furniture: select, move, rotate, scale, duplicate and remove Scene Objects.
+
+
+## Phase IV.35.3A — Pippin Discovers the Table Is Nailed to the Floor
+
+- [x] Move furniture authoring from late `click` handling to capture-phase `pointerdown`, matching the proven Lantern Rack placement boundary.
+- [x] Stop the armed furniture pointer before Lens panning, Fog, token, vision or cartography handlers can consume it.
+- [x] Use the shared battlemap-aware `coordinatesFromPointer()` helper so placement remains correct through the existing map/Lens geometry.
+- [x] Explicitly suspend Lens panning while furniture placement is armed.
+- [x] Preserve IV.35.2 persistence, exact Scene identity, Mimic-capable metadata and Living Table refresh behaviour.
+- [ ] Server certification.
+- [ ] Browser certification: place, reload, Scene isolation, Behind-the-Curtain placement and Player live visibility.
+- [ ] IV.35.3B — select, move, rotate, scale, duplicate and remove Scene Objects.

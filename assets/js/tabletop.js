@@ -358,14 +358,19 @@
         finishFurniturePlacement('Placement cancelled. Pippin has put the tape measure away.');
     });
 
-    board?.addEventListener('click', async (event) => {
+    // Furniture placement owns the next battlefield pointer in capture phase.
+    // This mirrors the certified Lantern Rack interaction: authoring must win before
+    // Lens panning, Fog, tokens, vision or cartography can consume the gesture.
+    board?.addEventListener('pointerdown', async (event) => {
         if (!furniturePlacement || !furniturePalette) return;
+        if (event.button !== 0) return;
+
         event.preventDefault();
         event.stopImmediatePropagation();
 
-        const rect = board.getBoundingClientRect();
-        const x = Math.max(0, Math.min(1, (event.clientX - rect.left) / Math.max(1, rect.width)));
-        const y = Math.max(0, Math.min(1, (event.clientY - rect.top) / Math.max(1, rect.height)));
+        const point = coordinatesFromPointer(event);
+        const x = point.x;
+        const y = point.y;
         const body = new URLSearchParams();
         body.set('gmrt_scene_object_action', 'place');
         body.set('gmrt_scene_object_nonce', furniturePalette.dataset.sceneObjectNonce || '');
@@ -1221,6 +1226,8 @@
             || visionDrafting
             || thresholdPlacement
             || bestiaryPlacement
+            || keeperLightPlacement
+            || furniturePlacement
             || isLensInteractiveTarget(event.target)
         ) {
             return;

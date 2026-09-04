@@ -1,3 +1,11 @@
+## Phase IV.35.3A — Pippin Discovers the Table Is Nailed to the Floor
+
+- Repairs the IV.35.2 browser placement path by giving armed furniture capture-phase `pointerdown` ownership of the battlefield, matching the proven Keeper light placement pattern.
+- Prevents Lens panning and later Fog/token/vision/cartography interactions from swallowing the furnishing gesture.
+- Routes furniture coordinates through the shared battlemap-aware pointer normalisation helper instead of measuring the outer board directly.
+- Keeps the existing Scene Object persistence, Scene scoping, heartbeat refresh and Mimic-capable catalogue unchanged.
+- Adds regression protection specifically for furniture pointer ownership.
+
 ## Phase IV.34.7 — The Next Gathering
 
 - Adds a dedicated between-Sessions **The Next Gathering** handover after a completed Session.
