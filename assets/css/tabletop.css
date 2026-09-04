@@ -3685,6 +3685,7 @@
 .gmrt-keeper-controls__body > .gmrt-lantern-rack,
 .gmrt-keeper-controls__body > .gmrt-vision-controls,
 .gmrt-keeper-controls__body > .gmrt-grid-calibrator,
+.gmrt-keeper-controls__body > .gmrt-furniture-palette,
 .gmrt-keeper-controls__body > .gmrt-cartographer-status {
     margin: 0;
 }
@@ -5742,8 +5743,45 @@
 .gmrt-furniture-palette__status { margin:.55rem 0 0; min-height:1.25em; font-size:.78rem; }
 .gmrt-board__viewport.is-furniture-placing { cursor:crosshair; }
 
+
+/* IV.35.3B — Keeper furniture editing. */
+.gmrt-furniture-editor {
+    display:grid;
+    gap:.35rem;
+    margin-top:.65rem;
+    padding:.55rem;
+    border:2px solid rgba(59,40,24,.6);
+    background:rgba(255,247,220,.28);
+}
+.gmrt-furniture-editor > strong { font-size:.82rem; text-transform:uppercase; letter-spacing:.04em; }
+.gmrt-furniture-editor > span { font-size:.74rem; opacity:.78; }
+.gmrt-furniture-editor__tools { display:flex; flex-wrap:wrap; gap:.35rem; }
+.gmrt-furniture-editor__tools button {
+    min-height:2.15rem;
+    border:2px solid #2d2117;
+    border-radius:3px;
+    padding:.25rem .5rem;
+    background:#5b3d25;
+    color:#fff1ce;
+    box-shadow:2px 2px 0 #21150d;
+    cursor:pointer;
+}
+.gmrt-furniture-editor__tools button:disabled { opacity:.42; cursor:default; box-shadow:none; }
+.gmrt-furniture-editor__tools button:not(:disabled):hover,
+.gmrt-furniture-editor__tools button:not(:disabled):focus-visible { outline:2px solid #fff1ce; outline-offset:1px; }
+.gmrt-furniture-editor__delete:not(:disabled) { background:#6d2d24; }
+.gmrt-board__viewport.is-furniture-moving { cursor:grabbing; }
+
 .gmrt-board__viewport { --gmrt-battlefield-z-objects: 5; }
 .gmrt-scene-object-layer { position:absolute; inset:0; z-index:var(--gmrt-battlefield-z-objects); pointer-events:none; }
+.gmrt-scene-object-layer.is-keeper-editable .gmrt-scene-object { pointer-events:auto; cursor:grab; }
+.gmrt-scene-object-layer.is-keeper-editable .gmrt-scene-object:focus-visible,
+.gmrt-scene-object-layer.is-keeper-editable .gmrt-scene-object.is-selected {
+    outline:2px dashed rgba(255,240,158,.98);
+    outline-offset:4px;
+    filter:drop-shadow(2px 3px 0 rgba(0,0,0,.46)) drop-shadow(0 0 4px rgba(255,218,102,.9));
+}
+.gmrt-scene-object-layer.is-keeper-editable .gmrt-scene-object.is-dragging { cursor:grabbing; opacity:.86; }
 .gmrt-scene-object {
     position:absolute;
     left:var(--gmrt-object-x);

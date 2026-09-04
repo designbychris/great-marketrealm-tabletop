@@ -28,19 +28,19 @@ $sceneObjectRepository = new WordPressSceneObjectRepository();
 $sceneObjectPlacementNotice = '';
 
 /*
- * IV.35.2 — The Keeper's Furniture Palette.
+ * IV.35.3B — Pippin Rearranges the Furniture.
  *
- * Placement is processed through the already-rendered authenticated Chamber
- * rather than introducing another poller or parallel state channel. The
- * projected Scene identity is authoritative, including Behind the Curtain.
+ * Scene Object authoring remains on the authenticated Chamber boundary. Every
+ * mutation is Keeper-only, nonce-protected, and pinned to the exact projected
+ * Scene (including Behind the Curtain) before an existing object is resolved.
  */
 if (
     $state !== null
     && $state->isDungeonMaster()
     && is_array($scene)
     && isset($_POST['gmrt_scene_object_action'])
-    && sanitize_key((string) wp_unslash($_POST['gmrt_scene_object_action'])) === 'place'
 ) {
+    $sceneObjectAction = sanitize_key((string) wp_unslash($_POST['gmrt_scene_object_action']));
     $submittedNonce = isset($_POST['gmrt_scene_object_nonce'])
         ? sanitize_text_field(wp_unslash((string) $_POST['gmrt_scene_object_nonce']))
         : '';
@@ -48,45 +48,122 @@ if (
         ? sanitize_text_field(wp_unslash((string) $_POST['gmrt_scene_object_scene_id']))
         : '';
     $projectedSceneId = (string) ($scene['id'] ?? '');
-    $kind = isset($_POST['gmrt_scene_object_kind'])
-        ? sanitize_key(wp_unslash((string) $_POST['gmrt_scene_object_kind']))
-        : '';
-    $definition = $furnitureCatalogue->find($kind);
+    $tableIdForObjects = (string) ($table['id'] ?? '');
 
     if (
         $submittedNonce !== ''
-        && wp_verify_nonce($submittedNonce, 'gmrt_scene_object_place')
+        && wp_verify_nonce($submittedNonce, 'gmrt_scene_object_author')
         && $submittedSceneId !== ''
         && hash_equals($projectedSceneId, $submittedSceneId)
-        && is_array($definition)
+        && $tableIdForObjects !== ''
     ) {
-        $x = isset($_POST['x']) ? (float) wp_unslash((string) $_POST['x']) : 0.5;
-        $y = isset($_POST['y']) ? (float) wp_unslash((string) $_POST['y']) : 0.5;
-        $x = max(0.0, min(1.0, $x));
-        $y = max(0.0, min(1.0, $y));
+        if ($sceneObjectAction === 'place') {
+            $kind = isset($_POST['gmrt_scene_object_kind'])
+                ? sanitize_key(wp_unslash((string) $_POST['gmrt_scene_object_kind']))
+                : '';
+            $definition = $furnitureCatalogue->find($kind);
 
-        $sceneObjectRepository->save(new SceneObject(
-            wp_generate_uuid4(),
-            (string) ($table['id'] ?? ''),
-            $projectedSceneId,
-            $kind,
-            (string) ($definition['category'] ?? 'decorative'),
-            $x,
-            $y,
-            0,
-            1.0,
-            [],
-            [
-                'label' => (string) ($definition['label'] ?? ucfirst($kind)),
-                'width_units' => (float) ($definition['width_units'] ?? 1.0),
-                'height_units' => (float) ($definition['height_units'] ?? 1.0),
-                'mimic_capable' => ! empty($definition['mimic_capable']),
-            ]
-        ));
-        $sceneObjectPlacementNotice = sprintf(
-            '%s placed. Pippin has measured it twice.',
-            (string) ($definition['label'] ?? 'Furniture')
-        );
+            if (is_array($definition)) {
+                $x = isset($_POST['x']) ? (float) wp_unslash((string) $_POST['x']) : 0.5;
+                $y = isset($_POST['y']) ? (float) wp_unslash((string) $_POST['y']) : 0.5;
+                $x = max(0.0, min(1.0, $x));
+                $y = max(0.0, min(1.0, $y));
+
+                $sceneObjectRepository->save(new SceneObject(
+                    wp_generate_uuid4(),
+                    $tableIdForObjects,
+                    $projectedSceneId,
+                    $kind,
+                    (string) ($definition['category'] ?? 'decorative'),
+                    $x,
+                    $y,
+                    0,
+                    1.0,
+                    [],
+                    [
+                        'label' => (string) ($definition['label'] ?? ucfirst($kind)),
+                        'width_units' => (float) ($definition['width_units'] ?? 1.0),
+                        'height_units' => (float) ($definition['height_units'] ?? 1.0),
+                        'mimic_capable' => ! empty($definition['mimic_capable']),
+                    ]
+                ));
+                $sceneObjectPlacementNotice = sprintf(
+                    '%s placed. Pippin has measured it twice.',
+                    (string) ($definition['label'] ?? 'Furniture')
+                );
+            }
+        } else {
+            $objectId = isset($_POST['gmrt_scene_object_id'])
+                ? sanitize_text_field(wp_unslash((string) $_POST['gmrt_scene_object_id']))
+                : '';
+            $existingObject = $objectId !== ''
+                ? $sceneObjectRepository->find($tableIdForObjects, $projectedSceneId, $objectId)
+                : null;
+
+            if ($existingObject instanceof SceneObject) {
+                if ($sceneObjectAction === 'delete') {
+                    $sceneObjectRepository->remove($tableIdForObjects, $projectedSceneId, $objectId);
+                    $sceneObjectPlacementNotice = 'Furniture removed. Pippin has updated the inventory.';
+                } elseif ($sceneObjectAction === 'duplicate') {
+                    $duplicateX = $existingObject->x() <= 0.95
+                        ? $existingObject->x() + 0.025
+                        : max(0.0, $existingObject->x() - 0.025);
+                    $duplicateY = $existingObject->y() <= 0.95
+                        ? $existingObject->y() + 0.025
+                        : max(0.0, $existingObject->y() - 0.025);
+                    $sceneObjectRepository->save(new SceneObject(
+                        wp_generate_uuid4(),
+                        $existingObject->tableId(),
+                        $existingObject->sceneId(),
+                        $existingObject->kind(),
+                        $existingObject->category(),
+                        $duplicateX,
+                        $duplicateY,
+                        $existingObject->rotation(),
+                        $existingObject->scale(),
+                        $existingObject->state(),
+                        $existingObject->properties()
+                    ));
+                    $sceneObjectPlacementNotice = 'Furniture duplicated. Pippin now has two measurements to worry about.';
+                } elseif (in_array($sceneObjectAction, ['move', 'rotate', 'scale'], true)) {
+                    $x = $existingObject->x();
+                    $y = $existingObject->y();
+                    $rotation = $existingObject->rotation();
+                    $scale = $existingObject->scale();
+
+                    if ($sceneObjectAction === 'move') {
+                        $x = isset($_POST['x']) ? (float) wp_unslash((string) $_POST['x']) : $x;
+                        $y = isset($_POST['y']) ? (float) wp_unslash((string) $_POST['y']) : $y;
+                        $x = max(0.0, min(1.0, $x));
+                        $y = max(0.0, min(1.0, $y));
+                    } elseif ($sceneObjectAction === 'rotate') {
+                        $rotation = isset($_POST['rotation'])
+                            ? (int) wp_unslash((string) $_POST['rotation'])
+                            : $rotation;
+                    } elseif ($sceneObjectAction === 'scale') {
+                        $scale = isset($_POST['scale'])
+                            ? (float) wp_unslash((string) $_POST['scale'])
+                            : $scale;
+                        $scale = max(0.5, min(2.5, $scale));
+                    }
+
+                    $sceneObjectRepository->save(new SceneObject(
+                        $existingObject->id(),
+                        $existingObject->tableId(),
+                        $existingObject->sceneId(),
+                        $existingObject->kind(),
+                        $existingObject->category(),
+                        $x,
+                        $y,
+                        $rotation,
+                        $scale,
+                        $existingObject->state(),
+                        $existingObject->properties()
+                    ));
+                    $sceneObjectPlacementNotice = 'Furniture adjusted. Pippin has reluctantly redrawn the floor plan.';
+                }
+            }
+        }
     }
 }
 
@@ -1559,31 +1636,17 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                     </details>
                 <?php endif; ?>
 
-                    <p
-                        class="gmrt-cartographer-status"
-                        data-cartographer-status
-                        role="status"
-                        aria-live="polite"
-                    >
-                        Battlemap artwork may be changed without moving tokens
-                        or changing the rules grid.
-                    </p>
-                        </div>
-                    </details>
-                <?php endif; ?>
-
-                <?php if ($state !== null && $state->isDungeonMaster() && is_array($scene)) : ?>
                     <section
                         class="gmrt-furniture-palette"
                         data-furniture-palette
-                        data-scene-object-nonce="<?php echo esc_attr(wp_create_nonce('gmrt_scene_object_place')); ?>"
+                        data-scene-object-nonce="<?php echo esc_attr(wp_create_nonce('gmrt_scene_object_author')); ?>"
                         aria-labelledby="gmrt-furniture-palette-title"
                     >
                         <header class="gmrt-furniture-palette__heading">
                             <span class="gmrt-furniture-palette__mark" aria-hidden="true">▦</span>
                             <div>
                                 <strong id="gmrt-furniture-palette-title">The Keeper's Furniture Palette</strong>
-                                <small>Choose a furnishing, then click the map to place it.</small>
+                                <small>Choose a furnishing to place, or select one already on the map to rearrange it.</small>
                             </div>
                         </header>
                         <div class="gmrt-furniture-palette__choices" role="group" aria-label="Furniture to place">
@@ -1602,10 +1665,34 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                             <?php endforeach; ?>
                             <button type="button" class="gmrt-furniture-palette__cancel" data-furniture-cancel disabled>Cancel placement</button>
                         </div>
+                        <div class="gmrt-furniture-editor" data-furniture-editor aria-label="Selected furniture controls">
+                            <strong data-furniture-selection>No furniture selected</strong>
+                            <span>Drag selected furniture on the map, or use the controls below.</span>
+                            <div class="gmrt-furniture-editor__tools">
+                                <button type="button" data-scene-object-rotate="-15" disabled>↶ Rotate</button>
+                                <button type="button" data-scene-object-rotate="15" disabled>Rotate ↷</button>
+                                <button type="button" data-scene-object-scale="-0.25" disabled>− Smaller</button>
+                                <button type="button" data-scene-object-scale="0.25" disabled>+ Larger</button>
+                                <button type="button" data-scene-object-duplicate disabled>Duplicate</button>
+                                <button type="button" class="gmrt-furniture-editor__delete" data-scene-object-remove disabled>Delete</button>
+                            </div>
+                        </div>
                         <p class="gmrt-furniture-palette__status" data-furniture-status role="status" aria-live="polite">
                             <?php echo esc_html($sceneObjectPlacementNotice !== '' ? $sceneObjectPlacementNotice : 'Pippin has sharpened the measuring pencil.'); ?>
                         </p>
                     </section>
+
+                    <p
+                        class="gmrt-cartographer-status"
+                        data-cartographer-status
+                        role="status"
+                        aria-live="polite"
+                    >
+                        Battlemap artwork may be changed without moving tokens
+                        or changing the rules grid.
+                    </p>
+                        </div>
+                    </details>
                 <?php endif; ?>
 
                 <div class="gmrt-board__lens-stage" data-lens-stage>
@@ -1749,7 +1836,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                         </div>
                     <?php endif; ?>
 
-                    <div class="gmrt-scene-object-layer" data-scene-object-layer aria-label="Scene furnishings">
+                    <div class="gmrt-scene-object-layer<?php echo $state->isDungeonMaster() ? ' is-keeper-editable' : ''; ?>" data-scene-object-layer aria-label="Scene furnishings">
                         <?php foreach ($sceneObjects as $sceneObject) :
                             $object = $sceneObject->toArray();
                             $objectProperties = is_array($object['properties'] ?? null) ? $object['properties'] : [];
@@ -1762,10 +1849,16 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                 class="gmrt-scene-object gmrt-scene-object--<?php echo esc_attr($objectKind); ?>"
                                 data-scene-object-id="<?php echo esc_attr((string) ($object['id'] ?? '')); ?>"
                                 data-scene-object-kind="<?php echo esc_attr($objectKind); ?>"
+                                data-scene-object-label="<?php echo esc_attr($objectLabel); ?>"
+                                data-scene-object-x="<?php echo esc_attr((string) ((float) ($object['x'] ?? 0))); ?>"
+                                data-scene-object-y="<?php echo esc_attr((string) ((float) ($object['y'] ?? 0))); ?>"
+                                data-scene-object-rotation="<?php echo esc_attr((string) ((int) ($object['rotation'] ?? 0))); ?>"
+                                data-scene-object-scale="<?php echo esc_attr((string) ((float) ($object['scale'] ?? 1))); ?>"
                                 data-mimic-capable="<?php echo ! empty($objectProperties['mimic_capable']) ? 'true' : 'false'; ?>"
                                 style="--gmrt-object-x: <?php echo esc_attr((string) ((float) ($object['x'] ?? 0) * 100)); ?>%; --gmrt-object-y: <?php echo esc_attr((string) ((float) ($object['y'] ?? 0) * 100)); ?>%; --gmrt-object-rotation: <?php echo esc_attr((string) ((int) ($object['rotation'] ?? 0))); ?>deg; --gmrt-object-scale: <?php echo esc_attr((string) ((float) ($object['scale'] ?? 1))); ?>; --gmrt-object-width-units: <?php echo esc_attr((string) $objectWidth); ?>; --gmrt-object-height-units: <?php echo esc_attr((string) $objectHeight); ?>;"
-                                role="img"
-                                aria-label="<?php echo esc_attr($objectLabel); ?>"
+                                role="<?php echo $state->isDungeonMaster() ? 'button' : 'img'; ?>"
+                                <?php if ($state->isDungeonMaster()) : ?>tabindex="0" aria-pressed="false"<?php endif; ?>
+                                aria-label="<?php echo esc_attr($objectLabel . ($state->isDungeonMaster() ? '. Select to rearrange.' : '')); ?>"
                                 title="<?php echo esc_attr($objectLabel); ?>"
                             ><span aria-hidden="true"></span></div>
                         <?php endforeach; ?>

@@ -1,5 +1,16 @@
 ## Phase IV.35.3A — Pippin Discovers the Table Is Nailed to the Floor
 
+## Phase IV.35.3B — Pippin Rearranges the Furniture
+
+- Moves the Keeper's Furniture Palette into the existing Dungeon Master Controls disclosure.
+- Makes individual Scene Objects Keeper-selectable while leaving empty battlefield space transparent to normal Lens/token/Fog interactions.
+- Adds drag-to-move with shared battlemap-aware pointer coordinates.
+- Adds rotate, scale, duplicate and delete controls for the selected furnishing.
+- Keeps every mutation Keeper-only, nonce-protected and pinned to the exact projected live or Behind-the-Curtain Scene.
+- Keeps Players read-only and preserves the existing Scene Object repository and Living Table refresh boundary.
+- Adds explicit regression coverage for the consolidated controls and complete rearrangement workflow.
+
+
 - Repairs the IV.35.2 browser placement path by giving armed furniture capture-phase `pointerdown` ownership of the battlefield, matching the proven Keeper light placement pattern.
 - Prevents Lens panning and later Fog/token/vision/cartography interactions from swallowing the furnishing gesture.
 - Routes furniture coordinates through the shared battlemap-aware pointer normalisation helper instead of measuring the outer board directly.

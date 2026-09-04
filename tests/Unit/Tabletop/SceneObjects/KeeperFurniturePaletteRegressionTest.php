@@ -29,7 +29,7 @@ final class KeeperFurniturePaletteRegressionTest extends TestCase
         $view = file_get_contents($this->root('app/Tabletop/Views/chamber.php'));
 
         self::assertStringContainsString('$state->isDungeonMaster()', $view);
-        self::assertStringContainsString("wp_verify_nonce(\$submittedNonce, 'gmrt_scene_object_place')", $view);
+        self::assertStringContainsString("wp_verify_nonce(\$submittedNonce, 'gmrt_scene_object_author')", $view);
         self::assertStringContainsString('hash_equals($projectedSceneId, $submittedSceneId)', $view);
         self::assertStringContainsString('new SceneObject(', $view);
         self::assertStringContainsString('data-furniture-palette', $view);
@@ -50,7 +50,7 @@ final class KeeperFurniturePaletteRegressionTest extends TestCase
         self::assertStringNotContainsString('setInterval(refreshSceneObjectLayer', $js);
     }
 
-    public function test_world_objects_render_below_tokens_and_editing_waits_for_the_next_phase(): void
+    public function test_world_objects_render_below_tokens_and_now_expose_keeper_editing_controls(): void
     {
         $view = file_get_contents($this->root('app/Tabletop/Views/chamber.php'));
         $css = file_get_contents($this->root('assets/css/tabletop.css'));

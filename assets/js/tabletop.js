@@ -309,12 +309,59 @@
     const furnitureStatus = document.querySelector('[data-furniture-status]');
     const furnitureCancel = document.querySelector('[data-furniture-cancel]');
     const furnitureButtons = Array.from(document.querySelectorAll('[data-furniture-kind]'));
+    const furnitureSelection = document.querySelector('[data-furniture-selection]');
+    const furnitureRotateButtons = Array.from(document.querySelectorAll('[data-scene-object-rotate]'));
+    const furnitureScaleButtons = Array.from(document.querySelectorAll('[data-scene-object-scale]'));
+    const furnitureDuplicate = document.querySelector('[data-scene-object-duplicate]');
+    const furnitureRemove = document.querySelector('[data-scene-object-remove]');
+    const sceneObjectLayer = document.querySelector('[data-scene-object-layer]');
+    const sceneObjectAuthoringUrl = window.location.toString();
+    let selectedSceneObjectId = '';
+    let sceneObjectDrag = null;
+    let sceneObjectBusy = false;
+
+    function sceneObjectElement(objectId) {
+        if (!objectId) return null;
+        return document.querySelector('[data-scene-object-id="' + CSS.escape(objectId) + '"]');
+    }
+
+    function setSceneObjectEditorEnabled(enabled) {
+        [...furnitureRotateButtons, ...furnitureScaleButtons].forEach((button) => {
+            button.disabled = !enabled;
+        });
+        if (furnitureDuplicate) furnitureDuplicate.disabled = !enabled;
+        if (furnitureRemove) furnitureRemove.disabled = !enabled;
+    }
+
+    function selectSceneObject(object) {
+        document.querySelectorAll('[data-scene-object-id]').forEach((candidate) => {
+            const selected = candidate === object;
+            candidate.classList.toggle('is-selected', selected);
+            if (candidate.getAttribute('role') === 'button') {
+                candidate.setAttribute('aria-pressed', selected ? 'true' : 'false');
+            }
+        });
+
+        selectedSceneObjectId = object?.dataset.sceneObjectId || '';
+        setSceneObjectEditorEnabled(Boolean(selectedSceneObjectId));
+
+        if (furnitureSelection) {
+            furnitureSelection.textContent = object
+                ? (object.dataset.sceneObjectLabel || 'Furniture') + ' selected'
+                : 'No furniture selected';
+        }
+    }
 
     function syncSceneObjectLayer(incomingDocument) {
         const currentLayer = document.querySelector('[data-scene-object-layer]');
         const incomingLayer = incomingDocument?.querySelector('[data-scene-object-layer]');
         if (!currentLayer || !incomingLayer) return;
         currentLayer.replaceChildren(...incomingLayer.childNodes);
+
+        if (selectedSceneObjectId) {
+            const restored = sceneObjectElement(selectedSceneObjectId);
+            selectSceneObject(restored);
+        }
     }
 
     async function refreshSceneObjectLayer() {
@@ -322,6 +369,37 @@
         const html = typeof data.html === 'string' ? data.html : '';
         if (!html) return;
         syncSceneObjectLayer(new DOMParser().parseFromString(html, 'text/html'));
+    }
+
+    async function submitSceneObjectAction(action, values = {}) {
+        if (!furniturePalette || sceneObjectBusy) return false;
+        sceneObjectBusy = true;
+
+        const body = new URLSearchParams();
+        body.set('gmrt_scene_object_action', action);
+        body.set('gmrt_scene_object_nonce', furniturePalette.dataset.sceneObjectNonce || '');
+        body.set('gmrt_scene_object_scene_id', projectedSceneId);
+        Object.entries(values).forEach(([key, value]) => body.set(key, String(value)));
+
+        try {
+            const response = await fetch(sceneObjectAuthoringUrl, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'},
+                body
+            });
+            if (!response.ok) throw new Error('Pippin could not rearrange that furnishing.');
+            const html = await response.text();
+            syncSceneObjectLayer(new DOMParser().parseFromString(html, 'text/html'));
+            return true;
+        } catch (error) {
+            if (furnitureStatus) {
+                furnitureStatus.textContent = error.message || 'Pippin could not rearrange that furnishing.';
+            }
+            return false;
+        } finally {
+            sceneObjectBusy = false;
+        }
     }
 
     function finishFurniturePlacement(message) {
@@ -337,6 +415,7 @@
 
     furnitureButtons.forEach((button) => {
         button.addEventListener('click', () => {
+            selectSceneObject(null);
             furniturePlacement = {
                 kind: String(button.dataset.furnitureKind || ''),
                 label: String(button.dataset.furnitureLabel || 'Furniture')
@@ -369,35 +448,146 @@
         event.stopImmediatePropagation();
 
         const point = coordinatesFromPointer(event);
-        const x = point.x;
-        const y = point.y;
-        const body = new URLSearchParams();
-        body.set('gmrt_scene_object_action', 'place');
-        body.set('gmrt_scene_object_nonce', furniturePalette.dataset.sceneObjectNonce || '');
-        body.set('gmrt_scene_object_scene_id', projectedSceneId);
-        body.set('gmrt_scene_object_kind', furniturePlacement.kind);
-        body.set('x', String(x));
-        body.set('y', String(y));
-
         const placedLabel = furniturePlacement.label;
-        try {
-            const furniturePlacementUrl = window.location.toString();
-            const response = await fetch(furniturePlacementUrl, {
-                method: 'POST',
-                credentials: 'same-origin',
-                headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'},
-                body
-            });
-            if (!response.ok) throw new Error('The furnishing could not be placed.');
-            const html = await response.text();
-            syncSceneObjectLayer(new DOMParser().parseFromString(html, 'text/html'));
+        const placed = await submitSceneObjectAction('place', {
+            gmrt_scene_object_kind: furniturePlacement.kind,
+            x: point.x,
+            y: point.y
+        });
+        if (placed) {
             finishFurniturePlacement(placedLabel + ' placed. Pippin has marked it on the map.');
-        } catch (error) {
-            if (furnitureStatus) {
-                furnitureStatus.textContent = error.message || 'The furnishing could not be placed.';
-            }
         }
     }, true);
+
+    // IV.35.3B — existing furnishings become Keeper-selectable without making the
+    // whole object layer intercept battlefield input. Only the object itself owns
+    // the pointer, so empty-map token/Lens interactions remain unchanged.
+    sceneObjectLayer?.addEventListener('pointerdown', (event) => {
+        if (!furniturePalette || furniturePlacement || event.button !== 0) return;
+        const object = event.target instanceof Element
+            ? event.target.closest('[data-scene-object-id]')
+            : null;
+        if (!object) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+        selectSceneObject(object);
+        sceneObjectDrag = {
+            id: object.dataset.sceneObjectId || '',
+            pointerId: event.pointerId,
+            object
+        };
+        object.classList.add('is-dragging');
+        object.setPointerCapture?.(event.pointerId);
+        board?.classList.add('is-furniture-moving');
+        if (furnitureStatus) {
+            furnitureStatus.textContent = 'Moving ' + (object.dataset.sceneObjectLabel || 'furniture') + ' — release to place it.';
+        }
+    });
+
+    window.addEventListener('pointermove', (event) => {
+        if (!sceneObjectDrag) return;
+        event.preventDefault();
+        const point = coordinatesFromPointer(event);
+        sceneObjectDrag.object.dataset.sceneObjectX = String(point.x);
+        sceneObjectDrag.object.dataset.sceneObjectY = String(point.y);
+        sceneObjectDrag.object.style.setProperty('--gmrt-object-x', String(point.x * 100) + '%');
+        sceneObjectDrag.object.style.setProperty('--gmrt-object-y', String(point.y * 100) + '%');
+    }, {passive: false});
+
+    window.addEventListener('pointerup', async (event) => {
+        if (!sceneObjectDrag || event.pointerId !== sceneObjectDrag.pointerId) return;
+        const drag = sceneObjectDrag;
+        sceneObjectDrag = null;
+        drag.object.classList.remove('is-dragging');
+        board?.classList.remove('is-furniture-moving');
+        drag.object.releasePointerCapture?.(event.pointerId);
+
+        const moved = await submitSceneObjectAction('move', {
+            gmrt_scene_object_id: drag.id,
+            x: drag.object.dataset.sceneObjectX || '0.5',
+            y: drag.object.dataset.sceneObjectY || '0.5'
+        });
+        if (moved && furnitureStatus) {
+            furnitureStatus.textContent = 'Furniture moved. Pippin has amended the floor plan.';
+        }
+    });
+
+    window.addEventListener('pointercancel', (event) => {
+        if (!sceneObjectDrag || event.pointerId !== sceneObjectDrag.pointerId) return;
+        sceneObjectDrag.object.classList.remove('is-dragging');
+        sceneObjectDrag = null;
+        board?.classList.remove('is-furniture-moving');
+        if (furnitureStatus) furnitureStatus.textContent = 'Furniture move cancelled.';
+    });
+
+    sceneObjectLayer?.addEventListener('keydown', (event) => {
+        if (!furniturePalette) return;
+        const object = event.target instanceof Element
+            ? event.target.closest('[data-scene-object-id]')
+            : null;
+        if (!object || !['Enter', ' '].includes(event.key)) return;
+        event.preventDefault();
+        selectSceneObject(object);
+    });
+
+    furnitureRotateButtons.forEach((button) => {
+        button.addEventListener('click', async () => {
+            const object = sceneObjectElement(selectedSceneObjectId);
+            if (!object) return;
+            const rotation = Number(object.dataset.sceneObjectRotation || 0)
+                + Number(button.dataset.sceneObjectRotate || 0);
+            const changed = await submitSceneObjectAction('rotate', {
+                gmrt_scene_object_id: selectedSceneObjectId,
+                rotation
+            });
+            if (changed && furnitureStatus) furnitureStatus.textContent = 'Furniture rotated. Pippin has rotated the paper too.';
+        });
+    });
+
+    furnitureScaleButtons.forEach((button) => {
+        button.addEventListener('click', async () => {
+            const object = sceneObjectElement(selectedSceneObjectId);
+            if (!object) return;
+            const scale = Math.max(0.5, Math.min(
+                2.5,
+                Number(object.dataset.sceneObjectScale || 1) + Number(button.dataset.sceneObjectScale || 0)
+            ));
+            const changed = await submitSceneObjectAction('scale', {
+                gmrt_scene_object_id: selectedSceneObjectId,
+                scale
+            });
+            if (changed && furnitureStatus) furnitureStatus.textContent = 'Furniture resized. Pippin disputes the new dimensions.';
+        });
+    });
+
+    furnitureDuplicate?.addEventListener('click', async () => {
+        if (!selectedSceneObjectId) return;
+        const changed = await submitSceneObjectAction('duplicate', {
+            gmrt_scene_object_id: selectedSceneObjectId
+        });
+        if (changed && furnitureStatus) furnitureStatus.textContent = 'Furniture duplicated. Pippin is counting again.';
+    });
+
+    furnitureRemove?.addEventListener('click', async () => {
+        if (!selectedSceneObjectId) return;
+        if (!window.confirm('Remove this furnishing from the Scene?')) return;
+        const objectId = selectedSceneObjectId;
+        const changed = await submitSceneObjectAction('delete', {
+            gmrt_scene_object_id: objectId
+        });
+        if (changed) {
+            selectSceneObject(null);
+            if (furnitureStatus) furnitureStatus.textContent = 'Furniture removed. Pippin has reclaimed the floor space.';
+        }
+    });
+
+    window.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && selectedSceneObjectId) {
+            selectSceneObject(null);
+            if (furnitureStatus) furnitureStatus.textContent = 'Furniture selection cleared.';
+        }
+    });
 
     async function replaceLifecycle(message) {
         const liveStatus = document.querySelector('#gmrt-tabletop-status');
