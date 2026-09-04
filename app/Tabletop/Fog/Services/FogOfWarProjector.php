@@ -9,6 +9,7 @@ use GreatMarketrealmTabletop\Tables\Tokens\Models\TableToken;
 use GreatMarketrealmTabletop\Tables\Tokens\Models\TableTokenType;
 use GreatMarketrealmTabletop\Tabletop\Fog\Models\FogOfWarState;
 use GreatMarketrealmTabletop\Tabletop\Light\Models\DroppedLight;
+use GreatMarketrealmTabletop\Tabletop\Light\Models\EnvironmentalLight;
 use GreatMarketrealmTabletop\Tabletop\Light\Models\MagicalLight;
 use GreatMarketrealmTabletop\Tabletop\SceneObjects\Repositories\WordPressSceneObjectRepository;
 use GreatMarketrealmTabletop\Tabletop\SceneObjects\SceneObjectVisionProjector;
@@ -120,7 +121,20 @@ final class FogOfWarProjector
             $sourceKind = 'carried';
             $brightFeet = 20;
             $dimFeet = 20;
-            if ($lightSource instanceof DroppedLight) {
+            if ($lightSource instanceof EnvironmentalLight) {
+                if (! $lightSource->lit()) {
+                    continue;
+                }
+
+                $sourceKind = 'environmental';
+                $brightFeet = $lightSource->brightFeet();
+                $dimFeet = $lightSource->dimFeet();
+                $lightSource = TableToken::create(
+                    $lightSource->id(), $lightSource->tableId(), $lightSource->sceneId(),
+                    $lightSource->label(), TableTokenType::OBJECT, 'environmental-' . $lightSource->kind(), null,
+                    $lightSource->x(), $lightSource->y(), 1, 1, 'visible', new DateTimeImmutable()
+                );
+            } elseif ($lightSource instanceof DroppedLight) {
                 $sourceKind = 'dropped';
                 $lightSource = TableToken::create(
                     $lightSource->id(), $lightSource->tableId(), $lightSource->sceneId(),
