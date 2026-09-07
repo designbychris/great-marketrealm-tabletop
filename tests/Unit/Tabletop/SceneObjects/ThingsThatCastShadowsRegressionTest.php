@@ -19,7 +19,7 @@ final class ThingsThatCastShadowsRegressionTest extends TestCase
 
         self::assertIsString($catalogue);
         self::assertStringContainsString('float $lightOcclusion', $catalogue);
-        self::assertStringContainsString("'light_occlusion' => max(0.0, min(1.0, $lightOcclusion))", $catalogue);
+        self::assertStringContainsString("'light_occlusion' => max(0.0, min(1.0, \$lightOcclusion))", $catalogue);
         self::assertStringContainsString("false,\n                0.15,", $catalogue);
         self::assertStringContainsString("false,\n                0.45,", $catalogue);
         self::assertStringContainsString("false,\n                0.55,", $catalogue);
