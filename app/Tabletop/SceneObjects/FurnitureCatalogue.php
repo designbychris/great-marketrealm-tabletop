@@ -30,6 +30,7 @@ final class FurnitureCatalogue
                 'half',
                 false,
                 0.45,
+                'none',
                 'A sturdy dungeon table. Number of legs not contractually guaranteed.'
             ),
             'chair' => $this->definition(
@@ -41,6 +42,7 @@ final class FurnitureCatalogue
                 'none',
                 false,
                 0.15,
+                'none',
                 'A suspiciously conventional place to sit.'
             ),
             'chest' => $this->definition(
@@ -52,6 +54,7 @@ final class FurnitureCatalogue
                 'half',
                 false,
                 0.55,
+                'open_close',
                 'Storage, treasure, or an extremely poor life decision.'
             ),
             'barrel' => $this->definition(
@@ -63,6 +66,7 @@ final class FurnitureCatalogue
                 'half',
                 false,
                 0.55,
+                'none',
                 'A stout barrel for provisions, brine, or ominous silence.'
             ),
             'crate' => $this->definition(
@@ -74,6 +78,7 @@ final class FurnitureCatalogue
                 'three_quarters',
                 false,
                 0.70,
+                'none',
                 'A stackable wooden crate with absolutely no promises about contents.'
             ),
             'bookshelf' => $this->definition(
@@ -85,6 +90,7 @@ final class FurnitureCatalogue
                 'full',
                 true,
                 1.00,
+                'none',
                 'A shelf of books, ledgers, maps and future bad ideas.'
             ),
         ];
@@ -107,6 +113,7 @@ final class FurnitureCatalogue
         string $cover,
         bool $blocksVision,
         float $lightOcclusion,
+        string $interaction,
         string $description
     ): array {
         return [
@@ -119,6 +126,9 @@ final class FurnitureCatalogue
             'cover' => $cover,
             'blocks_vision' => $blocksVision,
             'light_occlusion' => max(0.0, min(1.0, $lightOcclusion)),
+            'interaction' => in_array($interaction, ['none', 'open_close'], true)
+                ? $interaction
+                : 'none',
             'mimic_capable' => true,
         ];
     }

@@ -915,3 +915,5 @@ Carry Session recap evidence and character-attributed deeds across the Tabletop 
 - IV.35.4C.2 — Light Finds Another Way: Scene Object light occlusion now attenuates the existing authoritative illumination pipeline; strongest surviving light wins. 🕯️🌑
 
 - [x] IV.35.4C.3 — The Flames Begin to Dance: animated pixel emitters for Keeper lights; authoritative illumination remains unchanged. 🔥
+
+- [x] IV.35.5 — Please Do Not Open the Chest: persistent interactive Scene Object state begins with Keeper-controlled open/close Chests. 📦

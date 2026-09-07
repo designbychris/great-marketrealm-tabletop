@@ -1207,3 +1207,5 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - IV.35.4C.2B — Pippin Measures the Shadow Twice: aligned Scene Object light/vision geometry with Fog grid-reference calibration and hardened environmental source visibility.
 
 - IV.35.4C.3 — The Flames Begin to Dance: Keeper environmental lights now use stepped SNES-style emitter animation, pixel embers/sparks and restrained visual-only glow breathing with reduced-motion support.
+
+- IV.35.5 — Please Do Not Open the Chest: added persistent Scene Object interaction state with Keeper-controlled open/close Chests and pixel open-state presentation.

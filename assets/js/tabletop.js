@@ -314,6 +314,7 @@
     const furnitureRotateButtons = Array.from(document.querySelectorAll('[data-scene-object-rotate]'));
     const furnitureScaleButtons = Array.from(document.querySelectorAll('[data-scene-object-scale]'));
     const furnitureDuplicate = document.querySelector('[data-scene-object-duplicate]');
+    const furnitureInteract = document.querySelector('[data-scene-object-interact]');
     const furnitureRemove = document.querySelector('[data-scene-object-remove]');
     const sceneObjectLayer = document.querySelector('[data-scene-object-layer]');
     const sceneObjectAuthoringUrl = window.location.toString();
@@ -331,6 +332,14 @@
             button.disabled = !enabled;
         });
         if (furnitureDuplicate) furnitureDuplicate.disabled = !enabled;
+        if (furnitureInteract) {
+            const object = enabled ? sceneObjectElement(selectedSceneObjectId) : null;
+            const interaction = object?.dataset.sceneObjectInteraction || 'none';
+            furnitureInteract.disabled = !enabled || interaction === 'none';
+            furnitureInteract.textContent = interaction === 'open_close'
+                ? (object?.dataset.sceneObjectOpen === 'true' ? 'Close' : 'Open')
+                : 'Interact';
+        }
         if (furnitureRemove) furnitureRemove.disabled = !enabled;
     }
 
@@ -590,6 +599,21 @@
             });
             if (changed && furnitureStatus) furnitureStatus.textContent = 'Furniture resized. Pippin disputes the new dimensions.';
         });
+    });
+
+    furnitureInteract?.addEventListener('click', async () => {
+        const object = sceneObjectElement(selectedSceneObjectId);
+        if (!object || (object.dataset.sceneObjectInteraction || 'none') === 'none') return;
+        const changed = await submitSceneObjectAction('interact', {
+            gmrt_scene_object_id: selectedSceneObjectId
+        });
+        if (changed && furnitureStatus) {
+            const restored = sceneObjectElement(selectedSceneObjectId);
+            const isOpen = restored?.dataset.sceneObjectOpen === 'true';
+            furnitureStatus.textContent = isOpen
+                ? 'Chest opened. Pippin has taken three prudent steps backwards.'
+                : 'Chest closed. Pippin is pretending this solves the problem.';
+        }
     });
 
     furnitureDuplicate?.addEventListener('click', async () => {

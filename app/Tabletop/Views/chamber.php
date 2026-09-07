@@ -79,7 +79,9 @@ if (
                     $y,
                     0,
                     1.0,
-                    [],
+                    [
+                        'open' => false,
+                    ],
                     [
                         'label' => (string) ($definition['label'] ?? ucfirst($kind)),
                         'width_units' => (float) ($definition['width_units'] ?? 1.0),
@@ -88,6 +90,7 @@ if (
                         'cover' => (string) ($definition['cover'] ?? 'none'),
                         'blocks_vision' => ! empty($definition['blocks_vision']),
                         'light_occlusion' => max(0.0, min(1.0, (float) ($definition['light_occlusion'] ?? 0.0))),
+                        'interaction' => (string) ($definition['interaction'] ?? 'none'),
                         'mimic_capable' => ! empty($definition['mimic_capable']),
                     ]
                 ));
@@ -129,6 +132,35 @@ if (
                         $existingObject->properties()
                     ));
                     $sceneObjectPlacementNotice = 'Furniture duplicated. Pippin now has two measurements to worry about.';
+                } elseif ($sceneObjectAction === 'interact') {
+                    $definition = $furnitureCatalogue->find($existingObject->kind()) ?? [];
+                    $properties = $existingObject->properties();
+                    $interaction = sanitize_key((string) (
+                        $properties['interaction']
+                        ?? ($definition['interaction'] ?? 'none')
+                    ));
+
+                    if ($interaction === 'open_close') {
+                        $state = $existingObject->state();
+                        $state['open'] = empty($state['open']);
+
+                        $sceneObjectRepository->save(new SceneObject(
+                            $existingObject->id(),
+                            $existingObject->tableId(),
+                            $existingObject->sceneId(),
+                            $existingObject->kind(),
+                            $existingObject->category(),
+                            $existingObject->x(),
+                            $existingObject->y(),
+                            $existingObject->rotation(),
+                            $existingObject->scale(),
+                            $state,
+                            $properties
+                        ));
+                        $sceneObjectPlacementNotice = $state['open']
+                            ? 'Chest opened. Pippin has taken three prudent steps backwards.'
+                            : 'Chest closed. Pippin is pretending this solves the problem.';
+                    }
                 } elseif (in_array($sceneObjectAction, ['move', 'rotate', 'scale'], true)) {
                     $x = $existingObject->x();
                     $y = $existingObject->y();
@@ -1688,6 +1720,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                 <button type="button" data-scene-object-scale="-0.25" disabled>− Smaller</button>
                                 <button type="button" data-scene-object-scale="0.25" disabled>+ Larger</button>
                                 <button type="button" data-scene-object-duplicate disabled>Duplicate</button>
+                                <button type="button" data-scene-object-interact disabled>Interact</button>
                                 <button type="button" class="gmrt-furniture-editor__delete" data-scene-object-remove disabled>Delete</button>
                             </div>
                         </div>
@@ -1873,9 +1906,18 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                 $objectProperties['light_occlusion']
                                 ?? ($objectDefinition['light_occlusion'] ?? 0.0)
                             )));
+                            $objectState = is_array($object['state'] ?? null) ? $object['state'] : [];
+                            $objectOpen = ! empty($objectState['open']);
+                            $objectInteraction = sanitize_key((string) (
+                                $objectProperties['interaction']
+                                ?? ($objectDefinition['interaction'] ?? 'none')
+                            ));
+                            if (! in_array($objectInteraction, ['none', 'open_close'], true)) {
+                                $objectInteraction = 'none';
+                            }
                         ?>
                             <div
-                                class="gmrt-scene-object gmrt-scene-object--<?php echo esc_attr($objectKind); ?>"
+                                class="gmrt-scene-object gmrt-scene-object--<?php echo esc_attr($objectKind); ?><?php echo $objectOpen ? ' is-open' : ' is-closed'; ?>"
                                 data-scene-object-id="<?php echo esc_attr((string) ($object['id'] ?? '')); ?>"
                                 data-scene-object-kind="<?php echo esc_attr($objectKind); ?>"
                                 data-scene-object-label="<?php echo esc_attr($objectLabel); ?>"
@@ -1889,6 +1931,8 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                 data-object-cover="<?php echo esc_attr($objectCover); ?>"
                                 data-blocks-vision="<?php echo $objectBlocksVision ? 'true' : 'false'; ?>"
                                 data-light-occlusion="<?php echo esc_attr((string) $objectLightOcclusion); ?>"
+                                data-scene-object-interaction="<?php echo esc_attr($objectInteraction); ?>"
+                                data-scene-object-open="<?php echo $objectOpen ? 'true' : 'false'; ?>"
                                 data-mimic-capable="<?php echo ! empty($objectProperties['mimic_capable']) ? 'true' : 'false'; ?>"
                                 style="--gmrt-object-x: <?php echo esc_attr((string) ((float) ($object['x'] ?? 0) * 100)); ?>%; --gmrt-object-y: <?php echo esc_attr((string) ((float) ($object['y'] ?? 0) * 100)); ?>%; --gmrt-object-rotation: <?php echo esc_attr((string) ((int) ($object['rotation'] ?? 0))); ?>deg; --gmrt-object-scale: <?php echo esc_attr((string) ((float) ($object['scale'] ?? 1))); ?>; --gmrt-object-width-units: <?php echo esc_attr((string) $objectWidth); ?>; --gmrt-object-height-units: <?php echo esc_attr((string) $objectHeight); ?>;"
                                 role="<?php echo $state->isDungeonMaster() ? 'button' : 'img'; ?>"
