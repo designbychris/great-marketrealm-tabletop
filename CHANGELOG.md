@@ -1221,3 +1221,5 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - IV.35.8.1 — The Ottoman Regains Its Colour: preserves safe Inkscape SVG fill/stroke presentation by promoting approved inline style declarations to sanitised SVG attributes while continuing to reject active CSS and external references.
 
 - IV.35.8A — Pippin Reads the Labels: custom furniture gains controlled Forge room/environment labels; Dungeon Forge deterministically selects sparse opted-in custom accents while preserving all existing clearance and Scene Object rules.
+
+- IV.35.8A.1 — Administration Actually Files the Form: Furniture Catalogue POST actions gain a defensive admin_init dispatcher that reuses the existing nonce/capability-protected handlers when admin-post dispatch fails to return to the catalogue.

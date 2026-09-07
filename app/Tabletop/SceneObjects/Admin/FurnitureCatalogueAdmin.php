@@ -25,8 +25,30 @@ final class FurnitureCatalogueAdmin
     public function register(): void
     {
         add_action('admin_menu', [$this, 'menu']);
+
+        // Keep the normal WordPress admin-post boundary, but also register a
+        // defensive admin_init dispatcher. Some hosting stacks can reach
+        // admin-post.php without our named action completing its redirect;
+        // admin_init runs earlier in that request and gives the Catalogue a
+        // reliable, nonce-protected chance to claim its own form submission.
+        add_action('admin_init', [$this, 'dispatchPostedAction']);
         add_action('admin_post_gmrt_save_custom_furniture', [$this, 'save']);
         add_action('admin_post_gmrt_delete_custom_furniture', [$this, 'delete']);
+    }
+
+    public function dispatchPostedAction(): void
+    {
+        if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
+            return;
+        }
+
+        $action = sanitize_key((string) ($_POST['action'] ?? ''));
+        if ($action === 'gmrt_save_custom_furniture') {
+            $this->save();
+        }
+        if ($action === 'gmrt_delete_custom_furniture') {
+            $this->delete();
+        }
     }
 
     public function menu(): void
