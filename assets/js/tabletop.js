@@ -348,10 +348,9 @@
         if (furnitureMimic) {
             const object = enabled ? sceneObjectElement(selectedSceneObjectId) : null;
             const capable = object?.dataset.mimicCapable === 'true';
-            const armed = object?.dataset.mimicArmed === 'true';
             furnitureMimic.disabled = !enabled || !capable;
-            furnitureMimic.textContent = armed ? 'Remove Mimic Conversion' : '⚠ Convert to Mimic';
-            furnitureMimic.title = armed && object?.dataset.mimicName ? `Secretly ${object.dataset.mimicName}` : '';
+            furnitureMimic.textContent = '⚠ Convert to Mimic';
+            furnitureMimic.title = '';
         }
         if (furnitureRemove) furnitureRemove.disabled = !enabled;
     }
@@ -629,15 +628,9 @@
         }
     });
 
-    furnitureMimic?.addEventListener('click', async () => {
+    furnitureMimic?.addEventListener('click', () => {
         const object = sceneObjectElement(selectedSceneObjectId);
         if (!object || object.dataset.mimicCapable !== 'true') return;
-        if (object.dataset.mimicArmed === 'true') {
-            if (!window.confirm('Remove this Mimic conversion? The furnishing itself will remain.')) return;
-            const changed = await submitSceneObjectAction('remove_mimic', {gmrt_scene_object_id: selectedSceneObjectId});
-            if (changed && furnitureStatus) furnitureStatus.textContent = 'Mimic conversion removed. Pippin remains suspicious.';
-            return;
-        }
         if (mimicCreature) mimicCreature.value = '';
         mimicDialog?.showModal();
     });
@@ -653,11 +646,10 @@
             gmrt_scene_object_id: selectedSceneObjectId,
             gmrt_mimic_creature_id: creatureId
         });
-        if (changed && furnitureStatus) {
-            const restored = sceneObjectElement(selectedSceneObjectId);
-            furnitureStatus.textContent = restored?.dataset.mimicName
-                ? `${restored.dataset.sceneObjectLabel || 'Furniture'} is secretly ${restored.dataset.mimicName}.`
-                : 'Mimic conversion stored. It continues to look completely innocent.';
+        if (changed) {
+            const message = 'The furniture was a Mimic. Pippin would like the record to show that he objected.';
+            if (furnitureStatus) furnitureStatus.textContent = message;
+            await replaceChamber(message, null);
         }
     });
 

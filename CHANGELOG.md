@@ -1235,3 +1235,5 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - IV.35.8D — Pippin Draws the Way Home: Keeper-controlled persistent Scene routes link one Atlas Scene to another and reuse the destination Party Arrival Threshold for arrival.
 
 - IV.35.9 — Convert to Mimic: mimic-capable Scene Objects can be secretly bound to real Bestiary definitions while retaining their innocent appearance.
+
+- IV.35.9A — The Furniture Stops Pretending: Convert to Mimic now filters to Mimic Bestiary records, deploys the selected Mimic at the furniture position, removes the furniture only after successful deployment, and gives the warning dialog a MarketRealm treatment.

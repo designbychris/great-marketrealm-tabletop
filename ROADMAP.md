@@ -936,3 +936,5 @@ Carry Session recap evidence and character-attributed deeds across the Tabletop 
 - [x] IV.35.8D — Pippin Draws the Way Home — persistent Keeper-controlled Scene Transition routes reuse Party Arrival Thresholds.
 
 - [x] IV.35.9 — Convert to Mimic — Keeper-only Bestiary-backed secret conversion for mimic-capable Scene Objects.
+
+- [x] IV.35.9A — The Furniture Stops Pretending — Mimic-only chooser and immediate Scene Object → Bestiary creature conversion.

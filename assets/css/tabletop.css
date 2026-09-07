@@ -6196,5 +6196,19 @@
 .gmrt-scene-transition select{width:100%}
 .gmrt-scene-transition__actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 
-/* IV.35.9 — Convert to Mimic */
-.gmrt-mimic-dialog{max-width:520px;padding:18px;border:2px solid currentColor}.gmrt-mimic-dialog::backdrop{background:rgba(0,0,0,.72)}.gmrt-mimic-dialog form{display:grid;gap:12px}.gmrt-mimic-dialog select{width:100%}.gmrt-mimic-dialog__actions{display:flex;gap:8px;flex-wrap:wrap}
+/* IV.35.9 / IV.35.9A — Convert to Mimic */
+.gmrt-mimic-dialog{
+    width:min(520px,calc(100vw - 32px));max-width:520px;padding:0;
+    color:#f4dfaa;background:#17140f;border:4px solid #6f5728;
+    box-shadow:0 0 0 3px #0b0906,8px 8px 0 rgba(0,0,0,.55);
+    font-family:inherit;
+}
+.gmrt-mimic-dialog::backdrop{background:rgba(5,4,3,.82)}
+.gmrt-mimic-dialog form{display:grid;gap:14px;padding:20px;background:linear-gradient(180deg,#211b12,#15120d)}
+.gmrt-mimic-dialog h3{margin:0;padding:10px 12px;color:#ffe3a0;background:#30230f;border:2px solid #9b7734;text-shadow:2px 2px 0 #000}
+.gmrt-mimic-dialog p{margin:0;line-height:1.5}
+.gmrt-mimic-dialog label{display:grid;gap:7px;color:#f0d28a;font-weight:700}
+.gmrt-mimic-dialog select{width:100%;padding:8px;color:#f8e8b8;background:#0e0d0a;border:2px solid #a77d2c;box-shadow:inset 0 0 0 2px #30230f}
+.gmrt-mimic-dialog__actions{display:flex;gap:10px;flex-wrap:wrap;padding-top:4px}
+.gmrt-mimic-dialog__actions button{padding:8px 14px;color:#f7e2aa;background:#241c10;border:2px solid #8e6c30;box-shadow:2px 2px 0 #070605;font:inherit;font-weight:700}
+.gmrt-mimic-dialog__actions button:hover,.gmrt-mimic-dialog__actions button:focus-visible{background:#3a2a12;outline:2px solid #d5a94b;outline-offset:2px}
