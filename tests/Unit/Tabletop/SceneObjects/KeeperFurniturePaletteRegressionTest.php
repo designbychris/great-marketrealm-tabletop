@@ -13,14 +13,14 @@ final class KeeperFurniturePaletteRegressionTest extends TestCase
         return dirname(__DIR__, 4) . '/' . ltrim($path, '/');
     }
 
-    public function test_palette_registers_the_first_six_furnishings_and_every_one_can_become_a_mimic(): void
+    public function test_palette_registers_the_marketrealm_furnishings_and_every_one_can_become_a_mimic(): void
     {
         $catalogue = file_get_contents($this->root('app/Tabletop/SceneObjects/FurnitureCatalogue.php'));
 
         foreach (['table', 'chair', 'chest', 'barrel', 'crate', 'bookshelf'] as $kind) {
             self::assertStringContainsString("'{$kind}' =>", $catalogue);
         }
-        self::assertSame(6, substr_count($catalogue, '$this->definition('));
+        self::assertSame(16, substr_count($catalogue, '$this->definition('));
         self::assertStringContainsString("'mimic_capable' => true", $catalogue);
     }
 
