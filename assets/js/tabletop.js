@@ -3389,7 +3389,18 @@
     const dungeonForgeSceneType = document.querySelector('[data-dungeon-forge-scene-type]');
     const dungeonForgeStyle = document.querySelector('[data-dungeon-forge-style]');
     const dungeonForgeTheme = document.querySelector('[data-dungeon-forge-theme]');
+    const updateDungeonForgeLairAvailability = () => {
+        if (!dungeonForgeLair) return;
+        const allowed = String(dungeonForgeSceneType?.value || 'dungeon') === 'dungeon'
+            && String(dungeonForgeStyle?.value || 'standard') === 'grand';
+        dungeonForgeLair.disabled = !allowed;
+        if (!allowed) dungeonForgeLair.checked = false;
+    };
+    dungeonForgeSceneType?.addEventListener('change', updateDungeonForgeLairAvailability);
+    dungeonForgeStyle?.addEventListener('change', updateDungeonForgeLairAvailability);
+    updateDungeonForgeLairAvailability();
     const dungeonForgeEntry = document.querySelector('[data-dungeon-forge-entry]');
+    const dungeonForgeLair = document.querySelector('[data-dungeon-forge-lair]');
     const dungeonForgeGenerate = document.querySelector('[data-dungeon-forge-generate]');
     const dungeonForgeReroll = document.querySelector('[data-dungeon-forge-reroll]');
     const dungeonForgeBuild = document.querySelector('[data-dungeon-forge-build]');
@@ -3728,7 +3739,7 @@
     };
 
     // Legacy IV.30.2 source contract: generateDungeonForgePlan = (seed, style)
-    const generateDungeonForgePlan = (seed, style, theme = 'pantry-stone', preferredAspect = null, entryMode = 'none') => {
+    const generateDungeonForgePlan = (seed, style, theme = 'pantry-stone', preferredAspect = null, entryMode = 'none', includeBossLair = false) => {
         const presets = {
             compact: { cols:24, rooms:6, min:3, max:6 },
             standard: { cols:32, rooms:9, min:4, max:7 },
@@ -3744,6 +3755,17 @@
         const random = forgeRandom(`${seed}|${style}`);
         const integer = (min, max) => min + Math.floor(random() * ((max - min) + 1));
         const rooms = [];
+        const wantsBossLair = style === 'grand' && includeBossLair === true;
+
+        // IV.35.8C — reserve the boss chamber before ordinary packing so the
+        // largest map always has a genuinely large, combat-ready room.
+        if (wantsBossLair) {
+            const lairW = Math.max(10, Math.min(14, Math.floor(cols * .32)));
+            const lairH = Math.max(8, Math.min(11, Math.floor(rows * .34)));
+            const lairX = forgeHash(`${seed}|lair-x`) % 2 === 0 ? 2 : Math.max(2, cols - lairW - 2);
+            const lairY = 2 + (forgeHash(`${seed}|lair-y`) % Math.max(1, rows - lairH - 3));
+            rooms.push({ x:lairX, y:lairY, w:lairW, h:lairH, role:'lair', boss_lair:true });
+        }
 
         for (let attempt = 0; attempt < 500 && rooms.length < preset.rooms; attempt += 1) {
             const w = integer(preset.min, preset.max);
@@ -3969,7 +3991,7 @@
         return {version:3,scene_type:'village',seed,style,theme,cols,rows,floor,rooms,doors,barriers,lights,features};
     };
 
-    const generateSceneForgePlan = (sceneType, seed, style, theme = 'pantry-stone', preferredAspect = null, entryMode = 'none') => {
+    const generateSceneForgePlan = (sceneType, seed, style, theme = 'pantry-stone', preferredAspect = null, entryMode = 'none', includeBossLair = false) => {
         const mode=forgeEntryMode(entryMode);
         if (sceneType === 'forest' || sceneType === 'village') {
             const plan=sceneType === 'forest'
@@ -3984,7 +4006,7 @@
             plan.version=4;
             return plan;
         }
-        return generateDungeonForgePlan(seed, style, theme, preferredAspect, mode);
+        return generateDungeonForgePlan(seed, style, theme, preferredAspect, mode, includeBossLair);
     };
 
     const setForgeStatus = (message) => {
@@ -4002,7 +4024,7 @@
         const style = String(dungeonForgeStyle?.value || 'standard');
         const theme = String(dungeonForgeTheme?.value || 'pantry-stone');
         const entryMode = forgeEntryMode(dungeonForgeEntry?.value || 'none');
-        dungeonForgeDraft = generateSceneForgePlan(sceneType, seed, style, theme, null, entryMode);
+        dungeonForgeDraft = generateSceneForgePlan(sceneType, seed, style, theme, null, entryMode, Boolean(dungeonForgeLair?.checked));
         renderDungeonForgePlan(dungeonForgeDraft, true);
         if (dungeonForgeBuild) dungeonForgeBuild.disabled = false;
         if (dungeonForgeClear) dungeonForgeClear.disabled = false;
@@ -4589,6 +4611,7 @@
     const atlasForgeSceneType = document.querySelector('[data-atlas-forge-scene-type]');
     const atlasForgeStyle = document.querySelector('[data-atlas-forge-style]');
     const atlasForgeEntry = document.querySelector('[data-atlas-forge-entry]');
+    const atlasForgeLair = document.querySelector('[data-atlas-forge-lair]');
     const atlasForgeTheme = document.querySelector('[data-atlas-forge-theme]');
     const atlasForgeReroll = document.querySelector('[data-atlas-forge-reroll]');
     const atlasForgeCreate = document.querySelector('[data-atlas-forge-create]');
@@ -4609,6 +4632,16 @@
         }
     };
     atlasForgeSceneType?.addEventListener('change', () => updatePippinFieldNote(String(atlasForgeSceneType.value || 'dungeon')));
+    const updateAtlasForgeLairAvailability = () => {
+        if (!atlasForgeLair) return;
+        const allowed = String(atlasForgeSceneType?.value || 'dungeon') === 'dungeon'
+            && String(atlasForgeStyle?.value || 'standard') === 'grand';
+        atlasForgeLair.disabled = !allowed;
+        if (!allowed) atlasForgeLair.checked = false;
+    };
+    atlasForgeSceneType?.addEventListener('change', updateAtlasForgeLairAvailability);
+    atlasForgeStyle?.addEventListener('change', updateAtlasForgeLairAvailability);
+    updateAtlasForgeLairAvailability();
     const setAtlasOpen = (open) => setKeeperDrawerOpen('atlas', open);
 
     atlasForgeReroll?.addEventListener('click', () => {
@@ -4636,7 +4669,7 @@
         let plan;
         try {
             const aspectByStyle = { compact:.78, standard:.7, grand:.65 };
-            plan = generateSceneForgePlan(sceneType, seed, style, theme, aspectByStyle[style] || .7, entryMode);
+            plan = generateSceneForgePlan(sceneType, seed, style, theme, aspectByStyle[style] || .7, entryMode, Boolean(atlasForgeLair?.checked));
         } catch (error) {
             const message = error?.message || 'Pippin could not prepare that Scene plan.';
             if (atlasForgeStatus) atlasForgeStatus.textContent = message;

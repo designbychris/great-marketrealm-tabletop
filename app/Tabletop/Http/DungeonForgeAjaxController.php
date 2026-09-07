@@ -344,7 +344,15 @@ final class DungeonForgeAjaxController
             $y = max(0, min($rows - 1, (int) ($room['y'] ?? 0)));
             $w = max(2, min($cols - $x, (int) ($room['w'] ?? 2)));
             $h = max(2, min($rows - $y, (int) ($room['h'] ?? 2)));
-            $rooms[] = ['x' => $x, 'y' => $y, 'w' => $w, 'h' => $h];
+            $role = sanitize_key((string) ($room['role'] ?? ''));
+            if (! in_array($role, ['', 'lair'], true)) {
+                $role = '';
+            }
+            $rooms[] = [
+                'x' => $x, 'y' => $y, 'w' => $w, 'h' => $h,
+                'role' => $role,
+                'boss_lair' => $role === 'lair' && ! empty($room['boss_lair']),
+            ];
             if (count($rooms) > 24) break;
         }
         if (count($rooms) < 3) {

@@ -930,3 +930,5 @@ Carry Session recap evidence and character-attributed deeds across the Tabletop 
 - [x] IV.35.8A — Pippin Reads the Labels: custom furniture can be tagged with controlled room/environment labels and safely enters Pippin's deterministic furnishing pass when explicitly opted in. 🏷️🗺️
 
 - [x] IV.35.8B — Every Dungeon Needs a Door — optional Forge entrance/portal anchors with dynamic Party Arrival Threshold placement.
+
+- [x] IV.35.8C — Something Large Lives Here — optional Grand-Dungeon Boss Lair with semantic room role and combat-ready furnishing.

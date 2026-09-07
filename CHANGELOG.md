@@ -1227,3 +1227,5 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - IV.35.8B — Every Dungeon Needs a Door: Dungeon Forge gains optional Main entrance / Arrival portal anchors and wires them into the existing Party Arrival Threshold flow so arriving adventurers spawn at the generated way in.
 
 - IV.35.8B.1 — The Atlas Finds the Door: exposes None/Main entrance/Arrival portal in the Keeper's Atlas Generate Scene form and routes the choice through the shared certified Scene Forge entry pipeline.
+
+- IV.35.8C — Something Large Lives Here: Grand Dungeon Forge maps can reserve a semantic Boss Lair with a large combat floor, sparse perimeter furnishing, and a controlled `lair` custom-furniture label.

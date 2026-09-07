@@ -732,6 +732,10 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                     <option value="portal">Arrival portal</option>
                                 </select>
                             </label>
+                            <label data-atlas-forge-lair-wrap>
+                                Boss chamber
+                                <span><input type="checkbox" data-atlas-forge-lair disabled> Include Boss Lair <small>(Grand Dungeon only)</small></span>
+                            </label>
                             <label>
                                 Theme
                                 <select data-atlas-forge-theme>
@@ -1610,6 +1614,10 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                             <option value="entrance">Main entrance</option>
                                             <option value="portal">Arrival portal</option>
                                         </select>
+                                    </label>
+                                    <label data-dungeon-forge-lair-wrap>
+                                        Boss chamber
+                                        <span><input type="checkbox" data-dungeon-forge-lair disabled> Include Boss Lair <small>(Grand Dungeon only)</small></span>
                                     </label>
                                     <label>
                                         Theme

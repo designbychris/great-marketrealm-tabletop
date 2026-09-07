@@ -55,7 +55,10 @@ final class ForgeFurniturePlanner
                 continue;
             }
 
-            $role = $this->roomRole($sceneType, (int) $roomIndex, $seed);
+            $declaredRole = sanitize_key((string) ($room['role'] ?? ''));
+            $role = $declaredRole === 'lair'
+                ? 'lair'
+                : $this->roomRole($sceneType, (int) $roomIndex, $seed);
             $candidates = $this->candidatesForRole($role, $x, $y, $w, $h, $seed, (int) $roomIndex);
             $candidates = array_merge(
                 $candidates,
@@ -168,6 +171,13 @@ final class ForgeFurniturePlanner
         $longRotation = $w >= $h ? 0 : 90;
 
         $sets = [
+            // Boss chambers keep the centre clear for a large creature and the
+            // party. Furnishings hug the perimeter and remain deliberately sparse.
+            'lair' => [
+                ['kind' => 'crate', 'x' => $left, 'y' => $top, 'rotation' => 0],
+                ['kind' => 'barrel', 'x' => $right, 'y' => $bottom, 'rotation' => 0],
+                ['kind' => 'chest', 'x' => $right, 'y' => $top, 'rotation' => 0],
+            ],
             'mess' => [
                 ['kind' => 'table', 'x' => $cx, 'y' => $cy, 'rotation' => $longRotation],
                 ['kind' => 'bench', 'x' => $cx, 'y' => $cy + 1.15, 'rotation' => $longRotation],

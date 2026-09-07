@@ -122,7 +122,7 @@ final class FurnitureCatalogueAdmin
 
         $forgeTags = [];
         $allowedForgeTags = [
-            'mess', 'store', 'study', 'treasure', 'quarters', 'camp', 'cache',
+            'mess', 'store', 'study', 'treasure', 'quarters', 'camp', 'cache', 'lair',
             'dungeon', 'village', 'forest', 'outdoor', 'market',
         ];
         foreach (is_array($_POST['forge_tags'] ?? null) ? $_POST['forge_tags'] : [] as $tag) {
@@ -269,6 +269,7 @@ final class FurnitureCatalogueAdmin
                                 'quarters' => 'Quarters',
                                 'camp' => 'Camp',
                                 'cache' => 'Cache',
+                                'lair' => 'Boss lair',
                             ],
                             'Environment' => [
                                 'dungeon' => 'Dungeon',
