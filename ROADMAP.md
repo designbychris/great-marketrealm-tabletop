@@ -917,3 +917,5 @@ Carry Session recap evidence and character-attributed deeds across the Tabletop 
 - [x] IV.35.4C.3 — The Flames Begin to Dance: animated pixel emitters for Keeper lights; authoritative illumination remains unchanged. 🔥
 
 - [x] IV.35.5 — Please Do Not Open the Chest: persistent interactive Scene Object state begins with Keeper-controlled open/close Chests. 📦
+
+- [x] IV.35.4C.2C — The Walls Would Also Like a Say: wall/door-resolved authoritative light-cell presentation replaces unconstrained radius halos. 🧱🕯️

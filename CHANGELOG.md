@@ -1209,3 +1209,5 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - IV.35.4C.3 — The Flames Begin to Dance: Keeper environmental lights now use stepped SNES-style emitter animation, pixel embers/sparks and restrained visual-only glow breathing with reduced-motion support.
 
 - IV.35.5 — Please Do Not Open the Chest: added persistent Scene Object interaction state with Keeper-controlled open/close Chests and pixel open-state presentation.
+
+- IV.35.4C.2C — The Walls Would Also Like a Say: broad light pools now render from the existing barrier-resolved Fog illumination cells, preventing visual halo bleed through walls while preserving furniture attenuation and animated emitters.

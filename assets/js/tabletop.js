@@ -1791,6 +1791,34 @@
         const minRow = Math.floor((0 - offsetY) / size);
         const maxRow = Math.ceil((height - offsetY) / size);
 
+        // IV.35.4C.2C — the visible light pool itself is now painted from
+        // server-approved cells. FogCellMapper has already resolved walls,
+        // closed doors and other Vision Barriers before these cells arrive.
+        if (lightLayer) {
+            lightLayer.querySelectorAll('.gmrt-authoritative-light-cell').forEach((cell) => cell.remove());
+            const authoritativeLight = fogProjection.light_cells && typeof fogProjection.light_cells === 'object'
+                ? fogProjection.light_cells
+                : {};
+            Object.entries(authoritativeLight).forEach(([key, light]) => {
+                const match = /^(-?\d+):(-?\d+)$/.exec(String(key));
+                if (!match || !light || typeof light !== 'object') return;
+
+                const intensity = Math.max(0, Math.min(1, Number(light.intensity || 0)));
+                if (intensity <= 0.001) return;
+
+                const column = Number(match[1]);
+                const row = Number(match[2]);
+                const cell = document.createElement('span');
+                cell.className = 'gmrt-authoritative-light-cell is-' + (String(light.tone || 'warm') === 'cool' ? 'cool' : 'warm');
+                cell.style.left = `${offsetX + (column * size)}px`;
+                cell.style.top = `${offsetY + (row * size)}px`;
+                cell.style.width = `${size + 1}px`;
+                cell.style.height = `${size + 1}px`;
+                cell.style.setProperty('--gmrt-authoritative-light', String(intensity));
+                lightLayer.appendChild(cell);
+            });
+        }
+
         // IV.35.4C.2 — render the server-authoritative surviving light
         // transmission as pixel-cell shadowing. This is presentation only:
         // the server has already decided whether illumination survives.

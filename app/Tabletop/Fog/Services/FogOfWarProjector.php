@@ -40,6 +40,7 @@ final class FogOfWarProjector
         $sceneObjectVision = new SceneObjectVisionProjector();
         $sceneObjectLight = new SceneObjectLightOcclusionProjector();
         $lightTransmission = [];
+        $lightCells = [];
 
         // Scene Objects already persist by exact Table + Scene identity. The
         // Living Veil reads the same authoritative records rather than copying
@@ -168,7 +169,15 @@ final class FogOfWarProjector
             $mapper = new FogCellMapper();
             $lightRadius = max(1, (int) ceil(($brightFeet + $dimFeet) / 5));
             $illuminated = $mapper->visibleAround($scene, $lightSource, $barriers, $lightRadius);
-            $sharedVisible = array_values(array_intersect($illuminated, $viewerLineOfSight));
+            $sharedVisible = $dungeonMaster
+                ? $illuminated
+                : array_values(array_intersect($illuminated, $viewerLineOfSight));
+            $sourceCell = $mapper->cellFor($scene, $lightSource->x(), $lightSource->y());
+            $brightRadius = max(0, (int) ceil($brightFeet / 5));
+            $lightTone = (
+                $sourceKind === 'magical'
+                || ($sourceKind === 'environmental' && $environmentalKind === 'magical')
+            ) ? 'cool' : 'warm';
 
             // IV.35.4C.2 — Scene Objects attenuate the existing authoritative
             // illumination projection. Partial blockers leave a dimmed cell
@@ -197,11 +206,29 @@ final class FogOfWarProjector
 
                 if ($transmission > 1.0e-6) {
                     $survivingVisible[] = (string) $cellKey;
+
+                    if (preg_match('/^(-?\d+):(-?\d+)$/', (string) $cellKey, $cellParts)) {
+                        $column = (int) $cellParts[1];
+                        $row = (int) $cellParts[2];
+                        $distance = max(
+                            abs($column - $sourceCell['column']),
+                            abs($row - $sourceCell['row'])
+                        );
+                        $baseIntensity = $distance <= $brightRadius ? 1.0 : 0.55;
+                        $intensity = max(0.0, min(1.0, $baseIntensity * $transmission));
+                        $existingIntensity = (float) ($lightCells[(string) $cellKey]['intensity'] ?? 0.0);
+
+                        if ($intensity > $existingIntensity) {
+                            $lightCells[(string) $cellKey] = [
+                                'intensity' => $intensity,
+                                'tone' => $lightTone,
+                            ];
+                        }
+                    }
                 }
             }
             $visible = array_merge($visible, $survivingVisible);
 
-            $sourceCell = $mapper->cellFor($scene, $lightSource->x(), $lightSource->y());
             $sourceKey = FogCellMapper::key($sourceCell['column'], $sourceCell['row']);
             if (
                 $dungeonMaster
@@ -248,6 +275,7 @@ final class FogOfWarProjector
             'vision_origins' => $visionOrigins,
             'light_sources' => array_values($lightSources),
             'viewer_carried_light' => $ownLightSources !== [],
+            'light_cells' => $lightCells,
             'light_attenuation' => array_map(
                 static fn (float $transmission): float => max(0.0, min(1.0, 1.0 - $transmission)),
                 $lightTransmission

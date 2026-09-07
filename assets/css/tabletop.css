@@ -6053,3 +6053,65 @@
         transition: none;
     }
 }
+
+
+/* ==========================================================================
+   IV.35.4C.2C — The Walls Would Also Like a Say
+   The broad light pool is painted from authoritative barrier-resolved cells.
+   Source sprites retain only a compact local halo so no unconstrained radial
+   gradient can visually bleed through room walls.
+   ========================================================================== */
+
+.gmrt-authoritative-light-cell {
+    position: absolute;
+    z-index: 0;
+    pointer-events: none;
+    image-rendering: pixelated;
+    opacity: calc(.17 + (var(--gmrt-authoritative-light, 0) * .23));
+    box-shadow:
+        inset 0 0 5px rgba(255, 246, 205, calc(var(--gmrt-authoritative-light, 0) * .08));
+}
+
+.gmrt-authoritative-light-cell.is-warm {
+    background: rgba(255, 182, 72, calc(var(--gmrt-authoritative-light, 0) * .34));
+}
+.gmrt-authoritative-light-cell.is-cool {
+    background: rgba(180, 231, 255, calc(var(--gmrt-authoritative-light, 0) * .30));
+}
+
+/* The old environmental diameter remains available as projection metadata,
+   but it no longer controls a free-running visual circle. */
+.gmrt-carried-light.is-environmental {
+    width: 30px;
+    height: 30px;
+    aspect-ratio: auto;
+    background:
+        radial-gradient(circle, var(--gmrt-light-core) 0 18%, var(--gmrt-light-mid) 19% 48%, transparent 72%);
+    overflow: visible;
+}
+.gmrt-carried-light.is-environmental::after {
+    inset: 2px;
+    border-radius: 50%;
+}
+
+/* Preserve the magical emitter's cool local identity without restoring the
+   old room-crossing radius-sized gradient. */
+.gmrt-carried-light.is-environmental.is-magical {
+    background:
+        radial-gradient(circle, var(--gmrt-light-core) 0 18%, var(--gmrt-light-mid) 19% 48%, transparent 72%);
+}
+
+/* Attenuation remains above the approved light cell so furniture can dim a
+   wall-respecting pool rather than inventing visibility. */
+.gmrt-light-attenuation-cell {
+    z-index: 1;
+}
+.gmrt-carried-light {
+    z-index: 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gmrt-authoritative-light-cell {
+        transition: none;
+    }
+}
