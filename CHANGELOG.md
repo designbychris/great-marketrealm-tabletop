@@ -1201,3 +1201,5 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - Preserves server-authoritative Fog/LOS for the focused IV.35.4B.1 vision bridge and leaves light attenuation for IV.35.4C.
 
 - IV.35.4C.2 — Light Finds Another Way: wired Scene Object light occlusion into Living Veil illumination and added authoritative per-cell attenuation presentation.
+
+- IV.35.4C.2A — The Light Was There All Along: fixed attenuation-key rendering and restored viewer-safe Keeper light marker metadata/visibility.

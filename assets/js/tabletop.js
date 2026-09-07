@@ -1764,7 +1764,7 @@
                 ? fogProjection.light_attenuation
                 : {};
             Object.entries(attenuation).forEach(([key, amount]) => {
-                const match = /^(-?\\d+):(-?\\d+)$/.exec(String(key));
+                const match = /^(-?\d+):(-?\d+)$/.exec(String(key));
                 const opacity = Math.max(0, Math.min(1, Number(amount || 0)));
                 if (!match || opacity <= 0.001) return;
 

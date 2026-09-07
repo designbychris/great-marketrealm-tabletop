@@ -124,12 +124,18 @@ final class FogOfWarProjector
             $sourceKind = 'carried';
             $brightFeet = 20;
             $dimFeet = 20;
+            $environmentalKind = null;
+            $environmentalLabel = null;
+            $environmentalLit = null;
             if ($lightSource instanceof EnvironmentalLight) {
                 if (! $lightSource->lit()) {
                     continue;
                 }
 
                 $sourceKind = 'environmental';
+                $environmentalKind = $lightSource->kind();
+                $environmentalLabel = $lightSource->label();
+                $environmentalLit = $lightSource->lit();
                 $brightFeet = $lightSource->brightFeet();
                 $dimFeet = $lightSource->dimFeet();
                 $lightSource = TableToken::create(
@@ -197,7 +203,7 @@ final class FogOfWarProjector
 
             $sourceCell = $mapper->cellFor($scene, $lightSource->x(), $lightSource->y());
             $sourceKey = FogCellMapper::key($sourceCell['column'], $sourceCell['row']);
-            if ($dungeonMaster || in_array($sourceKey, $visible, true)) {
+            if ($dungeonMaster || in_array($sourceKey, $viewerLineOfSight, true)) {
                 $safeLightSources[] = [
                     'x' => $lightSource->x(),
                     'y' => $lightSource->y(),
@@ -207,6 +213,9 @@ final class FogOfWarProjector
                     'dim_light_feet' => $dimFeet,
                     'shared' => true,
                     'source_kind' => $sourceKind,
+                    'environmental_kind' => $environmentalKind,
+                    'label' => $environmentalLabel,
+                    'lit' => $environmentalLit,
                 ];
             }
         }
