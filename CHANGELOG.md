@@ -1199,3 +1199,5 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - Measures targeting lines against rotated/scaled furnishing footprints and reports the strongest intervening cover in the existing target status.
 - Keeps cover descriptive rather than silently changing Companion-certified attack or AC mechanics.
 - Preserves server-authoritative Fog/LOS for the focused IV.35.4B.1 vision bridge and leaves light attenuation for IV.35.4C.
+
+- IV.35.4C.2 — Light Finds Another Way: wired Scene Object light occlusion into Living Veil illumination and added authoritative per-cell attenuation presentation.

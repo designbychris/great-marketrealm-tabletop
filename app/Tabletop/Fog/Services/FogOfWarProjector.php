@@ -13,6 +13,7 @@ use GreatMarketrealmTabletop\Tabletop\Light\Models\EnvironmentalLight;
 use GreatMarketrealmTabletop\Tabletop\Light\Models\MagicalLight;
 use GreatMarketrealmTabletop\Tabletop\SceneObjects\Repositories\WordPressSceneObjectRepository;
 use GreatMarketrealmTabletop\Tabletop\SceneObjects\SceneObjectVisionProjector;
+use GreatMarketrealmTabletop\Tabletop\SceneObjects\SceneObjectLightOcclusionProjector;
 use DateTimeImmutable;
 
 defined('ABSPATH') || exit;
@@ -37,6 +38,8 @@ final class FogOfWarProjector
         $viewerLineOfSight = [];
         $sceneObjects = [];
         $sceneObjectVision = new SceneObjectVisionProjector();
+        $sceneObjectLight = new SceneObjectLightOcclusionProjector();
+        $lightTransmission = [];
 
         // Scene Objects already persist by exact Table + Scene identity. The
         // Living Veil reads the same authoritative records rather than copying
@@ -160,7 +163,37 @@ final class FogOfWarProjector
             $lightRadius = max(1, (int) ceil(($brightFeet + $dimFeet) / 5));
             $illuminated = $mapper->visibleAround($scene, $lightSource, $barriers, $lightRadius);
             $sharedVisible = array_values(array_intersect($illuminated, $viewerLineOfSight));
-            $visible = array_merge($visible, $sharedVisible);
+
+            // IV.35.4C.2 — Scene Objects attenuate the existing authoritative
+            // illumination projection. Partial blockers leave a dimmed cell
+            // visible; complete occlusion removes that light's contribution.
+            // Multiple lights use the strongest surviving transmission so a
+            // second lantern can genuinely "find another way" around an object.
+            $survivingVisible = [];
+            foreach ($sharedVisible as $cellKey) {
+                $target = $this->normalisedCellCentre($scene, (string) $cellKey);
+                if ($target === null) {
+                    continue;
+                }
+
+                $occlusion = $sceneObjectLight->occlusionBetween(
+                    $scene,
+                    ['x' => $lightSource->x(), 'y' => $lightSource->y()],
+                    $target,
+                    $sceneObjects
+                );
+                $transmission = max(0.0, min(1.0, 1.0 - $occlusion));
+
+                $lightTransmission[(string) $cellKey] = max(
+                    (float) ($lightTransmission[(string) $cellKey] ?? 0.0),
+                    $transmission
+                );
+
+                if ($transmission > 1.0e-6) {
+                    $survivingVisible[] = (string) $cellKey;
+                }
+            }
+            $visible = array_merge($visible, $survivingVisible);
 
             $sourceCell = $mapper->cellFor($scene, $lightSource->x(), $lightSource->y());
             $sourceKey = FogCellMapper::key($sourceCell['column'], $sourceCell['row']);
@@ -202,7 +235,42 @@ final class FogOfWarProjector
             'vision_origins' => $visionOrigins,
             'light_sources' => array_values($lightSources),
             'viewer_carried_light' => $ownLightSources !== [],
+            'light_attenuation' => array_map(
+                static fn (float $transmission): float => max(0.0, min(1.0, 1.0 - $transmission)),
+                $lightTransmission
+            ),
             'has_blockers' => $barriers !== [] || $sceneObjects !== [],
+        ];
+    }
+
+
+    /**
+     * Resolve a projected Fog cell key back to the normalised centre point
+     * used by Scene Object geometry.
+     *
+     * @return array{x:float,y:float}|null
+     */
+    private function normalisedCellCentre(TableScene $scene, string $cellKey): ?array
+    {
+        if (! preg_match('/^(-?\d+):(-?\d+)$/', $cellKey, $matches)) {
+            return null;
+        }
+
+        $column = (int) $matches[1];
+        $row = (int) $matches[2];
+        $referenceWidth = $scene->gridReferenceWidth();
+        $scale = $referenceWidth > 0
+            ? $scene->width() / $referenceWidth
+            : 1.0;
+        $size = max(1.0, $scene->gridSize() * $scale);
+        $offsetX = $scene->gridOffsetX() * $scale;
+        $offsetY = $scene->gridOffsetY() * $scale;
+        $width = max(1.0, (float) $scene->width());
+        $height = max(1.0, (float) $scene->height());
+
+        return [
+            'x' => max(0.0, min(1.0, ($offsetX + (($column + 0.5) * $size)) / $width)),
+            'y' => max(0.0, min(1.0, ($offsetY + (($row + 0.5) * $size)) / $height)),
         ];
     }
 

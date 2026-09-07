@@ -1755,6 +1755,32 @@
         const minRow = Math.floor((0 - offsetY) / size);
         const maxRow = Math.ceil((height - offsetY) / size);
 
+        // IV.35.4C.2 — render the server-authoritative surviving light
+        // transmission as pixel-cell shadowing. This is presentation only:
+        // the server has already decided whether illumination survives.
+        if (lightLayer) {
+            lightLayer.querySelectorAll('.gmrt-light-attenuation-cell').forEach((cell) => cell.remove());
+            const attenuation = fogProjection.light_attenuation && typeof fogProjection.light_attenuation === 'object'
+                ? fogProjection.light_attenuation
+                : {};
+            Object.entries(attenuation).forEach(([key, amount]) => {
+                const match = /^(-?\\d+):(-?\\d+)$/.exec(String(key));
+                const opacity = Math.max(0, Math.min(1, Number(amount || 0)));
+                if (!match || opacity <= 0.001) return;
+
+                const column = Number(match[1]);
+                const row = Number(match[2]);
+                const shadow = document.createElement('span');
+                shadow.className = 'gmrt-light-attenuation-cell';
+                shadow.style.left = `${offsetX + (column * size)}px`;
+                shadow.style.top = `${offsetY + (row * size)}px`;
+                shadow.style.width = `${size + 1}px`;
+                shadow.style.height = `${size + 1}px`;
+                shadow.style.setProperty('--gmrt-light-attenuation', String(opacity));
+                lightLayer.appendChild(shadow);
+            });
+        }
+
         const fragment = document.createDocumentFragment();
 
         for (let row = minRow; row < maxRow; row += 1) {
