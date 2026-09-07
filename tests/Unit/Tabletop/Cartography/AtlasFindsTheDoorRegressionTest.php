@@ -42,7 +42,7 @@ final class AtlasFindsTheDoorRegressionTest extends TestCase
         $js = $this->source('assets/js/tabletop.js');
 
         self::assertStringContainsString(
-            'generateSceneForgePlan(sceneType, seed, style, theme, aspectByStyle[style] || .7, entryMode)',
+            'generateSceneForgePlan(sceneType, seed, style, theme, aspectByStyle[style] || .7, entryMode, Boolean(atlasForgeLair?.checked))',
             $js
         );
     }
@@ -52,9 +52,9 @@ final class AtlasFindsTheDoorRegressionTest extends TestCase
         $js = $this->source('assets/js/tabletop.js');
 
         self::assertStringContainsString(
-            "const generateSceneForgePlan = (sceneType, seed, style, theme = 'pantry-stone', preferredAspect = null, entryMode = 'none') =>",
+            "const generateSceneForgePlan = (sceneType, seed, style, theme = 'pantry-stone', preferredAspect = null, entryMode = 'none', includeBossLair = false) =>",
             $js
         );
-        self::assertStringContainsString("return generateDungeonForgePlan(seed, style, theme, preferredAspect, mode);", $js);
+        self::assertStringContainsString("return generateDungeonForgePlan(seed, style, theme, preferredAspect, mode, includeBossLair);", $js);
     }
 }
