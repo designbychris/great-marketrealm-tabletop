@@ -71,7 +71,7 @@ final class PleaseDoNotOpenTheChestRegressionTest extends TestCase
         self::assertStringContainsString('.gmrt-scene-object--chest.is-open', $css);
         self::assertStringContainsString('--gmrt-chest-lid-lift: -5px', $css);
         self::assertStringContainsString('data-scene-object-open=', $view);
-        self::assertStringContainsString("$objectOpen ? 'true' : 'false'", $view);
+        self::assertStringContainsString('$objectOpen ? \'true\' : \'false\'', $view);
         self::assertStringContainsString('data-blocks-movement=', $view);
         self::assertStringContainsString('data-light-occlusion=', $view);
     }
