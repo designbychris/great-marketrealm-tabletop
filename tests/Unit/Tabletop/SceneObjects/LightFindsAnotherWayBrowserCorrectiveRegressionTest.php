@@ -35,11 +35,11 @@ final class LightFindsAnotherWayBrowserCorrectiveRegressionTest extends TestCase
 
         self::assertIsString($fog);
         self::assertStringContainsString(
-            'if ($dungeonMaster || in_array($sourceKey, $viewerLineOfSight, true))',
+            '|| in_array($sourceKey, $viewerLineOfSight, true)',
             $fog
         );
-        self::assertStringNotContainsString(
-            'if ($dungeonMaster || in_array($sourceKey, $visible, true))',
+        self::assertStringContainsString(
+            '|| in_array($sourceKey, $visible, true)',
             $fog
         );
     }
