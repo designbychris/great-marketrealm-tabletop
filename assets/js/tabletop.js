@@ -4588,6 +4588,7 @@
     const atlasForgeSeed = document.querySelector('[data-atlas-forge-seed]');
     const atlasForgeSceneType = document.querySelector('[data-atlas-forge-scene-type]');
     const atlasForgeStyle = document.querySelector('[data-atlas-forge-style]');
+    const atlasForgeEntry = document.querySelector('[data-atlas-forge-entry]');
     const atlasForgeTheme = document.querySelector('[data-atlas-forge-theme]');
     const atlasForgeReroll = document.querySelector('[data-atlas-forge-reroll]');
     const atlasForgeCreate = document.querySelector('[data-atlas-forge-create]');
@@ -4622,6 +4623,7 @@
         const sceneType = String(atlasForgeSceneType?.value || 'dungeon');
         const seed = String(atlasForgeSeed?.value || '').trim() || 'Peppercorn-01';
         const style = String(atlasForgeStyle?.value || 'standard');
+        const entryMode = forgeEntryMode(atlasForgeEntry?.value || 'none');
         const theme = String(atlasForgeTheme?.value || 'pantry-stone');
         if (!sceneName) {
             const message = 'Give Pippin a name for the new Scene first.';
@@ -4634,7 +4636,7 @@
         let plan;
         try {
             const aspectByStyle = { compact:.78, standard:.7, grand:.65 };
-            plan = generateSceneForgePlan(sceneType, seed, style, theme, aspectByStyle[style] || .7);
+            plan = generateSceneForgePlan(sceneType, seed, style, theme, aspectByStyle[style] || .7, entryMode);
         } catch (error) {
             const message = error?.message || 'Pippin could not prepare that Scene plan.';
             if (atlasForgeStatus) atlasForgeStatus.textContent = message;

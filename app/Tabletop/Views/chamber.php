@@ -725,6 +725,14 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                 </select>
                             </label>
                             <label>
+                                Way in
+                                <select data-atlas-forge-entry>
+                                    <option value="none" selected>None</option>
+                                    <option value="entrance">Main entrance</option>
+                                    <option value="portal">Arrival portal</option>
+                                </select>
+                            </label>
+                            <label>
                                 Theme
                                 <select data-atlas-forge-theme>
                                     <option value="pantry-stone" selected>Pantry Stone</option>
