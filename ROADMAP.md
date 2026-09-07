@@ -934,3 +934,5 @@ Carry Session recap evidence and character-attributed deeds across the Tabletop 
 - [x] IV.35.8C — Something Large Lives Here — optional Grand-Dungeon Boss Lair with semantic room role and combat-ready furnishing.
 
 - [x] IV.35.8D — Pippin Draws the Way Home — persistent Keeper-controlled Scene Transition routes reuse Party Arrival Thresholds.
+
+- [x] IV.35.9 — Convert to Mimic — Keeper-only Bestiary-backed secret conversion for mimic-capable Scene Objects.

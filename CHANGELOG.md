@@ -1233,3 +1233,5 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - IV.35.8C.2 — The Checkbox Awakens: declares the Dungeon Forge Boss Lair control before its availability initialiser runs, preventing a JavaScript temporal-dead-zone failure that left the Atlas checkbox disabled.
 
 - IV.35.8D — Pippin Draws the Way Home: Keeper-controlled persistent Scene routes link one Atlas Scene to another and reuse the destination Party Arrival Threshold for arrival.
+
+- IV.35.9 — Convert to Mimic: mimic-capable Scene Objects can be secretly bound to real Bestiary definitions while retaining their innocent appearance.

@@ -6195,3 +6195,6 @@
 .gmrt-scene-transition label{display:grid;gap:6px}
 .gmrt-scene-transition select{width:100%}
 .gmrt-scene-transition__actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+
+/* IV.35.9 — Convert to Mimic */
+.gmrt-mimic-dialog{max-width:520px;padding:18px;border:2px solid currentColor}.gmrt-mimic-dialog::backdrop{background:rgba(0,0,0,.72)}.gmrt-mimic-dialog form{display:grid;gap:12px}.gmrt-mimic-dialog select{width:100%}.gmrt-mimic-dialog__actions{display:flex;gap:8px;flex-wrap:wrap}

@@ -6,6 +6,7 @@ use GreatMarketrealmTabletop\Tables\Memberships\Models\TableColourPalette;
 use GreatMarketrealmTabletop\Tabletop\SceneObjects\FurnitureCatalogue;
 use GreatMarketrealmTabletop\Tabletop\SceneObjects\Models\SceneObject;
 use GreatMarketrealmTabletop\Tabletop\SceneObjects\Repositories\WordPressSceneObjectRepository;
+use GreatMarketrealmTabletop\Tabletop\Bestiary\Services\BestiaryRepositoryFactory;
 
 defined('ABSPATH') || exit;
 
@@ -25,6 +26,7 @@ $thresholds = $state?->thresholds() ?? [];
 $bestiary = $state?->bestiary() ?? [];
 $furnitureCatalogue = new FurnitureCatalogue();
 $sceneObjectRepository = new WordPressSceneObjectRepository();
+$bestiaryRepository = BestiaryRepositoryFactory::make();
 $sceneObjectPlacementNotice = '';
 
 /*
@@ -133,6 +135,43 @@ if (
                         $existingObject->properties()
                     ));
                     $sceneObjectPlacementNotice = 'Furniture duplicated. Pippin now has two measurements to worry about.';
+                } elseif ($sceneObjectAction === 'convert_mimic') {
+                    $properties = $existingObject->properties();
+                    $creatureId = isset($_POST['gmrt_mimic_creature_id'])
+                        ? sanitize_text_field(wp_unslash((string) $_POST['gmrt_mimic_creature_id']))
+                        : '';
+                    $creature = $creatureId !== '' ? $bestiaryRepository->find($creatureId) : null;
+                    if (empty($properties['mimic_capable'])) {
+                        $sceneObjectPlacementNotice = 'That furnishing cannot become a Mimic.';
+                    } elseif ($creature === null) {
+                        $sceneObjectPlacementNotice = 'Choose a creature from the Bestiary before ignoring Pippin’s advice.';
+                    } else {
+                        $objectState = $existingObject->state();
+                        $objectState['mimic'] = [
+                            'armed' => true,
+                            'revealed' => false,
+                            'creature_id' => $creature->id(),
+                            'creature_name' => $creature->name(),
+                        ];
+                        $sceneObjectRepository->save(new SceneObject(
+                            $existingObject->id(), $existingObject->tableId(), $existingObject->sceneId(),
+                            $existingObject->kind(), $existingObject->category(), $existingObject->x(), $existingObject->y(),
+                            $existingObject->rotation(), $existingObject->scale(), $objectState, $properties
+                        ));
+                        $sceneObjectPlacementNotice = sprintf(
+                            '%s is now secretly %s. It continues to look completely innocent.',
+                            (string) ($properties['label'] ?? 'Furniture'), $creature->name()
+                        );
+                    }
+                } elseif ($sceneObjectAction === 'remove_mimic') {
+                    $objectState = $existingObject->state();
+                    unset($objectState['mimic']);
+                    $sceneObjectRepository->save(new SceneObject(
+                        $existingObject->id(), $existingObject->tableId(), $existingObject->sceneId(),
+                        $existingObject->kind(), $existingObject->category(), $existingObject->x(), $existingObject->y(),
+                        $existingObject->rotation(), $existingObject->scale(), $objectState, $existingObject->properties()
+                    ));
+                    $sceneObjectPlacementNotice = 'Mimic conversion removed. Pippin remains suspicious.';
                 } elseif ($sceneObjectAction === 'interact') {
                     $definition = $furnitureCatalogue->find($existingObject->kind()) ?? [];
                     $properties = $existingObject->properties();
@@ -1774,9 +1813,30 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                 <button type="button" data-scene-object-scale="0.25" disabled>+ Larger</button>
                                 <button type="button" data-scene-object-duplicate disabled>Duplicate</button>
                                 <button type="button" data-scene-object-interact disabled>Interact</button>
+                                <button type="button" data-scene-object-mimic disabled>⚠ Convert to Mimic</button>
                                 <button type="button" class="gmrt-furniture-editor__delete" data-scene-object-remove disabled>Delete</button>
                             </div>
                         </div>
+                        <dialog class="gmrt-mimic-dialog" data-mimic-dialog>
+                            <form method="dialog">
+                                <h3>⚠ CONVERT TO MIMIC</h3>
+                                <p><em>This object will continue to look completely innocent.</em></p>
+                                <label>Choose Mimic from the Bestiary
+                                    <select data-mimic-creature>
+                                        <option value="">Choose a creature…</option>
+                                        <?php foreach ($bestiary as $creature) :
+                                            if (! is_array($creature) || empty($creature['id'])) continue; ?>
+                                            <option value="<?php echo esc_attr((string) $creature['id']); ?>"><?php echo esc_html((string) ($creature['name'] ?? 'Unknown creature')); ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </label>
+                                <p><strong>Pippin’s advice:</strong><br><strong>“Don’t.”</strong></p>
+                                <div class="gmrt-mimic-dialog__actions">
+                                    <button type="button" data-mimic-confirm>Convert</button>
+                                    <button type="button" data-mimic-cancel>Cancel</button>
+                                </div>
+                            </form>
+                        </dialog>
                         <p class="gmrt-furniture-palette__status" data-furniture-status role="status" aria-live="polite">
                             <?php echo esc_html($sceneObjectPlacementNotice !== '' ? $sceneObjectPlacementNotice : 'Pippin has sharpened the measuring pencil.'); ?>
                         </p>
@@ -1961,6 +2021,9 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                             )));
                             $objectState = is_array($object['state'] ?? null) ? $object['state'] : [];
                             $objectOpen = ! empty($objectState['open']);
+                            $objectMimic = is_array($objectState['mimic'] ?? null) ? $objectState['mimic'] : [];
+                            $objectMimicArmed = ! empty($objectMimic['armed']);
+                            $objectMimicName = (string) ($objectMimic['creature_name'] ?? '');
                             $objectInteraction = sanitize_key((string) (
                                 $objectProperties['interaction']
                                 ?? ($objectDefinition['interaction'] ?? 'none')
@@ -1991,6 +2054,8 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                 data-scene-object-interaction="<?php echo esc_attr($objectInteraction); ?>"
                                 data-scene-object-open="<?php echo $objectOpen ? 'true' : 'false'; ?>"
                                 data-mimic-capable="<?php echo ! empty($objectProperties['mimic_capable']) ? 'true' : 'false'; ?>"
+                                data-mimic-armed="<?php echo $objectMimicArmed ? 'true' : 'false'; ?>"
+                                data-mimic-name="<?php echo esc_attr($state->isDungeonMaster() ? $objectMimicName : ''); ?>"
                                 style="--gmrt-object-x: <?php echo esc_attr((string) ((float) ($object['x'] ?? 0) * 100)); ?>%; --gmrt-object-y: <?php echo esc_attr((string) ((float) ($object['y'] ?? 0) * 100)); ?>%; --gmrt-object-rotation: <?php echo esc_attr((string) ((int) ($object['rotation'] ?? 0))); ?>deg; --gmrt-object-scale: <?php echo esc_attr((string) ((float) ($object['scale'] ?? 1))); ?>; --gmrt-object-width-units: <?php echo esc_attr((string) $objectWidth); ?>; --gmrt-object-height-units: <?php echo esc_attr((string) $objectHeight); ?>;"
                                 role="<?php echo $state->isDungeonMaster() ? 'button' : 'img'; ?>"
                                 <?php if ($state->isDungeonMaster()) : ?>tabindex="0" aria-pressed="false"<?php endif; ?>

@@ -315,6 +315,11 @@
     const furnitureScaleButtons = Array.from(document.querySelectorAll('[data-scene-object-scale]'));
     const furnitureDuplicate = document.querySelector('[data-scene-object-duplicate]');
     const furnitureInteract = document.querySelector('[data-scene-object-interact]');
+    const furnitureMimic = document.querySelector('[data-scene-object-mimic]');
+    const mimicDialog = document.querySelector('[data-mimic-dialog]');
+    const mimicCreature = document.querySelector('[data-mimic-creature]');
+    const mimicConfirm = document.querySelector('[data-mimic-confirm]');
+    const mimicCancel = document.querySelector('[data-mimic-cancel]');
     const furnitureRemove = document.querySelector('[data-scene-object-remove]');
     const sceneObjectLayer = document.querySelector('[data-scene-object-layer]');
     const sceneObjectAuthoringUrl = window.location.toString();
@@ -339,6 +344,14 @@
             furnitureInteract.textContent = interaction === 'open_close'
                 ? (object?.dataset.sceneObjectOpen === 'true' ? 'Close' : 'Open')
                 : 'Interact';
+        }
+        if (furnitureMimic) {
+            const object = enabled ? sceneObjectElement(selectedSceneObjectId) : null;
+            const capable = object?.dataset.mimicCapable === 'true';
+            const armed = object?.dataset.mimicArmed === 'true';
+            furnitureMimic.disabled = !enabled || !capable;
+            furnitureMimic.textContent = armed ? 'Remove Mimic Conversion' : '⚠ Convert to Mimic';
+            furnitureMimic.title = armed && object?.dataset.mimicName ? `Secretly ${object.dataset.mimicName}` : '';
         }
         if (furnitureRemove) furnitureRemove.disabled = !enabled;
     }
@@ -613,6 +626,38 @@
             furnitureStatus.textContent = isOpen
                 ? 'Chest opened. Pippin has taken three prudent steps backwards.'
                 : 'Chest closed. Pippin is pretending this solves the problem.';
+        }
+    });
+
+    furnitureMimic?.addEventListener('click', async () => {
+        const object = sceneObjectElement(selectedSceneObjectId);
+        if (!object || object.dataset.mimicCapable !== 'true') return;
+        if (object.dataset.mimicArmed === 'true') {
+            if (!window.confirm('Remove this Mimic conversion? The furnishing itself will remain.')) return;
+            const changed = await submitSceneObjectAction('remove_mimic', {gmrt_scene_object_id: selectedSceneObjectId});
+            if (changed && furnitureStatus) furnitureStatus.textContent = 'Mimic conversion removed. Pippin remains suspicious.';
+            return;
+        }
+        if (mimicCreature) mimicCreature.value = '';
+        mimicDialog?.showModal();
+    });
+    mimicCancel?.addEventListener('click', () => mimicDialog?.close());
+    mimicConfirm?.addEventListener('click', async () => {
+        const creatureId = String(mimicCreature?.value || '');
+        if (!creatureId) {
+            if (furnitureStatus) furnitureStatus.textContent = 'Choose a creature from the Bestiary first.';
+            return;
+        }
+        mimicDialog?.close();
+        const changed = await submitSceneObjectAction('convert_mimic', {
+            gmrt_scene_object_id: selectedSceneObjectId,
+            gmrt_mimic_creature_id: creatureId
+        });
+        if (changed && furnitureStatus) {
+            const restored = sceneObjectElement(selectedSceneObjectId);
+            furnitureStatus.textContent = restored?.dataset.mimicName
+                ? `${restored.dataset.sceneObjectLabel || 'Furniture'} is secretly ${restored.dataset.mimicName}.`
+                : 'Mimic conversion stored. It continues to look completely innocent.';
         }
     });
 
