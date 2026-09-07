@@ -5845,3 +5845,172 @@
     background: rgba(0, 0, 0, calc(var(--gmrt-light-attenuation, 0) * .72));
     box-shadow: inset 0 0 8px rgba(0, 0, 0, calc(var(--gmrt-light-attenuation, 0) * .3));
 }
+
+
+/* ==========================================================================
+   IV.35.4C.3 — The Flames Begin to Dance
+   Presentation-only pixel emitter animation. Authoritative light radius,
+   visibility, attenuation and Fog remain entirely server-derived.
+   ========================================================================== */
+
+/* The emitter itself animates in stepped, sprite-like increments rather than
+   smooth vector motion. The surrounding light pool only breathes by a few
+   percent: this is visual life, never rules-state flicker. */
+.gmrt-keeper-light-marker.is-dancing {
+    transform-origin: 50% 100%;
+    will-change: transform, filter;
+}
+
+.gmrt-keeper-light-marker.is-dancing.is-torch {
+    animation: gmrt-emitter-torch-dance .48s steps(3, end) infinite;
+}
+.gmrt-keeper-light-marker.is-dancing.is-candle {
+    animation: gmrt-emitter-candle-dance .66s steps(2, end) infinite;
+}
+.gmrt-keeper-light-marker.is-dancing.is-lantern {
+    animation: gmrt-emitter-lantern-sway 2.8s steps(4, end) infinite;
+}
+.gmrt-keeper-light-marker.is-dancing.is-brazier {
+    animation: gmrt-emitter-brazier-dance .72s steps(4, end) infinite;
+}
+.gmrt-keeper-light-marker.is-dancing.is-magical {
+    animation: gmrt-emitter-magic-hover 1.35s steps(4, end) infinite;
+}
+
+.gmrt-carried-light.is-environmental:not(.is-doused).is-torch,
+.gmrt-carried-light.is-environmental:not(.is-doused).is-candle {
+    animation: gmrt-emitter-light-breathe 1.35s steps(4, end) infinite;
+}
+.gmrt-carried-light.is-environmental:not(.is-doused).is-brazier {
+    animation: gmrt-emitter-light-breathe 1.05s steps(4, end) infinite;
+}
+.gmrt-carried-light.is-environmental:not(.is-doused).is-lantern {
+    animation: gmrt-emitter-light-breathe 2.6s steps(4, end) infinite;
+}
+.gmrt-carried-light.is-environmental:not(.is-doused).is-magical {
+    animation: gmrt-emitter-magic-breathe 1.7s steps(4, end) infinite;
+}
+
+/* Tiny square particles keep the look SNES-like and deliberately avoid
+   sub-pixel particle systems. */
+.gmrt-light-emitter-particle {
+    --gmrt-emitter-particle-index: 0;
+    position: absolute;
+    display: block;
+    width: 2px;
+    height: 2px;
+    left: calc(5px + (var(--gmrt-emitter-particle-index) * 4px));
+    top: 3px;
+    background: #ffd95a;
+    box-shadow: 2px 0 0 #f18a2a;
+    opacity: 0;
+    pointer-events: none;
+    image-rendering: pixelated;
+}
+
+.gmrt-keeper-light-marker.is-torch .gmrt-light-emitter-particle {
+    animation: gmrt-emitter-ember-rise 1.05s steps(4, end) infinite;
+    animation-delay: calc(var(--gmrt-emitter-particle-index) * -.32s);
+}
+.gmrt-keeper-light-marker.is-brazier .gmrt-light-emitter-particle {
+    top: 2px;
+    animation: gmrt-emitter-ember-rise 1.28s steps(5, end) infinite;
+    animation-delay: calc(var(--gmrt-emitter-particle-index) * -.27s);
+}
+.gmrt-keeper-light-marker.is-candle .gmrt-light-emitter-particle {
+    left: 8px;
+    background: #fff0a1;
+    box-shadow: none;
+    animation: gmrt-emitter-candle-spark 1.6s steps(4, end) infinite;
+}
+.gmrt-keeper-light-marker.is-lantern .gmrt-light-emitter-particle {
+    left: 7px;
+    top: 8px;
+    background: #ffe178;
+    box-shadow: 2px 0 0 rgba(255, 190, 72, .82), -2px 0 0 rgba(255, 224, 125, .62);
+    animation: gmrt-emitter-lantern-heartbeat 1.9s steps(4, end) infinite;
+}
+.gmrt-keeper-light-marker.is-magical .gmrt-light-emitter-particle {
+    left: 7px;
+    top: 0;
+    background: #dff8ff;
+    box-shadow: -3px 6px 0 #9cdcff, 3px 8px 0 #c5efff;
+    animation: gmrt-emitter-magic-spark 1.25s steps(5, end) infinite;
+}
+
+@keyframes gmrt-emitter-torch-dance {
+    0%, 100% { transform: translate(0, 0) scaleX(1); filter: brightness(1); }
+    33% { transform: translate(1px, -1px) scaleX(.92); filter: brightness(1.12); }
+    66% { transform: translate(-1px, 0) scaleX(1.06); filter: brightness(.96); }
+}
+@keyframes gmrt-emitter-candle-dance {
+    0%, 100% { transform: translateX(0) scaleY(1); }
+    50% { transform: translateX(1px) scaleY(.94); }
+}
+@keyframes gmrt-emitter-lantern-sway {
+    0%, 100% { transform: rotate(0deg); filter: brightness(1); }
+    25% { transform: rotate(-2deg); filter: brightness(1.04); }
+    75% { transform: rotate(2deg); filter: brightness(.98); }
+}
+@keyframes gmrt-emitter-brazier-dance {
+    0%, 100% { transform: translateY(0) scaleX(1); filter: brightness(1); }
+    25% { transform: translate(1px, -1px) scaleX(1.04); filter: brightness(1.12); }
+    50% { transform: translateY(0) scaleX(.94); filter: brightness(.96); }
+    75% { transform: translate(-1px, -1px) scaleX(1.02); filter: brightness(1.08); }
+}
+@keyframes gmrt-emitter-magic-hover {
+    0%, 100% { transform: translateY(0) rotate(0deg); filter: brightness(1); }
+    25% { transform: translateY(-1px) rotate(2deg); filter: brightness(1.12); }
+    50% { transform: translateY(-2px) rotate(0deg); filter: brightness(1.05); }
+    75% { transform: translateY(-1px) rotate(-2deg); filter: brightness(1.16); }
+}
+@keyframes gmrt-emitter-ember-rise {
+    0%, 45% { opacity: 0; transform: translate(0, 5px); }
+    50% { opacity: 1; transform: translate(0, 2px); }
+    70% { opacity: .9; transform: translate(-2px, -2px); }
+    85% { opacity: .55; transform: translate(2px, -5px); }
+    100% { opacity: 0; transform: translate(0, -8px); }
+}
+@keyframes gmrt-emitter-candle-spark {
+    0%, 70%, 100% { opacity: 0; transform: translate(0, 1px); }
+    75% { opacity: .8; transform: translate(0, -2px); }
+    85% { opacity: .35; transform: translate(1px, -5px); }
+}
+@keyframes gmrt-emitter-lantern-heartbeat {
+    0%, 100% { opacity: .26; transform: scale(1); }
+    50% { opacity: .72; transform: scale(1.12); }
+}
+@keyframes gmrt-emitter-magic-spark {
+    0%, 100% { opacity: .2; transform: translateY(2px) rotate(0deg); }
+    25% { opacity: .95; transform: translateY(0) rotate(90deg); }
+    50% { opacity: .45; transform: translateY(-2px) rotate(180deg); }
+    75% { opacity: .8; transform: translateY(0) rotate(270deg); }
+}
+@keyframes gmrt-emitter-light-breathe {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.025); }
+}
+@keyframes gmrt-emitter-magic-breathe {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); filter: none; }
+    50% { transform: translate(-50%, -50%) scale(1.035); filter: brightness(1.04); }
+}
+
+/* Doused emitters are inert by definition. Reduced-motion users receive the
+   exact same pixels as a static sprite with no pulsing light presentation. */
+.gmrt-carried-light.is-environmental.is-doused,
+.gmrt-carried-light.is-environmental.is-doused .gmrt-keeper-light-marker {
+    animation: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gmrt-carried-light.is-environmental,
+    .gmrt-keeper-light-marker.is-dancing,
+    .gmrt-light-emitter-particle {
+        animation: none !important;
+        transform: none;
+    }
+
+    .gmrt-light-emitter-particle {
+        display: none;
+    }
+}

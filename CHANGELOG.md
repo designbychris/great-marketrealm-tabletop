@@ -1205,3 +1205,5 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - IV.35.4C.2A — The Light Was There All Along: fixed attenuation-key rendering and restored viewer-safe Keeper light marker metadata/visibility.
 
 - IV.35.4C.2B — Pippin Measures the Shadow Twice: aligned Scene Object light/vision geometry with Fog grid-reference calibration and hardened environmental source visibility.
+
+- IV.35.4C.3 — The Flames Begin to Dance: Keeper environmental lights now use stepped SNES-style emitter animation, pixel embers/sparks and restrained visual-only glow breathing with reduced-motion support.

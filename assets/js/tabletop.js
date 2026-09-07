@@ -1565,6 +1565,18 @@
                 const marker = document.createElement('i');
                 marker.className = 'gmrt-keeper-light-marker is-' + lightKind;
                 marker.setAttribute('aria-hidden', 'true');
+
+                if (source.lit !== false) {
+                    marker.classList.add('is-dancing');
+                    const particleCount = lightKind === 'brazier' ? 3 : (lightKind === 'torch' ? 2 : 1);
+                    for (let particleIndex = 0; particleIndex < particleCount; particleIndex += 1) {
+                        const particle = document.createElement('span');
+                        particle.className = 'gmrt-light-emitter-particle';
+                        particle.style.setProperty('--gmrt-emitter-particle-index', String(particleIndex));
+                        marker.appendChild(particle);
+                    }
+                }
+
                 glow.dataset.lightKind = lightKind;
                 glow.appendChild(marker);
                 glow.setAttribute('aria-label', String(source.label || 'Keeper light source') + (source.lit === false ? ', doused' : ', lit'));

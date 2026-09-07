@@ -913,3 +913,5 @@ Carry Session recap evidence and character-attributed deeds across the Tabletop 
 - [x] **IV.35.3B.1 — Pippin Refuses to Align the Chairs** — Keeper furniture may snap placement and dragging to calibrated Scene grid centres by default, with an authoring toggle for free placement. **SERVER + BROWSER CERTIFIED — 969 tests / 2,973 assertions.**
 
 - IV.35.4C.2 — Light Finds Another Way: Scene Object light occlusion now attenuates the existing authoritative illumination pipeline; strongest surviving light wins. 🕯️🌑
+
+- [x] IV.35.4C.3 — The Flames Begin to Dance: animated pixel emitters for Keeper lights; authoritative illumination remains unchanged. 🔥
