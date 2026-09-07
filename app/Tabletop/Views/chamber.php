@@ -1596,6 +1596,14 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                         </select>
                                     </label>
                                     <label>
+                                        Way in
+                                        <select data-dungeon-forge-entry>
+                                            <option value="none" selected>None</option>
+                                            <option value="entrance">Main entrance</option>
+                                            <option value="portal">Arrival portal</option>
+                                        </select>
+                                    </label>
+                                    <label>
                                         Theme
                                         <select data-dungeon-forge-theme>
                                             <option value="pantry-stone" selected>Pantry Stone</option>
@@ -1621,6 +1629,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                     <span><i class="is-wall"></i> Vision wall</span>
                                     <span><i class="is-door"></i> Door</span>
                                     <span><i class="is-light"></i> Suggested light</span>
+                                    <span><i class="is-entry"></i> Party arrival</span>
                                 </div>
                             </div>
                         </details>

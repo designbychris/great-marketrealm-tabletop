@@ -928,3 +928,5 @@ Carry Session recap evidence and character-attributed deeds across the Tabletop 
 - [ ] IV.35.8A — Pippin Reads the Labels: opt-in custom furniture gains room/usage tags consumed by Dungeon Forge. 🏷️🗺️
 
 - [x] IV.35.8A — Pippin Reads the Labels: custom furniture can be tagged with controlled room/environment labels and safely enters Pippin's deterministic furnishing pass when explicitly opted in. 🏷️🗺️
+
+- [x] IV.35.8B — Every Dungeon Needs a Door — optional Forge entrance/portal anchors with dynamic Party Arrival Threshold placement.

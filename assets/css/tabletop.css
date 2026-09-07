@@ -6181,3 +6181,11 @@
     border:0;
     box-shadow:none;
 }
+
+
+/* IV.35.8B — Every Dungeon Needs a Door. */
+.gmrt-dungeon-forge__legend .is-entry { background:currentColor; border-radius:50%; box-shadow:0 0 0 2px currentColor inset; }
+.gmrt-dungeon-forge-layer .gmrt-forge-entry { pointer-events:none; }
+.gmrt-dungeon-forge-layer .gmrt-forge-entry .is-entry-ring { fill:rgba(100,190,255,.14); stroke:rgba(160,225,255,.95); stroke-width:.12; vector-effect:non-scaling-stroke; }
+.gmrt-dungeon-forge-layer .gmrt-forge-entry.is-portal .is-entry-ring { fill:rgba(190,120,255,.16); stroke:rgba(220,180,255,.98); }
+.gmrt-dungeon-forge-layer .gmrt-forge-entry .is-entry-core { fill:rgba(236,245,255,.95); stroke:none; }

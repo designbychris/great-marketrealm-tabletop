@@ -57,6 +57,26 @@ final class ThresholdManager
         return $marker;
     }
 
+    public function setPartyArrival(
+        string $tableId,
+        int $viewerUserId,
+        string $sceneId,
+        float $x,
+        float $y
+    ): ThresholdMarker {
+        $this->assertDungeonMaster($tableId, $viewerUserId);
+        $scene = $this->requiredScene($tableId, $sceneId);
+        $scene->coordinates($x, $y);
+
+        foreach ($this->thresholds->forScene($tableId, $sceneId) as $marker) {
+            if ($marker->type() === ThresholdType::PARTY) {
+                $this->thresholds->delete($tableId, $sceneId, $marker->id());
+            }
+        }
+
+        return $this->place($tableId, $viewerUserId, $sceneId, ThresholdType::PARTY, $x, $y);
+    }
+
     public function move(
         string $tableId,
         int $viewerUserId,

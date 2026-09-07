@@ -19,6 +19,7 @@ use GreatMarketrealmTabletop\Tabletop\Vision\Services\VisionBarrierManager;
 use GreatMarketrealmTabletop\Tabletop\SceneObjects\Contracts\SceneObjectRepository;
 use GreatMarketrealmTabletop\Tabletop\SceneObjects\FurnitureCatalogue;
 use GreatMarketrealmTabletop\Tabletop\SceneObjects\Models\SceneObject;
+use GreatMarketrealmTabletop\Tabletop\Atlas\Thresholds\Services\ThresholdManager;
 use RuntimeException;
 use Throwable;
 
@@ -46,7 +47,8 @@ final class DungeonForgeAjaxController
         private SceneShelfCleaner $cleaner,
         private SceneObjectRepository $sceneObjects,
         private FurnitureCatalogue $furniture,
-        private ForgeFurniturePlanner $furnisher
+        private ForgeFurniturePlanner $furnisher,
+        private ThresholdManager $thresholds
     ) {}
 
     public function build(): void
@@ -229,6 +231,18 @@ final class DungeonForgeAjaxController
             $lightIds[] = $id;
         }
 
+        $arrivalThresholdId = null;
+        if (is_array($plan['entry_anchor'] ?? null)) {
+            $arrival = $this->thresholds->setPartyArrival(
+                $tableId,
+                $userId,
+                $sceneId,
+                (float) $plan['entry_anchor']['x'],
+                (float) $plan['entry_anchor']['y']
+            );
+            $arrivalThresholdId = $arrival->id();
+        }
+
         // Every forged environment starts veiled. The Keeper still owns the final reveal.
         $fog = $this->fog->configure($tableId, $userId, true, true, $sceneId);
 
@@ -245,6 +259,8 @@ final class DungeonForgeAjaxController
             'doors' => $plan['doors'],
             'lights' => $plan['lights'],
             'features' => $plan['features'],
+            'entry_anchor' => $plan['entry_anchor'],
+            'arrival_threshold_id' => $arrivalThresholdId,
             'furniture' => $furnitureDrafts,
             'barrier_ids' => array_map(static fn ($barrier): string => $barrier->id(), $created),
             'furniture_ids' => $furnitureIds,
@@ -410,8 +426,26 @@ final class DungeonForgeAjaxController
             if (count($features) >= 80) break;
         }
 
+        $entryAnchor = null;
+        if (is_array($plan['entry_anchor'] ?? null)) {
+            $type = sanitize_key((string) ($plan['entry_anchor']['type'] ?? ''));
+            $facing = sanitize_key((string) ($plan['entry_anchor']['facing'] ?? 'centre'));
+            if (in_array($type, ['entrance', 'portal'], true)) {
+                if (! in_array($facing, ['north', 'south', 'east', 'west', 'centre'], true)) {
+                    $facing = 'centre';
+                }
+                $entryAnchor = [
+                    'type' => $type,
+                    'x' => $this->clamp((float) ($plan['entry_anchor']['x'] ?? 0.5)),
+                    'y' => $this->clamp((float) ($plan['entry_anchor']['y'] ?? 0.5)),
+                    'facing' => $facing,
+                ];
+            }
+        }
+
         $floor = array_values($floor);
-        return compact('seed', 'style', 'theme', 'cols', 'rows', 'floor', 'rooms', 'barriers', 'doors', 'lights', 'features') + ['scene_type' => $sceneType];
+        return compact('seed', 'style', 'theme', 'cols', 'rows', 'floor', 'rooms', 'barriers', 'doors', 'lights', 'features')
+            + ['scene_type' => $sceneType, 'entry_anchor' => $entryAnchor];
     }
 
     private function clamp(float $value): float

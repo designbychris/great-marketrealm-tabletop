@@ -265,7 +265,8 @@ final class TabletopServiceProvider
             $mergedFurnitureCatalogue,
             new \GreatMarketrealmTabletop\Tabletop\Cartography\Services\ForgeFurniturePlanner(
                 $mergedFurnitureCatalogue
-            )
+            ),
+            \GreatMarketrealmTabletop\Tabletop\Atlas\Thresholds\Services\ThresholdManagerFactory::make()
         );
 
         $this->fogAjax = new FogOfWarAjaxController(

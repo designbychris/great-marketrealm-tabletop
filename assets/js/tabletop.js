@@ -3389,6 +3389,7 @@
     const dungeonForgeSceneType = document.querySelector('[data-dungeon-forge-scene-type]');
     const dungeonForgeStyle = document.querySelector('[data-dungeon-forge-style]');
     const dungeonForgeTheme = document.querySelector('[data-dungeon-forge-theme]');
+    const dungeonForgeEntry = document.querySelector('[data-dungeon-forge-entry]');
     const dungeonForgeGenerate = document.querySelector('[data-dungeon-forge-generate]');
     const dungeonForgeReroll = document.querySelector('[data-dungeon-forge-reroll]');
     const dungeonForgeBuild = document.querySelector('[data-dungeon-forge-build]');
@@ -3625,6 +3626,15 @@
         });
         dungeonForgeLayer.appendChild(doorGroup);
 
+        if (plan.entry_anchor) {
+            const anchor=plan.entry_anchor;
+            const marker=forgeSvg('g',{class:`gmrt-forge-entry is-${String(anchor.type || 'entrance')}`});
+            const cx=Number(anchor.x||0)*cols, cy=Number(anchor.y||0)*rows;
+            marker.appendChild(forgeSvg('circle',{cx,cy,r:.36,class:'is-entry-ring'}));
+            marker.appendChild(forgeSvg('circle',{cx,cy,r:.12,class:'is-entry-core'}));
+            dungeonForgeLayer.appendChild(marker);
+        }
+
         if (draft) {
             const lightGroup = forgeSvg('g', { class: 'gmrt-forge-lights' });
             (plan.lights || []).forEach((light) => {
@@ -3676,8 +3686,49 @@
         return { x1:x/cols, y1:y/rows, x2:(x+1)/cols, y2:y/rows };
     };
 
+    // IV.35.8B — Every Dungeon Needs a Door.
+    // A Forge arrival is semantic as well as visual: Entrance reaches the map
+    // boundary, while Portal may stand inside a playable room. Both become the
+    // authoritative Party Arrival Threshold when the draft is built.
+    const forgeEntryMode = (value) => ['entrance','portal'].includes(String(value || '')) ? String(value) : 'none';
+
+    const forgeRoomCentreCell = (room) => ({
+        x: Math.max(room.x, Math.min(room.x + room.w - 1, Math.floor(room.x + room.w / 2))),
+        y: Math.max(room.y, Math.min(room.y + room.h - 1, Math.floor(room.y + room.h / 2)))
+    });
+
+    const forgeDungeonEntrance = (rooms, cols, rows, seed) => {
+        if (!rooms.length) return null;
+        const ranked = rooms.map((room, index) => {
+            const c = forgeRoomCentreCell(room);
+            const distances = [
+                {side:'west', value:c.x}, {side:'east', value:(cols - 1) - c.x},
+                {side:'north', value:c.y}, {side:'south', value:(rows - 1) - c.y}
+            ].sort((a,b)=>a.value-b.value || a.side.localeCompare(b.side));
+            return {room,index,cell:c,side:distances[0].side,distance:distances[0].value};
+        }).sort((a,b)=>a.distance-b.distance || forgeHash(`${seed}|entry|${a.index}`)-forgeHash(`${seed}|entry|${b.index}`));
+        const chosen=ranked[0];
+        const {x,y}=chosen.cell;
+        const boundary = chosen.side==='west' ? {axis:'vertical',line:0,start:y,door:{x1:0,y1:y/rows,x2:0,y2:(y+1)/rows},cell:{x:0,y}}
+            : chosen.side==='east' ? {axis:'vertical',line:cols,start:y,door:{x1:1,y1:y/rows,x2:1,y2:(y+1)/rows},cell:{x:cols-1,y}}
+            : chosen.side==='north' ? {axis:'horizontal',line:0,start:x,door:{x1:x/cols,y1:0,x2:(x+1)/cols,y2:0},cell:{x,y:0}}
+            : {axis:'horizontal',line:rows,start:x,door:{x1:x/cols,y1:1,x2:(x+1)/cols,y2:1},cell:{x,y:rows-1}};
+        return {
+            ...boundary,
+            start: chosen.cell,
+            anchor:{type:'entrance',x:(boundary.cell.x+.5)/cols,y:(boundary.cell.y+.5)/rows,facing:chosen.side}
+        };
+    };
+
+    const forgePortalAnchor = (rooms, cols, rows, seed) => {
+        if (!rooms.length) return null;
+        const room=[...rooms].sort((a,b)=>(b.w*b.h)-(a.w*a.h) || forgeHash(`${seed}|portal|${a.x}:${a.y}`)-forgeHash(`${seed}|portal|${b.x}:${b.y}`))[0];
+        const cell=forgeRoomCentreCell(room);
+        return {type:'portal',x:(cell.x+.5)/cols,y:(cell.y+.5)/rows,facing:'centre'};
+    };
+
     // Legacy IV.30.2 source contract: generateDungeonForgePlan = (seed, style)
-    const generateDungeonForgePlan = (seed, style, theme = 'pantry-stone', preferredAspect = null) => {
+    const generateDungeonForgePlan = (seed, style, theme = 'pantry-stone', preferredAspect = null, entryMode = 'none') => {
         const presets = {
             compact: { cols:24, rooms:6, min:3, max:6 },
             standard: { cols:32, rooms:9, min:4, max:7 },
@@ -3749,6 +3800,23 @@
             doors.push(forgeDoorAt(next, a, cols, rows, horizontalFirst ? 'vertical' : 'horizontal'));
         }
 
+        const requestedEntry = forgeEntryMode(entryMode);
+        const dungeonEntrance = requestedEntry === 'entrance'
+            ? forgeDungeonEntrance(rooms, cols, rows, seed)
+            : null;
+        if (dungeonEntrance) {
+            const start=dungeonEntrance.start;
+            const target=dungeonEntrance.cell;
+            if(dungeonEntrance.axis==='vertical'){
+                const step=start.x<=target.x?1:-1;
+                for(let x=start.x;x!==target.x+step;x+=step) carve(x,start.y);
+            } else {
+                const step=start.y<=target.y?1:-1;
+                for(let y=start.y;y!==target.y+step;y+=step) carve(start.x,y);
+            }
+            doors.push(dungeonEntrance.door);
+        }
+
         // Merge contiguous exterior edges into long wall objects so the Forge remains
         // comfortably inside the existing 200-object Cartography safety budget.
         const floorSet = new Set(floor.keys());
@@ -3759,10 +3827,10 @@
         };
         floor.forEach((cell) => {
             const {x,y}=cell;
-            if (!floorSet.has(forgeFloorKey(x,y-1))) addEdge(horizontal,y,x);
-            if (!floorSet.has(forgeFloorKey(x,y+1))) addEdge(horizontal,y+1,x);
-            if (!floorSet.has(forgeFloorKey(x-1,y))) addEdge(vertical,x,y);
-            if (!floorSet.has(forgeFloorKey(x+1,y))) addEdge(vertical,x+1,y);
+            if (!floorSet.has(forgeFloorKey(x,y-1)) && !(dungeonEntrance?.axis==='horizontal' && dungeonEntrance.line===y && dungeonEntrance.start===x)) addEdge(horizontal,y,x);
+            if (!floorSet.has(forgeFloorKey(x,y+1)) && !(dungeonEntrance?.axis==='horizontal' && dungeonEntrance.line===y+1 && dungeonEntrance.start===x)) addEdge(horizontal,y+1,x);
+            if (!floorSet.has(forgeFloorKey(x-1,y)) && !(dungeonEntrance?.axis==='vertical' && dungeonEntrance.line===x && dungeonEntrance.start===y)) addEdge(vertical,x,y);
+            if (!floorSet.has(forgeFloorKey(x+1,y)) && !(dungeonEntrance?.axis==='vertical' && dungeonEntrance.line===x+1 && dungeonEntrance.start===y)) addEdge(vertical,x+1,y);
         });
         const barriers = [];
         const mergeEdges = (map, isHorizontal) => {
@@ -3797,8 +3865,11 @@
         });
 
         return {
-            version:3, scene_type:'dungeon', seed, style, theme, cols, rows,
-            floor:[...floor.values()], rooms, doors, barriers, lights, features:[]
+            version:4, scene_type:'dungeon', seed, style, theme, cols, rows,
+            floor:[...floor.values()], rooms, doors, barriers, lights, features:[],
+            entry_anchor: requestedEntry === 'portal'
+                ? forgePortalAnchor(rooms, cols, rows, seed)
+                : (dungeonEntrance?.anchor || null)
         };
     };
 
@@ -3898,10 +3969,22 @@
         return {version:3,scene_type:'village',seed,style,theme,cols,rows,floor,rooms,doors,barriers,lights,features};
     };
 
-    const generateSceneForgePlan = (sceneType, seed, style, theme = 'pantry-stone', preferredAspect = null) => {
-        if (sceneType === 'forest') return generateForestForgePlan(seed, style, theme, preferredAspect);
-        if (sceneType === 'village') return generateVillageForgePlan(seed, style, theme, preferredAspect);
-        return generateDungeonForgePlan(seed, style, theme, preferredAspect);
+    const generateSceneForgePlan = (sceneType, seed, style, theme = 'pantry-stone', preferredAspect = null, entryMode = 'none') => {
+        const mode=forgeEntryMode(entryMode);
+        if (sceneType === 'forest' || sceneType === 'village') {
+            const plan=sceneType === 'forest'
+                ? generateForestForgePlan(seed, style, theme, preferredAspect)
+                : generateVillageForgePlan(seed, style, theme, preferredAspect);
+            if(mode==='portal') plan.entry_anchor=forgePortalAnchor(plan.rooms,plan.cols,plan.rows,seed);
+            if(mode==='entrance') {
+                const side=forgeHash(`${seed}|outdoor-entry`) % 4;
+                const cells=[{x:.5/plan.cols,y:.5,facing:'west'},{x:(plan.cols-.5)/plan.cols,y:.5,facing:'east'},{x:.5,y:.5/plan.rows,facing:'north'},{x:.5,y:(plan.rows-.5)/plan.rows,facing:'south'}];
+                plan.entry_anchor={type:'entrance',...cells[side]};
+            }
+            plan.version=4;
+            return plan;
+        }
+        return generateDungeonForgePlan(seed, style, theme, preferredAspect, mode);
     };
 
     const setForgeStatus = (message) => {
@@ -3918,11 +4001,12 @@
         const seed = String(dungeonForgeSeed?.value || '').trim() || 'Peppercorn-01';
         const style = String(dungeonForgeStyle?.value || 'standard');
         const theme = String(dungeonForgeTheme?.value || 'pantry-stone');
-        dungeonForgeDraft = generateSceneForgePlan(sceneType, seed, style, theme);
+        const entryMode = forgeEntryMode(dungeonForgeEntry?.value || 'none');
+        dungeonForgeDraft = generateSceneForgePlan(sceneType, seed, style, theme, null, entryMode);
         renderDungeonForgePlan(dungeonForgeDraft, true);
         if (dungeonForgeBuild) dungeonForgeBuild.disabled = false;
         if (dungeonForgeClear) dungeonForgeClear.disabled = false;
-        setForgeStatus(`${String(dungeonForgeDraft.scene_type || 'dungeon')} · ${dungeonForgeDraft.rooms.length} major places · ${dungeonForgeDraft.barriers.length} vision objects · ${dungeonForgeDraft.doors.length} doors · ${dungeonForgeDraft.lights.length} suggested lights · preview only.`);
+        setForgeStatus(`${String(dungeonForgeDraft.scene_type || 'dungeon')} · ${dungeonForgeDraft.rooms.length} major places · ${dungeonForgeDraft.barriers.length} vision objects · ${dungeonForgeDraft.doors.length} doors · ${dungeonForgeDraft.lights.length} suggested lights${dungeonForgeDraft.entry_anchor ? ` · ${dungeonForgeDraft.entry_anchor.type} arrival` : ''} · preview only.`);
     };
 
     dungeonForgeGenerate?.addEventListener('click', () => {
