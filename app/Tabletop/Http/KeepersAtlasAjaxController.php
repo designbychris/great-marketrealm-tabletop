@@ -6,13 +6,22 @@ namespace GreatMarketrealmTabletop\Tabletop\Http;
 
 defined('ABSPATH') || exit;
 
-use GreatMarketrealmTabletop\Tabletop\Atlas\Exceptions\AtlasDenied;
 use GreatMarketrealmTabletop\Tabletop\Atlas\Services\KeepersAtlas;
+use GreatMarketrealmTabletop\Tabletop\Atlas\Transitions\Repositories\WordPressSceneTransitionRepository;
+use GreatMarketrealmTabletop\Tables\Memberships\Contracts\TableMembershipRepository;
+use GreatMarketrealmTabletop\Tables\Memberships\Models\TableMemberStatus;
+use GreatMarketrealmTabletop\Tables\Scenes\Contracts\TableSceneRepository;
+use GreatMarketrealmTabletop\Tabletop\Atlas\Exceptions\AtlasDenied;
 use Throwable;
 
 final class KeepersAtlasAjaxController
 {
-    public function __construct(private KeepersAtlas $atlas) {}
+    public function __construct(
+        private KeepersAtlas $atlas,
+        private TableMembershipRepository $members,
+        private TableSceneRepository $scenes,
+        private WordPressSceneTransitionRepository $transitions
+    ) {}
 
     public function addMap(): void
     {
@@ -119,6 +128,89 @@ final class KeepersAtlasAjaxController
             );
             return ['message' => 'Threshold Marker removed.'];
         });
+    }
+
+
+    public function transitionStatus(): void
+    {
+        $this->respond(function (): array {
+            $tableId = $this->tableId();
+            $sourceSceneId = sanitize_text_field((string) ($_POST['source_scene_id'] ?? ''));
+            $this->assertDungeonMaster($tableId);
+            return ['transition' => $this->transitions->forSource($tableId, $sourceSceneId)];
+        });
+    }
+
+    public function linkTransition(): void
+    {
+        $this->respond(function (): array {
+            $tableId = $this->tableId();
+            $sourceSceneId = sanitize_text_field((string) ($_POST['source_scene_id'] ?? ''));
+            $destinationSceneId = sanitize_text_field((string) ($_POST['destination_scene_id'] ?? ''));
+            $this->assertDungeonMaster($tableId);
+
+            if ($sourceSceneId === '' || $destinationSceneId === '' || $sourceSceneId === $destinationSceneId) {
+                throw new AtlasDenied('Choose another Scene as the destination.');
+            }
+            $source = $this->scenes->find($tableId, $sourceSceneId);
+            $destination = $this->scenes->find($tableId, $destinationSceneId);
+            if ($source === null || $destination === null) {
+                throw new AtlasDenied('Both ends of the route must belong to this Table.');
+            }
+
+            $transition = [
+                'source_scene_id' => $sourceSceneId,
+                'destination_scene_id' => $destinationSceneId,
+                'destination_anchor' => 'party',
+                'keeper_controlled' => true,
+                'updated_at' => gmdate(DATE_ATOM),
+            ];
+            $this->transitions->save($tableId, $sourceSceneId, $transition);
+
+            return [
+                'transition' => $transition,
+                'message' => 'Pippin has drawn the way to ' . $destination->name() . '.',
+            ];
+        });
+    }
+
+    public function removeTransition(): void
+    {
+        $this->respond(function (): array {
+            $tableId = $this->tableId();
+            $sourceSceneId = sanitize_text_field((string) ($_POST['source_scene_id'] ?? ''));
+            $this->assertDungeonMaster($tableId);
+            $this->transitions->remove($tableId, $sourceSceneId);
+            return ['message' => 'The Scene route has been erased.'];
+        });
+    }
+
+    public function travelTransition(): void
+    {
+        $this->respond(function (): array {
+            $tableId = $this->tableId();
+            $sourceSceneId = sanitize_text_field((string) ($_POST['source_scene_id'] ?? ''));
+            $this->assertDungeonMaster($tableId);
+            $transition = $this->transitions->forSource($tableId, $sourceSceneId);
+            if ($transition === null) {
+                throw new AtlasDenied('This way does not lead anywhere yet.');
+            }
+            $destinationSceneId = sanitize_text_field((string) ($transition['destination_scene_id'] ?? ''));
+            $scene = $this->atlas->openMap($tableId, get_current_user_id(), $destinationSceneId);
+            return [
+                'scene' => $scene->toArray(),
+                'destination_anchor' => 'party',
+                'message' => 'The party travels to ' . $scene->name() . '.',
+            ];
+        });
+    }
+
+    private function assertDungeonMaster(string $tableId): void
+    {
+        $member = $this->members->find($tableId, get_current_user_id());
+        if ($member === null || $member->status() !== TableMemberStatus::ACTIVE || ! $member->isDungeonMaster()) {
+            throw new AtlasDenied('Only the Dungeon Master may redraw the roads between Scenes.');
+        }
     }
 
     public function deleteMap(): void

@@ -614,6 +614,28 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                             <button type="button" data-threshold-place="monster" data-scene-id="<?php echo esc_attr((string) ($scene['id'] ?? '')); ?>">Place Monster Deployment</button>
                         </div>
                         <small data-threshold-count><?php echo esc_html((string) count($thresholds)); ?> marker<?php echo count($thresholds) === 1 ? '' : 's'; ?> on the Scene currently before the Keeper.</small>
+                        <div class="gmrt-scene-transition" data-scene-transition data-source-scene-id="<?php echo esc_attr((string) ($scene['id'] ?? '')); ?>">
+                            <p class="gmrt-chamber__eyebrow">IV.35.8D · Pippin Draws the Way Home</p>
+                            <label>
+                                This way leads to
+                                <select data-scene-transition-destination>
+                                    <option value="">Choose a destination Scene…</option>
+                                    <?php foreach ($scenes as $destinationScene) :
+                                        if (! is_array($destinationScene)) continue;
+                                        $destinationId = (string) ($destinationScene['id'] ?? '');
+                                        if ($destinationId === '' || $destinationId === (string) ($scene['id'] ?? '')) continue;
+                                    ?>
+                                        <option value="<?php echo esc_attr($destinationId); ?>"><?php echo esc_html((string) ($destinationScene['name'] ?? 'Unnamed Scene')); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </label>
+                            <div class="gmrt-scene-transition__actions">
+                                <button type="button" data-scene-transition-save>Draw Route</button>
+                                <button type="button" data-scene-transition-travel disabled>Take the Party Through</button>
+                                <button type="button" data-scene-transition-remove disabled>Erase Route</button>
+                            </div>
+                            <small data-scene-transition-status>Keeper-controlled. Arrivals use the destination Scene's Party Arrival Threshold.</small>
+                        </div>
                     </section>
                 <?php endif; ?>
 

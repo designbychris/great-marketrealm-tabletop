@@ -54,6 +54,7 @@ use GreatMarketrealmTabletop\Tabletop\Http\EnvironmentalLightAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\KeepersAtlasAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Http\BestiaryAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Atlas\Services\KeepersAtlasFactory;
+use GreatMarketrealmTabletop\Tabletop\Atlas\Transitions\Repositories\WordPressSceneTransitionRepository;
 use GreatMarketrealmTabletop\Tabletop\Bestiary\Services\BestiaryDeploymentManagerFactory;
 use GreatMarketrealmTabletop\Tabletop\Light\Repositories\WordPressCarriedLightRepository;
 use GreatMarketrealmTabletop\Tabletop\Light\Repositories\WordPressDroppedLightRepository;
@@ -326,7 +327,10 @@ final class TabletopServiceProvider
 
 
         $this->keepersAtlasAjax = new KeepersAtlasAjaxController(
-            KeepersAtlasFactory::make()
+            KeepersAtlasFactory::make(),
+            new WordPressTableMembershipRepository(),
+            new WordPressTableSceneRepository(),
+            new WordPressSceneTransitionRepository()
         );
 
         $this->bestiaryAjax = new BestiaryAjaxController(
@@ -464,6 +468,11 @@ final class TabletopServiceProvider
             'wp_ajax_gmrt_atlas_remove_threshold',
             [$this->keepersAtlasAjax, 'removeThreshold']
         );
+
+        add_action('wp_ajax_gmrt_atlas_transition_status', [$this->keepersAtlasAjax, 'transitionStatus']);
+        add_action('wp_ajax_gmrt_atlas_link_transition', [$this->keepersAtlasAjax, 'linkTransition']);
+        add_action('wp_ajax_gmrt_atlas_remove_transition', [$this->keepersAtlasAjax, 'removeTransition']);
+        add_action('wp_ajax_gmrt_atlas_travel_transition', [$this->keepersAtlasAjax, 'travelTransition']);
 
         add_action(
             'wp_ajax_gmrt_bestiary_deploy_at_point',

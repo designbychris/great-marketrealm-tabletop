@@ -6189,3 +6189,9 @@
 .gmrt-dungeon-forge-layer .gmrt-forge-entry .is-entry-ring { fill:rgba(100,190,255,.14); stroke:rgba(160,225,255,.95); stroke-width:.12; vector-effect:non-scaling-stroke; }
 .gmrt-dungeon-forge-layer .gmrt-forge-entry.is-portal .is-entry-ring { fill:rgba(190,120,255,.16); stroke:rgba(220,180,255,.98); }
 .gmrt-dungeon-forge-layer .gmrt-forge-entry .is-entry-core { fill:rgba(236,245,255,.95); stroke:none; }
+
+/* IV.35.8D — Scene Transition Anchors */
+.gmrt-scene-transition{margin-top:14px;padding:12px;border:1px solid currentColor}
+.gmrt-scene-transition label{display:grid;gap:6px}
+.gmrt-scene-transition select{width:100%}
+.gmrt-scene-transition__actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}

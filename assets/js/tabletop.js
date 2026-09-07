@@ -4873,6 +4873,74 @@
         });
     });
 
+
+    // IV.35.8D — Pippin Draws the Way Home.
+    // Scene routes are Keeper-controlled. The destination Party Arrival
+    // Threshold remains the single authoritative arrival anchor.
+    const sceneTransition = document.querySelector('[data-scene-transition]');
+    const sceneTransitionDestination = document.querySelector('[data-scene-transition-destination]');
+    const sceneTransitionSave = document.querySelector('[data-scene-transition-save]');
+    const sceneTransitionTravel = document.querySelector('[data-scene-transition-travel]');
+    const sceneTransitionRemove = document.querySelector('[data-scene-transition-remove]');
+    const sceneTransitionStatus = document.querySelector('[data-scene-transition-status]');
+
+    const setSceneTransitionState = (transition) => {
+        const destination = String(transition?.destination_scene_id || '');
+        if (sceneTransitionDestination) sceneTransitionDestination.value = destination;
+        if (sceneTransitionTravel) sceneTransitionTravel.disabled = destination === '';
+        if (sceneTransitionRemove) sceneTransitionRemove.disabled = destination === '';
+    };
+
+    if (sceneTransition) {
+        const sourceSceneId = String(sceneTransition.dataset.sourceSceneId || '');
+        request('gmrt_atlas_transition_status', { source_scene_id: sourceSceneId })
+            .then((data) => setSceneTransitionState(data.transition || null))
+            .catch(() => setSceneTransitionState(null));
+
+        sceneTransitionSave?.addEventListener('click', async () => {
+            const destinationSceneId = String(sceneTransitionDestination?.value || '');
+            if (!destinationSceneId) {
+                if (sceneTransitionStatus) sceneTransitionStatus.textContent = 'Choose another Scene first.';
+                return;
+            }
+            try {
+                const data = await request('gmrt_atlas_link_transition', {
+                    source_scene_id: sourceSceneId,
+                    destination_scene_id: destinationSceneId
+                });
+                setSceneTransitionState(data.transition || null);
+                if (sceneTransitionStatus) sceneTransitionStatus.textContent = data.message || 'Route drawn.';
+            } catch (error) {
+                if (sceneTransitionStatus) sceneTransitionStatus.textContent = error.message || 'The route could not be drawn.';
+            }
+        });
+
+        sceneTransitionTravel?.addEventListener('click', async () => {
+            if (!window.confirm('Take the Table through this route and open its destination Scene?')) return;
+            sceneTransitionTravel.disabled = true;
+            try {
+                const data = await request('gmrt_atlas_travel_transition', { source_scene_id: sourceSceneId });
+                const message = data.message || 'The party crosses the threshold.';
+                if (sceneTransitionStatus) sceneTransitionStatus.textContent = message;
+                say(message);
+                await replaceChamber(message, null);
+            } catch (error) {
+                if (sceneTransitionStatus) sceneTransitionStatus.textContent = error.message || 'The party could not travel.';
+                sceneTransitionTravel.disabled = false;
+            }
+        });
+
+        sceneTransitionRemove?.addEventListener('click', async () => {
+            try {
+                const data = await request('gmrt_atlas_remove_transition', { source_scene_id: sourceSceneId });
+                setSceneTransitionState(null);
+                if (sceneTransitionStatus) sceneTransitionStatus.textContent = data.message || 'Route erased.';
+            } catch (error) {
+                if (sceneTransitionStatus) sceneTransitionStatus.textContent = error.message || 'The route could not be erased.';
+            }
+        });
+    }
+
     document.querySelectorAll('[data-atlas-open-map]').forEach((button) => {
         button.addEventListener('click', async () => {
             const sceneId = String(button.dataset.sceneId || '');
