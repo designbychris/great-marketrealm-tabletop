@@ -87,6 +87,7 @@ if (
                         'blocks_movement' => ! empty($definition['blocks_movement']),
                         'cover' => (string) ($definition['cover'] ?? 'none'),
                         'blocks_vision' => ! empty($definition['blocks_vision']),
+                        'light_occlusion' => max(0.0, min(1.0, (float) ($definition['light_occlusion'] ?? 0.0))),
                         'mimic_capable' => ! empty($definition['mimic_capable']),
                     ]
                 ));
@@ -1868,6 +1869,10 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                             $objectBlocksVision = array_key_exists('blocks_vision', $objectProperties)
                                 ? ! empty($objectProperties['blocks_vision'])
                                 : ! empty($objectDefinition['blocks_vision']);
+                            $objectLightOcclusion = max(0.0, min(1.0, (float) (
+                                $objectProperties['light_occlusion']
+                                ?? ($objectDefinition['light_occlusion'] ?? 0.0)
+                            )));
                         ?>
                             <div
                                 class="gmrt-scene-object gmrt-scene-object--<?php echo esc_attr($objectKind); ?>"
@@ -1883,6 +1888,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                 data-blocks-movement="<?php echo $objectBlocksMovement ? 'true' : 'false'; ?>"
                                 data-object-cover="<?php echo esc_attr($objectCover); ?>"
                                 data-blocks-vision="<?php echo $objectBlocksVision ? 'true' : 'false'; ?>"
+                                data-light-occlusion="<?php echo esc_attr((string) $objectLightOcclusion); ?>"
                                 data-mimic-capable="<?php echo ! empty($objectProperties['mimic_capable']) ? 'true' : 'false'; ?>"
                                 style="--gmrt-object-x: <?php echo esc_attr((string) ((float) ($object['x'] ?? 0) * 100)); ?>%; --gmrt-object-y: <?php echo esc_attr((string) ((float) ($object['y'] ?? 0) * 100)); ?>%; --gmrt-object-rotation: <?php echo esc_attr((string) ((int) ($object['rotation'] ?? 0))); ?>deg; --gmrt-object-scale: <?php echo esc_attr((string) ((float) ($object['scale'] ?? 1))); ?>; --gmrt-object-width-units: <?php echo esc_attr((string) $objectWidth); ?>; --gmrt-object-height-units: <?php echo esc_attr((string) $objectHeight); ?>;"
                                 role="<?php echo $state->isDungeonMaster() ? 'button' : 'img'; ?>"

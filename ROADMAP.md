@@ -879,8 +879,11 @@ Carry Session recap evidence and character-attributed deeds across the Tabletop 
 - [ ] **IV.35.4 — Things That Get in the Way** — collision, cover, vision and light-obstruction behaviour.
   - [x] **IV.35.4A — Things You Cannot Walk Through** — explicit Scene Object movement blocking with rotated/scaled footprint collision and swept token movement. **SERVER + BROWSER CERTIFIED — 973 tests / 2,996 assertions.**
   - [x] **IV.35.4B — Things You Can Hide Behind** — explicit cover and vision-blocking traits plus rotated/scaled attack-line cover reporting. **IMPLEMENTED / awaiting certification.**
-    - [ ] **IV.35.4B.1 — The Bookshelf Blocks the View** — bridge `blocks_vision` into the existing server-authoritative Fog/LOS barrier projection.
+    - [x] **IV.35.4B.1 — The Bookshelf Blocks the View** — bridge `blocks_vision` into the existing server-authoritative Fog/LOS projection. **SERVER CERTIFIED — 981 tests / 3,062 assertions.**
   - [ ] **IV.35.4C — Things That Cast Shadows** — light blocking and attenuation.
+    - [x] **IV.35.4C.1 — The Shape of Darkness** — explicit per-object `light_occlusion` plus reusable rotated/scaled ray-occlusion geometry. **IMPLEMENTED / awaiting certification.**
+    - [ ] **IV.35.4C.2 — Light Finds Another Way** — feed Scene Object attenuation into the existing authoritative illumination projection.
+    - [ ] **IV.35.4C.3 — The Flames Begin to Dance** — pixel emitter sprites and restrained presentation-only flicker after mechanical lighting is stable.
 - [ ] **IV.35.5 — Please Do Not Open the Chest** — interactive object state and safe Keeper/player interaction boundaries.
 - [ ] **IV.35.6 — The Furnishings of the MarketRealm** — themed SNES-era furniture library.
 - [ ] **IV.35.7 — The Forge Learns Interior Design** — Dungeon Forge object seeding and furnishing polish.

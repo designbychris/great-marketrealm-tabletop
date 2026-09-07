@@ -57,7 +57,7 @@ final class ThingsYouCanHideBehindRegressionTest extends TestCase
         self::assertStringContainsString("label += ' · OBSCURED';", $js);
     }
 
-    public function test_cover_phase_does_not_smuggle_in_attack_math_or_light_occlusion(): void
+    public function test_cover_phase_does_not_smuggle_in_attack_math_while_light_occlusion_has_its_own_phase(): void
     {
         $js = file_get_contents($this->root('assets/js/tabletop.js'));
         $catalogue = file_get_contents($this->root('app/Tabletop/SceneObjects/FurnitureCatalogue.php'));
@@ -65,7 +65,7 @@ final class ThingsYouCanHideBehindRegressionTest extends TestCase
         self::assertIsString($js);
         self::assertIsString($catalogue);
         self::assertStringNotContainsString("body.set('cover'", $js);
-        self::assertStringNotContainsString('light_occlusion', $catalogue);
+        self::assertStringContainsString("'light_occlusion' => max(0.0, min(1.0, \$lightOcclusion))", $catalogue);
         self::assertStringNotContainsString('light_attenuation', $catalogue);
     }
 }

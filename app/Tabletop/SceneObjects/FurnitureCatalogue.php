@@ -29,6 +29,7 @@ final class FurnitureCatalogue
                 true,
                 'half',
                 false,
+                0.45,
                 'A sturdy dungeon table. Number of legs not contractually guaranteed.'
             ),
             'chair' => $this->definition(
@@ -39,6 +40,7 @@ final class FurnitureCatalogue
                 false,
                 'none',
                 false,
+                0.15,
                 'A suspiciously conventional place to sit.'
             ),
             'chest' => $this->definition(
@@ -49,6 +51,7 @@ final class FurnitureCatalogue
                 true,
                 'half',
                 false,
+                0.55,
                 'Storage, treasure, or an extremely poor life decision.'
             ),
             'barrel' => $this->definition(
@@ -59,6 +62,7 @@ final class FurnitureCatalogue
                 true,
                 'half',
                 false,
+                0.55,
                 'A stout barrel for provisions, brine, or ominous silence.'
             ),
             'crate' => $this->definition(
@@ -69,6 +73,7 @@ final class FurnitureCatalogue
                 true,
                 'three_quarters',
                 false,
+                0.70,
                 'A stackable wooden crate with absolutely no promises about contents.'
             ),
             'bookshelf' => $this->definition(
@@ -79,6 +84,7 @@ final class FurnitureCatalogue
                 true,
                 'full',
                 true,
+                1.00,
                 'A shelf of books, ledgers, maps and future bad ideas.'
             ),
         ];
@@ -100,6 +106,7 @@ final class FurnitureCatalogue
         bool $blocksMovement,
         string $cover,
         bool $blocksVision,
+        float $lightOcclusion,
         string $description
     ): array {
         return [
@@ -111,6 +118,7 @@ final class FurnitureCatalogue
             'blocks_movement' => $blocksMovement,
             'cover' => $cover,
             'blocks_vision' => $blocksVision,
+            'light_occlusion' => max(0.0, min(1.0, $lightOcclusion)),
             'mimic_capable' => true,
         ];
     }

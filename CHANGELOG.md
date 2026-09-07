@@ -1154,6 +1154,14 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 
 ## Phase IV.35 — Pippin Furnishes the Dungeon
 
+
+### Phase IV.35.4C.1 — The Shape of Darkness
+- Adds independent `light_occlusion` strengths to furniture definitions, from lightly interrupting chairs through fully opaque bookshelves.
+- Persists occlusion on new Scene Objects and backfills older furniture from the current catalogue.
+- Adds reusable rotated/scaled Scene Object ray geometry that compounds partial transmission without creating a second lighting engine.
+- Preserves the Keeper's Lantern Rack and existing carried, dropped, magical and environmental light projection unchanged until IV.35.4C.2 consumes the new seam.
+
+
 ### IV.35.1 — The Object Layer
 - Establishes persistent Scene Objects as a dedicated Scene-owned layer rather than baking furniture into battlemap artwork.
 - Adds stable object identity, normalised placement, rotation, scale, state and future behaviour/property seams.
