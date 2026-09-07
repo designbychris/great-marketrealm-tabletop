@@ -1213,3 +1213,5 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - IV.35.4C.2C — The Walls Would Also Like a Say: broad light pools now render from the existing barrier-resolved Fog illumination cells, preventing visual halo bleed through walls while preserving furniture attenuation and animated emitters.
 
 - IV.35.7 — Forge Learns Interior Design: Dungeon Forge now performs a deterministic, doorway-aware, overlap-safe furnishing pass using real persistent Scene Objects and the existing Furniture Catalogue.
+
+- IV.35.6 — Furnishings of the MarketRealm: expands the Scene Object catalogue to sixteen pieces with ten new pixel furnishings and immediately teaches the Forge to use beds, desks, benches, cupboards, sacks, campfires, stools and rugs contextually.

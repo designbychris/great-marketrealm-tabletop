@@ -93,6 +93,126 @@ final class FurnitureCatalogue
                 'none',
                 'A shelf of books, ledgers, maps and future bad ideas.'
             ),
+            'bed' => $this->definition(
+                'Bed',
+                SceneObjectCategory::STRUCTURAL,
+                2.0,
+                1.0,
+                true,
+                'half',
+                false,
+                0.35,
+                'none',
+                'A narrow adventurer-sized bed. Pippin has checked beneath it once.'
+            ),
+            'desk' => $this->definition(
+                'Desk',
+                SceneObjectCategory::STRUCTURAL,
+                1.5,
+                0.8,
+                true,
+                'half',
+                false,
+                0.45,
+                'none',
+                'A writing desk for maps, ledgers, warrants and increasingly worried notes.'
+            ),
+            'bench' => $this->definition(
+                'Bench',
+                SceneObjectCategory::STRUCTURAL,
+                2.0,
+                0.6,
+                true,
+                'half',
+                false,
+                0.30,
+                'none',
+                'A long wooden bench. Seating capacity depends on optimism.'
+            ),
+            'cupboard' => $this->definition(
+                'Cupboard',
+                SceneObjectCategory::STRUCTURAL,
+                1.2,
+                0.7,
+                true,
+                'full',
+                true,
+                0.95,
+                'none',
+                'A tall cupboard whose contents are between the Keeper and the cupboard.'
+            ),
+            'sacks' => $this->definition(
+                'Sacks',
+                SceneObjectCategory::DECORATIVE,
+                1.0,
+                0.8,
+                false,
+                'half',
+                false,
+                0.25,
+                'none',
+                'A heap of provisions, flour, grain, or something with paperwork.'
+            ),
+            'weapon-rack' => $this->definition(
+                'Weapon Rack',
+                SceneObjectCategory::STRUCTURAL,
+                1.5,
+                0.5,
+                true,
+                'half',
+                false,
+                0.35,
+                'none',
+                'A rack of pointy occupational equipment.'
+            ),
+            'market-stall' => $this->definition(
+                'Market Stall',
+                SceneObjectCategory::STRUCTURAL,
+                2.0,
+                1.5,
+                true,
+                'three_quarters',
+                false,
+                0.65,
+                'none',
+                'A portable stall ready for commerce, haggling and suspicious turnips.'
+            ),
+            'campfire' => $this->definition(
+                'Campfire',
+                SceneObjectCategory::INTERACTIVE,
+                1.0,
+                1.0,
+                true,
+                'half',
+                false,
+                0.15,
+                'none',
+                'A contained campfire. It is furniture only because nobody volunteered to argue.'
+            ),
+            'stool' => $this->definition(
+                'Stool',
+                SceneObjectCategory::DECORATIVE,
+                0.65,
+                0.65,
+                false,
+                'none',
+                false,
+                0.10,
+                'none',
+                'A small stool for sitting, reaching shelves, or regrettable improvised tactics.'
+            ),
+            'rug' => $this->definition(
+                'Rug',
+                SceneObjectCategory::DECORATIVE,
+                2.0,
+                1.5,
+                false,
+                'none',
+                false,
+                0.0,
+                'none',
+                'A woven rug that blocks absolutely nothing except stains.'
+            ),
         ];
     }
 

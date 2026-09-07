@@ -921,3 +921,5 @@ Carry Session recap evidence and character-attributed deeds across the Tabletop 
 - [x] IV.35.4C.2C — The Walls Would Also Like a Say: wall/door-resolved authoritative light-cell presentation replaces unconstrained radius halos. 🧱🕯️
 
 - [x] IV.35.7 — Forge Learns Interior Design: Pippin classifies Forge rooms and places editable, tactical Scene Object furniture while preserving door approaches and movement space. 🗺️🪑
+
+- [x] IV.35.6 — Furnishings of the MarketRealm: ten additional tactical/decorative furnishings expand both the Keeper Palette and Pippin's certified Forge interior-design vocabulary. 🛏️🪑🔥

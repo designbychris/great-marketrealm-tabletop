@@ -6115,3 +6115,41 @@
         transition: none;
     }
 }
+
+
+/* ==========================================================================
+   IV.35.6 — Furnishings of the MarketRealm
+   Second-wave pixel furniture. The Palette and Scene Object layer share these
+   silhouettes so the Keeper sees the same visual language before/after placement.
+   ========================================================================== */
+
+.gmrt-scene-object--bed > span { inset:5%; background:#765031; box-shadow:inset 0 18% 0 #d7c7a1, inset 0 38% 0 #7d3850, inset 0 88% 0 #3f291b; }
+.gmrt-scene-object--bed > span::before { left:4%; top:5%; width:38%; height:24%; background:#e7ddc1; box-shadow:2px 2px 0 #9b8b6e; }
+.gmrt-scene-object--desk > span { inset:15% 3% 25%; background:#88572d; box-shadow:inset 0 5px 0 #bd8245; }
+.gmrt-scene-object--desk > span::before { left:7%; bottom:-40%; width:10%; height:42%; background:#4a2b18; box-shadow:760% 0 0 #4a2b18; }
+.gmrt-scene-object--bench > span { inset:30% 3% 34%; background:#9a6232; box-shadow:inset 0 4px 0 #c48949; }
+.gmrt-scene-object--bench > span::before { left:8%; bottom:-65%; width:10%; height:68%; background:#4c2d19; box-shadow:720% 0 0 #4c2d19; }
+.gmrt-scene-object--cupboard > span { inset:2% 8%; background:#714525; border:2px solid #39271c; box-shadow:inset 50% 0 0 rgba(0,0,0,.16), inset 0 8% 0 #a56b37; }
+.gmrt-scene-object--cupboard > span::after { right:42%; top:48%; width:6%; height:6%; background:#d1a944; box-shadow:350% 0 0 #d1a944; }
+.gmrt-scene-object--sacks > span { inset:10% 4%; border-radius:42% 48% 38% 45%; background:#b19a6b; box-shadow:inset 0 18% 0 #d2bd8a, 18px 5px 0 -5px #8f794f; }
+.gmrt-scene-object--weapon-rack > span { inset:8% 2%; border-top:5px solid #6f4729; border-bottom:5px solid #6f4729; background:repeating-linear-gradient(90deg, transparent 0 18%, #b9b7ad 19% 23%, #4e3824 24% 27%); }
+.gmrt-scene-object--market-stall > span { inset:5%; background:#7c4b28; box-shadow:inset 0 28% 0 #b94141, inset 0 40% 0 #e4c56f, inset 0 88% 0 #4a2d1c; }
+.gmrt-scene-object--market-stall > span::before { left:7%; bottom:5%; width:8%; height:55%; background:#4a2d1c; box-shadow:970% 0 0 #4a2d1c; }
+.gmrt-scene-object--campfire > span { inset:12%; border-radius:50%; background:radial-gradient(circle, #fff0a6 0 12%, #e88932 13% 28%, #8f3426 29% 42%, transparent 44%), repeating-conic-gradient(#5a3926 0 12deg, #2e241e 13deg 24deg); }
+.gmrt-scene-object--campfire > span::after { left:42%; top:6%; width:18%; height:32%; background:#ffd65b; box-shadow:-5px 8px 0 #e86e32, 5px 9px 0 #f39a37; transform:rotate(45deg); }
+.gmrt-scene-object--stool > span { inset:22% 12% 30%; border-radius:18%; background:#9d6636; box-shadow:inset 0 4px 0 #c88b4c; }
+.gmrt-scene-object--stool > span::before { left:12%; bottom:-55%; width:16%; height:58%; background:#4b2c19; box-shadow:360% 0 0 #4b2c19; }
+.gmrt-scene-object--rug > span { inset:5%; background:repeating-linear-gradient(90deg,#7e3344 0 12%,#c09a51 13% 22%,#4f566c 23% 35%); border:2px solid #d2b16b; box-shadow:inset 0 0 0 3px rgba(45,30,28,.45); }
+
+/* Palette thumbnails inherit the furnishing silhouette through a compact
+   sprite vocabulary without changing placement behaviour. */
+.gmrt-furniture-choice--bed .gmrt-furniture-choice__sprite { background:linear-gradient(#e1d6b8 0 28%,#7d3850 29% 72%,#5b3b25 73%); }
+.gmrt-furniture-choice--desk .gmrt-furniture-choice__sprite { background:linear-gradient(#bd8245 0 22%,#88572d 23% 66%,#4a2b18 67%); }
+.gmrt-furniture-choice--bench .gmrt-furniture-choice__sprite { background:linear-gradient(transparent 0 28%,#a86e38 29% 58%,transparent 59%); border-bottom:4px solid #4c2d19; }
+.gmrt-furniture-choice--cupboard .gmrt-furniture-choice__sprite { background:linear-gradient(90deg,#714525 0 48%,#56351f 49% 100%); border:2px solid #39271c; }
+.gmrt-furniture-choice--sacks .gmrt-furniture-choice__sprite { border-radius:45%; background:#b19a6b; box-shadow:8px 4px 0 -2px #8f794f; }
+.gmrt-furniture-choice--weapon-rack .gmrt-furniture-choice__sprite { background:repeating-linear-gradient(90deg,#6f4729 0 10%,#b9b7ad 11% 16%,#4e3824 17% 23%); }
+.gmrt-furniture-choice--market-stall .gmrt-furniture-choice__sprite { background:linear-gradient(#b94141 0 28%,#e4c56f 29% 42%,#7c4b28 43%); }
+.gmrt-furniture-choice--campfire .gmrt-furniture-choice__sprite { border-radius:50%; background:radial-gradient(circle,#fff0a6 0 15%,#e88932 16% 35%,#5a3926 36% 58%,transparent 59%); }
+.gmrt-furniture-choice--stool .gmrt-furniture-choice__sprite { border-radius:25%; background:linear-gradient(#b67a42 0 45%,#4b2c19 46%); }
+.gmrt-furniture-choice--rug .gmrt-furniture-choice__sprite { background:repeating-linear-gradient(90deg,#7e3344 0 24%,#c09a51 25% 48%,#4f566c 49% 72%); border:1px solid #d2b16b; }

@@ -157,21 +157,21 @@ final class ForgeFurniturePlanner
         $sets = [
             'mess' => [
                 ['kind' => 'table', 'x' => $cx, 'y' => $cy, 'rotation' => $longRotation],
-                ['kind' => 'chair', 'x' => $cx - 1.35, 'y' => $cy, 'rotation' => 90],
-                ['kind' => 'chair', 'x' => $cx + 1.35, 'y' => $cy, 'rotation' => 270],
+                ['kind' => 'bench', 'x' => $cx, 'y' => $cy + 1.15, 'rotation' => $longRotation],
+                ['kind' => 'stool', 'x' => $left, 'y' => $bottom, 'rotation' => 0],
                 ['kind' => 'barrel', 'x' => $right, 'y' => $bottom, 'rotation' => 0],
             ],
             'store' => [
-                ['kind' => 'crate', 'x' => $left, 'y' => $top, 'rotation' => 0],
+                ['kind' => 'cupboard', 'x' => $cx, 'y' => $top, 'rotation' => 0],
                 ['kind' => 'barrel', 'x' => $right, 'y' => $top, 'rotation' => 0],
-                ['kind' => 'crate', 'x' => $right, 'y' => $bottom, 'rotation' => 0],
-                ['kind' => 'chest', 'x' => $left, 'y' => $bottom, 'rotation' => 0],
+                ['kind' => 'sacks', 'x' => $right, 'y' => $bottom, 'rotation' => 0],
+                ['kind' => 'crate', 'x' => $left, 'y' => $bottom, 'rotation' => 0],
             ],
             'study' => [
                 ['kind' => 'bookshelf', 'x' => $cx, 'y' => $top, 'rotation' => 0],
-                ['kind' => 'table', 'x' => $cx, 'y' => $cy + 0.65, 'rotation' => $longRotation],
+                ['kind' => 'desk', 'x' => $cx, 'y' => $cy + 0.65, 'rotation' => $longRotation],
                 ['kind' => 'chair', 'x' => $cx, 'y' => $cy - 0.85, 'rotation' => 180],
-                ['kind' => 'chest', 'x' => $right, 'y' => $bottom, 'rotation' => 0],
+                ['kind' => 'rug', 'x' => $right - 0.5, 'y' => $bottom - 0.5, 'rotation' => 0],
             ],
             'treasure' => [
                 ['kind' => 'chest', 'x' => $cx, 'y' => $top, 'rotation' => 0],
@@ -179,13 +179,15 @@ final class ForgeFurniturePlanner
                 ['kind' => 'barrel', 'x' => $right, 'y' => $bottom, 'rotation' => 0],
             ],
             'quarters' => [
-                ['kind' => 'table', 'x' => $cx, 'y' => $cy, 'rotation' => $longRotation],
-                ['kind' => 'chair', 'x' => $cx, 'y' => $cy + 1.15, 'rotation' => 0],
+                ['kind' => 'bed', 'x' => $left + 0.5, 'y' => $cy, 'rotation' => $h > $w ? 90 : 0],
+                ['kind' => 'desk', 'x' => $right - 0.25, 'y' => $top, 'rotation' => 0],
+                ['kind' => 'stool', 'x' => $right, 'y' => $cy, 'rotation' => 0],
                 ['kind' => 'chest', 'x' => $right, 'y' => $bottom, 'rotation' => 0],
             ],
             'camp' => [
-                ['kind' => 'crate', 'x' => $left, 'y' => $bottom, 'rotation' => 0],
-                ['kind' => 'barrel', 'x' => $right, 'y' => $bottom, 'rotation' => 0],
+                ['kind' => 'campfire', 'x' => $cx, 'y' => $cy, 'rotation' => 0],
+                ['kind' => 'sacks', 'x' => $left, 'y' => $bottom, 'rotation' => 0],
+                ['kind' => 'crate', 'x' => $right, 'y' => $bottom, 'rotation' => 0],
             ],
             'cache' => [
                 ['kind' => 'chest', 'x' => $cx, 'y' => $cy, 'rotation' => 0],
