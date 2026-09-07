@@ -94,8 +94,8 @@ final class ForgeLearnsInteriorDesignRegressionTest extends TestCase
     {
         $provider = $this->source('app/Tabletop/TabletopServiceProvider.php');
 
-        self::assertStringContainsString('SceneObjects\\\\Repositories\\\\WordPressSceneObjectRepository()', $provider);
-        self::assertStringContainsString('SceneObjects\\\\FurnitureCatalogue()', $provider);
-        self::assertStringContainsString('Cartography\\\\Services\\\\ForgeFurniturePlanner(', $provider);
+        self::assertStringContainsString('SceneObjects\\Repositories\\WordPressSceneObjectRepository()', $provider);
+        self::assertStringContainsString('SceneObjects\\FurnitureCatalogue()', $provider);
+        self::assertStringContainsString('Cartography\\Services\\ForgeFurniturePlanner(', $provider);
     }
 }
