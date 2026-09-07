@@ -1219,3 +1219,5 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - IV.35.8 — The Keeper Opens the Furniture Catalogue: adds an administrator-managed custom furniture registry, strict SVG sanitisation, immutable built-in keys, and automatic custom sprite rendering through the existing Keeper Palette/Scene Object pipeline.
 
 - IV.35.8.1 — The Ottoman Regains Its Colour: preserves safe Inkscape SVG fill/stroke presentation by promoting approved inline style declarations to sanitised SVG attributes while continuing to reject active CSS and external references.
+
+- IV.35.8A — Pippin Reads the Labels: custom furniture gains controlled Forge room/environment labels; Dungeon Forge deterministically selects sparse opted-in custom accents while preserving all existing clearance and Scene Object rules.

@@ -98,6 +98,19 @@ final class FurnitureCatalogueAdmin
             $interaction = 'none';
         }
 
+        $forgeTags = [];
+        $allowedForgeTags = [
+            'mess', 'store', 'study', 'treasure', 'quarters', 'camp', 'cache',
+            'dungeon', 'village', 'forest', 'outdoor', 'market',
+        ];
+        foreach (is_array($_POST['forge_tags'] ?? null) ? $_POST['forge_tags'] : [] as $tag) {
+            $tag = sanitize_key((string) $tag);
+            if (in_array($tag, $allowedForgeTags, true)) {
+                $forgeTags[$tag] = $tag;
+            }
+        }
+        $forgeTags = array_values($forgeTags);
+
         $definition = [
             'label' => $label,
             'category' => $category,
@@ -111,6 +124,7 @@ final class FurnitureCatalogueAdmin
             'interaction' => $interaction,
             'mimic_capable' => isset($_POST['mimic_capable']),
             'forge_enabled' => isset($_POST['forge_enabled']),
+            'forge_tags' => $forgeTags,
             'sprite_svg' => $sprite,
             'custom' => true,
         ];
@@ -176,7 +190,12 @@ final class FurnitureCatalogueAdmin
                     <td><div style="width:48px;height:48px"><?php echo (string) ($definition['sprite_svg'] ?? ''); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div></td>
                     <td><code><?php echo esc_html($kind); ?></code></td>
                     <td><?php echo esc_html((string) ($definition['label'] ?? $kind)); ?></td>
-                    <td><?php echo ! empty($definition['blocks_movement']) ? 'Movement · ' : ''; ?><?php echo esc_html((string) ($definition['cover'] ?? 'none')); ?> cover<?php echo ! empty($definition['blocks_vision']) ? ' · Vision' : ''; ?></td>
+                    <td>
+                        <?php echo ! empty($definition['blocks_movement']) ? 'Movement · ' : ''; ?><?php echo esc_html((string) ($definition['cover'] ?? 'none')); ?> cover<?php echo ! empty($definition['blocks_vision']) ? ' · Vision' : ''; ?>
+                        <?php if (! empty($definition['forge_enabled'])) : ?>
+                            <br><small>Forge: <?php echo esc_html(implode(', ', is_array($definition['forge_tags'] ?? null) ? $definition['forge_tags'] : [])); ?></small>
+                        <?php endif; ?>
+                    </td>
                     <td>
                         <a class="button" href="<?php echo esc_url(add_query_arg(['page' => self::PAGE, 'edit' => $kind], admin_url('tools.php'))); ?>">Edit</a>
                         <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" style="display:inline">
@@ -212,6 +231,43 @@ final class FurnitureCatalogueAdmin
                             'forge_enabled' => 'Available to Dungeon Forge',
                         ] as $field => $label) : ?>
                             <label style="display:block"><input type="checkbox" name="<?php echo esc_attr($field); ?>" <?php checked(! empty($editing[$field])); ?>> <?php echo esc_html($label); ?></label>
+                        <?php endforeach; ?>
+                    </td></tr>
+                    <tr><th>Dungeon Forge labels</th><td>
+                        <?php
+                        $selectedForgeTags = is_array($editing['forge_tags'] ?? null)
+                            ? array_map('sanitize_key', $editing['forge_tags'])
+                            : [];
+                        $forgeTagGroups = [
+                            'Room purpose' => [
+                                'mess' => 'Mess / dining',
+                                'store' => 'Store room',
+                                'study' => 'Study / archive',
+                                'treasure' => 'Treasure room',
+                                'quarters' => 'Quarters',
+                                'camp' => 'Camp',
+                                'cache' => 'Cache',
+                            ],
+                            'Environment' => [
+                                'dungeon' => 'Dungeon',
+                                'village' => 'Village',
+                                'forest' => 'Forest',
+                                'outdoor' => 'Outdoor',
+                                'market' => 'Market',
+                            ],
+                        ];
+                        ?>
+                        <p class="description">Pippin may use an opted-in furnishing when any selected label matches the generated room/context. Leave all labels empty to keep it out of automatic placement.</p>
+                        <?php foreach ($forgeTagGroups as $groupLabel => $forgeTags) : ?>
+                            <fieldset style="margin:10px 0">
+                                <legend><strong><?php echo esc_html($groupLabel); ?></strong></legend>
+                                <?php foreach ($forgeTags as $tag => $tagLabel) : ?>
+                                    <label style="display:inline-block;min-width:170px;margin:3px 10px 3px 0">
+                                        <input type="checkbox" name="forge_tags[]" value="<?php echo esc_attr($tag); ?>" <?php checked(in_array($tag, $selectedForgeTags, true)); ?>>
+                                        <?php echo esc_html($tagLabel); ?>
+                                    </label>
+                                <?php endforeach; ?>
+                            </fieldset>
                         <?php endforeach; ?>
                     </td></tr>
                     <tr><th><label for="gmrt-description">Description</label></th><td><textarea id="gmrt-description" name="description" rows="4" class="large-text"><?php echo esc_textarea((string) ($editing['description'] ?? '')); ?></textarea></td></tr>

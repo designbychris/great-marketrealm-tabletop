@@ -197,6 +197,10 @@ final class DungeonForgeAjaxController
                     'light_occlusion' => max(0.0, min(1.0, (float) ($definition['light_occlusion'] ?? 0.0))),
                     'interaction' => (string) ($definition['interaction'] ?? 'none'),
                     'mimic_capable' => ! empty($definition['mimic_capable']),
+                    'sprite_svg' => (string) ($definition['sprite_svg'] ?? ''),
+                    'forge_tags' => is_array($definition['forge_tags'] ?? null)
+                        ? array_values($definition['forge_tags'])
+                        : [],
                     'forge_generated' => true,
                     'forge_room_index' => (int) ($draft['room_index'] ?? 0),
                     'forge_room_role' => (string) ($draft['room_role'] ?? 'room'),

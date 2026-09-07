@@ -926,3 +926,5 @@ Carry Session recap evidence and character-attributed deeds across the Tabletop 
 
 - [x] IV.35.8 — The Keeper Opens the Furniture Catalogue: admins can register sanitised SVG-backed custom furniture without a code push; built-ins remain immutable and runtime consumers use one merged catalogue. 🗄️🖼️
 - [ ] IV.35.8A — Pippin Reads the Labels: opt-in custom furniture gains room/usage tags consumed by Dungeon Forge. 🏷️🗺️
+
+- [x] IV.35.8A — Pippin Reads the Labels: custom furniture can be tagged with controlled room/environment labels and safely enters Pippin's deterministic furnishing pass when explicitly opted in. 🏷️🗺️

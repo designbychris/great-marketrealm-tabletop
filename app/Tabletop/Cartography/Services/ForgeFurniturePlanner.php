@@ -57,6 +57,19 @@ final class ForgeFurniturePlanner
 
             $role = $this->roomRole($sceneType, (int) $roomIndex, $seed);
             $candidates = $this->candidatesForRole($role, $x, $y, $w, $h, $seed, (int) $roomIndex);
+            $candidates = array_merge(
+                $candidates,
+                $this->customCandidatesForContext(
+                    $role,
+                    $sceneType,
+                    $x,
+                    $y,
+                    $w,
+                    $h,
+                    $seed,
+                    (int) $roomIndex
+                )
+            );
 
             foreach ($candidates as $candidateIndex => $candidate) {
                 if (count($drafts) >= $maximum) {
@@ -205,6 +218,105 @@ final class ForgeFurniturePlanner
             && $this->fraction($seed, 'trim-' . $roomIndex . '-' . $role) < 0.34
         ) {
             array_pop($candidates);
+        }
+
+        return $candidates;
+    }
+
+    /**
+     * @return array<int,array{kind:string,x:float,y:float,rotation:int}>
+     */
+    private function customCandidatesForContext(
+        string $role,
+        string $sceneType,
+        float $x,
+        float $y,
+        float $w,
+        float $h,
+        string $seed,
+        int $roomIndex
+    ): array {
+        $context = [$role, $sceneType];
+        if ($sceneType === 'forest') {
+            $context[] = 'outdoor';
+        }
+        if ($sceneType === 'village') {
+            $context[] = 'market';
+        }
+
+        $eligible = [];
+        foreach ($this->catalogue->all() as $kind => $definition) {
+            if (
+                empty($definition['custom'])
+                || empty($definition['forge_enabled'])
+                || ! is_array($definition['forge_tags'] ?? null)
+            ) {
+                continue;
+            }
+
+            $tags = array_values(array_filter(array_map(
+                static fn ($tag): string => sanitize_key((string) $tag),
+                $definition['forge_tags']
+            )));
+            if ($tags === [] || array_intersect($tags, $context) === []) {
+                continue;
+            }
+
+            $eligible[(string) $kind] = $definition;
+        }
+
+        if ($eligible === []) {
+            return [];
+        }
+
+        ksort($eligible);
+        $cx = $x + ($w / 2);
+        $cy = $y + ($h / 2);
+        $slots = [
+            [$x + 1.0, $cy],
+            [$x + $w - 1.0, $cy],
+            [$cx, $y + 1.0],
+            [$cx, $y + $h - 1.0],
+            [$x + 1.0, $y + 1.0],
+            [$x + $w - 1.0, $y + $h - 1.0],
+        ];
+
+        $candidates = [];
+        foreach (array_keys($eligible) as $kind) {
+            // Keep custom content as an accent rather than allowing a large
+            // admin catalogue to overwhelm every generated room.
+            if ($this->fraction($seed, 'custom-use-' . $roomIndex . '-' . $role . '-' . $kind) > 0.58) {
+                continue;
+            }
+
+            $slotIndex = min(
+                count($slots) - 1,
+                (int) floor(
+                    $this->fraction($seed, 'custom-slot-' . $roomIndex . '-' . $kind)
+                    * count($slots)
+                )
+            );
+            $rotationIndex = min(
+                3,
+                (int) floor(
+                    $this->fraction($seed, 'custom-rotation-' . $roomIndex . '-' . $kind)
+                    * 4
+                )
+            );
+            $rotation = [0, 90, 180, 270][$rotationIndex];
+
+            $candidates[] = [
+                'kind' => $kind,
+                'x' => $slots[$slotIndex][0],
+                'y' => $slots[$slotIndex][1],
+                'rotation' => $rotation,
+            ];
+
+            // At most two custom accents per room; the overlap/door rules still
+            // make the final authoritative decision.
+            if (count($candidates) >= 2) {
+                break;
+            }
         }
 
         return $candidates;
