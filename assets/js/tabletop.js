@@ -3965,7 +3965,7 @@
             });
             builtDungeonForgePlan = data.forge || dungeonForgeDraft;
             dungeonForgeDraft = null;
-            setForgeStatus(data.message || 'Dungeon forged. Walls, doors, lights, grid and Fog are now authoritative.');
+            setForgeStatus(data.message || 'Dungeon forged. Walls, doors, furniture, lights, grid and Fog are now authoritative.');
             await replaceChamber(data.message || 'Dungeon forged.', preparationSceneId || null);
         } catch (error) {
             dungeonForgeBuild.disabled = false;

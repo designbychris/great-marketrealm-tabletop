@@ -10,11 +10,15 @@ use GreatMarketrealmTabletop\Tables\Scenes\Contracts\TableSceneRepository;
 use GreatMarketrealmTabletop\Tables\Scenes\Models\GridType;
 use GreatMarketrealmTabletop\Tables\Scenes\Services\TableSceneManager;
 use GreatMarketrealmTabletop\Tabletop\Cartography\Contracts\DungeonForgeRepository;
+use GreatMarketrealmTabletop\Tabletop\Cartography\Services\ForgeFurniturePlanner;
 use GreatMarketrealmTabletop\Tabletop\Atlas\Services\SceneShelfCleaner;
 use GreatMarketrealmTabletop\Tabletop\Fog\Services\FogOfWarManager;
 use GreatMarketrealmTabletop\Tabletop\Light\Contracts\EnvironmentalLightRepository;
 use GreatMarketrealmTabletop\Tabletop\Light\Models\EnvironmentalLight;
 use GreatMarketrealmTabletop\Tabletop\Vision\Services\VisionBarrierManager;
+use GreatMarketrealmTabletop\Tabletop\SceneObjects\Contracts\SceneObjectRepository;
+use GreatMarketrealmTabletop\Tabletop\SceneObjects\FurnitureCatalogue;
+use GreatMarketrealmTabletop\Tabletop\SceneObjects\Models\SceneObject;
 use RuntimeException;
 use Throwable;
 
@@ -39,7 +43,10 @@ final class DungeonForgeAjaxController
         private EnvironmentalLightRepository $lights,
         private FogOfWarManager $fog,
         private TableSceneManager $sceneManager,
-        private SceneShelfCleaner $cleaner
+        private SceneShelfCleaner $cleaner,
+        private SceneObjectRepository $sceneObjects,
+        private FurnitureCatalogue $furniture,
+        private ForgeFurniturePlanner $furnisher
     ) {}
 
     public function build(): void
@@ -69,9 +76,10 @@ final class DungeonForgeAjaxController
 
             return [
                 'message' => sprintf(
-                    'Scene forged · %d major places · %d barriers · %d lights · Fog enabled.',
+                    'Scene forged · %d major places · %d barriers · %d furnishings · %d lights · Fog enabled.',
                     count($plan['rooms']),
                     count($projection['barrier_ids']),
+                    count($projection['furniture_ids']),
                     count($projection['light_ids'])
                 ),
                 'forge' => $projection,
@@ -115,10 +123,11 @@ final class DungeonForgeAjaxController
                 'scene' => $scene->toArray(),
                 'forge' => $projection,
                 'message' => sprintf(
-                    '%s has been forged into the Keeper\'s Atlas · %d major places · %d doors · %d lights.',
+                    '%s has been forged into the Keeper\'s Atlas · %d major places · %d doors · %d furnishings · %d lights.',
                     $scene->name(),
                     count($plan['rooms']),
                     count($plan['doors']),
+                    count($projection['furniture_ids']),
                     count($projection['light_ids'])
                 ),
             ];
@@ -140,6 +149,61 @@ final class DungeonForgeAjaxController
     private function buildPlan(string $tableId, int $userId, string $sceneId, array $plan): array
     {
         $created = $this->vision->addBatch($tableId, $userId, $plan['barriers'], $sceneId);
+
+        // IV.35.7 — architecture first, furniture second. The planner never
+        // paints props into the Forge SVG; it creates ordinary persistent Scene
+        // Objects after walls/doors have been accepted as authoritative.
+        $furnitureDrafts = $this->furnisher->plan($plan);
+        $furnitureIds = [];
+        foreach ($furnitureDrafts as $index => $draft) {
+            $kind = (string) ($draft['kind'] ?? '');
+            $definition = $this->furniture->find($kind);
+            if (! is_array($definition)) {
+                continue;
+            }
+
+            $id = 'forge-furniture-' . substr(
+                hash(
+                    'sha256',
+                    $plan['seed']
+                        . '|' . $sceneId
+                        . '|' . (string) $index
+                        . '|' . $kind
+                        . '|' . (string) ($draft['x'] ?? 0)
+                        . '|' . (string) ($draft['y'] ?? 0)
+                ),
+                0,
+                18
+            );
+
+            $this->sceneObjects->save(new SceneObject(
+                $id,
+                $tableId,
+                $sceneId,
+                $kind,
+                (string) ($definition['category'] ?? 'decorative'),
+                max(0.0, min(1.0, (float) ($draft['x'] ?? 0.5))),
+                max(0.0, min(1.0, (float) ($draft['y'] ?? 0.5))),
+                (int) ($draft['rotation'] ?? 0),
+                1.0,
+                ['open' => false],
+                [
+                    'label' => (string) ($definition['label'] ?? ucfirst($kind)),
+                    'width_units' => (float) ($definition['width_units'] ?? 1.0),
+                    'height_units' => (float) ($definition['height_units'] ?? 1.0),
+                    'blocks_movement' => ! empty($definition['blocks_movement']),
+                    'cover' => (string) ($definition['cover'] ?? 'none'),
+                    'blocks_vision' => ! empty($definition['blocks_vision']),
+                    'light_occlusion' => max(0.0, min(1.0, (float) ($definition['light_occlusion'] ?? 0.0))),
+                    'interaction' => (string) ($definition['interaction'] ?? 'none'),
+                    'mimic_capable' => ! empty($definition['mimic_capable']),
+                    'forge_generated' => true,
+                    'forge_room_index' => (int) ($draft['room_index'] ?? 0),
+                    'forge_room_role' => (string) ($draft['room_role'] ?? 'room'),
+                ]
+            ));
+            $furnitureIds[] = $id;
+        }
 
         $lightIds = [];
         foreach ($plan['lights'] as $index => $draft) {
@@ -165,7 +229,7 @@ final class DungeonForgeAjaxController
         $fog = $this->fog->configure($tableId, $userId, true, true, $sceneId);
 
         $projection = [
-            'version' => 3,
+            'version' => 4,
             'scene_type' => $plan['scene_type'],
             'seed' => $plan['seed'],
             'style' => $plan['style'],
@@ -177,7 +241,9 @@ final class DungeonForgeAjaxController
             'doors' => $plan['doors'],
             'lights' => $plan['lights'],
             'features' => $plan['features'],
+            'furniture' => $furnitureDrafts,
             'barrier_ids' => array_map(static fn ($barrier): string => $barrier->id(), $created),
+            'furniture_ids' => $furnitureIds,
             'light_ids' => $lightIds,
             'built_at' => gmdate(DATE_ATOM),
         ];

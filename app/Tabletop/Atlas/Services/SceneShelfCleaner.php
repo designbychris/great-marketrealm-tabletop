@@ -46,6 +46,7 @@ final class SceneShelfCleaner
 
         $this->forgetKeys('gmrt_battle_events', $tableId, $encounterIds);
         $this->forgetMagicalLights($tableId, $sceneId);
+        $this->forgetFlatSceneRows('gmrt_scene_objects', $tableId, $sceneId);
         $this->forgetScene('gmrt_table_scenes', $tableId, $sceneId);
     }
 
@@ -83,6 +84,28 @@ final class SceneShelfCleaner
         if (($all[$tableId] ?? []) === []) {
             unset($all[$tableId]);
         }
+        update_option($option, $all, false);
+    }
+
+    private function forgetFlatSceneRows(string $option, string $tableId, string $sceneId): void
+    {
+        $all = get_option($option, []);
+        if (! is_array($all)) {
+            return;
+        }
+
+        foreach ($all as $id => $row) {
+            if (! is_array($row)) {
+                continue;
+            }
+            if (
+                (string) ($row['table_id'] ?? '') === $tableId
+                && (string) ($row['scene_id'] ?? '') === $sceneId
+            ) {
+                unset($all[$id]);
+            }
+        }
+
         update_option($option, $all, false);
     }
 

@@ -247,7 +247,12 @@ final class TabletopServiceProvider
             new WordPressEnvironmentalLightRepository(),
             FogOfWarFactory::make(),
             \GreatMarketrealmTabletop\Tables\Scenes\Services\TableSceneManagerFactory::make(),
-            new \GreatMarketrealmTabletop\Tabletop\Atlas\Services\SceneShelfCleaner()
+            new \GreatMarketrealmTabletop\Tabletop\Atlas\Services\SceneShelfCleaner(),
+            new \GreatMarketrealmTabletop\Tabletop\SceneObjects\Repositories\WordPressSceneObjectRepository(),
+            new \GreatMarketrealmTabletop\Tabletop\SceneObjects\FurnitureCatalogue(),
+            new \GreatMarketrealmTabletop\Tabletop\Cartography\Services\ForgeFurniturePlanner(
+                new \GreatMarketrealmTabletop\Tabletop\SceneObjects\FurnitureCatalogue()
+            )
         );
 
         $this->fogAjax = new FogOfWarAjaxController(

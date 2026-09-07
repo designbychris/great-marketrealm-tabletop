@@ -1211,3 +1211,5 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - IV.35.5 — Please Do Not Open the Chest: added persistent Scene Object interaction state with Keeper-controlled open/close Chests and pixel open-state presentation.
 
 - IV.35.4C.2C — The Walls Would Also Like a Say: broad light pools now render from the existing barrier-resolved Fog illumination cells, preventing visual halo bleed through walls while preserving furniture attenuation and animated emitters.
+
+- IV.35.7 — Forge Learns Interior Design: Dungeon Forge now performs a deterministic, doorway-aware, overlap-safe furnishing pass using real persistent Scene Objects and the existing Furniture Catalogue.
