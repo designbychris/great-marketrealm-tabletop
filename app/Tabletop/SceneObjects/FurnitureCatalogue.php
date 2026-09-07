@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace GreatMarketrealmTabletop\Tabletop\SceneObjects;
 
 use GreatMarketrealmTabletop\Tabletop\SceneObjects\Models\SceneObjectCategory;
+use GreatMarketrealmTabletop\Tabletop\SceneObjects\Repositories\WordPressCustomFurnitureRepository;
 
 defined('ABSPATH') || exit;
 
@@ -17,8 +18,12 @@ defined('ABSPATH') || exit;
  */
 final class FurnitureCatalogue
 {
+    public function __construct(
+        private ?WordPressCustomFurnitureRepository $custom = null
+    ) {}
+
     /** @return array<string,array<string,mixed>> */
-    public function all(): array
+    public function builtIns(): array
     {
         return [
             'table' => $this->definition(
@@ -216,11 +221,27 @@ final class FurnitureCatalogue
         ];
     }
 
+    /** @return array<string,array<string,mixed>> */
+    public function all(): array
+    {
+        $builtIns = $this->builtIns();
+        $custom = ($this->custom ?? new WordPressCustomFurnitureRepository())->all();
+
+        // Core keys are deliberately immutable. A custom record may never
+        // shadow a certified built-in furnishing.
+        return $builtIns + $custom;
+    }
+
     /** @return array<string,mixed>|null */
     public function find(string $kind): ?array
     {
         $kind = sanitize_key($kind);
         return $this->all()[$kind] ?? null;
+    }
+
+    public function isBuiltIn(string $kind): bool
+    {
+        return array_key_exists(sanitize_key($kind), $this->builtIns());
     }
 
     /** @return array<string,mixed> */

@@ -92,6 +92,7 @@ if (
                         'light_occlusion' => max(0.0, min(1.0, (float) ($definition['light_occlusion'] ?? 0.0))),
                         'interaction' => (string) ($definition['interaction'] ?? 'none'),
                         'mimic_capable' => ! empty($definition['mimic_capable']),
+                                'sprite_svg' => (string) ($definition['sprite_svg'] ?? ''),
                     ]
                 ));
                 $sceneObjectPlacementNotice = sprintf(
@@ -1705,7 +1706,12 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                     aria-pressed="false"
                                     title="<?php echo esc_attr((string) $furnitureDefinition['description']); ?>"
                                 >
-                                    <span class="gmrt-furniture-choice__sprite" aria-hidden="true"></span>
+                                    <?php $furnitureSpriteSvg = (string) ($furnitureDefinition['sprite_svg'] ?? ''); ?>
+                                    <?php if ($furnitureSpriteSvg !== '') : ?>
+                                        <span class="gmrt-furniture-choice__sprite gmrt-furniture-choice__sprite--custom" aria-hidden="true"><?php echo $furnitureSpriteSvg; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+                                    <?php else : ?>
+                                        <span class="gmrt-furniture-choice__sprite" aria-hidden="true"></span>
+                                    <?php endif; ?>
                                     <span><?php echo esc_html((string) $furnitureDefinition['label']); ?></span>
                                 </button>
                             <?php endforeach; ?>
@@ -1915,6 +1921,10 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                             if (! in_array($objectInteraction, ['none', 'open_close'], true)) {
                                 $objectInteraction = 'none';
                             }
+                            $objectSpriteSvg = (string) (
+                                $objectProperties['sprite_svg']
+                                ?? ($objectDefinition['sprite_svg'] ?? '')
+                            );
                         ?>
                             <div
                                 class="gmrt-scene-object gmrt-scene-object--<?php echo esc_attr($objectKind); ?><?php echo $objectOpen ? ' is-open' : ' is-closed'; ?>"
@@ -1939,7 +1949,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                 <?php if ($state->isDungeonMaster()) : ?>tabindex="0" aria-pressed="false"<?php endif; ?>
                                 aria-label="<?php echo esc_attr($objectLabel . ($state->isDungeonMaster() ? '. Select to rearrange.' : '')); ?>"
                                 title="<?php echo esc_attr($objectLabel); ?>"
-                            ><span aria-hidden="true"></span></div>
+                            ><?php if ($objectSpriteSvg !== '') : ?><span class="gmrt-scene-object__custom-sprite" aria-hidden="true"><?php echo $objectSpriteSvg; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span><?php else : ?><span aria-hidden="true"></span><?php endif; ?></div>
                         <?php endforeach; ?>
                     </div>
 

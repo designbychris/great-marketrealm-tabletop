@@ -923,3 +923,6 @@ Carry Session recap evidence and character-attributed deeds across the Tabletop 
 - [x] IV.35.7 — Forge Learns Interior Design: Pippin classifies Forge rooms and places editable, tactical Scene Object furniture while preserving door approaches and movement space. 🗺️🪑
 
 - [x] IV.35.6 — Furnishings of the MarketRealm: ten additional tactical/decorative furnishings expand both the Keeper Palette and Pippin's certified Forge interior-design vocabulary. 🛏️🪑🔥
+
+- [x] IV.35.8 — The Keeper Opens the Furniture Catalogue: admins can register sanitised SVG-backed custom furniture without a code push; built-ins remain immutable and runtime consumers use one merged catalogue. 🗄️🖼️
+- [ ] IV.35.8A — Pippin Reads the Labels: opt-in custom furniture gains room/usage tags consumed by Dungeon Forge. 🏷️🗺️

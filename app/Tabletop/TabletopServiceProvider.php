@@ -87,6 +87,10 @@ use GreatMarketrealmTabletop\Tabletop\Movement\Services\TabletopMovementFactory;
 use GreatMarketrealmTabletop\Tabletop\Presentation\TabletopChamberRenderer;
 use GreatMarketrealmTabletop\Tabletop\Presentation\TabletopShortcode;
 use GreatMarketrealmTabletop\Tabletop\Services\TabletopChamberFactory;
+use GreatMarketrealmTabletop\Tabletop\SceneObjects\Admin\FurnitureCatalogueAdmin;
+use GreatMarketrealmTabletop\Tabletop\SceneObjects\FurnitureCatalogue;
+use GreatMarketrealmTabletop\Tabletop\SceneObjects\FurnitureSvgSanitizer;
+use GreatMarketrealmTabletop\Tabletop\SceneObjects\Repositories\WordPressCustomFurnitureRepository;
 
 defined('ABSPATH') || exit;
 
@@ -159,9 +163,18 @@ final class TabletopServiceProvider
 
     private BestiaryAjaxController $bestiaryAjax;
 
+    private FurnitureCatalogueAdmin $furnitureCatalogueAdmin;
+
     public function __construct()
     {
         $chamber = TabletopChamberFactory::make();
+        $customFurniture = new WordPressCustomFurnitureRepository();
+        $mergedFurnitureCatalogue = new FurnitureCatalogue($customFurniture);
+        $this->furnitureCatalogueAdmin = new FurnitureCatalogueAdmin(
+            $mergedFurnitureCatalogue,
+            $customFurniture,
+            new FurnitureSvgSanitizer()
+        );
 
         $this->shortcode = new TabletopShortcode(
             $chamber,
@@ -249,9 +262,9 @@ final class TabletopServiceProvider
             \GreatMarketrealmTabletop\Tables\Scenes\Services\TableSceneManagerFactory::make(),
             new \GreatMarketrealmTabletop\Tabletop\Atlas\Services\SceneShelfCleaner(),
             new \GreatMarketrealmTabletop\Tabletop\SceneObjects\Repositories\WordPressSceneObjectRepository(),
-            new \GreatMarketrealmTabletop\Tabletop\SceneObjects\FurnitureCatalogue(),
+            $mergedFurnitureCatalogue,
             new \GreatMarketrealmTabletop\Tabletop\Cartography\Services\ForgeFurniturePlanner(
-                new \GreatMarketrealmTabletop\Tabletop\SceneObjects\FurnitureCatalogue()
+                $mergedFurnitureCatalogue
             )
         );
 
@@ -383,6 +396,8 @@ final class TabletopServiceProvider
 
     public function register(): void
     {
+        $this->furnitureCatalogueAdmin->register();
+
         add_shortcode(
             TabletopShortcode::TAG,
             [$this->shortcode, 'render']
