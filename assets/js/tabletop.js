@@ -3389,6 +3389,8 @@
     const dungeonForgeSceneType = document.querySelector('[data-dungeon-forge-scene-type]');
     const dungeonForgeStyle = document.querySelector('[data-dungeon-forge-style]');
     const dungeonForgeTheme = document.querySelector('[data-dungeon-forge-theme]');
+    const dungeonForgeEntry = document.querySelector('[data-dungeon-forge-entry]');
+    const dungeonForgeLair = document.querySelector('[data-dungeon-forge-lair]');
     const updateDungeonForgeLairAvailability = () => {
         if (!dungeonForgeLair) return;
         const allowed = String(dungeonForgeSceneType?.value || 'dungeon') === 'dungeon'
@@ -3399,8 +3401,6 @@
     dungeonForgeSceneType?.addEventListener('change', updateDungeonForgeLairAvailability);
     dungeonForgeStyle?.addEventListener('change', updateDungeonForgeLairAvailability);
     updateDungeonForgeLairAvailability();
-    const dungeonForgeEntry = document.querySelector('[data-dungeon-forge-entry]');
-    const dungeonForgeLair = document.querySelector('[data-dungeon-forge-lair]');
     const dungeonForgeGenerate = document.querySelector('[data-dungeon-forge-generate]');
     const dungeonForgeReroll = document.querySelector('[data-dungeon-forge-reroll]');
     const dungeonForgeBuild = document.querySelector('[data-dungeon-forge-build]');
