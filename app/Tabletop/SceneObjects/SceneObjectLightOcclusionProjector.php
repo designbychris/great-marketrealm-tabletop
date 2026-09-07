@@ -62,7 +62,11 @@ final class SceneObjectLightOcclusionProjector
         $catalogue = $this->catalogue ?? new FurnitureCatalogue();
         $sceneWidth = max(1.0, (float) $scene->width());
         $sceneHeight = max(1.0, (float) $scene->height());
-        $grid = max(1.0, (float) $scene->gridSize());
+        $referenceWidth = (float) $scene->gridReferenceWidth();
+        $gridScale = $referenceWidth > 0.0
+            ? $sceneWidth / $referenceWidth
+            : 1.0;
+        $grid = max(1.0, (float) $scene->gridSize() * $gridScale);
         $result = [];
 
         foreach ($objects as $object) {

@@ -203,7 +203,11 @@ final class FogOfWarProjector
 
             $sourceCell = $mapper->cellFor($scene, $lightSource->x(), $lightSource->y());
             $sourceKey = FogCellMapper::key($sourceCell['column'], $sourceCell['row']);
-            if ($dungeonMaster || in_array($sourceKey, $viewerLineOfSight, true)) {
+            if (
+                $dungeonMaster
+                || in_array($sourceKey, $viewerLineOfSight, true)
+                || in_array($sourceKey, $visible, true)
+            ) {
                 $safeLightSources[] = [
                     'x' => $lightSource->x(),
                     'y' => $lightSource->y(),

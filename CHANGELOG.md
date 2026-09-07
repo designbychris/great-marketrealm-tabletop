@@ -1203,3 +1203,5 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - IV.35.4C.2 — Light Finds Another Way: wired Scene Object light occlusion into Living Veil illumination and added authoritative per-cell attenuation presentation.
 
 - IV.35.4C.2A — The Light Was There All Along: fixed attenuation-key rendering and restored viewer-safe Keeper light marker metadata/visibility.
+
+- IV.35.4C.2B — Pippin Measures the Shadow Twice: aligned Scene Object light/vision geometry with Fog grid-reference calibration and hardened environmental source visibility.

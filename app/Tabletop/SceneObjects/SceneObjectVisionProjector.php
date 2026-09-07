@@ -77,7 +77,11 @@ final class SceneObjectVisionProjector
         $polygons = [];
         $sceneWidth = max(1.0, (float) $scene->width());
         $sceneHeight = max(1.0, (float) $scene->height());
-        $grid = max(1.0, (float) $scene->gridSize());
+        $referenceWidth = (float) $scene->gridReferenceWidth();
+        $gridScale = $referenceWidth > 0.0
+            ? $sceneWidth / $referenceWidth
+            : 1.0;
+        $grid = max(1.0, (float) $scene->gridSize() * $gridScale);
 
         foreach ($objects as $object) {
             if (! $object instanceof SceneObject) {
@@ -126,16 +130,22 @@ final class SceneObjectVisionProjector
 
         $column = (int) $parts[0];
         $row = (int) $parts[1];
-        $grid = max(1.0, (float) $scene->gridSize());
         $width = max(1.0, (float) $scene->width());
         $height = max(1.0, (float) $scene->height());
+        $referenceWidth = (float) $scene->gridReferenceWidth();
+        $gridScale = $referenceWidth > 0.0
+            ? $width / $referenceWidth
+            : 1.0;
+        $grid = max(1.0, (float) $scene->gridSize() * $gridScale);
+        $offsetX = (float) $scene->gridOffsetX() * $gridScale;
+        $offsetY = (float) $scene->gridOffsetY() * $gridScale;
 
         return [
             'x' => $this->clamp01(
-                ((float) $scene->gridOffsetX() + (($column + 0.5) * $grid)) / $width
+                ($offsetX + (($column + 0.5) * $grid)) / $width
             ),
             'y' => $this->clamp01(
-                ((float) $scene->gridOffsetY() + (($row + 0.5) * $grid)) / $height
+                ($offsetY + (($row + 0.5) * $grid)) / $height
             ),
         ];
     }
