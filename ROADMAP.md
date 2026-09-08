@@ -941,4 +941,4 @@ Carry Session recap evidence and character-attributed deeds across the Tabletop 
 
 - [x] IV.35.9B — Pippin Does Not Trust the Furniture — final disguised Mimic arming/reveal/disarm workflow alongside immediate conversion.
 
-- [x] IV.35.10 — Something Is Waiting in the Lair — optional Bestiary-backed Boss Lair occupant deployment.
+- [x] IV.35.10A — The Lair Checks the Entire Bestiary — Bestiary bridge/schema and combat vocabulary compatibility correction exposed by Boss Lair deployment.

@@ -31,13 +31,18 @@ defined('ABSPATH') || exit;
  */
 final class BestiaryCombatProvisioner
 {
+    private BestiaryCompatibilityNormalizer $compatibility;
+
     public function __construct(
         private CombatProfileRepository $combatProfiles,
         private DamageProfileRepository $damageProfiles,
         private CombatArsenalRepository $arsenals,
         private DamageDefenseRepository $defenses,
-        private VitalityRepository $vitality
-    ) {}
+        private VitalityRepository $vitality,
+        ?BestiaryCompatibilityNormalizer $compatibility = null
+    ) {
+        $this->compatibility = $compatibility ?? new BestiaryCompatibilityNormalizer();
+    }
 
     public function provision(
         string $tableId,
@@ -114,7 +119,7 @@ final class BestiaryCombatProvisioner
             max(1, (int) ($damage['dice_count'] ?? 1)),
             (int) ($damage['die_sides'] ?? 4),
             (int) ($damage['modifier'] ?? 0),
-            DamageType::assert((string) ($damage['type'] ?? DamageType::BLUDGEONING))
+            $this->compatibility->damageType((string) ($damage['type'] ?? DamageType::BLUDGEONING))
         );
     }
 
@@ -162,7 +167,7 @@ final class BestiaryCombatProvisioner
                     max(1, (int) ($damage['dice_count'] ?? 1)),
                     (int) ($damage['die_sides'] ?? 4),
                     (int) ($damage['modifier'] ?? 0),
-                    DamageType::assert((string) ($damage['type'] ?? DamageType::BLUDGEONING))
+                    $this->compatibility->damageType((string) ($damage['type'] ?? DamageType::BLUDGEONING))
                 ),
                 is_array($record['properties'] ?? null)
                     ? array_map('strval', $record['properties'])

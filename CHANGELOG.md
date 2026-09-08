@@ -1240,4 +1240,4 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 
 - IV.35.9B — Pippin Does Not Trust the Furniture: Mimic-capable Scene Objects can now be armed as innocent disguises, then Keeper-revealed into their stored Bestiary Mimic or safely disarmed.
 
-- IV.35.10 — Something Is Waiting in the Lair: Grand Boss Lairs may optionally deploy a canonical Bestiary creature at their semantic centre, hidden from Players by default.
+- IV.35.10A — The Lair Checks the Entire Bestiary: broadened neutral Bestiary schema compatibility, normalized presentation-friendly attack/damage vocabulary, added precise unsupported-value errors, and added deduplicated supplemental/Workshop source shelves.

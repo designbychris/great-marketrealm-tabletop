@@ -25,7 +25,32 @@ final class CompanionBestiarySource implements BestiarySource
     public function records(): array
     {
         if (! $this->available()) return [];
-        $records = apply_filters('gmrc_tabletop_bestiary_records', []);
-        return is_array($records) ? array_values(array_filter($records, 'is_array')) : [];
+
+        $shelves = [
+            apply_filters('gmrc_tabletop_bestiary_records', []),
+            apply_filters('gmrc_tabletop_bestiary_supplemental_records', []),
+            apply_filters('gmrc_tabletop_bestiary_workshop_records', []),
+        ];
+
+        $records = [];
+        foreach ($shelves as $shelf) {
+            if (! is_array($shelf)) {
+                continue;
+            }
+            foreach ($shelf as $record) {
+                if (! is_array($record)) {
+                    continue;
+                }
+                $id = trim((string) ($record['id'] ?? $record['key'] ?? $record['slug'] ?? ''));
+                if ($id === '') {
+                    continue;
+                }
+                // Later shelves may enrich an already-published creature, but
+                // never create a duplicate row in the Keeper's Menagerie.
+                $records[$id] = $record;
+            }
+        }
+
+        return array_values($records);
     }
 }
