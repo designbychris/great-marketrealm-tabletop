@@ -46,13 +46,32 @@ final class BestiaryCompatibilityNormalizer
             return $aliases[$value];
         }
 
+        $firstCanonical = null;
+        $firstOffset = null;
+
         foreach (DamageType::all() as $canonical) {
             if ($value === $canonical) {
                 return $canonical;
             }
-            if (preg_match('/\b' . preg_quote($canonical, '/') . '\b/', $value) === 1) {
-                return $canonical;
+
+            if (preg_match(
+                '/\b' . preg_quote($canonical, '/') . '\b/',
+                $value,
+                $matches,
+                PREG_OFFSET_CAPTURE
+            ) !== 1) {
+                continue;
             }
+
+            $offset = (int) ($matches[0][1] ?? PHP_INT_MAX);
+            if ($firstOffset === null || $offset < $firstOffset) {
+                $firstCanonical = $canonical;
+                $firstOffset = $offset;
+            }
+        }
+
+        if ($firstCanonical !== null) {
+            return $firstCanonical;
         }
 
         throw new InvalidArgumentException(sprintf(

@@ -948,3 +948,5 @@ Carry Session recap evidence and character-attributed deeds across the Tabletop 
 - [x] IV.35.10A.2 — The Old Test Reads the New Signpost — regression expectation aligned with the Bestiary compatibility boundary.
 
 - [x] IV.35.10B — The Boss Would Like to Participate — Boss Lair catalogue, combat compatibility, and Keeper interaction correction.
+
+- [x] IV.35.10B.1 — The Hydra Reads Left to Right — preserve source ordering when normalising qualified Bestiary damage defenses.

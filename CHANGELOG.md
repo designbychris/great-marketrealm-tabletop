@@ -1247,3 +1247,5 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - IV.35.10A.2 — The Old Test Reads the New Signpost: update the IV.29C Bestiary battle regression to assert the new compatibility-normalizer attack-kind boundary rather than the superseded direct `AttackKind::assert()` implementation detail.
 
 - IV.35.10B — The Boss Would Like to Participate: complete the Boss Lair Bestiary bridge, qualified-defense compatibility, and live-created Keeper token interaction path.
+
+- IV.35.10B.1 — The Hydra Reads Left to Right: qualified Bestiary defense labels now resolve to the first canonical damage type written in the source text instead of canonical enum order.
