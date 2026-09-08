@@ -48,7 +48,7 @@ final class CreaturesInBattleRegressionTest extends TestCase
         $source = file_get_contents($this->root('app/Tabletop/Bestiary/Services/BestiaryCombatProvisioner.php'));
         self::assertStringContainsString('foreach ($creature->attacks() as $record)', $source);
         self::assertStringContainsString('new ArsenalAttack(', $source);
-        self::assertStringContainsString('AttackKind::assert(', $source);
+        self::assertStringContainsString('$this->compatibility->attackKind(', $source);
         self::assertStringContainsString('new CombatArsenal(', $source);
         self::assertStringContainsString("'bestiary'", $source);
         self::assertStringContainsString("'gmrt-bestiary:' . \$creature->id() . ':' . \$id", $source);

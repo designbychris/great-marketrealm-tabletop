@@ -1243,3 +1243,5 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - IV.35.10A — The Lair Checks the Entire Bestiary: broadened neutral Bestiary schema compatibility, normalized presentation-friendly attack/damage vocabulary, added precise unsupported-value errors, and added deduplicated supplemental/Workshop source shelves.
 
 - IV.35.10A.1 — The Attack Kind Actually Crosses the Bridge: route Bestiary arsenal attack kinds through the compatibility normalizer instead of the remaining direct `AttackKind::assert()` call.
+
+- IV.35.10A.2 — The Old Test Reads the New Signpost: update the IV.29C Bestiary battle regression to assert the new compatibility-normalizer attack-kind boundary rather than the superseded direct `AttackKind::assert()` implementation detail.

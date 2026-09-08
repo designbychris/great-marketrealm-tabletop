@@ -944,3 +944,5 @@ Carry Session recap evidence and character-attributed deeds across the Tabletop 
 - [x] IV.35.10A — The Lair Checks the Entire Bestiary — Bestiary bridge/schema and combat vocabulary compatibility correction exposed by Boss Lair deployment.
 
 - [x] IV.35.10A.1 — The Attack Kind Actually Crosses the Bridge — regression hotfix for the final direct Bestiary arsenal attack-kind assertion.
+
+- [x] IV.35.10A.2 — The Old Test Reads the New Signpost — regression expectation aligned with the Bestiary compatibility boundary.
