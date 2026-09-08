@@ -6348,7 +6348,13 @@
                     String(Math.max(1, Number(token.height_units || 1)))
                 );
                 node.dataset.tokenRevision = String(token.revision || 1);
+                node.dataset.tokenSource = String(token.source_reference || '');
+                node.classList.toggle(
+                    'is-hidden-token',
+                    String(token.visibility || '') === 'hidden'
+                );
                 node.style.setProperty('--gmrt-fellowship-colour', String(token.table_colour_hex || '#d8ad4f'));
+                bindTokenInteractions(node);
 
                 const combatantState =
                     combatantStates[String(token.id)]
@@ -6364,7 +6370,9 @@
         }
     }
 
-    document.querySelectorAll('.gmrt-token').forEach((token) => {
+    function bindTokenInteractions(token) {
+        if (!token || token.dataset.tokenInteractionsBound === '1') return;
+        token.dataset.tokenInteractionsBound = '1';
         token.setAttribute('aria-pressed', 'false');
 
         const tokenDrag = {
@@ -6504,6 +6512,10 @@
                 Math.max(0, Math.min(1, y))
             );
         });
+    }
+
+    document.querySelectorAll('.gmrt-token').forEach((token) => {
+        bindTokenInteractions(token);
     });
 
     board.addEventListener('click', async (event) => {

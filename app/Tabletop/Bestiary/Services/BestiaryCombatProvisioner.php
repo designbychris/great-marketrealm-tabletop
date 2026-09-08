@@ -74,9 +74,9 @@ final class BestiaryCombatProvisioner
             $tableId,
             new DamageDefenseProfile(
                 $token->id(),
-                $creature->resistances(),
-                $creature->weaknesses(),
-                $creature->immunities()
+                $this->damageTypes($creature->resistances()),
+                $this->damageTypes($creature->weaknesses()),
+                $this->damageTypes($creature->immunities())
             )
         );
 
@@ -178,6 +178,32 @@ final class BestiaryCombatProvisioner
         }
 
         return $attacks;
+    }
+
+
+    /**
+     * Bestiary sources may carry qualified defense text such as
+     * "Slashing (unless fire is used)" or non-damage descriptors such as
+     * "Nonmagical Weapons". Tabletop's battle model stores only concrete
+     * canonical damage types, so retain the damage types we can represent and
+     * leave descriptive qualifiers at the Bestiary boundary.
+     *
+     * @param array<int,string> $types
+     * @return array<int,string>
+     */
+    private function damageTypes(array $types): array
+    {
+        $normalized = [];
+
+        foreach ($types as $type) {
+            try {
+                $normalized[] = $this->compatibility->damageType((string) $type);
+            } catch (\InvalidArgumentException) {
+                continue;
+            }
+        }
+
+        return array_values(array_unique($normalized));
     }
 
     /** @param array<string,mixed>|null $attack */
