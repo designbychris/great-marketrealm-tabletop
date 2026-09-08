@@ -154,7 +154,7 @@ final class BestiaryCombatProvisioner
                 $id,
                 $tokenId,
                 $name,
-                AttackKind::assert((string) ($record['kind'] ?? AttackKind::IMPROVISED)),
+                $this->compatibility->attackKind((string) ($record['kind'] ?? AttackKind::IMPROVISED)),
                 new CombatProfile(
                     $tokenId,
                     $creature->armorClass(),

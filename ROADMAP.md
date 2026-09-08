@@ -942,3 +942,5 @@ Carry Session recap evidence and character-attributed deeds across the Tabletop 
 - [x] IV.35.9B — Pippin Does Not Trust the Furniture — final disguised Mimic arming/reveal/disarm workflow alongside immediate conversion.
 
 - [x] IV.35.10A — The Lair Checks the Entire Bestiary — Bestiary bridge/schema and combat vocabulary compatibility correction exposed by Boss Lair deployment.
+
+- [x] IV.35.10A.1 — The Attack Kind Actually Crosses the Bridge — regression hotfix for the final direct Bestiary arsenal attack-kind assertion.
