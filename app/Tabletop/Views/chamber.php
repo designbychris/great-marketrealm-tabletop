@@ -177,6 +177,96 @@ if (
                             $creature->name()
                         );
                     }
+                } elseif ($sceneObjectAction === 'arm_mimic') {
+                    $properties = $existingObject->properties();
+                    $creatureId = isset($_POST['gmrt_mimic_creature_id'])
+                        ? sanitize_text_field(wp_unslash((string) $_POST['gmrt_mimic_creature_id']))
+                        : '';
+                    $creature = $creatureId !== '' ? $bestiaryRepository->find($creatureId) : null;
+
+                    if (empty($properties['mimic_capable'])) {
+                        $sceneObjectPlacementNotice = 'That furnishing cannot become a Mimic.';
+                    } elseif ($creature === null || ! MimicBestiaryFilter::isMimic($creature)) {
+                        $sceneObjectPlacementNotice = 'Choose a Mimic from the Bestiary before ignoring Pippin’s advice.';
+                    } else {
+                        $objectState = $existingObject->state();
+                        $objectState['mimic_disguise'] = [
+                            'armed' => true,
+                            'creature_id' => $creature->id(),
+                            'creature_name' => $creature->name(),
+                        ];
+                        $sceneObjectRepository->save(new SceneObject(
+                            $existingObject->id(),
+                            $existingObject->tableId(),
+                            $existingObject->sceneId(),
+                            $existingObject->kind(),
+                            $existingObject->category(),
+                            $existingObject->x(),
+                            $existingObject->y(),
+                            $existingObject->rotation(),
+                            $existingObject->scale(),
+                            $objectState,
+                            $properties
+                        ));
+                        $sceneObjectPlacementNotice = sprintf(
+                            '%s is armed as a disguised %s. It still looks completely innocent.',
+                            (string) ($properties['label'] ?? 'Furniture'),
+                            $creature->name()
+                        );
+                    }
+                } elseif ($sceneObjectAction === 'disarm_mimic') {
+                    $objectState = $existingObject->state();
+                    unset($objectState['mimic_disguise']);
+                    $sceneObjectRepository->save(new SceneObject(
+                        $existingObject->id(),
+                        $existingObject->tableId(),
+                        $existingObject->sceneId(),
+                        $existingObject->kind(),
+                        $existingObject->category(),
+                        $existingObject->x(),
+                        $existingObject->y(),
+                        $existingObject->rotation(),
+                        $existingObject->scale(),
+                        $objectState,
+                        $existingObject->properties()
+                    ));
+                    $sceneObjectPlacementNotice = 'The disguise has been disarmed. Pippin remains unconvinced.';
+                } elseif ($sceneObjectAction === 'reveal_mimic') {
+                    $objectState = $existingObject->state();
+                    $mimicDisguise = is_array($objectState['mimic_disguise'] ?? null)
+                        ? $objectState['mimic_disguise']
+                        : [];
+                    $creatureId = sanitize_text_field((string) ($mimicDisguise['creature_id'] ?? ''));
+                    $creature = $creatureId !== '' ? $bestiaryRepository->find($creatureId) : null;
+
+                    if (
+                        empty($mimicDisguise['armed'])
+                        || $creature === null
+                        || ! MimicBestiaryFilter::isMimic($creature)
+                    ) {
+                        $sceneObjectPlacementNotice = 'That furnishing is not currently armed as a Mimic.';
+                    } else {
+                        $bestiaryDeploymentManager->deployAtPoint(
+                            $tableIdForObjects,
+                            get_current_user_id(),
+                            $projectedSceneId,
+                            $creature->id(),
+                            $existingObject->x(),
+                            $existingObject->y(),
+                            1,
+                            false
+                        );
+                        $sceneObjectRepository->remove(
+                            $tableIdForObjects,
+                            $projectedSceneId,
+                            $existingObject->id()
+                        );
+                        $sceneObjectPlacementNotice = sprintf(
+                            '%s reveals itself as %s. Pippin is already halfway down the corridor.',
+                            (string) ($existingObject->properties()['label'] ?? 'Furniture'),
+                            $creature->name()
+                        );
+                    }
                 } elseif ($sceneObjectAction === 'interact') {
                     $definition = $furnitureCatalogue->find($existingObject->kind()) ?? [];
                     $properties = $existingObject->properties();
@@ -1819,6 +1909,9 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                 <button type="button" data-scene-object-duplicate disabled>Duplicate</button>
                                 <button type="button" data-scene-object-interact disabled>Interact</button>
                                 <button type="button" data-scene-object-mimic disabled>⚠ Convert to Mimic</button>
+                                <button type="button" data-scene-object-arm-mimic disabled>Arm as Disguised Mimic</button>
+                                <button type="button" data-scene-object-reveal-mimic disabled>Reveal Mimic</button>
+                                <button type="button" data-scene-object-disarm-mimic disabled>Disarm Mimic</button>
                                 <button type="button" class="gmrt-furniture-editor__delete" data-scene-object-remove disabled>Delete</button>
                             </div>
                         </div>
@@ -1841,7 +1934,8 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                 </label>
                                 <p><strong>Pippin’s advice:</strong><br><strong>“Don’t.”</strong></p>
                                 <div class="gmrt-mimic-dialog__actions">
-                                    <button type="button" data-mimic-confirm>Convert</button>
+                                    <button type="button" data-mimic-confirm>Convert Now</button>
+                                    <button type="button" data-mimic-arm>Arm Disguise</button>
                                     <button type="button" data-mimic-cancel>Cancel</button>
                                 </div>
                             </form>
@@ -2030,6 +2124,11 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                             )));
                             $objectState = is_array($object['state'] ?? null) ? $object['state'] : [];
                             $objectOpen = ! empty($objectState['open']);
+                            $objectMimicDisguise = is_array($objectState['mimic_disguise'] ?? null)
+                                ? $objectState['mimic_disguise']
+                                : [];
+                            $objectMimicArmed = ! empty($objectMimicDisguise['armed']);
+                            $objectMimicName = (string) ($objectMimicDisguise['creature_name'] ?? '');
                             $objectInteraction = sanitize_key((string) (
                                 $objectProperties['interaction']
                                 ?? ($objectDefinition['interaction'] ?? 'none')
@@ -2060,6 +2159,10 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                 data-scene-object-interaction="<?php echo esc_attr($objectInteraction); ?>"
                                 data-scene-object-open="<?php echo $objectOpen ? 'true' : 'false'; ?>"
                                 data-mimic-capable="<?php echo ! empty($objectProperties['mimic_capable']) ? 'true' : 'false'; ?>"
+                                <?php if ($state->isDungeonMaster()) : ?>
+                                    data-mimic-armed="<?php echo $objectMimicArmed ? 'true' : 'false'; ?>"
+                                    data-mimic-name="<?php echo esc_attr($objectMimicName); ?>"
+                                <?php endif; ?>
                                 style="--gmrt-object-x: <?php echo esc_attr((string) ((float) ($object['x'] ?? 0) * 100)); ?>%; --gmrt-object-y: <?php echo esc_attr((string) ((float) ($object['y'] ?? 0) * 100)); ?>%; --gmrt-object-rotation: <?php echo esc_attr((string) ((int) ($object['rotation'] ?? 0))); ?>deg; --gmrt-object-scale: <?php echo esc_attr((string) ((float) ($object['scale'] ?? 1))); ?>; --gmrt-object-width-units: <?php echo esc_attr((string) $objectWidth); ?>; --gmrt-object-height-units: <?php echo esc_attr((string) $objectHeight); ?>;"
                                 role="<?php echo $state->isDungeonMaster() ? 'button' : 'img'; ?>"
                                 <?php if ($state->isDungeonMaster()) : ?>tabindex="0" aria-pressed="false"<?php endif; ?>

@@ -1237,3 +1237,5 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - IV.35.9 — Convert to Mimic: mimic-capable Scene Objects can be secretly bound to real Bestiary definitions while retaining their innocent appearance.
 
 - IV.35.9A — The Furniture Stops Pretending: Convert to Mimic now filters to Mimic Bestiary records, deploys the selected Mimic at the furniture position, removes the furniture only after successful deployment, and gives the warning dialog a MarketRealm treatment.
+
+- IV.35.9B — Pippin Does Not Trust the Furniture: Mimic-capable Scene Objects can now be armed as innocent disguises, then Keeper-revealed into their stored Bestiary Mimic or safely disarmed.

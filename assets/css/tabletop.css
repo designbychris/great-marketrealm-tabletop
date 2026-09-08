@@ -6212,3 +6212,11 @@
 .gmrt-mimic-dialog__actions{display:flex;gap:10px;flex-wrap:wrap;padding-top:4px}
 .gmrt-mimic-dialog__actions button{padding:8px 14px;color:#f7e2aa;background:#241c10;border:2px solid #8e6c30;box-shadow:2px 2px 0 #070605;font:inherit;font-weight:700}
 .gmrt-mimic-dialog__actions button:hover,.gmrt-mimic-dialog__actions button:focus-visible{background:#3a2a12;outline:2px solid #d5a94b;outline-offset:2px}
+
+/* IV.35.9B — Pippin Does Not Trust the Furniture */
+.gmrt-furniture-editor [data-scene-object-reveal-mimic]:not(:disabled){
+    box-shadow:0 0 0 2px rgba(176,126,42,.25),2px 2px 0 #070605;
+}
+.gmrt-mimic-dialog__actions [data-mimic-arm]{
+    background:#2d2416;
+}
