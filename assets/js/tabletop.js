@@ -3486,15 +3486,22 @@
     const dungeonForgeTheme = document.querySelector('[data-dungeon-forge-theme]');
     const dungeonForgeEntry = document.querySelector('[data-dungeon-forge-entry]');
     const dungeonForgeLair = document.querySelector('[data-dungeon-forge-lair]');
+    const dungeonForgeLairOccupantWrap = document.querySelector('[data-dungeon-forge-lair-occupant-wrap]');
+    const dungeonForgeLairOccupant = document.querySelector('[data-dungeon-forge-lair-occupant]');
+    const dungeonForgeLairOccupantHidden = document.querySelector('[data-dungeon-forge-lair-occupant-hidden]');
     const updateDungeonForgeLairAvailability = () => {
         if (!dungeonForgeLair) return;
         const allowed = String(dungeonForgeSceneType?.value || 'dungeon') === 'dungeon'
             && String(dungeonForgeStyle?.value || 'standard') === 'grand';
         dungeonForgeLair.disabled = !allowed;
         if (!allowed) dungeonForgeLair.checked = false;
+        const chosen = allowed && dungeonForgeLair.checked;
+        if (dungeonForgeLairOccupantWrap) dungeonForgeLairOccupantWrap.hidden = !chosen;
+        if (!chosen && dungeonForgeLairOccupant) dungeonForgeLairOccupant.value = '';
     };
     dungeonForgeSceneType?.addEventListener('change', updateDungeonForgeLairAvailability);
     dungeonForgeStyle?.addEventListener('change', updateDungeonForgeLairAvailability);
+    dungeonForgeLair?.addEventListener('change', updateDungeonForgeLairAvailability);
     updateDungeonForgeLairAvailability();
     const dungeonForgeGenerate = document.querySelector('[data-dungeon-forge-generate]');
     const dungeonForgeReroll = document.querySelector('[data-dungeon-forge-reroll]');
@@ -4120,6 +4127,8 @@
         const theme = String(dungeonForgeTheme?.value || 'pantry-stone');
         const entryMode = forgeEntryMode(dungeonForgeEntry?.value || 'none');
         dungeonForgeDraft = generateSceneForgePlan(sceneType, seed, style, theme, null, entryMode, Boolean(dungeonForgeLair?.checked));
+        dungeonForgeDraft.lair_occupant_id = dungeonForgeLair?.checked ? String(dungeonForgeLairOccupant?.value || '') : '';
+        dungeonForgeDraft.lair_occupant_hidden = Boolean(dungeonForgeDraft.lair_occupant_id && dungeonForgeLairOccupantHidden?.checked);
         renderDungeonForgePlan(dungeonForgeDraft, true);
         if (dungeonForgeBuild) dungeonForgeBuild.disabled = false;
         if (dungeonForgeClear) dungeonForgeClear.disabled = false;
@@ -4707,6 +4716,9 @@
     const atlasForgeStyle = document.querySelector('[data-atlas-forge-style]');
     const atlasForgeEntry = document.querySelector('[data-atlas-forge-entry]');
     const atlasForgeLair = document.querySelector('[data-atlas-forge-lair]');
+    const atlasForgeLairOccupantWrap = document.querySelector('[data-atlas-forge-lair-occupant-wrap]');
+    const atlasForgeLairOccupant = document.querySelector('[data-atlas-forge-lair-occupant]');
+    const atlasForgeLairOccupantHidden = document.querySelector('[data-atlas-forge-lair-occupant-hidden]');
     const atlasForgeTheme = document.querySelector('[data-atlas-forge-theme]');
     const atlasForgeReroll = document.querySelector('[data-atlas-forge-reroll]');
     const atlasForgeCreate = document.querySelector('[data-atlas-forge-create]');
@@ -4733,9 +4745,13 @@
             && String(atlasForgeStyle?.value || 'standard') === 'grand';
         atlasForgeLair.disabled = !allowed;
         if (!allowed) atlasForgeLair.checked = false;
+        const chosen = allowed && atlasForgeLair.checked;
+        if (atlasForgeLairOccupantWrap) atlasForgeLairOccupantWrap.hidden = !chosen;
+        if (!chosen && atlasForgeLairOccupant) atlasForgeLairOccupant.value = '';
     };
     atlasForgeSceneType?.addEventListener('change', updateAtlasForgeLairAvailability);
     atlasForgeStyle?.addEventListener('change', updateAtlasForgeLairAvailability);
+    atlasForgeLair?.addEventListener('change', updateAtlasForgeLairAvailability);
     updateAtlasForgeLairAvailability();
     const setAtlasOpen = (open) => setKeeperDrawerOpen('atlas', open);
 
@@ -4765,6 +4781,8 @@
         try {
             const aspectByStyle = { compact:.78, standard:.7, grand:.65 };
             plan = generateSceneForgePlan(sceneType, seed, style, theme, aspectByStyle[style] || .7, entryMode, Boolean(atlasForgeLair?.checked));
+            plan.lair_occupant_id = atlasForgeLair?.checked ? String(atlasForgeLairOccupant?.value || '') : '';
+            plan.lair_occupant_hidden = Boolean(plan.lair_occupant_id && atlasForgeLairOccupantHidden?.checked);
         } catch (error) {
             const message = error?.message || 'Pippin could not prepare that Scene plan.';
             if (atlasForgeStatus) atlasForgeStatus.textContent = message;

@@ -940,3 +940,5 @@ Carry Session recap evidence and character-attributed deeds across the Tabletop 
 - [x] IV.35.9A — The Furniture Stops Pretending — Mimic-only chooser and immediate Scene Object → Bestiary creature conversion.
 
 - [x] IV.35.9B — Pippin Does Not Trust the Furniture — final disguised Mimic arming/reveal/disarm workflow alongside immediate conversion.
+
+- [x] IV.35.10 — Something Is Waiting in the Lair — optional Bestiary-backed Boss Lair occupant deployment.

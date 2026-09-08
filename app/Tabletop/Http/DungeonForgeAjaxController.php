@@ -20,6 +20,8 @@ use GreatMarketrealmTabletop\Tabletop\SceneObjects\Contracts\SceneObjectReposito
 use GreatMarketrealmTabletop\Tabletop\SceneObjects\FurnitureCatalogue;
 use GreatMarketrealmTabletop\Tabletop\SceneObjects\Models\SceneObject;
 use GreatMarketrealmTabletop\Tabletop\Atlas\Thresholds\Services\ThresholdManager;
+use GreatMarketrealmTabletop\Tabletop\Bestiary\Services\BestiaryDeploymentManager;
+use GreatMarketrealmTabletop\Tabletop\Bestiary\Services\BestiaryRepositoryFactory;
 use RuntimeException;
 use Throwable;
 
@@ -48,7 +50,8 @@ final class DungeonForgeAjaxController
         private SceneObjectRepository $sceneObjects,
         private FurnitureCatalogue $furniture,
         private ForgeFurniturePlanner $furnisher,
-        private ThresholdManager $thresholds
+        private ThresholdManager $thresholds,
+        private BestiaryDeploymentManager $bestiaryDeployment
     ) {}
 
     public function build(): void
@@ -243,6 +246,23 @@ final class DungeonForgeAjaxController
             $arrivalThresholdId = $arrival->id();
         }
 
+        // IV.35.10 — Something Is Waiting in the Lair.
+        $lairOccupantTokenId = null;
+        $lairOccupantId = sanitize_text_field((string) ($plan['lair_occupant_id'] ?? ''));
+        if ($lairOccupantId !== '') {
+            $lair = null;
+            foreach ($plan['rooms'] as $room) {
+                if (is_array($room) && ($room['role'] ?? '') === 'lair' && ! empty($room['boss_lair'])) { $lair = $room; break; }
+            }
+            if ($lair === null) throw new RuntimeException('A lair occupant requires a genuine Boss Lair.');
+            $creature = BestiaryRepositoryFactory::make()->find($lairOccupantId);
+            if ($creature === null) throw new RuntimeException('That lair occupant is not recorded in the Keeper’s Bestiary.');
+            $lairX = max(0.0, min(1.0, (((float) $lair['x']) + (((float) $lair['w']) / 2.0)) / $plan['cols']));
+            $lairY = max(0.0, min(1.0, (((float) $lair['y']) + (((float) $lair['h']) / 2.0)) / $plan['rows']));
+            $tokens = $this->bestiaryDeployment->deployAtPoint($tableId, $userId, $sceneId, $creature->id(), $lairX, $lairY, 1, ! empty($plan['lair_occupant_hidden']));
+            $lairOccupantTokenId = $tokens[0]->id() ?? null;
+        }
+
         // Every forged environment starts veiled. The Keeper still owns the final reveal.
         $fog = $this->fog->configure($tableId, $userId, true, true, $sceneId);
 
@@ -261,6 +281,9 @@ final class DungeonForgeAjaxController
             'features' => $plan['features'],
             'entry_anchor' => $plan['entry_anchor'],
             'arrival_threshold_id' => $arrivalThresholdId,
+            'lair_occupant_id' => $plan['lair_occupant_id'],
+            'lair_occupant_hidden' => $plan['lair_occupant_hidden'],
+            'lair_occupant_token_id' => $lairOccupantTokenId,
             'furniture' => $furnitureDrafts,
             'barrier_ids' => array_map(static fn ($barrier): string => $barrier->id(), $created),
             'furniture_ids' => $furnitureIds,
@@ -359,6 +382,15 @@ final class DungeonForgeAjaxController
             throw new RuntimeException('The Scene Forge requires at least three major playable places.');
         }
 
+        $hasBossLair = false;
+        foreach ($rooms as $room) {
+            if (($room['role'] ?? '') === 'lair' && ! empty($room['boss_lair'])) { $hasBossLair = true; break; }
+        }
+        $lairOccupantId = sanitize_text_field((string) ($plan['lair_occupant_id'] ?? ''));
+        if (! $hasBossLair) $lairOccupantId = '';
+        if (strlen($lairOccupantId) > 120) throw new RuntimeException('That lair occupant identifier is too long.');
+        $lairOccupantHidden = $lairOccupantId !== '' && ! empty($plan['lair_occupant_hidden']);
+
         $barriers = [];
         foreach (is_array($plan['barriers'] ?? null) ? $plan['barriers'] : [] as $barrier) {
             if (! is_array($barrier)) continue;
@@ -453,7 +485,7 @@ final class DungeonForgeAjaxController
 
         $floor = array_values($floor);
         return compact('seed', 'style', 'theme', 'cols', 'rows', 'floor', 'rooms', 'barriers', 'doors', 'lights', 'features')
-            + ['scene_type' => $sceneType, 'entry_anchor' => $entryAnchor];
+            + ['scene_type' => $sceneType, 'entry_anchor' => $entryAnchor, 'lair_occupant_id' => $lairOccupantId, 'lair_occupant_hidden' => $lairOccupantHidden];
     }
 
     private function clamp(float $value): float

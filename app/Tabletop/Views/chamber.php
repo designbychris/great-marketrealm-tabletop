@@ -892,6 +892,17 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                 Boss chamber
                                 <span><input type="checkbox" data-atlas-forge-lair disabled> Include Boss Lair <small>(Grand Dungeon only)</small></span>
                             </label>
+                            <div class="gmrt-forge-lair-occupant" data-atlas-forge-lair-occupant-wrap hidden>
+                                <label>Something waiting in the lair
+                                    <select data-atlas-forge-lair-occupant><option value="">Leave the lair empty</option>
+                                        <?php foreach ($bestiary as $creature) : if (! is_array($creature) || empty($creature['id'])) continue; ?>
+                                            <option value="<?php echo esc_attr((string) $creature['id']); ?>"><?php echo esc_html((string) ($creature['name'] ?? 'Unknown creature')); ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </label>
+                                <label><input type="checkbox" data-atlas-forge-lair-occupant-hidden checked> Keep occupant hidden from Players</label>
+                                <small>Deployed at the centre of the Boss Lair and provisioned for combat.</small>
+                            </div>
                             <label>
                                 Theme
                                 <select data-atlas-forge-theme>
@@ -1775,6 +1786,17 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                         Boss chamber
                                         <span><input type="checkbox" data-dungeon-forge-lair disabled> Include Boss Lair <small>(Grand Dungeon only)</small></span>
                                     </label>
+                                    <div class="gmrt-forge-lair-occupant" data-dungeon-forge-lair-occupant-wrap hidden>
+                                        <label>Something waiting in the lair
+                                            <select data-dungeon-forge-lair-occupant><option value="">Leave the lair empty</option>
+                                                <?php foreach ($bestiary as $creature) : if (! is_array($creature) || empty($creature['id'])) continue; ?>
+                                                    <option value="<?php echo esc_attr((string) $creature['id']); ?>"><?php echo esc_html((string) ($creature['name'] ?? 'Unknown creature')); ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </label>
+                                        <label><input type="checkbox" data-dungeon-forge-lair-occupant-hidden checked> Keep occupant hidden from Players</label>
+                                        <small>Deployed at the centre of the Boss Lair and provisioned for combat.</small>
+                                    </div>
                                     <label>
                                         Theme
                                         <select data-dungeon-forge-theme>

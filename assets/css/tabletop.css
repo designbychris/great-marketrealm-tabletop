@@ -6220,3 +6220,6 @@
 .gmrt-mimic-dialog__actions [data-mimic-arm]{
     background:#2d2416;
 }
+
+/* IV.35.10 */
+.gmrt-forge-lair-occupant{display:grid;gap:8px;padding:10px;margin-top:4px;border:1px solid rgba(184,139,58,.65);background:rgba(34,25,13,.72)}.gmrt-forge-lair-occupant[hidden]{display:none}.gmrt-forge-lair-occupant label{display:grid;gap:5px}.gmrt-forge-lair-occupant select{width:100%}
