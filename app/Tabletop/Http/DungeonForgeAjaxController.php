@@ -11,6 +11,7 @@ use GreatMarketrealmTabletop\Tables\Scenes\Models\GridType;
 use GreatMarketrealmTabletop\Tables\Scenes\Services\TableSceneManager;
 use GreatMarketrealmTabletop\Tabletop\Cartography\Contracts\DungeonForgeRepository;
 use GreatMarketrealmTabletop\Tabletop\Cartography\Services\ForgeFurniturePlanner;
+use GreatMarketrealmTabletop\Tabletop\Cartography\Services\ForgeOccupantPlanner;
 use GreatMarketrealmTabletop\Tabletop\Atlas\Services\SceneShelfCleaner;
 use GreatMarketrealmTabletop\Tabletop\Fog\Services\FogOfWarManager;
 use GreatMarketrealmTabletop\Tabletop\Light\Contracts\EnvironmentalLightRepository;
@@ -50,6 +51,7 @@ final class DungeonForgeAjaxController
         private SceneObjectRepository $sceneObjects,
         private FurnitureCatalogue $furniture,
         private ForgeFurniturePlanner $furnisher,
+        private ForgeOccupantPlanner $occupants,
         private ThresholdManager $thresholds,
         private BestiaryDeploymentManager $bestiaryDeployment
     ) {}
@@ -246,6 +248,25 @@ final class DungeonForgeAjaxController
             $arrivalThresholdId = $arrival->id();
         }
 
+        // IV.36.2 — Something Else Lives Down Here.
+        // Ordinary Forge inhabitants are prepared as hidden Bestiary tokens.
+        // They remain exploration state until the Keeper deliberately includes
+        // them in an Encounter, exactly like the specialised Boss Lair case.
+        $forgeOccupants = [];
+        foreach ($this->occupants->plan($plan) as $draft) {
+            $createdOccupants = $this->bestiaryDeployment->deployAtPoint(
+                $tableId, $userId, $sceneId, $draft['creature_id'],
+                $draft['x'], $draft['y'], $draft['quantity'], true
+            );
+            foreach ($createdOccupants as $token) {
+                $forgeOccupants[] = [
+                    'token_id' => $token->id(),
+                    'creature_id' => $draft['creature_id'],
+                    'room_index' => $draft['room_index'],
+                ];
+            }
+        }
+
         // IV.35.10 — Something Is Waiting in the Lair.
         $lairOccupantTokenId = null;
         $lairOccupantId = sanitize_text_field((string) ($plan['lair_occupant_id'] ?? ''));
@@ -284,6 +305,8 @@ final class DungeonForgeAjaxController
             'lair_occupant_id' => $plan['lair_occupant_id'],
             'lair_occupant_hidden' => $plan['lair_occupant_hidden'],
             'lair_occupant_token_id' => $lairOccupantTokenId,
+            'populate_rooms' => $plan['populate_rooms'],
+            'forge_occupants' => $forgeOccupants,
             'furniture' => $furnitureDrafts,
             'barrier_ids' => array_map(static fn ($barrier): string => $barrier->id(), $created),
             'furniture_ids' => $furnitureIds,
@@ -390,6 +413,7 @@ final class DungeonForgeAjaxController
         if (! $hasBossLair) $lairOccupantId = '';
         if (strlen($lairOccupantId) > 120) throw new RuntimeException('That lair occupant identifier is too long.');
         $lairOccupantHidden = $lairOccupantId !== '' && ! empty($plan['lair_occupant_hidden']);
+        $populateRooms = $sceneType === 'dungeon' && ! empty($plan['populate_rooms']);
 
         $barriers = [];
         foreach (is_array($plan['barriers'] ?? null) ? $plan['barriers'] : [] as $barrier) {
@@ -485,7 +509,7 @@ final class DungeonForgeAjaxController
 
         $floor = array_values($floor);
         return compact('seed', 'style', 'theme', 'cols', 'rows', 'floor', 'rooms', 'barriers', 'doors', 'lights', 'features')
-            + ['scene_type' => $sceneType, 'entry_anchor' => $entryAnchor, 'lair_occupant_id' => $lairOccupantId, 'lair_occupant_hidden' => $lairOccupantHidden];
+            + ['scene_type' => $sceneType, 'entry_anchor' => $entryAnchor, 'lair_occupant_id' => $lairOccupantId, 'lair_occupant_hidden' => $lairOccupantHidden, 'populate_rooms' => $populateRooms];
     }
 
     private function clamp(float $value): float

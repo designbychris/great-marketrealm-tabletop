@@ -956,3 +956,5 @@ Carry Session recap evidence and character-attributed deeds across the Tabletop 
 - [ ] **IV.36 — The Dungeon Comes Alive** — generated environments progress from prepared maps into playable adventure spaces with encounters, inhabitants, secrets, traps, rewards and narrative structure.
 
 - [ ] **IV.36.1 — The Boss Notices the Adventurers** — a forged Boss Lair occupant remains hidden during exploration, then reveals and joins the ordinary Turn of Battle when the Keeper includes it in a fresh Encounter.
+
+- [x] IV.36.2 — Something Else Lives Down Here — general Forge room occupants built on the Bestiary and existing Encounter boundary.

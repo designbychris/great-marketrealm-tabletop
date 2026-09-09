@@ -267,6 +267,9 @@ final class TabletopServiceProvider
             new \GreatMarketrealmTabletop\Tabletop\Cartography\Services\ForgeFurniturePlanner(
                 $mergedFurnitureCatalogue
             ),
+            new \GreatMarketrealmTabletop\Tabletop\Cartography\Services\ForgeOccupantPlanner(
+                BestiaryRepositoryFactory::make()
+            ),
             \GreatMarketrealmTabletop\Tabletop\Atlas\Thresholds\Services\ThresholdManagerFactory::make(),
             BestiaryDeploymentManagerFactory::make()
         );

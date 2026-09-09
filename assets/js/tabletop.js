@@ -3489,6 +3489,7 @@
     const dungeonForgeLairOccupantWrap = document.querySelector('[data-dungeon-forge-lair-occupant-wrap]');
     const dungeonForgeLairOccupant = document.querySelector('[data-dungeon-forge-lair-occupant]');
     const dungeonForgeLairOccupantHidden = document.querySelector('[data-dungeon-forge-lair-occupant-hidden]');
+    const dungeonForgePopulate = document.querySelector('[data-dungeon-forge-populate]');
     const updateDungeonForgeLairAvailability = () => {
         if (!dungeonForgeLair) return;
         const allowed = String(dungeonForgeSceneType?.value || 'dungeon') === 'dungeon'
@@ -4129,6 +4130,7 @@
         dungeonForgeDraft = generateSceneForgePlan(sceneType, seed, style, theme, null, entryMode, Boolean(dungeonForgeLair?.checked));
         dungeonForgeDraft.lair_occupant_id = dungeonForgeLair?.checked ? String(dungeonForgeLairOccupant?.value || '') : '';
         dungeonForgeDraft.lair_occupant_hidden = Boolean(dungeonForgeDraft.lair_occupant_id && dungeonForgeLairOccupantHidden?.checked);
+        dungeonForgeDraft.populate_rooms = String(dungeonForgeDraft.scene_type || 'dungeon') === 'dungeon' && Boolean(dungeonForgePopulate?.checked);
         renderDungeonForgePlan(dungeonForgeDraft, true);
         if (dungeonForgeBuild) dungeonForgeBuild.disabled = false;
         if (dungeonForgeClear) dungeonForgeClear.disabled = false;
@@ -4719,6 +4721,7 @@
     const atlasForgeLairOccupantWrap = document.querySelector('[data-atlas-forge-lair-occupant-wrap]');
     const atlasForgeLairOccupant = document.querySelector('[data-atlas-forge-lair-occupant]');
     const atlasForgeLairOccupantHidden = document.querySelector('[data-atlas-forge-lair-occupant-hidden]');
+    const atlasForgePopulate = document.querySelector('[data-atlas-forge-populate]');
     const atlasForgeTheme = document.querySelector('[data-atlas-forge-theme]');
     const atlasForgeReroll = document.querySelector('[data-atlas-forge-reroll]');
     const atlasForgeCreate = document.querySelector('[data-atlas-forge-create]');
@@ -4783,6 +4786,7 @@
             plan = generateSceneForgePlan(sceneType, seed, style, theme, aspectByStyle[style] || .7, entryMode, Boolean(atlasForgeLair?.checked));
             plan.lair_occupant_id = atlasForgeLair?.checked ? String(atlasForgeLairOccupant?.value || '') : '';
             plan.lair_occupant_hidden = Boolean(plan.lair_occupant_id && atlasForgeLairOccupantHidden?.checked);
+            plan.populate_rooms = String(plan.scene_type || 'dungeon') === 'dungeon' && Boolean(atlasForgePopulate?.checked);
         } catch (error) {
             const message = error?.message || 'Pippin could not prepare that Scene plan.';
             if (atlasForgeStatus) atlasForgeStatus.textContent = message;

@@ -37,29 +37,32 @@ final class LairEncounterParticipant
             return null;
         }
 
-        $tokenId = trim((string) ($plan['lair_occupant_token_id'] ?? ''));
-        $creatureId = trim((string) ($plan['lair_occupant_id'] ?? ''));
-        if ($tokenId === '' || $creatureId === '') {
-            return null;
-        }
-
         $chosen = array_fill_keys(array_map('strval', $combatantTokenIds), true);
-        if (! isset($chosen[$tokenId])) {
-            return null;
+        $participants = [];
+        $bossTokenId = trim((string) ($plan['lair_occupant_token_id'] ?? ''));
+        $bossCreatureId = trim((string) ($plan['lair_occupant_id'] ?? ''));
+        if ($bossTokenId !== '' && $bossCreatureId !== '') {
+            $participants[] = ['token_id' => $bossTokenId, 'creature_id' => $bossCreatureId];
+        }
+        foreach (is_array($plan['forge_occupants'] ?? null) ? $plan['forge_occupants'] : [] as $occupant) {
+            if (! is_array($occupant)) continue;
+            $participants[] = [
+                'token_id' => trim((string) ($occupant['token_id'] ?? '')),
+                'creature_id' => trim((string) ($occupant['creature_id'] ?? '')),
+            ];
         }
 
-        $token = $this->tokens->find($tableId, $tokenId);
-        if (
-            $token === null
-            || $token->sceneId() !== $sceneId
-            || (string) ($token->sourceReference() ?? '') !== 'gmrt-bestiary:' . $creatureId
-        ) {
-            return null;
+        $awakened = null;
+        foreach ($participants as $participant) {
+            $tokenId = $participant['token_id']; $creatureId = $participant['creature_id'];
+            if ($tokenId === '' || $creatureId === '' || ! isset($chosen[$tokenId])) continue;
+            $token = $this->tokens->find($tableId, $tokenId);
+            if ($token === null || $token->sceneId() !== $sceneId
+                || (string) ($token->sourceReference() ?? '') !== 'gmrt-bestiary:' . $creatureId) continue;
+            $token->show();
+            $this->tokens->save($token);
+            $awakened ??= $token->id();
         }
-
-        $token->show();
-        $this->tokens->save($token);
-
-        return $token->id();
+        return $awakened;
     }
 }

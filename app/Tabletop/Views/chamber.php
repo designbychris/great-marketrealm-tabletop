@@ -381,6 +381,10 @@ $integrations = $state?->integrations() ?? [];
 $dungeonForge = is_array($integrations['dungeon_forge'] ?? null) ? $integrations['dungeon_forge'] : [];
 $lairBossTokenId = trim((string) ($dungeonForge['lair_occupant_token_id'] ?? ''));
 $lairBossCreatureId = trim((string) ($dungeonForge['lair_occupant_id'] ?? ''));
+$forgeOccupantTokenIds = [];
+foreach (is_array($dungeonForge['forge_occupants'] ?? null) ? $dungeonForge['forge_occupants'] : [] as $occupant) {
+    if (is_array($occupant) && ! empty($occupant['token_id'])) $forgeOccupantTokenIds[(string) $occupant['token_id']] = true;
+}
 $companion = is_array($integrations['companion'] ?? null)
     ? $integrations['companion']
     : [];
@@ -890,6 +894,11 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                     <option value="portal">Arrival portal</option>
                                 </select>
                             </label>
+                            <label class="gmrt-forge-population">
+                                Dungeon inhabitants
+                                <span><input type="checkbox" data-atlas-forge-populate> Populate ordinary rooms <small>(Dungeon only)</small></span>
+                                <small>Deterministically places a sparse mix of hidden Bestiary creatures. The Keeper decides when they join battle.</small>
+                            </label>
                             <label data-atlas-forge-lair-wrap>
                                 Boss chamber
                                 <span><input type="checkbox" data-atlas-forge-lair disabled> Include Boss Lair <small>(Grand Dungeon only)</small></span>
@@ -1118,14 +1127,14 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                             <?php foreach ($tokens as $token) : ?>
                                 <?php $tokenId = (string) ($token['id'] ?? ''); ?>
                                 <?php if ($tokenId === '') { continue; } ?>
-                                <label class="gmrt-start-encounter__combatant<?php echo $tokenId === $lairBossTokenId ? ' is-lair-boss' : ''; ?>">
+                                <label class="gmrt-start-encounter__combatant<?php echo $tokenId === $lairBossTokenId ? ' is-lair-boss' : (isset($forgeOccupantTokenIds[$tokenId]) ? ' is-forge-occupant' : ''); ?>">
                                     <input
                                         type="checkbox"
                                         value="<?php echo esc_attr($tokenId); ?>"
                                         data-encounter-combatant
                                         checked
                                     >
-                                    <span><?php echo esc_html((string) ($token['label'] ?? 'Combatant')); ?><?php if ($tokenId === $lairBossTokenId) : ?><small class="gmrt-start-encounter__boss-badge">Boss Lair occupant</small><?php endif; ?></span>
+                                    <span><?php echo esc_html((string) ($token['label'] ?? 'Combatant')); ?><?php if ($tokenId === $lairBossTokenId) : ?><small class="gmrt-start-encounter__boss-badge">Boss Lair occupant</small><?php elseif (isset($forgeOccupantTokenIds[$tokenId])) : ?><small class="gmrt-start-encounter__occupant-badge">Dungeon occupant</small><?php endif; ?></span>
                                     <span>Initiative</span>
                                     <input
                                         type="number"
@@ -1789,7 +1798,12 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                             <option value="portal">Arrival portal</option>
                                         </select>
                                     </label>
-                                    <label data-dungeon-forge-lair-wrap>
+                                    <label class="gmrt-forge-population">
+                                Dungeon inhabitants
+                                <span><input type="checkbox" data-dungeon-forge-populate> Populate ordinary rooms <small>(Dungeon only)</small></span>
+                                <small>Deterministically places a sparse mix of hidden Bestiary creatures. The Keeper decides when they join battle.</small>
+                            </label>
+                            <label data-dungeon-forge-lair-wrap>
                                         Boss chamber
                                         <span><input type="checkbox" data-dungeon-forge-lair disabled> Include Boss Lair <small>(Grand Dungeon only)</small></span>
                                     </label>
