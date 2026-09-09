@@ -1253,3 +1253,9 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - IV.36.1 — The Boss Notices the Adventurers: a selected forged Boss Lair occupant now crosses from hidden exploration preparation into the existing Encounter lifecycle, revealing to Players only when the Keeper actually includes it in battle; the Start Encounter register clearly marks the lair boss without creating a parallel boss-combat system.
 
 - IV.36.2 — Something Else Lives Down Here: optional deterministic dungeon population places hidden, room-aware Bestiary inhabitants and wakes only those deliberately included in an Encounter.
+
+### Phase IV.36.2A — The Repository Was on the Wrong Shelf
+
+- Corrects the IV.36.2 service-provider import for `BestiaryRepositoryFactory`.
+- Restores application boot without changing ordinary-room population behaviour.
+- Test expectation remains 1,133 tests.

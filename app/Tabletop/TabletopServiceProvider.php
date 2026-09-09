@@ -56,6 +56,7 @@ use GreatMarketrealmTabletop\Tabletop\Http\BestiaryAjaxController;
 use GreatMarketrealmTabletop\Tabletop\Atlas\Services\KeepersAtlasFactory;
 use GreatMarketrealmTabletop\Tabletop\Atlas\Transitions\Repositories\WordPressSceneTransitionRepository;
 use GreatMarketrealmTabletop\Tabletop\Bestiary\Services\BestiaryDeploymentManagerFactory;
+use GreatMarketrealmTabletop\Tabletop\Bestiary\Services\BestiaryRepositoryFactory;
 use GreatMarketrealmTabletop\Tabletop\Light\Repositories\WordPressCarriedLightRepository;
 use GreatMarketrealmTabletop\Tabletop\Light\Repositories\WordPressDroppedLightRepository;
 use GreatMarketrealmTabletop\Tabletop\Light\Repositories\WordPressMagicalLightRepository;

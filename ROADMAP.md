@@ -958,3 +958,7 @@ Carry Session recap evidence and character-attributed deeds across the Tabletop 
 - [ ] **IV.36.1 — The Boss Notices the Adventurers** — a forged Boss Lair occupant remains hidden during exploration, then reveals and joins the ordinary Turn of Battle when the Keeper includes it in a fresh Encounter.
 
 - [x] IV.36.2 — Something Else Lives Down Here — general Forge room occupants built on the Bestiary and existing Encounter boundary.
+
+### Phase IV.36.2A — The Repository Was on the Wrong Shelf
+
+Corrective wiring pass for IV.36.2: import `BestiaryRepositoryFactory` from its actual `Tabletop\Bestiary\Services` namespace. No scope expansion.
