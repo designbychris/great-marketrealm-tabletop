@@ -1270,3 +1270,9 @@ Adds optional deterministic Keeper-only concealed doors and hidden caches to for
 - Restores the Dungeon Forge projection version to `4`; IV.36.3 secrets are additive metadata, not a breaking schema revision.
 - Keeps the complete Keeper-secret/reveal architecture unchanged.
 - Expected suite remains 1,140 tests.
+
+### Phase IV.36.3B — The Empty Chair Is Not the Dungeon Master
+
+- Guards the IV.36.3 secret presentation filter against a nullable Tabletop chamber state.
+- Prevents the WordPress critical error caused by calling `isDungeonMaster()` on `null`.
+- Adds a regression for the nullable-state presentation boundary.

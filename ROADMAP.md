@@ -971,3 +971,7 @@ Adds optional deterministic Keeper-only concealed doors and hidden caches to for
 ### Phase IV.36.3A — The Old Signpost Was Still Correct
 
 Corrective compatibility pass: IV.36.3 retains Forge projection version 4 because its secret fields are additive and backward-compatible.
+
+### Phase IV.36.3B — The Empty Chair Is Not the Dungeon Master
+
+Corrective browser-hardening pass for IV.36.3: secret projection filtering now respects the chamber's established nullable-state contract.

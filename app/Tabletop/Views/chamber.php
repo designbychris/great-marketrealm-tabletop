@@ -380,7 +380,7 @@ $visionLayer = $state?->visionLayer() ?? [];
 $integrations = $state?->integrations() ?? [];
 $dungeonForge = is_array($integrations['dungeon_forge'] ?? null) ? $integrations['dungeon_forge'] : [];
 // IV.36.3 — unrevealed Forge secrets never cross the Player presentation boundary.
-if (! $state->isDungeonMaster() && $dungeonForge !== []) {
+if ($state !== null && ! $state->isDungeonMaster() && $dungeonForge !== []) {
     $hiddenDoorIndexes=[]; $visibleSecrets=[];
     foreach(is_array($dungeonForge['secrets']??null)?$dungeonForge['secrets']:[] as $secret){
         if(!is_array($secret)) continue;
