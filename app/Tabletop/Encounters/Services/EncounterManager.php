@@ -19,6 +19,7 @@ use GreatMarketrealmTabletop\Tables\Models\TableStatus;
 use GreatMarketrealmTabletop\Tables\Scenes\Contracts\TableSceneRepository;
 use GreatMarketrealmTabletop\Tables\Tokens\Contracts\TableTokenRepository;
 use GreatMarketrealmTabletop\Tabletop\Sessions\Contracts\TableSessionRepository;
+use GreatMarketrealmTabletop\Tabletop\Cartography\Services\LairEncounterParticipant;
 use RuntimeException;
 
 defined('ABSPATH') || exit;
@@ -35,7 +36,8 @@ final class EncounterManager
         private TableClock $clock,
         private EncounterControlPolicy $policy,
         private ?ConditionLifecycle $conditionLifecycle = null,
-        private ?TableSessionRepository $sessions = null
+        private ?TableSessionRepository $sessions = null,
+        private ?LairEncounterParticipant $lairParticipant = null
     ) {}
 
     public function prepare(
@@ -151,6 +153,21 @@ final class EncounterManager
                 (int) ($record['initiative_modifier'] ?? 0)
             ));
         }
+
+        /*
+         * IV.36.1 — The Boss Notices the Adventurers.
+         *
+         * A forged Boss Lair occupant remains private exploration preparation
+         * until the Keeper actually includes that token in a fresh Encounter.
+         * At that boundary the canonical token is revealed to Players and
+         * joins the ordinary Encounter model; no parallel boss-only battle
+         * state is introduced.
+         */
+        $this->lairParticipant?->awakenIfParticipating(
+            $tableId,
+            $scene->id(),
+            array_keys($seen)
+        );
 
         $encounter->start();
         $this->encounters->save($encounter);

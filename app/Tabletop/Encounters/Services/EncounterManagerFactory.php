@@ -12,6 +12,8 @@ use GreatMarketrealmTabletop\Tables\Scenes\Repositories\WordPressTableSceneRepos
 use GreatMarketrealmTabletop\Tables\Services\SystemTableClock;
 use GreatMarketrealmTabletop\Tables\Tokens\Repositories\WordPressTableTokenRepository;
 use GreatMarketrealmTabletop\Tabletop\Sessions\Repositories\WordPressTableSessionRepository;
+use GreatMarketrealmTabletop\Tabletop\Cartography\Repositories\WordPressDungeonForgeRepository;
+use GreatMarketrealmTabletop\Tabletop\Cartography\Services\LairEncounterParticipant;
 
 defined('ABSPATH') || exit;
 
@@ -29,7 +31,11 @@ final class EncounterManagerFactory
             new SystemTableClock(),
             new EncounterControlPolicy(),
             ConditionManagerFactory::lifecycle(),
-            new WordPressTableSessionRepository()
+            new WordPressTableSessionRepository(),
+            new LairEncounterParticipant(
+                new WordPressDungeonForgeRepository(),
+                new WordPressTableTokenRepository()
+            )
         );
     }
 }

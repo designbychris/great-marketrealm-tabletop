@@ -950,3 +950,9 @@ Carry Session recap evidence and character-attributed deeds across the Tabletop 
 - [x] IV.35.10B — The Boss Would Like to Participate — Boss Lair catalogue, combat compatibility, and Keeper interaction correction.
 
 - [x] IV.35.10B.1 — The Hydra Reads Left to Right — preserve source ordering when normalising qualified Bestiary damage defenses.
+
+- [x] **IV.35 — Furniture & Object Layer** — object architecture, tactical furnishings, Forge interior design, catalogue extensions, Mimics and Bestiary-backed Boss Lairs complete. **SERVER + BROWSER CERTIFIED — 1,121 tests / 3,667 assertions.**
+
+- [ ] **IV.36 — The Dungeon Comes Alive** — generated environments progress from prepared maps into playable adventure spaces with encounters, inhabitants, secrets, traps, rewards and narrative structure.
+
+- [ ] **IV.36.1 — The Boss Notices the Adventurers** — a forged Boss Lair occupant remains hidden during exploration, then reveals and joins the ordinary Turn of Battle when the Keeper includes it in a fresh Encounter.

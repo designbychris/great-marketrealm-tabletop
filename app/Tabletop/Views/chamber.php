@@ -379,6 +379,8 @@ $fog = $state?->fog() ?? [];
 $visionLayer = $state?->visionLayer() ?? [];
 $integrations = $state?->integrations() ?? [];
 $dungeonForge = is_array($integrations['dungeon_forge'] ?? null) ? $integrations['dungeon_forge'] : [];
+$lairBossTokenId = trim((string) ($dungeonForge['lair_occupant_token_id'] ?? ''));
+$lairBossCreatureId = trim((string) ($dungeonForge['lair_occupant_id'] ?? ''));
 $companion = is_array($integrations['companion'] ?? null)
     ? $integrations['companion']
     : [];
@@ -1116,14 +1118,14 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                             <?php foreach ($tokens as $token) : ?>
                                 <?php $tokenId = (string) ($token['id'] ?? ''); ?>
                                 <?php if ($tokenId === '') { continue; } ?>
-                                <label class="gmrt-start-encounter__combatant">
+                                <label class="gmrt-start-encounter__combatant<?php echo $tokenId === $lairBossTokenId ? ' is-lair-boss' : ''; ?>">
                                     <input
                                         type="checkbox"
                                         value="<?php echo esc_attr($tokenId); ?>"
                                         data-encounter-combatant
                                         checked
                                     >
-                                    <span><?php echo esc_html((string) ($token['label'] ?? 'Combatant')); ?></span>
+                                    <span><?php echo esc_html((string) ($token['label'] ?? 'Combatant')); ?><?php if ($tokenId === $lairBossTokenId) : ?><small class="gmrt-start-encounter__boss-badge">Boss Lair occupant</small><?php endif; ?></span>
                                     <span>Initiative</span>
                                     <input
                                         type="number"
@@ -1135,7 +1137,12 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                     >
                                 </label>
                             <?php endforeach; ?>
-                        </fieldset>
+                                                </fieldset>
+                        <?php if ($lairBossTokenId !== '') : ?>
+                            <p class="gmrt-start-encounter__boss-note">
+                                <strong>The boss is waiting.</strong> If the Boss Lair occupant is included when battle begins, the Forge will reveal that token to Players and hand it to the ordinary Turn of Battle.
+                            </p>
+                        <?php endif; ?>
                         <button type="button" data-start-encounter>
                             Begin Battle ⚔
                         </button>

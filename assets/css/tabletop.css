@@ -6223,3 +6223,25 @@
 
 /* IV.35.10 */
 .gmrt-forge-lair-occupant{display:grid;gap:8px;padding:10px;margin-top:4px;border:1px solid rgba(184,139,58,.65);background:rgba(34,25,13,.72)}.gmrt-forge-lair-occupant[hidden]{display:none}.gmrt-forge-lair-occupant label{display:grid;gap:5px}.gmrt-forge-lair-occupant select{width:100%}
+
+/* IV.36.1 — The Boss Notices the Adventurers. */
+.gmrt-start-encounter__combatant.is-lair-boss {
+    padding: .45rem .55rem;
+    border: 1px solid rgba(212, 175, 55, .55);
+    background: rgba(87, 64, 28, .2);
+}
+.gmrt-start-encounter__boss-badge {
+    display: block;
+    margin-top: .12rem;
+    font-size: .72rem;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    opacity: .78;
+}
+.gmrt-start-encounter__boss-note {
+    margin: 0;
+    padding: .55rem .65rem;
+    border-left: 3px solid rgba(212, 175, 55, .7);
+    background: rgba(87, 64, 28, .18);
+    font-size: .86rem;
+}
