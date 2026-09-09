@@ -310,7 +310,7 @@ final class DungeonForgeAjaxController
         $secretDrafts = $this->secrets->plan($plan);
 
         $projection = [
-            'version' => 5,
+            'version' => 4,
             'scene_type' => $plan['scene_type'],
             'seed' => $plan['seed'],
             'style' => $plan['style'],

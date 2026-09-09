@@ -967,3 +967,7 @@ Corrective wiring pass for IV.36.2: import `BestiaryRepositoryFactory` from its 
 ### Phase IV.36.3 — The Dungeon Has Secrets
 
 Adds optional deterministic Keeper-only concealed doors and hidden caches to forged Dungeons, with an explicit persistent reveal boundary. Unrevealed secrets are removed from Player presentation. Trap mechanics remain reserved for IV.36.4.
+
+### Phase IV.36.3A — The Old Signpost Was Still Correct
+
+Corrective compatibility pass: IV.36.3 retains Forge projection version 4 because its secret fields are additive and backward-compatible.

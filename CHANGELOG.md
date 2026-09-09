@@ -1264,3 +1264,9 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 ### Phase IV.36.3 — The Dungeon Has Secrets
 
 Adds optional deterministic Keeper-only concealed doors and hidden caches to forged Dungeons, with an explicit persistent reveal boundary. Unrevealed secrets are removed from Player presentation. Trap mechanics remain reserved for IV.36.4.
+
+### Phase IV.36.3A — The Old Signpost Was Still Correct
+
+- Restores the Dungeon Forge projection version to `4`; IV.36.3 secrets are additive metadata, not a breaking schema revision.
+- Keeps the complete Keeper-secret/reveal architecture unchanged.
+- Expected suite remains 1,140 tests.
