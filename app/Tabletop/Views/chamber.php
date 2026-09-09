@@ -379,6 +379,17 @@ $fog = $state?->fog() ?? [];
 $visionLayer = $state?->visionLayer() ?? [];
 $integrations = $state?->integrations() ?? [];
 $dungeonForge = is_array($integrations['dungeon_forge'] ?? null) ? $integrations['dungeon_forge'] : [];
+// IV.36.3 — unrevealed Forge secrets never cross the Player presentation boundary.
+if (! $state->isDungeonMaster() && $dungeonForge !== []) {
+    $hiddenDoorIndexes=[]; $visibleSecrets=[];
+    foreach(is_array($dungeonForge['secrets']??null)?$dungeonForge['secrets']:[] as $secret){
+        if(!is_array($secret)) continue;
+        if(!empty($secret['revealed'])){$visibleSecrets[]=$secret;continue;}
+        if(($secret['kind']??'')==='secret-door')$hiddenDoorIndexes[]=(int)($secret['door_index']??-1);
+    }
+    if($hiddenDoorIndexes!==[]){$dungeonForge['doors']=array_values(array_filter(is_array($dungeonForge['doors']??null)?$dungeonForge['doors']:[],static fn($door,$index):bool=>!in_array((int)$index,$hiddenDoorIndexes,true),ARRAY_FILTER_USE_BOTH));}
+    $dungeonForge['secrets']=$visibleSecrets;
+}
 $lairBossTokenId = trim((string) ($dungeonForge['lair_occupant_token_id'] ?? ''));
 $lairBossCreatureId = trim((string) ($dungeonForge['lair_occupant_id'] ?? ''));
 $forgeOccupantTokenIds = [];
@@ -897,6 +908,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                             <label class="gmrt-forge-population">
                                 Dungeon inhabitants
                                 <span><input type="checkbox" data-atlas-forge-populate> Populate ordinary rooms <small>(Dungeon only)</small></span>
+                                <span><input type="checkbox" data-atlas-forge-secrets> Include secrets <small>(Dungeon only)</small></span>
                                 <small>Deterministically places a sparse mix of hidden Bestiary creatures. The Keeper decides when they join battle.</small>
                             </label>
                             <label data-atlas-forge-lair-wrap>
@@ -1801,6 +1813,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                     <label class="gmrt-forge-population">
                                 Dungeon inhabitants
                                 <span><input type="checkbox" data-dungeon-forge-populate> Populate ordinary rooms <small>(Dungeon only)</small></span>
+                                <span><input type="checkbox" data-dungeon-forge-secrets> Include secrets <small>(Dungeon only)</small></span>
                                 <small>Deterministically places a sparse mix of hidden Bestiary creatures. The Keeper decides when they join battle.</small>
                             </label>
                             <label data-dungeon-forge-lair-wrap>

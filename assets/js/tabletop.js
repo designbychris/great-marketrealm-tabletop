@@ -3473,6 +3473,23 @@
     renderVisionLayer();
     renderCartographySuggestions();
 
+    // IV.36.3 — The Dungeon Has Secrets. Keeper reveal is explicit and persistent.
+    document.addEventListener('click', async (event) => {
+        const marker = event.target.closest?.('[data-forge-secret-id]');
+        if (!marker || marker.disabled) return;
+        const secretId=String(marker.dataset.forgeSecretId||'');
+        if(!secretId)return;
+        marker.disabled=true;
+        try {
+            const data=await request('gmrt_reveal_forge_secret',{secret_id:secretId});
+            say(data.message || 'The secret is revealed.');
+            window.location.reload();
+        } catch(error) {
+            marker.disabled=false;
+            say(error?.message || 'That secret refused to be found.');
+        }
+    });
+
     // Phase IV.30.2 — The Cartographer's Dungeon Forge.
     // Geometry comes first: a deterministic seed carves connected floor, then the
     // Forge derives authoritative vision barriers, doors, Keeper lights and Fog.
@@ -3490,6 +3507,7 @@
     const dungeonForgeLairOccupant = document.querySelector('[data-dungeon-forge-lair-occupant]');
     const dungeonForgeLairOccupantHidden = document.querySelector('[data-dungeon-forge-lair-occupant-hidden]');
     const dungeonForgePopulate = document.querySelector('[data-dungeon-forge-populate]');
+    const dungeonForgeSecrets = document.querySelector('[data-dungeon-forge-secrets]');
     const updateDungeonForgeLairAvailability = () => {
         if (!dungeonForgeLair) return;
         const allowed = String(dungeonForgeSceneType?.value || 'dungeon') === 'dungeon'
@@ -4131,6 +4149,7 @@
         dungeonForgeDraft.lair_occupant_id = dungeonForgeLair?.checked ? String(dungeonForgeLairOccupant?.value || '') : '';
         dungeonForgeDraft.lair_occupant_hidden = Boolean(dungeonForgeDraft.lair_occupant_id && dungeonForgeLairOccupantHidden?.checked);
         dungeonForgeDraft.populate_rooms = String(dungeonForgeDraft.scene_type || 'dungeon') === 'dungeon' && Boolean(dungeonForgePopulate?.checked);
+        dungeonForgeDraft.include_secrets = String(dungeonForgeDraft.scene_type || 'dungeon') === 'dungeon' && Boolean(dungeonForgeSecrets?.checked);
         renderDungeonForgePlan(dungeonForgeDraft, true);
         if (dungeonForgeBuild) dungeonForgeBuild.disabled = false;
         if (dungeonForgeClear) dungeonForgeClear.disabled = false;
@@ -4722,6 +4741,7 @@
     const atlasForgeLairOccupant = document.querySelector('[data-atlas-forge-lair-occupant]');
     const atlasForgeLairOccupantHidden = document.querySelector('[data-atlas-forge-lair-occupant-hidden]');
     const atlasForgePopulate = document.querySelector('[data-atlas-forge-populate]');
+    const atlasForgeSecrets = document.querySelector('[data-atlas-forge-secrets]');
     const atlasForgeTheme = document.querySelector('[data-atlas-forge-theme]');
     const atlasForgeReroll = document.querySelector('[data-atlas-forge-reroll]');
     const atlasForgeCreate = document.querySelector('[data-atlas-forge-create]');
@@ -4787,6 +4807,7 @@
             plan.lair_occupant_id = atlasForgeLair?.checked ? String(atlasForgeLairOccupant?.value || '') : '';
             plan.lair_occupant_hidden = Boolean(plan.lair_occupant_id && atlasForgeLairOccupantHidden?.checked);
             plan.populate_rooms = String(plan.scene_type || 'dungeon') === 'dungeon' && Boolean(atlasForgePopulate?.checked);
+            plan.include_secrets = String(plan.scene_type || 'dungeon') === 'dungeon' && Boolean(atlasForgeSecrets?.checked);
         } catch (error) {
             const message = error?.message || 'Pippin could not prepare that Scene plan.';
             if (atlasForgeStatus) atlasForgeStatus.textContent = message;

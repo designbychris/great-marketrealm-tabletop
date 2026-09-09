@@ -1259,3 +1259,8 @@ Current HP and Temporary HP can now be adjusted from the Satchel through an owne
 - Corrects the IV.36.2 service-provider import for `BestiaryRepositoryFactory`.
 - Restores application boot without changing ordinary-room population behaviour.
 - Test expectation remains 1,133 tests.
+
+
+### Phase IV.36.3 — The Dungeon Has Secrets
+
+Adds optional deterministic Keeper-only concealed doors and hidden caches to forged Dungeons, with an explicit persistent reveal boundary. Unrevealed secrets are removed from Player presentation. Trap mechanics remain reserved for IV.36.4.

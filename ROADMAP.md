@@ -962,3 +962,8 @@ Carry Session recap evidence and character-attributed deeds across the Tabletop 
 ### Phase IV.36.2A — The Repository Was on the Wrong Shelf
 
 Corrective wiring pass for IV.36.2: import `BestiaryRepositoryFactory` from its actual `Tabletop\Bestiary\Services` namespace. No scope expansion.
+
+
+### Phase IV.36.3 — The Dungeon Has Secrets
+
+Adds optional deterministic Keeper-only concealed doors and hidden caches to forged Dungeons, with an explicit persistent reveal boundary. Unrevealed secrets are removed from Player presentation. Trap mechanics remain reserved for IV.36.4.

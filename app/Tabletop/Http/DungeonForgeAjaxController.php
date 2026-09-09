@@ -12,6 +12,7 @@ use GreatMarketrealmTabletop\Tables\Scenes\Services\TableSceneManager;
 use GreatMarketrealmTabletop\Tabletop\Cartography\Contracts\DungeonForgeRepository;
 use GreatMarketrealmTabletop\Tabletop\Cartography\Services\ForgeFurniturePlanner;
 use GreatMarketrealmTabletop\Tabletop\Cartography\Services\ForgeOccupantPlanner;
+use GreatMarketrealmTabletop\Tabletop\Cartography\Services\ForgeSecretPlanner;
 use GreatMarketrealmTabletop\Tabletop\Atlas\Services\SceneShelfCleaner;
 use GreatMarketrealmTabletop\Tabletop\Fog\Services\FogOfWarManager;
 use GreatMarketrealmTabletop\Tabletop\Light\Contracts\EnvironmentalLightRepository;
@@ -52,6 +53,7 @@ final class DungeonForgeAjaxController
         private FurnitureCatalogue $furniture,
         private ForgeFurniturePlanner $furnisher,
         private ForgeOccupantPlanner $occupants,
+        private ForgeSecretPlanner $secrets,
         private ThresholdManager $thresholds,
         private BestiaryDeploymentManager $bestiaryDeployment
     ) {}
@@ -138,6 +140,23 @@ final class DungeonForgeAjaxController
                     count($projection['light_ids'])
                 ),
             ];
+        });
+    }
+
+    public function revealSecret(): void
+    {
+        $this->respond(function (string $tableId, int $userId): array {
+            $sceneId=sanitize_text_field((string)($_POST['scene_id']??''));
+            $secretId=sanitize_text_field((string)($_POST['secret_id']??''));
+            $projection=$sceneId!==''?$this->forge->forScene($tableId,$sceneId):null;
+            if(!is_array($projection)||$secretId==='') throw new RuntimeException('That dungeon secret could not be found.');
+            $found=false;
+            foreach(is_array($projection['secrets']??null)?$projection['secrets']:[] as $index=>$secret){
+                if(is_array($secret)&&($secret['id']??'')===$secretId){$projection['secrets'][$index]['revealed']=true;$found=true;break;}
+            }
+            if(!$found) throw new RuntimeException('That dungeon secret could not be found.');
+            $this->forge->save($tableId,$sceneId,$projection);
+            return ['message'=>'The secret is revealed. Pippin has reluctantly amended the map.','secret_id'=>$secretId];
         });
     }
 
@@ -287,8 +306,11 @@ final class DungeonForgeAjaxController
         // Every forged environment starts veiled. The Keeper still owns the final reveal.
         $fog = $this->fog->configure($tableId, $userId, true, true, $sceneId);
 
+        // IV.36.3 — Keeper-only secrets are metadata until deliberately revealed.
+        $secretDrafts = $this->secrets->plan($plan);
+
         $projection = [
-            'version' => 4,
+            'version' => 5,
             'scene_type' => $plan['scene_type'],
             'seed' => $plan['seed'],
             'style' => $plan['style'],
@@ -306,6 +328,8 @@ final class DungeonForgeAjaxController
             'lair_occupant_hidden' => $plan['lair_occupant_hidden'],
             'lair_occupant_token_id' => $lairOccupantTokenId,
             'populate_rooms' => $plan['populate_rooms'],
+            'include_secrets' => $plan['include_secrets'],
+            'secrets' => $secretDrafts,
             'forge_occupants' => $forgeOccupants,
             'furniture' => $furnitureDrafts,
             'barrier_ids' => array_map(static fn ($barrier): string => $barrier->id(), $created),
@@ -414,6 +438,7 @@ final class DungeonForgeAjaxController
         if (strlen($lairOccupantId) > 120) throw new RuntimeException('That lair occupant identifier is too long.');
         $lairOccupantHidden = $lairOccupantId !== '' && ! empty($plan['lair_occupant_hidden']);
         $populateRooms = $sceneType === 'dungeon' && ! empty($plan['populate_rooms']);
+        $includeSecrets = $sceneType === 'dungeon' && ! empty($plan['include_secrets']);
 
         $barriers = [];
         foreach (is_array($plan['barriers'] ?? null) ? $plan['barriers'] : [] as $barrier) {
@@ -509,7 +534,7 @@ final class DungeonForgeAjaxController
 
         $floor = array_values($floor);
         return compact('seed', 'style', 'theme', 'cols', 'rows', 'floor', 'rooms', 'barriers', 'doors', 'lights', 'features')
-            + ['scene_type' => $sceneType, 'entry_anchor' => $entryAnchor, 'lair_occupant_id' => $lairOccupantId, 'lair_occupant_hidden' => $lairOccupantHidden, 'populate_rooms' => $populateRooms];
+            + ['scene_type' => $sceneType, 'entry_anchor' => $entryAnchor, 'lair_occupant_id' => $lairOccupantId, 'lair_occupant_hidden' => $lairOccupantHidden, 'populate_rooms' => $populateRooms, 'include_secrets' => $includeSecrets];
     }
 
     private function clamp(float $value): float
