@@ -13,6 +13,7 @@ use GreatMarketrealmTabletop\Tabletop\Cartography\Contracts\DungeonForgeReposito
 use GreatMarketrealmTabletop\Tabletop\Cartography\Services\ForgeFurniturePlanner;
 use GreatMarketrealmTabletop\Tabletop\Cartography\Services\ForgeOccupantPlanner;
 use GreatMarketrealmTabletop\Tabletop\Cartography\Services\ForgeSecretPlanner;
+use GreatMarketrealmTabletop\Tabletop\Cartography\Services\ForgeTrapPlanner;
 use GreatMarketrealmTabletop\Tabletop\Atlas\Services\SceneShelfCleaner;
 use GreatMarketrealmTabletop\Tabletop\Fog\Services\FogOfWarManager;
 use GreatMarketrealmTabletop\Tabletop\Light\Contracts\EnvironmentalLightRepository;
@@ -54,6 +55,7 @@ final class DungeonForgeAjaxController
         private ForgeFurniturePlanner $furnisher,
         private ForgeOccupantPlanner $occupants,
         private ForgeSecretPlanner $secrets,
+        private ForgeTrapPlanner $traps,
         private ThresholdManager $thresholds,
         private BestiaryDeploymentManager $bestiaryDeployment
     ) {}
@@ -157,6 +159,22 @@ final class DungeonForgeAjaxController
             if(!$found) throw new RuntimeException('That dungeon secret could not be found.');
             $this->forge->save($tableId,$sceneId,$projection);
             return ['message'=>'The secret is revealed. Pippin has reluctantly amended the map.','secret_id'=>$secretId];
+        });
+    }
+
+    public function trapAction():void
+    {
+        $this->respond(function(string $tableId,int $userId):array{
+            $sceneId=sanitize_text_field((string)($_POST['scene_id']??''));$trapId=sanitize_text_field((string)($_POST['trap_id']??''));$action=sanitize_key((string)($_POST['trap_action']??''));$p=$sceneId!==''?$this->forge->forScene($tableId,$sceneId):null;
+            if(!is_array($p)||$trapId==='')throw new RuntimeException('That dungeon trap could not be found.');
+            if(!in_array($action,['reveal','disarm','trigger','reset'],true))throw new RuntimeException('That trap action is not recognised.');
+            $found=false;$label='Trap';
+            foreach(is_array($p['traps']??null)?$p['traps']:[] as $i=>$trap){if(!is_array($trap)||($trap['id']??'')!==$trapId)continue;$label=(string)($trap['label']??'Trap');
+                if($action==='reveal')$p['traps'][$i]['revealed']=true;
+                if($action==='disarm'){$p['traps'][$i]['revealed']=true;$p['traps'][$i]['armed']=false;}
+                if($action==='trigger'){$p['traps'][$i]['revealed']=true;$p['traps'][$i]['armed']=false;$p['traps'][$i]['triggered']=true;}
+                if($action==='reset'){$p['traps'][$i]['revealed']=true;$p['traps'][$i]['armed']=true;$p['traps'][$i]['triggered']=false;unset($p['traps'][$i]['triggered_by_token_id'],$p['traps'][$i]['triggered_at']);}$found=true;break;}
+            if(!$found)throw new RuntimeException('That dungeon trap could not be found.');$this->forge->save($tableId,$sceneId,$p);$verbs=['reveal'=>'revealed','disarm'=>'disarmed','trigger'=>'sprung','reset'=>'reset'];return['message'=>$label.' '.$verbs[$action].'.','trap_id'=>$trapId,'trap_action'=>$action];
         });
     }
 
@@ -308,6 +326,7 @@ final class DungeonForgeAjaxController
 
         // IV.36.3 — Keeper-only secrets are metadata until deliberately revealed.
         $secretDrafts = $this->secrets->plan($plan);
+        $trapDrafts = $this->traps->plan($plan);
 
         $projection = [
             'version' => 4,
@@ -329,7 +348,9 @@ final class DungeonForgeAjaxController
             'lair_occupant_token_id' => $lairOccupantTokenId,
             'populate_rooms' => $plan['populate_rooms'],
             'include_secrets' => $plan['include_secrets'],
+            'include_traps' => $plan['include_traps'],
             'secrets' => $secretDrafts,
+            'traps' => $trapDrafts,
             'forge_occupants' => $forgeOccupants,
             'furniture' => $furnitureDrafts,
             'barrier_ids' => array_map(static fn ($barrier): string => $barrier->id(), $created),
@@ -439,6 +460,7 @@ final class DungeonForgeAjaxController
         $lairOccupantHidden = $lairOccupantId !== '' && ! empty($plan['lair_occupant_hidden']);
         $populateRooms = $sceneType === 'dungeon' && ! empty($plan['populate_rooms']);
         $includeSecrets = $sceneType === 'dungeon' && ! empty($plan['include_secrets']);
+        $includeTraps = $sceneType === 'dungeon' && ! empty($plan['include_traps']);
 
         $barriers = [];
         foreach (is_array($plan['barriers'] ?? null) ? $plan['barriers'] : [] as $barrier) {
@@ -534,7 +556,7 @@ final class DungeonForgeAjaxController
 
         $floor = array_values($floor);
         return compact('seed', 'style', 'theme', 'cols', 'rows', 'floor', 'rooms', 'barriers', 'doors', 'lights', 'features')
-            + ['scene_type' => $sceneType, 'entry_anchor' => $entryAnchor, 'lair_occupant_id' => $lairOccupantId, 'lair_occupant_hidden' => $lairOccupantHidden, 'populate_rooms' => $populateRooms, 'include_secrets' => $includeSecrets];
+            + ['scene_type' => $sceneType, 'entry_anchor' => $entryAnchor, 'lair_occupant_id' => $lairOccupantId, 'lair_occupant_hidden' => $lairOccupantHidden, 'populate_rooms' => $populateRooms, 'include_secrets' => $includeSecrets, 'include_traps' => $includeTraps];
     }
 
     private function clamp(float $value): float

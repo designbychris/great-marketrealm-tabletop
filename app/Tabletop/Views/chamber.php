@@ -389,6 +389,7 @@ if ($state !== null && ! $state->isDungeonMaster() && $dungeonForge !== []) {
     }
     if($hiddenDoorIndexes!==[]){$dungeonForge['doors']=array_values(array_filter(is_array($dungeonForge['doors']??null)?$dungeonForge['doors']:[],static fn($door,$index):bool=>!in_array((int)$index,$hiddenDoorIndexes,true),ARRAY_FILTER_USE_BOTH));}
     $dungeonForge['secrets']=$visibleSecrets;
+    $dungeonForge['traps']=array_values(array_filter(is_array($dungeonForge['traps']??null)?$dungeonForge['traps']:[],static fn($trap):bool=>is_array($trap)&&!empty($trap['revealed'])));
 }
 $lairBossTokenId = trim((string) ($dungeonForge['lair_occupant_token_id'] ?? ''));
 $lairBossCreatureId = trim((string) ($dungeonForge['lair_occupant_id'] ?? ''));
@@ -909,6 +910,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                 Dungeon inhabitants
                                 <span><input type="checkbox" data-atlas-forge-populate> Populate ordinary rooms <small>(Dungeon only)</small></span>
                                 <span><input type="checkbox" data-atlas-forge-secrets> Include secrets <small>(Dungeon only)</small></span>
+                                <span><input type="checkbox" data-atlas-forge-traps> Include traps <small>(Dungeon only)</small></span>
                                 <small>Deterministically places a sparse mix of hidden Bestiary creatures. The Keeper decides when they join battle.</small>
                             </label>
                             <label data-atlas-forge-lair-wrap>
@@ -1814,6 +1816,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                 Dungeon inhabitants
                                 <span><input type="checkbox" data-dungeon-forge-populate> Populate ordinary rooms <small>(Dungeon only)</small></span>
                                 <span><input type="checkbox" data-dungeon-forge-secrets> Include secrets <small>(Dungeon only)</small></span>
+                                <span><input type="checkbox" data-dungeon-forge-traps> Include traps <small>(Dungeon only)</small></span>
                                 <small>Deterministically places a sparse mix of hidden Bestiary creatures. The Keeper decides when they join battle.</small>
                             </label>
                             <label data-dungeon-forge-lair-wrap>
@@ -2074,6 +2077,25 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                         data-forge-theme="<?php echo esc_attr((string) ($dungeonForge['theme'] ?? 'pantry-stone')); ?>"
                         aria-hidden="true"
                     ></svg>
+
+                    <?php $forgeTraps=is_array($dungeonForge['traps']??null)?$dungeonForge['traps']:[]; if($forgeTraps!==[]) : ?>
+                        <div class="gmrt-forge-trap-layer" data-forge-trap-layer aria-label="Dungeon traps">
+                            <?php foreach($forgeTraps as $trap) : if(!is_array($trap)||empty($trap['id']))continue;
+                                $trapRevealed=!empty($trap['revealed']);$trapTriggered=!empty($trap['triggered']);$trapArmed=!empty($trap['armed']);
+                                if(!$state->isDungeonMaster()&&!$trapRevealed)continue; ?>
+                                <div class="gmrt-forge-trap-marker<?php echo $trapTriggered?' is-triggered':($trapArmed?' is-armed':' is-disarmed'); ?>"
+                                    style="--gmrt-trap-x:<?php echo esc_attr((string)((float)($trap['x']??.5)*100)); ?>%;--gmrt-trap-y:<?php echo esc_attr((string)((float)($trap['y']??.5)*100)); ?>%;"
+                                    data-forge-trap-id="<?php echo esc_attr((string)$trap['id']); ?>" title="<?php echo esc_attr((string)($trap['label']??'Trap')); ?>">
+                                    <span aria-hidden="true"><?php echo $trapTriggered?'💥':($trapArmed?'⚠':'✓'); ?></span>
+                                    <?php if($state->isDungeonMaster()) : ?><div class="gmrt-forge-trap-controls">
+                                        <strong><?php echo esc_html((string)($trap['label']??'Trap')); ?></strong>
+                                        <?php if(!$trapRevealed): ?><button type="button" data-forge-trap-action="reveal">Reveal</button><?php endif; ?>
+                                        <?php if($trapArmed&&!$trapTriggered): ?><button type="button" data-forge-trap-action="disarm">Disarm</button><button type="button" data-forge-trap-action="trigger">Spring</button><?php else: ?><button type="button" data-forge-trap-action="reset">Reset</button><?php endif; ?>
+                                    </div><?php endif; ?>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
 
                     <?php if (
                         ($scene['grid_type'] ?? '')

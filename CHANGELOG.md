@@ -1276,3 +1276,10 @@ Adds optional deterministic Keeper-only concealed doors and hidden caches to for
 - Guards the IV.36.3 secret presentation filter against a nullable Tabletop chamber state.
 - Prevents the WordPress critical error caused by calling `isDungeonMaster()` on `null`.
 - Adds a regression for the nullable-state presentation boundary.
+
+### Phase IV.36.4 — Pippin Steps on Something
+- Adds deterministic hidden Forge traps: Pressure Plate and Tripwire.
+- Player movement can spring armed traps across the full movement segment.
+- Adds persisted reveal/disarm/spring/reset lifecycle and Keeper controls.
+- Unrevealed traps are stripped from Player presentation.
+- Adds 7 regression tests; expected suite 1,148.

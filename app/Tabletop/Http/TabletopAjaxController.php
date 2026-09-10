@@ -136,6 +136,7 @@ final class TabletopAjaxController
 
             wp_send_json_success([
                 'token' => $token->toArray(),
+                'trap' => $this->movement->lastTrapEvent(),
             ]);
         } catch (StaleTokenRevision $exception) {
             wp_send_json_error(

@@ -3473,6 +3473,14 @@
     renderVisionLayer();
     renderCartographySuggestions();
 
+    // IV.36.4 — Keeper controls share the same persisted state as movement triggers.
+    document.addEventListener('click',async(event)=>{
+        const button=event.target.closest?.('[data-forge-trap-action]');if(!button||button.disabled)return;
+        const marker=button.closest('[data-forge-trap-id]');if(!marker)return;button.disabled=true;
+        try{const data=await request('gmrt_forge_trap_action',{trap_id:String(marker.dataset.forgeTrapId||''),trap_action:String(button.dataset.forgeTrapAction||'')});say(data.message||'The trap state changed.');window.location.reload();}
+        catch(error){button.disabled=false;say(error?.message||'Pippin refuses to touch that mechanism.');}
+    });
+
     // IV.36.3 — The Dungeon Has Secrets. Keeper reveal is explicit and persistent.
     document.addEventListener('click', async (event) => {
         const marker = event.target.closest?.('[data-forge-secret-id]');
@@ -3508,6 +3516,7 @@
     const dungeonForgeLairOccupantHidden = document.querySelector('[data-dungeon-forge-lair-occupant-hidden]');
     const dungeonForgePopulate = document.querySelector('[data-dungeon-forge-populate]');
     const dungeonForgeSecrets = document.querySelector('[data-dungeon-forge-secrets]');
+    const dungeonForgeTraps = document.querySelector('[data-dungeon-forge-traps]');
     const updateDungeonForgeLairAvailability = () => {
         if (!dungeonForgeLair) return;
         const allowed = String(dungeonForgeSceneType?.value || 'dungeon') === 'dungeon'
@@ -4150,6 +4159,7 @@
         dungeonForgeDraft.lair_occupant_hidden = Boolean(dungeonForgeDraft.lair_occupant_id && dungeonForgeLairOccupantHidden?.checked);
         dungeonForgeDraft.populate_rooms = String(dungeonForgeDraft.scene_type || 'dungeon') === 'dungeon' && Boolean(dungeonForgePopulate?.checked);
         dungeonForgeDraft.include_secrets = String(dungeonForgeDraft.scene_type || 'dungeon') === 'dungeon' && Boolean(dungeonForgeSecrets?.checked);
+        dungeonForgeDraft.include_traps = String(dungeonForgeDraft.scene_type || 'dungeon') === 'dungeon' && Boolean(dungeonForgeTraps?.checked);
         renderDungeonForgePlan(dungeonForgeDraft, true);
         if (dungeonForgeBuild) dungeonForgeBuild.disabled = false;
         if (dungeonForgeClear) dungeonForgeClear.disabled = false;
@@ -4742,6 +4752,7 @@
     const atlasForgeLairOccupantHidden = document.querySelector('[data-atlas-forge-lair-occupant-hidden]');
     const atlasForgePopulate = document.querySelector('[data-atlas-forge-populate]');
     const atlasForgeSecrets = document.querySelector('[data-atlas-forge-secrets]');
+    const atlasForgeTraps = document.querySelector('[data-atlas-forge-traps]');
     const atlasForgeTheme = document.querySelector('[data-atlas-forge-theme]');
     const atlasForgeReroll = document.querySelector('[data-atlas-forge-reroll]');
     const atlasForgeCreate = document.querySelector('[data-atlas-forge-create]');
@@ -4808,6 +4819,7 @@
             plan.lair_occupant_hidden = Boolean(plan.lair_occupant_id && atlasForgeLairOccupantHidden?.checked);
             plan.populate_rooms = String(plan.scene_type || 'dungeon') === 'dungeon' && Boolean(atlasForgePopulate?.checked);
             plan.include_secrets = String(plan.scene_type || 'dungeon') === 'dungeon' && Boolean(atlasForgeSecrets?.checked);
+            plan.include_traps = String(plan.scene_type || 'dungeon') === 'dungeon' && Boolean(atlasForgeTraps?.checked);
         } catch (error) {
             const message = error?.message || 'Pippin could not prepare that Scene plan.';
             if (atlasForgeStatus) atlasForgeStatus.textContent = message;
@@ -6057,7 +6069,7 @@
             selected.style.setProperty('--gmrt-token-x', (token.x * 100) + '%');
             selected.style.setProperty('--gmrt-token-y', (token.y * 100) + '%');
             selected.dataset.tokenRevision = String(token.revision);
-            say((token.label || 'Token') + ' moved.');
+            if(data.trap){say(`CLICK! ${data.trap.label || 'A trap'} has been sprung. ${data.trap.effect || ''}`.trim());}else{say((token.label || 'Token') + ' moved.');}
             await updateTargeting();
             await refresh();
         } catch (error) {

@@ -975,3 +975,6 @@ Corrective compatibility pass: IV.36.3 retains Forge projection version 4 becaus
 ### Phase IV.36.3B — The Empty Chair Is Not the Dungeon Master
 
 Corrective browser-hardening pass for IV.36.3: secret projection filtering now respects the chamber's established nullable-state contract.
+
+### Phase IV.36.4 — Pippin Steps on Something
+Trap lifecycle foundation: deterministic Forge placement, Keeper secrecy and controls, movement-triggered discovery, persistent sprung/disarmed state.

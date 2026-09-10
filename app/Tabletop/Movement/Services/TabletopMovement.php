@@ -16,12 +16,16 @@ use GreatMarketrealmTabletop\Tabletop\Conditions\Contracts\ConditionRepository;
 use GreatMarketrealmTabletop\Tabletop\Conditions\Services\ConditionCombatRules;
 use GreatMarketrealmTabletop\Tabletop\Fog\Services\FogOfWarManager;
 use GreatMarketrealmTabletop\Tabletop\Footsteps\Services\FootstepTrailRecorder;
+use GreatMarketrealmTabletop\Tabletop\Cartography\Services\ForgeTrapTrigger;
 use RuntimeException;
 
 defined('ABSPATH') || exit;
 
 final class TabletopMovement
 {
+    /** @var array<string,mixed>|null */
+    private ?array $lastTrapEvent=null;
+
     public function __construct(
         private TableRepository $tables,
         private TableMembershipRepository $members,
@@ -31,7 +35,8 @@ final class TabletopMovement
         private ?ConditionRepository $conditions = null,
         private ?ConditionCombatRules $conditionRules = null,
         private ?FogOfWarManager $fog = null,
-        private ?FootstepTrailRecorder $footsteps = null
+        private ?FootstepTrailRecorder $footsteps = null,
+        private ?ForgeTrapTrigger $traps = null
     ) {}
 
     public function move(
@@ -155,6 +160,10 @@ final class TabletopMovement
             $this->footsteps->movement($token, $scene, $fromX, $fromY);
         }
 
+        $this->lastTrapEvent=$this->traps?->afterMovement($member,$token,$fromX,$fromY);
         return $token;
     }
+
+    /** @return array<string,mixed>|null */
+    public function lastTrapEvent():?array{return $this->lastTrapEvent;}
 }

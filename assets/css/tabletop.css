@@ -6253,3 +6253,11 @@
 .gmrt-forge-secret-marker.is-concealed{outline:1px dashed currentColor;outline-offset:2px}
 .gmrt-forge-secret-marker.is-revealed{background:#342b1d;color:#f4dfa0;opacity:.9}
 .gmrt-forge-secret-marker:disabled{cursor:default}
+
+/* IV.36.4 — Pippin Steps on Something */
+.gmrt-forge-trap-layer{position:absolute;inset:0;pointer-events:none;z-index:18}
+.gmrt-forge-trap-marker{position:absolute;left:var(--gmrt-trap-x);top:var(--gmrt-trap-y);transform:translate(-50%,-50%);width:1.7rem;height:1.7rem;display:grid;place-items:center;border:2px solid currentColor;border-radius:3px;background:#17120d;color:#e7c96a;font-weight:800;pointer-events:auto;box-shadow:0 2px 0 #0008}
+.gmrt-forge-trap-marker.is-triggered{font-size:1.05rem;background:#3a1d14}.gmrt-forge-trap-marker.is-disarmed{background:#243024}
+.gmrt-forge-trap-controls{display:none;position:absolute;left:1.9rem;top:-.4rem;min-width:12rem;padding:.45rem;background:#17120d;border:2px solid #b7954d;box-shadow:3px 3px 0 #0009;z-index:4}
+.gmrt-forge-trap-marker:hover .gmrt-forge-trap-controls,.gmrt-forge-trap-marker:focus-within .gmrt-forge-trap-controls{display:flex;gap:.3rem;align-items:center;flex-wrap:wrap}
+.gmrt-forge-trap-controls strong{width:100%;font-size:.75rem}.gmrt-forge-trap-controls button{font-size:.68rem}

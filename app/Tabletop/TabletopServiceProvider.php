@@ -272,6 +272,7 @@ final class TabletopServiceProvider
                 BestiaryRepositoryFactory::make()
             ),
             new \GreatMarketrealmTabletop\Tabletop\Cartography\Services\ForgeSecretPlanner(),
+            new \GreatMarketrealmTabletop\Tabletop\Cartography\Services\ForgeTrapPlanner(),
             \GreatMarketrealmTabletop\Tabletop\Atlas\Thresholds\Services\ThresholdManagerFactory::make(),
             BestiaryDeploymentManagerFactory::make()
         );
@@ -628,6 +629,11 @@ final class TabletopServiceProvider
         add_action(
             'wp_ajax_gmrt_reveal_forge_secret',
             [$this->dungeonForgeAjax, 'revealSecret']
+        );
+
+        add_action(
+            'wp_ajax_gmrt_forge_trap_action',
+            [$this->dungeonForgeAjax, 'trapAction']
         );
 
         add_action(
