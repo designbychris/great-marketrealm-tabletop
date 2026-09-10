@@ -1010,3 +1010,20 @@ Regression-only correction for the IV.36.6 story fixture path; no production beh
 - [x] Give expansion Bestiary cards a provenance-aware presentation seam; Midnight Menu receives the first neon treatment.
 - [ ] Server certification.
 - [ ] Browser certification with The Midnight Menu.
+
+
+## Phase IV.37 — The Adventure at the Table
+
+The Forge has prepared the dungeon; IV.37 turns that preparation into practical
+Keeper tools for actually running the adventure during a Session.
+
+### Phase IV.37.1 — Pippin Turns the Page
+- [x] Turn Pippin's Adventure Notes into a Keeper run sheet.
+- [x] Waiting / Current / Resolved beat lifecycle.
+- [x] Exactly one Current beat at a time.
+- [x] Persist progress in the existing Forge Scene projection.
+- [x] Preserve IV.36.6 story compatibility.
+- [x] Preserve the Player story-secrecy boundary.
+- [x] Keep live Forge revision parity for story progress.
+- [ ] Server certification.
+- [ ] Browser certification.

@@ -644,6 +644,11 @@ final class TabletopServiceProvider
         );
 
         add_action(
+            'wp_ajax_gmrt_forge_story_beat_action',
+            [$this->dungeonForgeAjax, 'storyBeatAction']
+        );
+
+        add_action(
             'wp_ajax_gmrt_configure_fog',
             [$this->fogAjax, 'configure']
         );

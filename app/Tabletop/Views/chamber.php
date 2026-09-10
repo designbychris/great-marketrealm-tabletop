@@ -401,6 +401,7 @@ $visibleForgeRevision = hash('sha256', (string) json_encode([
     'secrets' => $dungeonForge['secrets'] ?? [],
     'traps' => $dungeonForge['traps'] ?? [],
     'treasure' => $dungeonForge['treasure'] ?? [],
+    'story' => $dungeonForge['story'] ?? [],
 ], JSON_UNESCAPED_SLASHES));
 $lairBossTokenId = trim((string) ($dungeonForge['lair_occupant_token_id'] ?? ''));
 $lairBossCreatureId = trim((string) ($dungeonForge['lair_occupant_id'] ?? ''));
@@ -1838,11 +1839,45 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                             <h4><?php echo esc_html((string) ($forgeStory['title'] ?? 'A MarketRealm Detour')); ?></h4>
                             <p class="gmrt-forge-story__hook"><?php echo esc_html((string) ($forgeStory['hook'] ?? '')); ?></p>
                             <small><?php echo esc_html((string) ($forgeStory['summary'] ?? '')); ?></small>
-                            <ol class="gmrt-forge-story__beats">
-                                <?php foreach (is_array($forgeStory['beats'] ?? null) ? $forgeStory['beats'] : [] as $beat) : if (! is_array($beat)) continue; ?>
-                                    <li><strong><?php echo esc_html((string) ($beat['stage'] ?? 'Beat')); ?></strong> — <?php echo esc_html((string) ($beat['text'] ?? '')); ?></li>
+                            <ol class="gmrt-forge-story__beats" data-story-beat-roster>
+                                <?php foreach (is_array($forgeStory['beats'] ?? null) ? $forgeStory['beats'] : [] as $beatIndex => $beat) :
+                                    if (! is_array($beat)) continue;
+                                    $beatStatus = (string) ($beat['status'] ?? 'pending');
+                                    if (! in_array($beatStatus, ['pending', 'active', 'resolved'], true)) {
+                                        $beatStatus = 'pending';
+                                    }
+                                ?>
+                                    <li
+                                        class="gmrt-forge-story__beat is-<?php echo esc_attr($beatStatus); ?>"
+                                        data-story-beat-row
+                                        data-story-beat-index="<?php echo esc_attr((string) $beatIndex); ?>"
+                                    >
+                                        <div class="gmrt-forge-story__beat-copy">
+                                            <span class="gmrt-forge-story__beat-status"><?php
+                                                echo esc_html(
+                                                    $beatStatus === 'active'
+                                                        ? 'Current'
+                                                        : ($beatStatus === 'resolved' ? 'Resolved' : 'Waiting')
+                                                );
+                                            ?></span>
+                                            <strong><?php echo esc_html((string) ($beat['stage'] ?? 'Beat')); ?></strong>
+                                            <span><?php echo esc_html((string) ($beat['text'] ?? '')); ?></span>
+                                        </div>
+                                        <div class="gmrt-forge-story__beat-actions" aria-label="<?php echo esc_attr((string) ($beat['stage'] ?? 'Adventure beat')); ?> controls">
+                                            <?php if ($beatStatus !== 'active') : ?>
+                                                <button type="button" data-story-beat-action="activate">Make Current</button>
+                                            <?php endif; ?>
+                                            <?php if ($beatStatus !== 'resolved') : ?>
+                                                <button type="button" data-story-beat-action="resolve">Resolve</button>
+                                            <?php endif; ?>
+                                            <?php if ($beatStatus !== 'pending') : ?>
+                                                <button type="button" data-story-beat-action="reset">Reset</button>
+                                            <?php endif; ?>
+                                        </div>
+                                    </li>
                                 <?php endforeach; ?>
                             </ol>
+                            <span class="gmrt-forge-story__status" data-story-beat-status role="status" aria-live="polite">Pippin’s notes are ready for the Keeper to run at the table.</span>
                             <p class="gmrt-forge-story__note"><?php echo esc_html((string) ($forgeStory['keeper_note'] ?? '')); ?></p>
                         <?php endif; ?>
                     </div>

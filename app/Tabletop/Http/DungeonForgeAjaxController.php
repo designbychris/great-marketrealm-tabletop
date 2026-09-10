@@ -318,6 +318,75 @@ final class DungeonForgeAjaxController
         });
     }
 
+    public function storyBeatAction(): void
+    {
+        $this->respond(function (string $tableId, int $userId): array {
+            $sceneId = sanitize_text_field((string) ($_POST['scene_id'] ?? ''));
+            $action = sanitize_key((string) ($_POST['story_action'] ?? ''));
+            $beatIndex = isset($_POST['beat_index']) ? (int) $_POST['beat_index'] : -1;
+            $projection = $sceneId !== '' ? $this->forge->forScene($tableId, $sceneId) : null;
+
+            if (! is_array($projection)) {
+                throw new RuntimeException('This Scene does not contain a Forge adventure brief.');
+            }
+
+            $story = is_array($projection['story'] ?? null) ? $projection['story'] : [];
+            $beats = is_array($story['beats'] ?? null) ? array_values($story['beats']) : [];
+
+            if ($beats === [] || ! isset($beats[$beatIndex]) || ! is_array($beats[$beatIndex])) {
+                throw new RuntimeException('That adventure beat could not be found.');
+            }
+
+            if (! in_array($action, ['activate', 'resolve', 'reset'], true)) {
+                throw new RuntimeException('That adventure beat action is not recognised.');
+            }
+
+            // IV.37.1 deliberately keeps one "current" beat at a time while
+            // preserving already-resolved beats. Older IV.36.6 stories without
+            // an explicit status remain backward-compatible and read as pending.
+            if ($action === 'activate') {
+                foreach ($beats as $index => $beat) {
+                    if (! is_array($beat)) {
+                        continue;
+                    }
+
+                    if ($index !== $beatIndex
+                        && (string) ($beat['status'] ?? 'pending') === 'active') {
+                        $beats[$index]['status'] = 'pending';
+                    }
+                }
+
+                $beats[$beatIndex]['status'] = 'active';
+            } elseif ($action === 'resolve') {
+                $beats[$beatIndex]['status'] = 'resolved';
+            } else {
+                $beats[$beatIndex]['status'] = 'pending';
+            }
+
+            $story['beats'] = $beats;
+            $projection['story'] = $story;
+            $this->forge->save($tableId, $sceneId, $projection);
+
+            $stage = trim((string) ($beats[$beatIndex]['stage'] ?? 'Adventure beat'));
+            if ($stage === '') {
+                $stage = 'Adventure beat';
+            }
+
+            $messages = [
+                'activate' => $stage . ' is now the Keeper’s current story beat.',
+                'resolve' => $stage . ' marked resolved.',
+                'reset' => $stage . ' returned to the waiting notes.',
+            ];
+
+            return [
+                'message' => $messages[$action],
+                'beat_index' => $beatIndex,
+                'story_action' => $action,
+                'status' => (string) ($beats[$beatIndex]['status'] ?? 'pending'),
+            ];
+        });
+    }
+
     public function treasureAction(): void
     {
         $this->respond(function (string $tableId, int $userId): array {

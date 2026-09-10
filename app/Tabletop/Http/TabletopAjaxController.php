@@ -239,6 +239,7 @@ final class TabletopAjaxController
             'secrets' => $forge['secrets'] ?? [],
             'traps' => $forge['traps'] ?? [],
             'treasure' => $forge['treasure'] ?? [],
+            'story' => $forge['story'] ?? [],
         ], JSON_UNESCAPED_SLASHES));
     }
 

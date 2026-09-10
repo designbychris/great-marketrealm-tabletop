@@ -1,3 +1,14 @@
+## Phase IV.37.1 — Pippin Turns the Page
+
+- Opens **IV.37 — The Adventure at the Table**.
+- Turns Pippin's generated Adventure Notes into a persistent Keeper run sheet.
+- Adds Waiting, Current and Resolved lifecycle states for story beats.
+- Keeps exactly one beat Current while preserving already-resolved beats.
+- Stores run progress in the existing Forge Scene projection with no new persistence domain.
+- Keeps older IV.36.6 story projections backward-compatible as Waiting beats.
+- Keeps Forge story data fully absent from Player-rendered and Player-AJAX state.
+- Includes story progress in matched rendered/live Forge revisions.
+
 ## Phase V.11B — The Tabletop Opens the Same Book
 
 - Adds a campaign-scoped GMREXP Bestiary source using the V.11 Active Content API.

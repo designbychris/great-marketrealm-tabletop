@@ -430,6 +430,47 @@
     }, true);
 
 
+    const storyBeatRoster = document.querySelector('[data-story-beat-roster]');
+    const storyBeatStatus = document.querySelector('[data-story-beat-status]');
+
+    function storySceneId() {
+        return preparationSceneId || projectedSceneId;
+    }
+
+    storyBeatRoster?.addEventListener('click', async (event) => {
+        const button = event.target.closest?.('[data-story-beat-action]');
+        if (!button || button.disabled) return;
+
+        const row = button.closest('[data-story-beat-row]');
+        const beatIndex = Number.parseInt(String(row?.dataset.storyBeatIndex || ''), 10);
+        const action = String(button.dataset.storyBeatAction || '');
+
+        if (!Number.isInteger(beatIndex) || beatIndex < 0 || !action) return;
+
+        button.disabled = true;
+        try {
+            const data = await request('gmrt_forge_story_beat_action', {
+                scene_id: storySceneId(),
+                beat_index: beatIndex,
+                story_action: action
+            });
+
+            if (storyBeatStatus) {
+                storyBeatStatus.textContent = data.message || 'Adventure notes updated.';
+            }
+
+            await replaceChamber(
+                data.message || 'Adventure notes updated.',
+                storySceneId() || null
+            );
+        } catch (error) {
+            button.disabled = false;
+            if (storyBeatStatus) {
+                storyBeatStatus.textContent = error?.message || 'Pippin could not turn that page.';
+            }
+        }
+    });
+
     const treasureLedger = document.querySelector('[data-treasure-ledger]');
     const treasureStatus = document.querySelector('[data-treasure-status]');
     const treasureRoster = document.querySelector('[data-treasure-roster]');
