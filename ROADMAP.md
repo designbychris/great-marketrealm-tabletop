@@ -996,3 +996,6 @@ Corrective pass: Forge treasure controls restored, Player secrecy boundary align
 
 ### Phase IV.36.6 — The Forge Tells a Story
 The Forge can now weave entrance, inhabitants, discoveries, hazards, lair and rewards into one Keeper-facing adventure brief.
+
+### Phase IV.36.6A — Pippin Filed the Story One Shelf Too High
+Regression-only correction for the IV.36.6 story fixture path; no production behaviour changes.

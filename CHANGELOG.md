@@ -1319,3 +1319,9 @@ Adds optional deterministic Keeper-only concealed doors and hidden caches to for
 - Adds deterministic Keeper adventure briefs derived from semantic Dungeon Forge preparation.
 - Adds Tell a story to both Forge surfaces and Pippin’s Adventure Notes to Dungeon Master Controls.
 - Keeps generated story preparation entirely outside the Player presentation and AJAX boundaries.
+
+### Phase IV.36.6A — Pippin Filed the Story One Shelf Too High
+- Corrects the IV.36.6 story regression fixture root from four plugin parents plus one accidental extra level.
+- Adds explicit string guards around regression fixture reads.
+- Production Forge story behaviour is unchanged.
+- Expected suite remains 1,188 tests.
