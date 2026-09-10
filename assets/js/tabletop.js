@@ -258,6 +258,7 @@
     let keeperLightPlacement = null;
     let furniturePlacement = null;
     let trapPlacement = null;
+    let treasurePlacement = null;
     // The fog renderer runs during boot before the Lantern Rack event bindings are
     // installed, so the roster reference must exist before that first render.
     const keeperLightRoster = document.querySelector('[data-keeper-light-roster]');
@@ -335,6 +336,7 @@
     });
 
     trapPlace?.addEventListener('click', () => {
+        if (treasurePlacement) finishTreasurePlacement('Treasure placement cancelled.');
         trapPlacement = {
             mode: 'add',
             type: String(trapNewType?.value || 'pressure-plate'),
@@ -414,6 +416,134 @@
             await replaceChamber(data.message || 'Trap position updated.', trapSceneId() || null);
         } catch (error) {
             if (trapStatus) trapStatus.textContent = (error?.message || 'The trap could not be placed.') + ' Placement remains armed; click again or cancel.';
+        }
+    }, true);
+
+
+    const treasureLedger = document.querySelector('[data-treasure-ledger]');
+    const treasureStatus = document.querySelector('[data-treasure-status]');
+    const treasureRoster = document.querySelector('[data-treasure-roster]');
+    const treasureNewType = document.querySelector('[data-treasure-new-type]');
+    const treasureNewLabel = document.querySelector('[data-treasure-new-label]');
+    const treasureNewContents = document.querySelector('[data-treasure-new-contents]');
+    const treasurePlace = document.querySelector('[data-treasure-place]');
+    const treasurePlaceCancel = document.querySelector('[data-treasure-place-cancel]');
+
+    function treasureSceneId() {
+        return preparationSceneId || projectedSceneId;
+    }
+
+    function treasureDefaults(type) {
+        switch (String(type || 'coin-cache')) {
+            case 'trade-goods':
+                return ['Trade Goods', 'A useful bundle of trade goods and saleable provisions.'];
+            case 'adventurer-cache':
+                return ["Adventurer's Cache", 'A small cache of adventuring supplies worth carrying onward.'];
+            case 'curio-stash':
+                return ['Curio Stash', 'A peculiar curio and a few saleable trinkets.'];
+            case 'lair-hoard':
+                return ['Boss Hoard', 'A substantial hoard of mixed coin, valuables, and one conspicuously important prize for the Keeper to define.'];
+            default:
+                return ['Coin Cache', 'A modest cache of mixed coin and trade tokens.'];
+        }
+    }
+
+    function finishTreasurePlacement(message) {
+        treasurePlacement = null;
+        board?.classList.remove('is-treasure-placing');
+        if (treasurePlaceCancel) treasurePlaceCancel.disabled = true;
+        if (treasurePlace) treasurePlace.classList.remove('is-active');
+        if (treasureStatus && message) treasureStatus.textContent = message;
+    }
+
+    treasureNewType?.addEventListener('change', () => {
+        const [label, contents] = treasureDefaults(treasureNewType.value);
+        if (treasureNewLabel) treasureNewLabel.value = label;
+        if (treasureNewContents) treasureNewContents.value = contents;
+    });
+
+    treasurePlace?.addEventListener('click', () => {
+        if (trapPlacement) finishTrapPlacement('Trap placement cancelled.');
+        treasurePlacement = {
+            mode: 'add',
+            type: String(treasureNewType?.value || 'coin-cache'),
+            label: String(treasureNewLabel?.value || '').trim(),
+            contents: String(treasureNewContents?.value || '').trim()
+        };
+        board?.classList.add('is-treasure-placing');
+        treasurePlace.classList.add('is-active');
+        if (treasurePlaceCancel) treasurePlaceCancel.disabled = false;
+        if (treasureStatus) treasureStatus.textContent = 'Treasure selected — click the battlemap to place it.';
+    });
+
+    treasurePlaceCancel?.addEventListener('click', () => {
+        finishTreasurePlacement('Treasure placement cancelled. Pippin has stopped drawing little X marks.');
+    });
+
+    treasureRoster?.addEventListener('click', async (event) => {
+        const button = event.target.closest?.('[data-treasure-manage]');
+        if (!button || button.disabled) return;
+        const row = button.closest('[data-treasure-row]');
+        const treasureId = String(row?.dataset.treasureId || '');
+        const action = String(button.dataset.treasureManage || '');
+        if (!treasureId || !action) return;
+
+        if (action === 'move') {
+            treasurePlacement = {mode: 'move', treasureId};
+            board?.classList.add('is-treasure-placing');
+            if (treasurePlaceCancel) treasurePlaceCancel.disabled = false;
+            if (treasureStatus) treasureStatus.textContent = 'Move selected — click the battlemap for the treasure’s new position.';
+            return;
+        }
+
+        if (action === 'remove' && !window.confirm('Remove this treasure from the Scene?')) return;
+
+        button.disabled = true;
+        try {
+            const values = {
+                scene_id: treasureSceneId(),
+                treasure_id: treasureId,
+                treasure_action: action
+            };
+            if (action === 'update') {
+                values.label = String(row.querySelector('[data-treasure-label]')?.value || '').trim();
+                values.treasure_type = String(row.querySelector('[data-treasure-type]')?.value || 'coin-cache');
+                values.contents = String(row.querySelector('[data-treasure-contents]')?.value || '').trim();
+            }
+            const data = await request('gmrt_forge_treasure_action', values);
+            if (treasureStatus) treasureStatus.textContent = data.message || 'Treasure updated.';
+            await replaceChamber(data.message || 'Treasure updated.', treasureSceneId() || null);
+        } catch (error) {
+            button.disabled = false;
+            if (treasureStatus) treasureStatus.textContent = error?.message || 'Pippin could not amend that treasure record.';
+        }
+    });
+
+    board?.addEventListener('pointerdown', async (event) => {
+        if (!treasurePlacement || event.button !== 0) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        const point = coordinatesFromPointer(event);
+        const placement = treasurePlacement;
+        try {
+            const values = {
+                scene_id: treasureSceneId(),
+                treasure_action: placement.mode === 'move' ? 'move' : 'add',
+                x: point.x,
+                y: point.y
+            };
+            if (placement.mode === 'move') {
+                values.treasure_id = placement.treasureId;
+            } else {
+                values.treasure_type = placement.type;
+                values.label = placement.label;
+                values.contents = placement.contents;
+            }
+            const data = await request('gmrt_forge_treasure_action', values);
+            finishTreasurePlacement(data.message || 'Treasure position updated.');
+            await replaceChamber(data.message || 'Treasure position updated.', treasureSceneId() || null);
+        } catch (error) {
+            if (treasureStatus) treasureStatus.textContent = (error?.message || 'The treasure could not be placed.') + ' Placement remains armed; click again or cancel.';
         }
     }, true);
 
@@ -3585,6 +3715,27 @@
     renderVisionLayer();
     renderCartographySuggestions();
 
+    // IV.36.5 — revealed treasure becomes Player-visible through the same Forge revision boundary.
+    document.addEventListener('click', async (event) => {
+        const button = event.target.closest?.('[data-forge-treasure-action]');
+        if (!button || button.disabled) return;
+        const marker = button.closest('[data-forge-treasure-id]');
+        if (!marker) return;
+        button.disabled = true;
+        try {
+            const data = await request('gmrt_forge_treasure_action', {
+                scene_id: treasureSceneId(),
+                treasure_id: String(marker.dataset.forgeTreasureId || ''),
+                treasure_action: String(button.dataset.forgeTreasureAction || '')
+            });
+            say(data.message || 'The treasure ledger changed.');
+            await replaceChamber(data.message || 'The treasure ledger changed.', treasureSceneId() || null);
+        } catch (error) {
+            button.disabled = false;
+            say(error?.message || 'Pippin cannot reconcile that particular pile of valuables.');
+        }
+    });
+
     // IV.36.4 — Keeper controls share the same persisted state as movement triggers.
     document.addEventListener('click', async (event) => {
         const button = event.target.closest?.('[data-forge-trap-action]');
@@ -3642,6 +3793,7 @@
     const dungeonForgePopulate = document.querySelector('[data-dungeon-forge-populate]');
     const dungeonForgeSecrets = document.querySelector('[data-dungeon-forge-secrets]');
     const dungeonForgeTraps = document.querySelector('[data-dungeon-forge-traps]');
+    const dungeonForgeTreasure = document.querySelector('[data-dungeon-forge-treasure]');
     const updateDungeonForgeLairAvailability = () => {
         if (!dungeonForgeLair) return;
         const allowed = String(dungeonForgeSceneType?.value || 'dungeon') === 'dungeon'
@@ -4285,6 +4437,7 @@
         dungeonForgeDraft.populate_rooms = String(dungeonForgeDraft.scene_type || 'dungeon') === 'dungeon' && Boolean(dungeonForgePopulate?.checked);
         dungeonForgeDraft.include_secrets = String(dungeonForgeDraft.scene_type || 'dungeon') === 'dungeon' && Boolean(dungeonForgeSecrets?.checked);
         dungeonForgeDraft.include_traps = String(dungeonForgeDraft.scene_type || 'dungeon') === 'dungeon' && Boolean(dungeonForgeTraps?.checked);
+        dungeonForgeDraft.include_treasure = String(dungeonForgeDraft.scene_type || 'dungeon') === 'dungeon' && Boolean(dungeonForgeTreasure?.checked);
         renderDungeonForgePlan(dungeonForgeDraft, true);
         if (dungeonForgeBuild) dungeonForgeBuild.disabled = false;
         if (dungeonForgeClear) dungeonForgeClear.disabled = false;
@@ -4878,6 +5031,7 @@
     const atlasForgePopulate = document.querySelector('[data-atlas-forge-populate]');
     const atlasForgeSecrets = document.querySelector('[data-atlas-forge-secrets]');
     const atlasForgeTraps = document.querySelector('[data-atlas-forge-traps]');
+    const atlasForgeTreasure = document.querySelector('[data-atlas-forge-treasure]');
     const atlasForgeTheme = document.querySelector('[data-atlas-forge-theme]');
     const atlasForgeReroll = document.querySelector('[data-atlas-forge-reroll]');
     const atlasForgeCreate = document.querySelector('[data-atlas-forge-create]');
@@ -4945,6 +5099,7 @@
             plan.populate_rooms = String(plan.scene_type || 'dungeon') === 'dungeon' && Boolean(atlasForgePopulate?.checked);
             plan.include_secrets = String(plan.scene_type || 'dungeon') === 'dungeon' && Boolean(atlasForgeSecrets?.checked);
             plan.include_traps = String(plan.scene_type || 'dungeon') === 'dungeon' && Boolean(atlasForgeTraps?.checked);
+            plan.include_treasure = String(plan.scene_type || 'dungeon') === 'dungeon' && Boolean(atlasForgeTreasure?.checked);
         } catch (error) {
             const message = error?.message || 'Pippin could not prepare that Scene plan.';
             if (atlasForgeStatus) atlasForgeStatus.textContent = message;

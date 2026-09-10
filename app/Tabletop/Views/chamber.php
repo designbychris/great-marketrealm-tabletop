@@ -1817,6 +1817,79 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                         <?php endif; ?>
                     </div>
 
+                    <div class="gmrt-treasure-ledger" data-treasure-ledger>
+                        <strong>The Keeper's Treasure Ledger</strong>
+                        <span>Add, move, describe, reveal or mark treasure looted on this forged Scene.</span>
+                        <?php if ($dungeonForge === []) : ?>
+                            <small>This Scene has no Forge projection yet, so there is no treasure ledger to manage.</small>
+                        <?php else : ?>
+                            <div class="gmrt-treasure-ledger__tools">
+                                <label>
+                                    Cache
+                                    <select data-treasure-new-type>
+                                        <option value="coin-cache">Coin Cache</option>
+                                        <option value="trade-goods">Trade Goods</option>
+                                        <option value="adventurer-cache">Adventurer's Cache</option>
+                                        <option value="curio-stash">Curio Stash</option>
+                                        <option value="lair-hoard">Boss Hoard</option>
+                                    </select>
+                                </label>
+                                <label>
+                                    Label
+                                    <input type="text" maxlength="60" value="Coin Cache" data-treasure-new-label>
+                                </label>
+                                <label class="gmrt-treasure-ledger__contents">
+                                    Contents / Keeper note
+                                    <textarea maxlength="300" rows="2" data-treasure-new-contents>A modest cache of mixed coin and trade tokens.</textarea>
+                                </label>
+                                <button type="button" data-treasure-place>Place Treasure</button>
+                                <button type="button" data-treasure-place-cancel disabled>Finish / Cancel</button>
+                            </div>
+                            <span data-treasure-status role="status" aria-live="polite">Choose a cache, then place or tend it.</span>
+                            <div class="gmrt-treasure-ledger__roster" data-treasure-roster>
+                                <?php $keeperTreasure = is_array($dungeonForge['treasure'] ?? null) ? $dungeonForge['treasure'] : []; ?>
+                                <?php if ($keeperTreasure === []) : ?>
+                                    <small>No treasure on this Scene yet.</small>
+                                <?php else : ?>
+                                    <?php foreach ($keeperTreasure as $treasure) :
+                                        if (! is_array($treasure) || empty($treasure['id'])) continue;
+                                        $treasureId = (string) $treasure['id'];
+                                        $treasureType = (string) ($treasure['treasure_type'] ?? 'coin-cache');
+                                        $treasureLabel = (string) ($treasure['label'] ?? 'Coin Cache');
+                                        $treasureContents = (string) ($treasure['contents'] ?? '');
+                                        $treasureRevealed = ! empty($treasure['revealed']);
+                                        $treasureLooted = ! empty($treasure['looted']);
+                                    ?>
+                                        <div class="gmrt-treasure-ledger__row" data-treasure-row data-treasure-id="<?php echo esc_attr($treasureId); ?>">
+                                            <div class="gmrt-treasure-ledger__identity">
+                                                <input type="text" maxlength="60" value="<?php echo esc_attr($treasureLabel); ?>" data-treasure-label aria-label="Treasure label">
+                                                <select data-treasure-type aria-label="Treasure type">
+                                                    <option value="coin-cache" <?php selected($treasureType, 'coin-cache'); ?>>Coin Cache</option>
+                                                    <option value="trade-goods" <?php selected($treasureType, 'trade-goods'); ?>>Trade Goods</option>
+                                                    <option value="adventurer-cache" <?php selected($treasureType, 'adventurer-cache'); ?>>Adventurer's Cache</option>
+                                                    <option value="curio-stash" <?php selected($treasureType, 'curio-stash'); ?>>Curio Stash</option>
+                                                    <option value="lair-hoard" <?php selected($treasureType, 'lair-hoard'); ?>>Boss Hoard</option>
+                                                </select>
+                                                <textarea maxlength="300" rows="2" data-treasure-contents aria-label="Treasure contents"><?php echo esc_textarea($treasureContents); ?></textarea>
+                                            </div>
+                                            <span class="gmrt-treasure-ledger__state">
+                                                <?php echo esc_html(($treasureLooted ? '○ Looted' : '✦ Waiting') . ' · ' . ($treasureRevealed ? 'Revealed' : 'Concealed')); ?>
+                                            </span>
+                                            <div class="gmrt-treasure-ledger__actions">
+                                                <button type="button" data-treasure-manage="update">Save</button>
+                                                <button type="button" data-treasure-manage="move">Move</button>
+                                                <button type="button" data-treasure-manage="<?php echo $treasureRevealed ? 'conceal' : 'reveal'; ?>"><?php echo $treasureRevealed ? 'Conceal' : 'Reveal'; ?></button>
+                                                <?php if (! $treasureLooted) : ?><button type="button" data-treasure-manage="loot">Mark Looted</button><?php endif; ?>
+                                                <button type="button" data-treasure-manage="reset">Reset &amp; Conceal</button>
+                                                <button type="button" data-treasure-manage="remove" class="is-danger">Remove</button>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+
                     <div class="gmrt-vision-controls" data-vision-controls>
                         <strong>Sight Beyond the Door</strong>
                         <span>Teach the Veil where sight must stop.</span>
@@ -2170,6 +2243,28 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                         <strong><?php echo esc_html((string)($trap['label']??'Trap')); ?></strong>
                                         <?php if(!$trapRevealed): ?><button type="button" data-forge-trap-action="reveal">Reveal</button><?php endif; ?>
                                         <?php if($trapArmed&&!$trapTriggered): ?><button type="button" data-forge-trap-action="disarm">Disarm</button><button type="button" data-forge-trap-action="trigger">Spring</button><?php else: ?><button type="button" data-forge-trap-action="rearm">Re-arm</button><?php endif; ?><button type="button" data-forge-trap-action="reset">Reset &amp; Conceal</button>
+                                    </div><?php endif; ?>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <?php $forgeTreasure=is_array($dungeonForge['treasure']??null)?$dungeonForge['treasure']:[]; if($forgeTreasure!==[]) : ?>
+                        <div class="gmrt-forge-treasure-layer" data-forge-treasure-layer aria-label="Dungeon treasure">
+                            <?php foreach($forgeTreasure as $treasure) : if(!is_array($treasure)||empty($treasure['id']))continue;
+                                $treasureRevealed=!empty($treasure['revealed']);$treasureLooted=!empty($treasure['looted']);
+                                if(($state?->isDungeonMaster() ?? false) === false&&!$treasureRevealed)continue; ?>
+                                <div class="gmrt-forge-treasure-marker<?php echo !$treasureRevealed?' is-concealed':($treasureLooted?' is-looted':' is-revealed'); ?>"
+                                    style="--gmrt-treasure-x:<?php echo esc_attr((string)((float)($treasure['x']??.5)*100)); ?>%;--gmrt-treasure-y:<?php echo esc_attr((string)((float)($treasure['y']??.5)*100)); ?>%;"
+                                    data-forge-treasure-id="<?php echo esc_attr((string)$treasure['id']); ?>"
+                                    title="<?php echo esc_attr((string)($treasure['label']??'Treasure')); ?>">
+                                    <span aria-hidden="true"><?php echo !$treasureRevealed?'?':($treasureLooted?'○':'✦'); ?></span>
+                                    <?php if($state?->isDungeonMaster() ?? false) : ?><div class="gmrt-forge-treasure-controls">
+                                        <strong><?php echo esc_html((string)($treasure['label']??'Treasure')); ?></strong>
+                                        <small><?php echo esc_html((string)($treasure['contents']??'')); ?></small>
+                                        <?php if(!$treasureRevealed): ?><button type="button" data-forge-treasure-action="reveal">Reveal</button><?php else: ?><button type="button" data-forge-treasure-action="conceal">Conceal</button><?php endif; ?>
+                                        <?php if(!$treasureLooted): ?><button type="button" data-forge-treasure-action="loot">Mark Looted</button><?php endif; ?>
+                                        <button type="button" data-forge-treasure-action="reset">Reset &amp; Conceal</button>
                                     </div><?php endif; ?>
                                 </div>
                             <?php endforeach; ?>

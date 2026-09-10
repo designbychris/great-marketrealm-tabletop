@@ -987,3 +987,6 @@ Regression-only compatibility correction: Satchel cleanup now certifies the filt
 
 ### Phase IV.36.4B — The Keeper Opens the Trap Cabinet
 Dungeon Master Controls now own a full Forge trap cabinet: place, edit, move, reveal/conceal, arm/disarm, spring/reset and remove prepared traps. Also fixes active-Scene trap action addressing.
+
+### IV.36.5 — There May Be Treasure
+Dungeon Forge treasure preparation: deterministic hidden caches and Boss Hoards, Keeper-managed reveal/loot lifecycle, Player-safe visibility boundary, and manual Treasure Ledger controls. Inventory/currency handoff remains a later Companion integration boundary.

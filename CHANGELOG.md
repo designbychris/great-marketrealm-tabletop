@@ -1301,3 +1301,11 @@ Adds optional deterministic Keeper-only concealed doors and hidden caches to for
 - Fixes trap/secret marker actions so the active Scene ID is always sent to the Forge endpoint.
 - Replaces blind trap-action reloads with the normal Chamber refresh boundary.
 - Adds 6 regressions; expected suite 1,158 tests.
+
+### Phase IV.36.5 — There May Be Treasure
+- Adds deterministic, opt-in hidden Forge treasure for Dungeon scenes.
+- Gives genuine Boss Lairs a deterministic Boss Hoard and ordinary suitable rooms sparse caches.
+- Adds the Keeper's Treasure Ledger to Dungeon Master Controls with add/edit/move/reveal/conceal/loot/reset/remove lifecycle actions.
+- Keeps unrevealed treasure outside both Player-rendered markup and live AJAX integration state.
+- Adds live treasure markers and Player-visible reveal/loot state through the Forge revision boundary.
+- Keeps inventory/currency transfer outside Cartography so future Companion integration remains canonical.

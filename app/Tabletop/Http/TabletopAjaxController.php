@@ -216,6 +216,10 @@ final class TabletopAjaxController
             is_array($forge['traps'] ?? null) ? $forge['traps'] : [],
             static fn ($trap): bool => is_array($trap) && ! empty($trap['revealed'])
         ));
+        $forge['treasure'] = array_values(array_filter(
+            is_array($forge['treasure'] ?? null) ? $forge['treasure'] : [],
+            static fn ($treasure): bool => is_array($treasure) && ! empty($treasure['revealed'])
+        ));
         $integrations['dungeon_forge'] = $forge;
 
         return $integrations;
@@ -232,6 +236,7 @@ final class TabletopAjaxController
             'doors' => $forge['doors'] ?? [],
             'secrets' => $forge['secrets'] ?? [],
             'traps' => $forge['traps'] ?? [],
+            'treasure' => $forge['treasure'] ?? [],
         ], JSON_UNESCAPED_SLASHES));
     }
 

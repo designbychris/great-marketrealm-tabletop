@@ -14,6 +14,7 @@ use GreatMarketrealmTabletop\Tabletop\Cartography\Services\ForgeFurniturePlanner
 use GreatMarketrealmTabletop\Tabletop\Cartography\Services\ForgeOccupantPlanner;
 use GreatMarketrealmTabletop\Tabletop\Cartography\Services\ForgeSecretPlanner;
 use GreatMarketrealmTabletop\Tabletop\Cartography\Services\ForgeTrapPlanner;
+use GreatMarketrealmTabletop\Tabletop\Cartography\Services\ForgeTreasurePlanner;
 use GreatMarketrealmTabletop\Tabletop\Atlas\Services\SceneShelfCleaner;
 use GreatMarketrealmTabletop\Tabletop\Fog\Services\FogOfWarManager;
 use GreatMarketrealmTabletop\Tabletop\Light\Contracts\EnvironmentalLightRepository;
@@ -56,6 +57,7 @@ final class DungeonForgeAjaxController
         private ForgeOccupantPlanner $occupants,
         private ForgeSecretPlanner $secrets,
         private ForgeTrapPlanner $traps,
+        private ForgeTreasurePlanner $treasure,
         private ThresholdManager $thresholds,
         private BestiaryDeploymentManager $bestiaryDeployment
     ) {}
@@ -314,6 +316,169 @@ final class DungeonForgeAjaxController
         });
     }
 
+    public function treasureAction(): void
+    {
+        $this->respond(function (string $tableId, int $userId): array {
+            $sceneId = sanitize_text_field((string) ($_POST['scene_id'] ?? ''));
+            $action = sanitize_key((string) ($_POST['treasure_action'] ?? ''));
+            $projection = $sceneId !== '' ? $this->forge->forScene($tableId, $sceneId) : null;
+
+            if (! is_array($projection)) {
+                throw new RuntimeException('This Scene does not contain a Forge treasure shelf to manage.');
+            }
+
+            $allowed = ['add', 'update', 'move', 'remove', 'reveal', 'conceal', 'loot', 'reset'];
+            if (! in_array($action, $allowed, true)) {
+                throw new RuntimeException('That treasure action is not recognised.');
+            }
+
+            $projection['treasure'] = is_array($projection['treasure'] ?? null)
+                ? array_values($projection['treasure'])
+                : [];
+
+            if ($action === 'add') {
+                $type = $this->treasureType((string) ($_POST['treasure_type'] ?? 'coin-cache'));
+                $label = $this->treasureLabel((string) ($_POST['label'] ?? ''), $type);
+                $contents = $this->treasureContents((string) ($_POST['contents'] ?? ''), $type);
+                $treasure = [
+                    'id' => 'keeper-treasure-' . substr(wp_generate_uuid4(), 0, 18),
+                    'kind' => 'treasure',
+                    'treasure_type' => $type,
+                    'label' => $label,
+                    'contents' => $contents,
+                    'value_tier' => 'keeper',
+                    'x' => $this->normalisedCoordinate($_POST['x'] ?? 0.5),
+                    'y' => $this->normalisedCoordinate($_POST['y'] ?? 0.5),
+                    'revealed' => false,
+                    'looted' => false,
+                    'manual' => true,
+                ];
+                $projection['treasure'][] = $treasure;
+                $this->forge->save($tableId, $sceneId, $projection);
+
+                return [
+                    'message' => $label . ' placed and kept off the adventurers’ map.',
+                    'treasure' => $treasure,
+                    'treasure_action' => $action,
+                ];
+            }
+
+            $treasureId = sanitize_text_field((string) ($_POST['treasure_id'] ?? ''));
+            if ($treasureId === '') {
+                throw new RuntimeException('Choose a treasure record before changing it.');
+            }
+
+            $foundIndex = null;
+            foreach ($projection['treasure'] as $index => $record) {
+                if (is_array($record) && ($record['id'] ?? '') === $treasureId) {
+                    $foundIndex = $index;
+                    break;
+                }
+            }
+            if ($foundIndex === null) {
+                throw new RuntimeException('That treasure record could not be found.');
+            }
+
+            if ($action === 'remove') {
+                $removed = (string) ($projection['treasure'][$foundIndex]['label'] ?? 'Treasure');
+                array_splice($projection['treasure'], $foundIndex, 1);
+                $this->forge->save($tableId, $sceneId, $projection);
+                return [
+                    'message' => $removed . ' removed from the Forge ledger.',
+                    'treasure_id' => $treasureId,
+                    'treasure_action' => $action,
+                ];
+            }
+
+            if ($action === 'update') {
+                $type = $this->treasureType((string) ($_POST['treasure_type'] ?? ($projection['treasure'][$foundIndex]['treasure_type'] ?? 'coin-cache')));
+                $projection['treasure'][$foundIndex]['treasure_type'] = $type;
+                $projection['treasure'][$foundIndex]['label'] = $this->treasureLabel((string) ($_POST['label'] ?? ''), $type);
+                $projection['treasure'][$foundIndex]['contents'] = $this->treasureContents((string) ($_POST['contents'] ?? ''), $type);
+            }
+            if ($action === 'move') {
+                $projection['treasure'][$foundIndex]['x'] = $this->normalisedCoordinate($_POST['x'] ?? $projection['treasure'][$foundIndex]['x'] ?? 0.5);
+                $projection['treasure'][$foundIndex]['y'] = $this->normalisedCoordinate($_POST['y'] ?? $projection['treasure'][$foundIndex]['y'] ?? 0.5);
+            }
+            if ($action === 'reveal') {
+                $projection['treasure'][$foundIndex]['revealed'] = true;
+            }
+            if ($action === 'conceal') {
+                $projection['treasure'][$foundIndex]['revealed'] = false;
+            }
+            if ($action === 'loot') {
+                $projection['treasure'][$foundIndex]['revealed'] = true;
+                $projection['treasure'][$foundIndex]['looted'] = true;
+            }
+            if ($action === 'reset') {
+                $projection['treasure'][$foundIndex]['revealed'] = false;
+                $projection['treasure'][$foundIndex]['looted'] = false;
+            }
+
+            $this->forge->save($tableId, $sceneId, $projection);
+            $updated = $projection['treasure'][$foundIndex];
+            $messages = [
+                'update' => 'Treasure details updated.',
+                'move' => 'Treasure moved. Pippin has redrawn the suspiciously valuable X.',
+                'reveal' => 'Treasure revealed to the adventurers.',
+                'conceal' => 'Treasure concealed from the adventurers.',
+                'loot' => 'Treasure marked looted.',
+                'reset' => 'Treasure reset and concealed for another expedition.',
+            ];
+
+            return [
+                'message' => $messages[$action] ?? 'Treasure updated.',
+                'treasure_id' => $treasureId,
+                'treasure_action' => $action,
+                'treasure' => $updated,
+            ];
+        });
+    }
+
+    private function treasureType(string $value): string
+    {
+        $type = sanitize_key($value);
+        return in_array($type, ['coin-cache', 'trade-goods', 'adventurer-cache', 'curio-stash', 'lair-hoard'], true)
+            ? $type
+            : 'coin-cache';
+    }
+
+    private function treasureLabel(string $value, string $type): string
+    {
+        $label = trim(sanitize_text_field(wp_unslash($value)));
+        if ($label === '') {
+            $label = match ($type) {
+                'trade-goods' => 'Trade Goods',
+                'adventurer-cache' => 'Adventurer’s Cache',
+                'curio-stash' => 'Curio Stash',
+                'lair-hoard' => 'Boss Hoard',
+                default => 'Coin Cache',
+            };
+        }
+        if (strlen($label) > 60) {
+            throw new RuntimeException('Treasure labels must be 60 characters or fewer.');
+        }
+        return $label;
+    }
+
+    private function treasureContents(string $value, string $type): string
+    {
+        $contents = trim(sanitize_textarea_field(wp_unslash($value)));
+        if ($contents === '') {
+            $contents = match ($type) {
+                'trade-goods' => 'A useful bundle of trade goods and saleable provisions.',
+                'adventurer-cache' => 'A small cache of adventuring supplies worth carrying onward.',
+                'curio-stash' => 'A peculiar curio and a few saleable trinkets.',
+                'lair-hoard' => 'A substantial hoard of mixed coin, valuables, and one conspicuously important prize for the Keeper to define.',
+                default => 'A modest cache of mixed coin and trade tokens.',
+            };
+        }
+        if (strlen($contents) > 300) {
+            throw new RuntimeException('Treasure notes must be 300 characters or fewer.');
+        }
+        return $contents;
+    }
+
     private function trapType(string $value): string
     {
         $type = sanitize_key($value);
@@ -496,6 +661,7 @@ final class DungeonForgeAjaxController
         // IV.36.3 — Keeper-only secrets are metadata until deliberately revealed.
         $secretDrafts = $this->secrets->plan($plan);
         $trapDrafts = $this->traps->plan($plan);
+        $treasureDrafts = $this->treasure->plan($plan);
 
         $projection = [
             'version' => 4,
@@ -518,8 +684,10 @@ final class DungeonForgeAjaxController
             'populate_rooms' => $plan['populate_rooms'],
             'include_secrets' => $plan['include_secrets'],
             'include_traps' => $plan['include_traps'],
+            'include_treasure' => $plan['include_treasure'],
             'secrets' => $secretDrafts,
             'traps' => $trapDrafts,
+            'treasure' => $treasureDrafts,
             'forge_occupants' => $forgeOccupants,
             'furniture' => $furnitureDrafts,
             'barrier_ids' => array_map(static fn ($barrier): string => $barrier->id(), $created),
@@ -630,6 +798,7 @@ final class DungeonForgeAjaxController
         $populateRooms = $sceneType === 'dungeon' && ! empty($plan['populate_rooms']);
         $includeSecrets = $sceneType === 'dungeon' && ! empty($plan['include_secrets']);
         $includeTraps = $sceneType === 'dungeon' && ! empty($plan['include_traps']);
+        $includeTreasure = $sceneType === 'dungeon' && ! empty($plan['include_treasure']);
 
         $barriers = [];
         foreach (is_array($plan['barriers'] ?? null) ? $plan['barriers'] : [] as $barrier) {
@@ -725,7 +894,7 @@ final class DungeonForgeAjaxController
 
         $floor = array_values($floor);
         return compact('seed', 'style', 'theme', 'cols', 'rows', 'floor', 'rooms', 'barriers', 'doors', 'lights', 'features')
-            + ['scene_type' => $sceneType, 'entry_anchor' => $entryAnchor, 'lair_occupant_id' => $lairOccupantId, 'lair_occupant_hidden' => $lairOccupantHidden, 'populate_rooms' => $populateRooms, 'include_secrets' => $includeSecrets, 'include_traps' => $includeTraps];
+            + ['scene_type' => $sceneType, 'entry_anchor' => $entryAnchor, 'lair_occupant_id' => $lairOccupantId, 'lair_occupant_hidden' => $lairOccupantHidden, 'populate_rooms' => $populateRooms, 'include_secrets' => $includeSecrets, 'include_traps' => $includeTraps, 'include_treasure' => $includeTreasure];
     }
 
     private function clamp(float $value): float
