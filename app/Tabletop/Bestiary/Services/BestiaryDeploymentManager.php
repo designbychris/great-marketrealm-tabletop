@@ -38,7 +38,7 @@ final class BestiaryDeploymentManager
         private ThresholdRepository $thresholds,
         private TableTokenRepository $tokens,
         private TableTokenManager $tokenManager,
-        private BestiaryRepository $bestiary,
+        private ?BestiaryRepository $bestiary,
         private BestiaryCombatProvisioner $combatProvisioner
     ) {}
 
@@ -55,7 +55,7 @@ final class BestiaryDeploymentManager
     ): array {
         $this->assertDungeonMaster($tableId, $viewerUserId);
         $scene = $this->requiredScene($tableId, $sceneId);
-        $creature = $this->requiredCreature($creatureId);
+        $creature = $this->requiredCreature($tableId, $viewerUserId, $creatureId);
         $scene->coordinates($x, $y);
 
         return $this->forgeGroup(
@@ -80,7 +80,7 @@ final class BestiaryDeploymentManager
     ): array {
         $this->assertDungeonMaster($tableId, $viewerUserId);
         $scene = $this->requiredScene($tableId, $sceneId);
-        $creature = $this->requiredCreature($creatureId);
+        $creature = $this->requiredCreature($tableId, $viewerUserId, $creatureId);
         $markers = array_values(array_filter(
             $this->thresholds->forScene($tableId, $sceneId),
             static fn (ThresholdMarker $marker): bool => $marker->type() === ThresholdType::MONSTER
@@ -208,11 +208,16 @@ final class BestiaryDeploymentManager
         return $quantity;
     }
 
-    private function requiredCreature(string $creatureId): BestiaryCreature
-    {
-        $creature = $this->bestiary->find(trim($creatureId));
+    private function requiredCreature(
+        string $tableId,
+        int $viewerUserId,
+        string $creatureId
+    ): BestiaryCreature {
+        $bestiary = $this->bestiary
+            ?? BestiaryRepositoryFactory::make($tableId, $viewerUserId);
+        $creature = $bestiary->find(trim($creatureId));
         if ($creature === null) {
-            throw new BestiaryDeploymentDenied('That creature is not recorded in the Keeper\'s Bestiary.');
+            throw new BestiaryDeploymentDenied('That creature is not recorded in the Keeper\'s Bestiary for this Campaign.');
         }
         return $creature;
     }

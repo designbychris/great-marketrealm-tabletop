@@ -1,3 +1,11 @@
+## Phase V.11B — The Tabletop Opens the Same Book
+
+- Adds a campaign-scoped GMREXP Bestiary source using the V.11 Active Content API.
+- Reads shared Almanac keys from the existing linked Companion Campaign rather than creating a second Tabletop activation system.
+- Projects GMREXP monster AC, HP, walking speed, defenses, abilities, traits, senses and canonical provenance into the existing Keeper's Menagerie boundary.
+- Keeps free-form sourcebook action prose out of live combat mechanics unless explicit structured attack rules exist.
+- Revalidates campaign-scoped Bestiary access at summon time so stale UI cannot bypass a changed sharing decision.
+- Adds Almanac badges and Midnight Menu-specific neon presentation to expansion Bestiary cards, with forced-colour accessibility fallback.
 
 ## Phase IV.35.4B.1 — The Bookshelf Blocks the View
 

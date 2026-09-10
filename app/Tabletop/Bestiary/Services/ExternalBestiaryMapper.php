@@ -73,7 +73,11 @@ final class ExternalBestiaryMapper
             is_array($record['ability_scores'] ?? null) ? $record['ability_scores'] : [],
             is_array($record['saving_throws'] ?? null) ? $record['saving_throws'] : [],
             $this->list($record['senses'] ?? []),
-            (string) ($record['source'] ?? 'external-bestiary')
+            (string) ($record['source'] ?? 'external-bestiary'),
+            (string) ($record['expansion_key'] ?? ''),
+            (string) ($record['expansion_label'] ?? ''),
+            (string) ($record['canonical_id'] ?? ''),
+            $this->list($record['reference_actions'] ?? [])
         );
     }
 

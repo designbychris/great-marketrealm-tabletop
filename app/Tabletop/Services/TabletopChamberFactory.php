@@ -67,7 +67,7 @@ final class TabletopChamberFactory
             new WordPressDroppedLightRepository(),
             new WordPressMagicalLightRepository(),
             new WordPressThresholdRepository(),
-            BestiaryRepositoryFactory::make(),
+            null,
             new WordPressEnvironmentalLightRepository(),
             new WordPressDungeonForgeRepository(),
             new WordPressTableSessionRepository(),

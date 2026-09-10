@@ -999,3 +999,14 @@ The Forge can now weave entrance, inhabitants, discoveries, hazards, lair and re
 
 ### Phase IV.36.6A — Pippin Filed the Story One Shelf Too High
 Regression-only correction for the IV.36.6 story fixture path; no production behaviour changes.
+
+## Phase V.11B — The Tabletop Opens the Same Book ✅
+- [x] Read linked Companion Campaign Almanac scope.
+- [x] Read canonical active GMREXP monster definitions without copying them.
+- [x] Add only Campaign-shared expansion monsters to the Keeper's Bestiary.
+- [x] Preserve fully-qualified GMREXP identities and sourcebook provenance.
+- [x] Revalidate access at deployment time.
+- [x] Refuse to guess free-form sourcebook prose into live attack mechanics.
+- [x] Give expansion Bestiary cards a provenance-aware presentation seam; Midnight Menu receives the first neon treatment.
+- [ ] Server certification.
+- [ ] Browser certification with The Midnight Menu.

@@ -28,7 +28,7 @@ final class BestiaryDeploymentManagerFactory
             new WordPressThresholdRepository(),
             new WordPressTableTokenRepository(),
             TableTokenManagerFactory::make(),
-            BestiaryRepositoryFactory::make(),
+            null,
             new BestiaryCombatProvisioner(
                 new WordPressCombatProfileRepository(),
                 new WordPressDamageProfileRepository(),

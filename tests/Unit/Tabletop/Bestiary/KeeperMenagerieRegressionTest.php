@@ -40,11 +40,15 @@ final class KeeperMenagerieRegressionTest extends TestCase
         self::assertStringContainsString('return null;', $mapper);
     }
 
-    public function test_both_chamber_and_deployment_use_same_menagerie_factory(): void
+    public function test_chamber_and_deployment_resolve_the_campaign_scoped_menagerie_at_action_time(): void
     {
-        foreach (['app/Tabletop/Services/TabletopChamberFactory.php','app/Tabletop/Bestiary/Services/BestiaryDeploymentManagerFactory.php'] as $file) {
-            self::assertStringContainsString('BestiaryRepositoryFactory::make()', file_get_contents($this->root($file)));
-        }
+        $chamber = file_get_contents($this->root('app/Tabletop/Services/TabletopChamber.php'));
+        $deployment = file_get_contents($this->root('app/Tabletop/Bestiary/Services/BestiaryDeploymentManager.php'));
+
+        self::assertStringContainsString('BestiaryRepositoryFactory::make(', $chamber);
+        self::assertStringContainsString('$tableId', $chamber);
+        self::assertStringContainsString('$viewerUserId', $chamber);
+        self::assertStringContainsString('BestiaryRepositoryFactory::make($tableId, $viewerUserId)', $deployment);
     }
 
     public function test_keeper_drawer_names_the_menagerie_phase(): void

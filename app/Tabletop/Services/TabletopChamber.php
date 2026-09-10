@@ -40,6 +40,7 @@ use GreatMarketrealmTabletop\Tables\Tokens\Models\TableToken;
 use GreatMarketrealmTabletop\Tables\Tokens\Models\TableTokenType;
 use GreatMarketrealmTabletop\Tabletop\Atlas\Thresholds\Contracts\ThresholdRepository;
 use GreatMarketrealmTabletop\Tabletop\Bestiary\Contracts\BestiaryRepository;
+use GreatMarketrealmTabletop\Tabletop\Bestiary\Services\BestiaryRepositoryFactory;
 use GreatMarketrealmTabletop\Tabletop\Cartography\Contracts\DungeonForgeRepository;
 use GreatMarketrealmTabletop\Tabletop\Sessions\Contracts\TableSessionRepository;
 use GreatMarketrealmTabletop\Tabletop\Sessions\Repositories\WordPressSessionRecapRepository;
@@ -544,10 +545,13 @@ $worldLightSourceModels[] = $environmentalLight;
                     $this->thresholds->forScene($tableId, $activeScene->id())
                 )
                 : [],
-            $viewer->isDungeonMaster() && $this->bestiary !== null
+            $viewer->isDungeonMaster()
                 ? array_map(
                     static fn ($creature): array => $creature->toArray(),
-                    $this->bestiary->all()
+                    ($this->bestiary ?? BestiaryRepositoryFactory::make(
+                        $tableId,
+                        $viewerUserId
+                    ))->all()
                 )
                 : [],
             $this->sessions?->currentForTable($tableId)?->toArray(),

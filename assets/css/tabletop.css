@@ -6307,3 +6307,50 @@
 .gmrt-forge-story__beats{margin:.75rem 0;padding-left:1.4rem}
 .gmrt-forge-story__beats li{margin:.4rem 0}
 .gmrt-forge-story__note{margin:.75rem 0 0;padding-top:.65rem;border-top:1px dashed rgba(214,174,86,.4)}
+/* V.11B — Almanac provenance in the Keeper's Bestiary. */
+.gmrt-bestiary-card--expansion {
+    position: relative;
+    border-color: rgba(160, 211, 255, .34);
+    background:
+        linear-gradient(135deg, rgba(83, 146, 188, .08), transparent 42%),
+        rgba(255,255,255,.035);
+    box-shadow: inset 0 0 0 1px rgba(160, 211, 255, .04);
+}
+.gmrt-bestiary-card__expansion-badge {
+    display: inline-flex;
+    width: max-content;
+    max-width: 100%;
+    margin-top: .2rem;
+    padding: .17rem .42rem;
+    border: 1px solid rgba(160, 211, 255, .36);
+    border-radius: 4px;
+    background: rgba(14, 18, 12, .62);
+    font-size: .58rem;
+    font-weight: 900;
+    line-height: 1.25;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+}
+.gmrt-bestiary-card--expansion-midnight-menu {
+    border-color: rgba(94, 245, 255, .5);
+    background:
+        linear-gradient(135deg, rgba(42, 246, 255, .09), transparent 38%),
+        linear-gradient(315deg, rgba(255, 74, 224, .07), transparent 44%),
+        rgba(255,255,255,.035);
+    box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.025),
+        0 0 12px rgba(42, 246, 255, .08),
+        0 0 18px rgba(255, 74, 224, .045);
+}
+.gmrt-bestiary-card--expansion-midnight-menu .gmrt-bestiary-card__sigil,
+.gmrt-bestiary-card--expansion-midnight-menu .gmrt-bestiary-card__expansion-badge {
+    border-color: rgba(94, 245, 255, .58);
+}
+@media (forced-colors: active) {
+    .gmrt-bestiary-card--expansion,
+    .gmrt-bestiary-card--expansion-midnight-menu,
+    .gmrt-bestiary-card__expansion-badge {
+        border-color: CanvasText;
+        box-shadow: none;
+    }
+}

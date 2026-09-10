@@ -41,7 +41,11 @@ final class BestiaryCreature
         private array $abilityScores = [],
         private array $savingThrows = [],
         private array $senses = [],
-        private string $source = 'gmrt-bestiary'
+        private string $source = 'gmrt-bestiary',
+        private string $expansionKey = '',
+        private string $expansionLabel = '',
+        private string $canonicalId = '',
+        private array $referenceActions = []
     ) {
         if (trim($id) === '' || trim($name) === '') {
             throw new InvalidArgumentException('A Bestiary creature requires an ID and name.');
@@ -89,6 +93,10 @@ final class BestiaryCreature
             'saving_throws' => $this->savingThrows,
             'senses' => array_values($this->senses),
             'source' => $this->source,
+            'expansion_key' => $this->expansionKey,
+            'expansion_label' => $this->expansionLabel,
+            'canonical_id' => $this->canonicalId,
+            'reference_actions' => array_values($this->referenceActions),
         ];
     }
 }
