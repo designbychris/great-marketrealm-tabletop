@@ -162,20 +162,189 @@ final class DungeonForgeAjaxController
         });
     }
 
-    public function trapAction():void
+    public function trapAction(): void
     {
-        $this->respond(function(string $tableId,int $userId):array{
-            $sceneId=sanitize_text_field((string)($_POST['scene_id']??''));$trapId=sanitize_text_field((string)($_POST['trap_id']??''));$action=sanitize_key((string)($_POST['trap_action']??''));$p=$sceneId!==''?$this->forge->forScene($tableId,$sceneId):null;
-            if(!is_array($p)||$trapId==='')throw new RuntimeException('That dungeon trap could not be found.');
-            if(!in_array($action,['reveal','disarm','trigger','reset'],true))throw new RuntimeException('That trap action is not recognised.');
-            $found=false;$label='Trap';
-            foreach(is_array($p['traps']??null)?$p['traps']:[] as $i=>$trap){if(!is_array($trap)||($trap['id']??'')!==$trapId)continue;$label=(string)($trap['label']??'Trap');
-                if($action==='reveal')$p['traps'][$i]['revealed']=true;
-                if($action==='disarm'){$p['traps'][$i]['revealed']=true;$p['traps'][$i]['armed']=false;}
-                if($action==='trigger'){$p['traps'][$i]['revealed']=true;$p['traps'][$i]['armed']=false;$p['traps'][$i]['triggered']=true;}
-                if($action==='reset'){$p['traps'][$i]['revealed']=true;$p['traps'][$i]['armed']=true;$p['traps'][$i]['triggered']=false;unset($p['traps'][$i]['triggered_by_token_id'],$p['traps'][$i]['triggered_at']);}$found=true;break;}
-            if(!$found)throw new RuntimeException('That dungeon trap could not be found.');$this->forge->save($tableId,$sceneId,$p);$verbs=['reveal'=>'revealed','disarm'=>'disarmed','trigger'=>'sprung','reset'=>'reset'];return['message'=>$label.' '.$verbs[$action].'.','trap_id'=>$trapId,'trap_action'=>$action];
+        $this->respond(function (string $tableId, int $userId): array {
+            $sceneId = sanitize_text_field((string) ($_POST['scene_id'] ?? ''));
+            $action = sanitize_key((string) ($_POST['trap_action'] ?? ''));
+            $projection = $sceneId !== '' ? $this->forge->forScene($tableId, $sceneId) : null;
+
+            if (! is_array($projection)) {
+                throw new RuntimeException('This Scene does not contain Forge traps to manage.');
+            }
+
+            $allowed = [
+                'add', 'update', 'move', 'remove',
+                'reveal', 'conceal', 'disarm', 'rearm', 'trigger', 'reset',
+            ];
+            if (! in_array($action, $allowed, true)) {
+                throw new RuntimeException('That trap action is not recognised.');
+            }
+
+            $projection['traps'] = is_array($projection['traps'] ?? null)
+                ? array_values($projection['traps'])
+                : [];
+
+            if ($action === 'add') {
+                $trapType = $this->trapType((string) ($_POST['trap_type'] ?? 'pressure-plate'));
+                $label = $this->trapLabel((string) ($_POST['label'] ?? ''), $trapType);
+                $trap = [
+                    'id' => 'keeper-trap-' . substr(wp_generate_uuid4(), 0, 18),
+                    'kind' => 'trap',
+                    'trap_type' => $trapType,
+                    'label' => $label,
+                    'effect' => $this->trapEffect($trapType),
+                    'x' => $this->normalisedCoordinate($_POST['x'] ?? 0.5),
+                    'y' => $this->normalisedCoordinate($_POST['y'] ?? 0.5),
+                    'trigger_radius' => 0.02,
+                    'revealed' => false,
+                    'armed' => true,
+                    'triggered' => false,
+                    'manual' => true,
+                ];
+                $projection['traps'][] = $trap;
+                $this->forge->save($tableId, $sceneId, $projection);
+
+                return [
+                    'message' => $label . ' placed and concealed. Pippin is pretending not to know where it is.',
+                    'trap' => $trap,
+                    'trap_action' => $action,
+                ];
+            }
+
+            $trapId = sanitize_text_field((string) ($_POST['trap_id'] ?? ''));
+            if ($trapId === '') {
+                throw new RuntimeException('Choose a trap first.');
+            }
+
+            $foundIndex = null;
+            foreach ($projection['traps'] as $index => $candidate) {
+                if (is_array($candidate) && (string) ($candidate['id'] ?? '') === $trapId) {
+                    $foundIndex = $index;
+                    break;
+                }
+            }
+            if ($foundIndex === null) {
+                throw new RuntimeException('That dungeon trap could not be found.');
+            }
+
+            $trap = $projection['traps'][$foundIndex];
+            $label = (string) ($trap['label'] ?? 'Trap');
+
+            if ($action === 'remove') {
+                array_splice($projection['traps'], $foundIndex, 1);
+                $this->forge->save($tableId, $sceneId, $projection);
+                return [
+                    'message' => $label . ' removed from the Scene.',
+                    'trap_id' => $trapId,
+                    'trap_action' => $action,
+                ];
+            }
+
+            if ($action === 'update') {
+                $trapType = $this->trapType((string) ($_POST['trap_type'] ?? ($trap['trap_type'] ?? 'pressure-plate')));
+                $projection['traps'][$foundIndex]['trap_type'] = $trapType;
+                $projection['traps'][$foundIndex]['label'] = $this->trapLabel(
+                    (string) ($_POST['label'] ?? $label),
+                    $trapType
+                );
+                $projection['traps'][$foundIndex]['effect'] = $this->trapEffect($trapType);
+            }
+
+            if ($action === 'move') {
+                $projection['traps'][$foundIndex]['x'] = $this->normalisedCoordinate($_POST['x'] ?? ($trap['x'] ?? 0.5));
+                $projection['traps'][$foundIndex]['y'] = $this->normalisedCoordinate($_POST['y'] ?? ($trap['y'] ?? 0.5));
+            }
+
+            if ($action === 'reveal') {
+                $projection['traps'][$foundIndex]['revealed'] = true;
+            }
+            if ($action === 'conceal') {
+                $projection['traps'][$foundIndex]['revealed'] = false;
+            }
+            if ($action === 'disarm') {
+                $projection['traps'][$foundIndex]['revealed'] = true;
+                $projection['traps'][$foundIndex]['armed'] = false;
+            }
+            if ($action === 'rearm') {
+                $projection['traps'][$foundIndex]['revealed'] = true;
+                $projection['traps'][$foundIndex]['armed'] = true;
+                $projection['traps'][$foundIndex]['triggered'] = false;
+                unset(
+                    $projection['traps'][$foundIndex]['triggered_by_token_id'],
+                    $projection['traps'][$foundIndex]['triggered_at']
+                );
+            }
+            if ($action === 'trigger') {
+                $projection['traps'][$foundIndex]['revealed'] = true;
+                $projection['traps'][$foundIndex]['armed'] = false;
+                $projection['traps'][$foundIndex]['triggered'] = true;
+            }
+            if ($action === 'reset') {
+                // Reset means return to the original prepared state, not merely
+                // flip the armed flag while leaving an already-revealed marker.
+                $projection['traps'][$foundIndex]['revealed'] = false;
+                $projection['traps'][$foundIndex]['armed'] = true;
+                $projection['traps'][$foundIndex]['triggered'] = false;
+                unset(
+                    $projection['traps'][$foundIndex]['triggered_by_token_id'],
+                    $projection['traps'][$foundIndex]['triggered_at']
+                );
+            }
+
+            $this->forge->save($tableId, $sceneId, $projection);
+            $updated = $projection['traps'][$foundIndex];
+            $messages = [
+                'update' => 'Trap details updated.',
+                'move' => 'Trap moved. Pippin has amended the dangerous part of the map.',
+                'reveal' => 'Trap revealed to the adventurers.',
+                'conceal' => 'Trap concealed from the adventurers.',
+                'disarm' => 'Trap disarmed.',
+                'rearm' => 'Trap re-armed and left revealed.',
+                'trigger' => 'Trap sprung.',
+                'reset' => 'Trap reset, re-armed and concealed.',
+            ];
+
+            return [
+                'message' => $messages[$action] ?? 'Trap updated.',
+                'trap_id' => $trapId,
+                'trap_action' => $action,
+                'trap' => $updated,
+            ];
         });
+    }
+
+    private function trapType(string $value): string
+    {
+        $type = sanitize_key($value);
+        return in_array($type, ['pressure-plate', 'tripwire'], true)
+            ? $type
+            : 'pressure-plate';
+    }
+
+    private function trapLabel(string $value, string $type): string
+    {
+        $label = trim(sanitize_text_field(wp_unslash($value)));
+        if ($label === '') {
+            $label = $type === 'tripwire' ? 'Tripwire' : 'Pressure Plate';
+        }
+        if (strlen($label) > 60) {
+            throw new RuntimeException('Trap labels must be 60 characters or fewer.');
+        }
+        return $label;
+    }
+
+    private function trapEffect(string $type): string
+    {
+        return $type === 'tripwire'
+            ? 'A hidden line is pulled taut and the trap is sprung.'
+            : 'A concealed mechanism snaps into motion.';
+    }
+
+    /** @param mixed $value */
+    private function normalisedCoordinate($value): float
+    {
+        return max(0.0, min(1.0, (float) $value));
     }
 
     /** @return array<string,mixed> */

@@ -1744,6 +1744,79 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                         <div class="gmrt-lantern-rack__roster" data-keeper-light-roster></div>
                     </div>
 
+                    <div class="gmrt-trap-cabinet" data-trap-cabinet>
+                        <strong>The Keeper's Trap Cabinet</strong>
+                        <span>Add, move, rename, reveal, disarm or remove traps prepared on this forged Scene.</span>
+                        <?php if ($dungeonForge === []) : ?>
+                            <small>This Scene has no Forge projection yet, so there is no trap shelf to manage.</small>
+                        <?php else : ?>
+                            <div class="gmrt-trap-cabinet__tools">
+                                <label>
+                                    Trap
+                                    <select data-trap-new-type>
+                                        <option value="pressure-plate">Pressure Plate</option>
+                                        <option value="tripwire">Tripwire</option>
+                                    </select>
+                                </label>
+                                <label>
+                                    Label
+                                    <input type="text" maxlength="60" value="Pressure Plate" data-trap-new-label>
+                                </label>
+                                <button type="button" data-trap-place>Place Trap</button>
+                                <button type="button" data-trap-place-cancel disabled>Finish / Cancel</button>
+                            </div>
+                            <span data-trap-status role="status" aria-live="polite">Choose a trap, then place or tend it.</span>
+                            <div class="gmrt-trap-cabinet__roster" data-trap-roster>
+                                <?php $keeperTraps = is_array($dungeonForge['traps'] ?? null) ? $dungeonForge['traps'] : []; ?>
+                                <?php if ($keeperTraps === []) : ?>
+                                    <small>No traps on this Scene yet.</small>
+                                <?php else : ?>
+                                    <?php foreach ($keeperTraps as $trap) :
+                                        if (! is_array($trap) || empty($trap['id'])) continue;
+                                        $trapId = (string) $trap['id'];
+                                        $trapType = (string) ($trap['trap_type'] ?? 'pressure-plate');
+                                        $trapLabel = (string) ($trap['label'] ?? ($trapType === 'tripwire' ? 'Tripwire' : 'Pressure Plate'));
+                                        $trapRevealed = ! empty($trap['revealed']);
+                                        $trapArmed = ! empty($trap['armed']);
+                                        $trapTriggered = ! empty($trap['triggered']);
+                                    ?>
+                                        <div class="gmrt-trap-cabinet__row" data-trap-row data-trap-id="<?php echo esc_attr($trapId); ?>">
+                                            <div class="gmrt-trap-cabinet__identity">
+                                                <input type="text" maxlength="60" value="<?php echo esc_attr($trapLabel); ?>" data-trap-label aria-label="Trap label">
+                                                <select data-trap-type aria-label="Trap type">
+                                                    <option value="pressure-plate" <?php selected($trapType, 'pressure-plate'); ?>>Pressure Plate</option>
+                                                    <option value="tripwire" <?php selected($trapType, 'tripwire'); ?>>Tripwire</option>
+                                                </select>
+                                            </div>
+                                            <span class="gmrt-trap-cabinet__state">
+                                                <?php
+                                                echo esc_html(
+                                                    ($trapTriggered ? '💥 Sprung' : ($trapArmed ? '⚠ Armed' : '✓ Disarmed'))
+                                                    . ' · '
+                                                    . ($trapRevealed ? 'Revealed' : 'Concealed')
+                                                );
+                                                ?>
+                                            </span>
+                                            <div class="gmrt-trap-cabinet__actions">
+                                                <button type="button" data-trap-manage="update">Save</button>
+                                                <button type="button" data-trap-manage="move">Move</button>
+                                                <button type="button" data-trap-manage="<?php echo $trapRevealed ? 'conceal' : 'reveal'; ?>"><?php echo $trapRevealed ? 'Conceal' : 'Reveal'; ?></button>
+                                                <?php if ($trapArmed && ! $trapTriggered) : ?>
+                                                    <button type="button" data-trap-manage="disarm">Disarm</button>
+                                                    <button type="button" data-trap-manage="trigger">Spring</button>
+                                                <?php else : ?>
+                                                    <button type="button" data-trap-manage="rearm">Re-arm</button>
+                                                <?php endif; ?>
+                                                <button type="button" data-trap-manage="reset">Reset &amp; Conceal</button>
+                                                <button type="button" data-trap-manage="remove" class="is-danger">Remove</button>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+
                     <div class="gmrt-vision-controls" data-vision-controls>
                         <strong>Sight Beyond the Door</strong>
                         <span>Teach the Veil where sight must stop.</span>
@@ -2096,7 +2169,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                     <?php if($state?->isDungeonMaster() ?? false) : ?><div class="gmrt-forge-trap-controls">
                                         <strong><?php echo esc_html((string)($trap['label']??'Trap')); ?></strong>
                                         <?php if(!$trapRevealed): ?><button type="button" data-forge-trap-action="reveal">Reveal</button><?php endif; ?>
-                                        <?php if($trapArmed&&!$trapTriggered): ?><button type="button" data-forge-trap-action="disarm">Disarm</button><button type="button" data-forge-trap-action="trigger">Spring</button><?php else: ?><button type="button" data-forge-trap-action="reset">Reset</button><?php endif; ?>
+                                        <?php if($trapArmed&&!$trapTriggered): ?><button type="button" data-forge-trap-action="disarm">Disarm</button><button type="button" data-forge-trap-action="trigger">Spring</button><?php else: ?><button type="button" data-forge-trap-action="rearm">Re-arm</button><?php endif; ?><button type="button" data-forge-trap-action="reset">Reset &amp; Conceal</button>
                                     </div><?php endif; ?>
                                 </div>
                             <?php endforeach; ?>

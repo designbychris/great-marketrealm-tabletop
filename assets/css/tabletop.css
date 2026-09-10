@@ -3689,6 +3689,7 @@
 .gmrt-keeper-controls__body > .gmrt-keeper-controls__scene-tools,
 .gmrt-keeper-controls__body > .gmrt-fog-controls,
 .gmrt-keeper-controls__body > .gmrt-lantern-rack,
+.gmrt-keeper-controls__body > .gmrt-trap-cabinet,
 .gmrt-keeper-controls__body > .gmrt-vision-controls,
 .gmrt-keeper-controls__body > .gmrt-grid-calibrator,
 .gmrt-keeper-controls__body > .gmrt-furniture-palette,
@@ -6266,3 +6267,15 @@
 .gmrt-forge-trap-marker.is-concealed{opacity:.72;border-style:dashed}
 .gmrt-forge-trap-controls{left:calc(100% - 2px);top:-2px;margin:0;pointer-events:auto}
 .gmrt-forge-trap-controls::before{content:"";position:absolute;right:100%;top:0;width:4px;height:100%}
+
+/* IV.36.4B — The Keeper Opens the Trap Cabinet */
+.gmrt-trap-cabinet{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;padding:.65rem .75rem;border:1px solid rgba(244,234,214,.18);border-radius:8px;background:rgba(28,20,10,.68)}
+.gmrt-trap-cabinet>strong{color:#f4ead6}.gmrt-trap-cabinet>span,.gmrt-trap-cabinet>small{opacity:.78}
+.gmrt-trap-cabinet__tools{display:flex;flex-wrap:wrap;align-items:end;gap:.45rem;flex-basis:100%}
+.gmrt-trap-cabinet__tools label{display:grid;gap:.2rem;font-size:.72rem}.gmrt-trap-cabinet input,.gmrt-trap-cabinet select{min-height:2rem}
+.gmrt-trap-cabinet button{border:1px solid rgba(244,234,214,.35);border-radius:6px;padding:.38rem .55rem;background:rgba(0,0,0,.3);color:inherit;cursor:pointer}
+.gmrt-trap-cabinet button.is-active{outline:2px solid rgba(255,196,88,.95);outline-offset:2px}.gmrt-trap-cabinet button.is-danger{border-color:rgba(222,112,92,.58)}
+.gmrt-trap-cabinet__roster{flex-basis:100%;display:grid;gap:.4rem}.gmrt-trap-cabinet__row{display:grid;grid-template-columns:minmax(12rem,1.15fr) minmax(8rem,.65fr) minmax(18rem,1.8fr);align-items:center;gap:.5rem;padding:.45rem;border:1px solid rgba(244,234,214,.12);border-radius:6px}
+.gmrt-trap-cabinet__identity{display:grid;grid-template-columns:minmax(8rem,1fr) minmax(7rem,.75fr);gap:.35rem}.gmrt-trap-cabinet__state{font-size:.75rem;font-weight:800}.gmrt-trap-cabinet__actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:.3rem}
+.gmrt-board__viewport.is-trap-placing{cursor:crosshair}
+@media (max-width:900px){.gmrt-trap-cabinet__row{grid-template-columns:1fr}.gmrt-trap-cabinet__actions{justify-content:flex-start}}

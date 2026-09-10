@@ -1294,3 +1294,10 @@ Adds optional deterministic Keeper-only concealed doors and hidden caches to for
 - Updates the stale Satchel live-state regression for the IV.36.4A Player-safe integrations projection.
 - Preserves Companion integration data used by Satchel cleanup while continuing to filter only Keeper-only `dungeon_forge` metadata.
 - Expected suite remains 1,152 tests.
+
+### Phase IV.36.4B — The Keeper Opens the Trap Cabinet
+- Adds a DM Controls trap authoring roster with add, edit, move and remove support.
+- Separates Re-arm from Reset & Conceal so reset has an explicit, visible lifecycle meaning.
+- Fixes trap/secret marker actions so the active Scene ID is always sent to the Forge endpoint.
+- Replaces blind trap-action reloads with the normal Chamber refresh boundary.
+- Adds 6 regressions; expected suite 1,158 tests.

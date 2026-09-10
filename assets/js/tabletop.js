@@ -257,6 +257,7 @@
     let bestiaryPlacement = null;
     let keeperLightPlacement = null;
     let furniturePlacement = null;
+    let trapPlacement = null;
     // The fog renderer runs during boot before the Lantern Rack event bindings are
     // installed, so the roster reference must exist before that first render.
     const keeperLightRoster = document.querySelector('[data-keeper-light-roster]');
@@ -304,6 +305,117 @@
 
         return data.data;
     }
+
+    const trapCabinet = document.querySelector('[data-trap-cabinet]');
+    const trapStatus = document.querySelector('[data-trap-status]');
+    const trapRoster = document.querySelector('[data-trap-roster]');
+    const trapNewType = document.querySelector('[data-trap-new-type]');
+    const trapNewLabel = document.querySelector('[data-trap-new-label]');
+    const trapPlace = document.querySelector('[data-trap-place]');
+    const trapPlaceCancel = document.querySelector('[data-trap-place-cancel]');
+
+    function trapSceneId() {
+        return preparationSceneId || projectedSceneId;
+    }
+
+    function finishTrapPlacement(message) {
+        trapPlacement = null;
+        board?.classList.remove('is-trap-placing');
+        if (trapPlaceCancel) trapPlaceCancel.disabled = true;
+        if (trapPlace) trapPlace.classList.remove('is-active');
+        if (trapStatus && message) trapStatus.textContent = message;
+    }
+
+    trapNewType?.addEventListener('change', () => {
+        if (!trapNewLabel) return;
+        const current = trapNewLabel.value.trim();
+        if (current === '' || current === 'Pressure Plate' || current === 'Tripwire') {
+            trapNewLabel.value = trapNewType.value === 'tripwire' ? 'Tripwire' : 'Pressure Plate';
+        }
+    });
+
+    trapPlace?.addEventListener('click', () => {
+        trapPlacement = {
+            mode: 'add',
+            type: String(trapNewType?.value || 'pressure-plate'),
+            label: String(trapNewLabel?.value || '').trim()
+        };
+        board?.classList.add('is-trap-placing');
+        trapPlace.classList.add('is-active');
+        if (trapPlaceCancel) trapPlaceCancel.disabled = false;
+        if (trapStatus) trapStatus.textContent = 'Trap selected — click the battlemap to place it.';
+    });
+
+    trapPlaceCancel?.addEventListener('click', () => {
+        finishTrapPlacement('Trap placement cancelled. Pippin has lifted his feet very carefully.');
+    });
+
+    trapRoster?.addEventListener('click', async (event) => {
+        const button = event.target.closest?.('[data-trap-manage]');
+        if (!button || button.disabled) return;
+        const row = button.closest('[data-trap-row]');
+        const trapId = String(row?.dataset.trapId || '');
+        const action = String(button.dataset.trapManage || '');
+        if (!trapId || !action) return;
+
+        if (action === 'move') {
+            trapPlacement = {mode: 'move', trapId};
+            board?.classList.add('is-trap-placing');
+            if (trapPlaceCancel) trapPlaceCancel.disabled = false;
+            if (trapStatus) trapStatus.textContent = 'Move selected — click the battlemap for the trap\'s new position.';
+            return;
+        }
+
+        if (action === 'remove' && !window.confirm('Remove this trap from the Scene?')) return;
+
+        button.disabled = true;
+        try {
+            const values = {
+                scene_id: trapSceneId(),
+                trap_id: trapId,
+                trap_action: action
+            };
+            if (action === 'update') {
+                values.label = String(row.querySelector('[data-trap-label]')?.value || '').trim();
+                values.trap_type = String(row.querySelector('[data-trap-type]')?.value || 'pressure-plate');
+            }
+            const data = await request('gmrt_forge_trap_action', values);
+            if (trapStatus) trapStatus.textContent = data.message || 'Trap updated.';
+            await replaceChamber(data.message || 'Trap updated.', trapSceneId() || null);
+        } catch (error) {
+            button.disabled = false;
+            if (trapStatus) trapStatus.textContent = error?.message || 'Pippin could not tend that trap.';
+        }
+    });
+
+    // Trap placement owns the battlefield gesture in the same way as furniture
+    // and Keeper lights. It is server-authored; the map marker is just presentation.
+    board?.addEventListener('pointerdown', async (event) => {
+        if (!trapPlacement || event.button !== 0) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        const point = coordinatesFromPointer(event);
+        const placement = trapPlacement;
+        try {
+            const values = {
+                scene_id: trapSceneId(),
+                trap_action: placement.mode === 'move' ? 'move' : 'add',
+                x: point.x,
+                y: point.y
+            };
+            if (placement.mode === 'move') {
+                values.trap_id = placement.trapId;
+            } else {
+                values.trap_type = placement.type;
+                values.label = placement.label;
+            }
+            const data = await request('gmrt_forge_trap_action', values);
+            finishTrapPlacement(data.message || 'Trap position updated.');
+            await replaceChamber(data.message || 'Trap position updated.', trapSceneId() || null);
+        } catch (error) {
+            if (trapStatus) trapStatus.textContent = (error?.message || 'The trap could not be placed.') + ' Placement remains armed; click again or cancel.';
+        }
+    }, true);
 
     const furniturePalette = document.querySelector('[data-furniture-palette]');
     const furnitureStatus = document.querySelector('[data-furniture-status]');
@@ -3474,11 +3586,24 @@
     renderCartographySuggestions();
 
     // IV.36.4 — Keeper controls share the same persisted state as movement triggers.
-    document.addEventListener('click',async(event)=>{
-        const button=event.target.closest?.('[data-forge-trap-action]');if(!button||button.disabled)return;
-        const marker=button.closest('[data-forge-trap-id]');if(!marker)return;button.disabled=true;
-        try{const data=await request('gmrt_forge_trap_action',{trap_id:String(marker.dataset.forgeTrapId||''),trap_action:String(button.dataset.forgeTrapAction||'')});say(data.message||'The trap state changed.');window.location.reload();}
-        catch(error){button.disabled=false;say(error?.message||'Pippin refuses to touch that mechanism.');}
+    document.addEventListener('click', async (event) => {
+        const button = event.target.closest?.('[data-forge-trap-action]');
+        if (!button || button.disabled) return;
+        const marker = button.closest('[data-forge-trap-id]');
+        if (!marker) return;
+        button.disabled = true;
+        try {
+            const data = await request('gmrt_forge_trap_action', {
+                scene_id: preparationSceneId || projectedSceneId,
+                trap_id: String(marker.dataset.forgeTrapId || ''),
+                trap_action: String(button.dataset.forgeTrapAction || '')
+            });
+            say(data.message || 'The trap state changed.');
+            await replaceChamber(data.message || 'The trap state changed.', preparationSceneId || projectedSceneId || null);
+        } catch (error) {
+            button.disabled = false;
+            say(error?.message || 'Pippin refuses to touch that mechanism.');
+        }
     });
 
     // IV.36.3 — The Dungeon Has Secrets. Keeper reveal is explicit and persistent.
@@ -3489,7 +3614,7 @@
         if(!secretId)return;
         marker.disabled=true;
         try {
-            const data=await request('gmrt_reveal_forge_secret',{secret_id:secretId});
+            const data=await request('gmrt_reveal_forge_secret',{scene_id:preparationSceneId||projectedSceneId,secret_id:secretId});
             say(data.message || 'The secret is revealed.');
             window.location.reload();
         } catch(error) {

@@ -15,7 +15,7 @@ final class PippinStepsOnSomethingRegressionTest extends TestCase
         $movement=file_get_contents(dirname(__DIR__,4).'/app/Tabletop/Movement/Services/TabletopMovement.php');
         $controller=file_get_contents(dirname(__DIR__,4).'/app/Tabletop/Http/DungeonForgeAjaxController.php');
         self::assertStringContainsString('afterMovement($member,$token,$fromX,$fromY)',$movement);
-        self::assertStringContainsString("['reveal','disarm','trigger','reset']",$controller);
+        self::assertStringContainsString("'reveal', 'conceal', 'disarm', 'rearm', 'trigger', 'reset'",$controller);
         self::assertStringContainsString("'traps' => \$trapDrafts",$controller);
     }
 }

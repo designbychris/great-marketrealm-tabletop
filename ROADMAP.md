@@ -984,3 +984,6 @@ Corrective browser pass: reachable trap controls, visible reveal state, live Pla
 
 ### Phase IV.36.4A.1 — The Satchel Reads the New Signpost
 Regression-only compatibility correction: Satchel cleanup now certifies the filtered live integrations boundary introduced by IV.36.4A.
+
+### Phase IV.36.4B — The Keeper Opens the Trap Cabinet
+Dungeon Master Controls now own a full Forge trap cabinet: place, edit, move, reveal/conceal, arm/disarm, spring/reset and remove prepared traps. Also fixes active-Scene trap action addressing.
