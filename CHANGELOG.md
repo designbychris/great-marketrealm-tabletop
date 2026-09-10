@@ -1,3 +1,10 @@
+## Phase IV.37.1A — Pippin Escapes the Quotation Marks
+
+- Corrects the IV.37.1 endpoint-registration regression so `$this->dungeonForgeAjax` is asserted as literal source text rather than interpolated by PHP.
+- Removes the accompanying undefined-property warning.
+- Production IV.37.1 behaviour is unchanged.
+- Expected suite remains 1,204 tests.
+
 ## Phase IV.37.1 — Pippin Turns the Page
 
 - Opens **IV.37 — The Adventure at the Table**.

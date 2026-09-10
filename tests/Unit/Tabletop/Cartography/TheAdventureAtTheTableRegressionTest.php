@@ -45,7 +45,7 @@ final class TheAdventureAtTheTableRegressionTest extends TestCase
         $provider = (string) file_get_contents($this->root('app/Tabletop/TabletopServiceProvider.php'));
 
         self::assertStringContainsString('wp_ajax_gmrt_forge_story_beat_action', $provider);
-        self::assertStringContainsString("[$this->dungeonForgeAjax, 'storyBeatAction']", $provider);
+        self::assertStringContainsString("[\$this->dungeonForgeAjax, 'storyBeatAction']", $provider);
     }
 
     public function test_story_beat_actions_mutate_the_existing_forge_projection(): void

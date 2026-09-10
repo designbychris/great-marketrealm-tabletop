@@ -1027,3 +1027,6 @@ Keeper tools for actually running the adventure during a Session.
 - [x] Keep live Forge revision parity for story progress.
 - [ ] Server certification.
 - [ ] Browser certification.
+
+### Phase IV.37.1A — Pippin Escapes the Quotation Marks
+Regression-only correction for the story-beat endpoint registration assertion; no production behaviour changes.
