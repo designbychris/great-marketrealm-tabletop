@@ -1309,3 +1309,8 @@ Adds optional deterministic Keeper-only concealed doors and hidden caches to for
 - Keeps unrevealed treasure outside both Player-rendered markup and live AJAX integration state.
 - Adds live treasure markers and Player-visible reveal/loot state through the Forge revision boundary.
 - Keeps inventory/currency transfer outside Cartography so future Companion integration remains canonical.
+
+### Phase IV.36.5A — The Ledger Stops Folding Itself Away
+- Restores both Forge treasure toggles and the Player-side treasure presentation filter.
+- Aligns rendered/live Forge revisions by including treasure, stopping false heartbeat refreshes that collapsed Dungeon Master Controls.
+- Preserves open Dungeon Master Controls across legitimate Chamber fragment replacement.

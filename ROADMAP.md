@@ -990,3 +990,6 @@ Dungeon Master Controls now own a full Forge trap cabinet: place, edit, move, re
 
 ### IV.36.5 — There May Be Treasure
 Dungeon Forge treasure preparation: deterministic hidden caches and Boss Hoards, Keeper-managed reveal/loot lifecycle, Player-safe visibility boundary, and manual Treasure Ledger controls. Inventory/currency handoff remains a later Companion integration boundary.
+
+### Phase IV.36.5A — The Ledger Stops Folding Itself Away
+Corrective pass: Forge treasure controls restored, Player secrecy boundary aligned, live revision parity fixed, and DM Controls remain open across refreshes.

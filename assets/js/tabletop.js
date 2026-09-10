@@ -181,6 +181,9 @@
     async function replaceChamber(message, sceneId = null) {
         const current = document.querySelector('.gmrt-chamber');
         const liveStatus = document.querySelector('#gmrt-tabletop-status');
+        const keeperControlsWasOpen = Boolean(
+            current?.querySelector('[data-keeper-controls]')?.open
+        );
 
         if (!current || !window.gmrtTabletop) {
             return;
@@ -229,6 +232,13 @@
         if (activeRefreshTimer) {
             window.clearInterval(activeRefreshTimer);
             activeRefreshTimer = null;
+        }
+
+        if (keeperControlsWasOpen) {
+            const incomingKeeperControls = incoming.querySelector('[data-keeper-controls]');
+            if (incomingKeeperControls) {
+                incomingKeeperControls.open = true;
+            }
         }
 
         current.replaceWith(incoming);

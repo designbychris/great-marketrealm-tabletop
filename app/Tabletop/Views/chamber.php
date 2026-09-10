@@ -390,11 +390,13 @@ if ($state !== null && ! $state->isDungeonMaster() && $dungeonForge !== []) {
     if($hiddenDoorIndexes!==[]){$dungeonForge['doors']=array_values(array_filter(is_array($dungeonForge['doors']??null)?$dungeonForge['doors']:[],static fn($door,$index):bool=>!in_array((int)$index,$hiddenDoorIndexes,true),ARRAY_FILTER_USE_BOTH));}
     $dungeonForge['secrets']=$visibleSecrets;
     $dungeonForge['traps']=array_values(array_filter(is_array($dungeonForge['traps']??null)?$dungeonForge['traps']:[],static fn($trap):bool=>is_array($trap)&&!empty($trap['revealed'])));
+    $dungeonForge['treasure']=array_values(array_filter(is_array($dungeonForge['treasure']??null)?$dungeonForge['treasure']:[],static fn($treasure):bool=>is_array($treasure)&&!empty($treasure['revealed'])));
 }
 $visibleForgeRevision = hash('sha256', (string) json_encode([
     'doors' => $dungeonForge['doors'] ?? [],
     'secrets' => $dungeonForge['secrets'] ?? [],
     'traps' => $dungeonForge['traps'] ?? [],
+    'treasure' => $dungeonForge['treasure'] ?? [],
 ], JSON_UNESCAPED_SLASHES));
 $lairBossTokenId = trim((string) ($dungeonForge['lair_occupant_token_id'] ?? ''));
 $lairBossCreatureId = trim((string) ($dungeonForge['lair_occupant_id'] ?? ''));
@@ -917,6 +919,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                 <span><input type="checkbox" data-atlas-forge-populate> Populate ordinary rooms <small>(Dungeon only)</small></span>
                                 <span><input type="checkbox" data-atlas-forge-secrets> Include secrets <small>(Dungeon only)</small></span>
                                 <span><input type="checkbox" data-atlas-forge-traps> Include traps <small>(Dungeon only)</small></span>
+                                <span><input type="checkbox" data-atlas-forge-treasure> Include treasure <small>(Dungeon only)</small></span>
                                 <small>Deterministically places a sparse mix of hidden Bestiary creatures. The Keeper decides when they join battle.</small>
                             </label>
                             <label data-atlas-forge-lair-wrap>
@@ -1969,6 +1972,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                 <span><input type="checkbox" data-dungeon-forge-populate> Populate ordinary rooms <small>(Dungeon only)</small></span>
                                 <span><input type="checkbox" data-dungeon-forge-secrets> Include secrets <small>(Dungeon only)</small></span>
                                 <span><input type="checkbox" data-dungeon-forge-traps> Include traps <small>(Dungeon only)</small></span>
+                                <span><input type="checkbox" data-dungeon-forge-treasure> Include treasure <small>(Dungeon only)</small></span>
                                 <small>Deterministically places a sparse mix of hidden Bestiary creatures. The Keeper decides when they join battle.</small>
                             </label>
                             <label data-dungeon-forge-lair-wrap>
