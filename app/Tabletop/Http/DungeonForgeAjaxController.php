@@ -15,6 +15,7 @@ use GreatMarketrealmTabletop\Tabletop\Cartography\Services\ForgeOccupantPlanner;
 use GreatMarketrealmTabletop\Tabletop\Cartography\Services\ForgeSecretPlanner;
 use GreatMarketrealmTabletop\Tabletop\Cartography\Services\ForgeTrapPlanner;
 use GreatMarketrealmTabletop\Tabletop\Cartography\Services\ForgeTreasurePlanner;
+use GreatMarketrealmTabletop\Tabletop\Cartography\Services\ForgeStoryPlanner;
 use GreatMarketrealmTabletop\Tabletop\Atlas\Services\SceneShelfCleaner;
 use GreatMarketrealmTabletop\Tabletop\Fog\Services\FogOfWarManager;
 use GreatMarketrealmTabletop\Tabletop\Light\Contracts\EnvironmentalLightRepository;
@@ -58,6 +59,7 @@ final class DungeonForgeAjaxController
         private ForgeSecretPlanner $secrets,
         private ForgeTrapPlanner $traps,
         private ForgeTreasurePlanner $treasure,
+        private ForgeStoryPlanner $story,
         private ThresholdManager $thresholds,
         private BestiaryDeploymentManager $bestiaryDeployment
     ) {}
@@ -662,6 +664,8 @@ final class DungeonForgeAjaxController
         $secretDrafts = $this->secrets->plan($plan);
         $trapDrafts = $this->traps->plan($plan);
         $treasureDrafts = $this->treasure->plan($plan);
+        $storyDraft = $this->story->plan($plan, ['secrets' => $secretDrafts, 'traps' => $trapDrafts, 'treasure' => $treasureDrafts,
+            'story' => $storyDraft, 'occupants' => $forgeOccupants]);
 
         $projection = [
             'version' => 4,
@@ -685,9 +689,11 @@ final class DungeonForgeAjaxController
             'include_secrets' => $plan['include_secrets'],
             'include_traps' => $plan['include_traps'],
             'include_treasure' => $plan['include_treasure'],
+            'include_story' => $plan['include_story'],
             'secrets' => $secretDrafts,
             'traps' => $trapDrafts,
             'treasure' => $treasureDrafts,
+            'story' => $storyDraft,
             'forge_occupants' => $forgeOccupants,
             'furniture' => $furnitureDrafts,
             'barrier_ids' => array_map(static fn ($barrier): string => $barrier->id(), $created),
@@ -799,6 +805,7 @@ final class DungeonForgeAjaxController
         $includeSecrets = $sceneType === 'dungeon' && ! empty($plan['include_secrets']);
         $includeTraps = $sceneType === 'dungeon' && ! empty($plan['include_traps']);
         $includeTreasure = $sceneType === 'dungeon' && ! empty($plan['include_treasure']);
+        $includeStory = $sceneType === 'dungeon' && ! empty($plan['include_story']);
 
         $barriers = [];
         foreach (is_array($plan['barriers'] ?? null) ? $plan['barriers'] : [] as $barrier) {
@@ -894,7 +901,7 @@ final class DungeonForgeAjaxController
 
         $floor = array_values($floor);
         return compact('seed', 'style', 'theme', 'cols', 'rows', 'floor', 'rooms', 'barriers', 'doors', 'lights', 'features')
-            + ['scene_type' => $sceneType, 'entry_anchor' => $entryAnchor, 'lair_occupant_id' => $lairOccupantId, 'lair_occupant_hidden' => $lairOccupantHidden, 'populate_rooms' => $populateRooms, 'include_secrets' => $includeSecrets, 'include_traps' => $includeTraps, 'include_treasure' => $includeTreasure];
+            + ['scene_type' => $sceneType, 'entry_anchor' => $entryAnchor, 'lair_occupant_id' => $lairOccupantId, 'lair_occupant_hidden' => $lairOccupantHidden, 'populate_rooms' => $populateRooms, 'include_secrets' => $includeSecrets, 'include_traps' => $includeTraps, 'include_treasure' => $includeTreasure, 'include_story' => $includeStory];
     }
 
     private function clamp(float $value): float

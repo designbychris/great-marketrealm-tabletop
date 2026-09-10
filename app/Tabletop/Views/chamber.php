@@ -391,6 +391,7 @@ if ($state !== null && ! $state->isDungeonMaster() && $dungeonForge !== []) {
     $dungeonForge['secrets']=$visibleSecrets;
     $dungeonForge['traps']=array_values(array_filter(is_array($dungeonForge['traps']??null)?$dungeonForge['traps']:[],static fn($trap):bool=>is_array($trap)&&!empty($trap['revealed'])));
     $dungeonForge['treasure']=array_values(array_filter(is_array($dungeonForge['treasure']??null)?$dungeonForge['treasure']:[],static fn($treasure):bool=>is_array($treasure)&&!empty($treasure['revealed'])));
+    unset($dungeonForge['story']);
 }
 $visibleForgeRevision = hash('sha256', (string) json_encode([
     'doors' => $dungeonForge['doors'] ?? [],
@@ -920,6 +921,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                 <span><input type="checkbox" data-atlas-forge-secrets> Include secrets <small>(Dungeon only)</small></span>
                                 <span><input type="checkbox" data-atlas-forge-traps> Include traps <small>(Dungeon only)</small></span>
                                 <span><input type="checkbox" data-atlas-forge-treasure> Include treasure <small>(Dungeon only)</small></span>
+                                <span><input type="checkbox" data-atlas-forge-story> Tell a story <small>(Dungeon only)</small></span>
                                 <small>Deterministically places a sparse mix of hidden Bestiary creatures. The Keeper decides when they join battle.</small>
                             </label>
                             <label data-atlas-forge-lair-wrap>
@@ -1820,6 +1822,24 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                         <?php endif; ?>
                     </div>
 
+                    <?php $forgeStory = is_array($dungeonForge['story'] ?? null) ? $dungeonForge['story'] : []; ?>
+                    <div class="gmrt-forge-story" data-forge-story>
+                        <strong>Pippin’s Adventure Notes</strong>
+                        <?php if ($forgeStory === []) : ?>
+                            <small>No Forge story has been prepared for this Scene yet. Enable “Tell a story” when forging a Dungeon.</small>
+                        <?php else : ?>
+                            <h4><?php echo esc_html((string) ($forgeStory['title'] ?? 'A MarketRealm Detour')); ?></h4>
+                            <p class="gmrt-forge-story__hook"><?php echo esc_html((string) ($forgeStory['hook'] ?? '')); ?></p>
+                            <small><?php echo esc_html((string) ($forgeStory['summary'] ?? '')); ?></small>
+                            <ol class="gmrt-forge-story__beats">
+                                <?php foreach (is_array($forgeStory['beats'] ?? null) ? $forgeStory['beats'] : [] as $beat) : if (! is_array($beat)) continue; ?>
+                                    <li><strong><?php echo esc_html((string) ($beat['stage'] ?? 'Beat')); ?></strong> — <?php echo esc_html((string) ($beat['text'] ?? '')); ?></li>
+                                <?php endforeach; ?>
+                            </ol>
+                            <p class="gmrt-forge-story__note"><?php echo esc_html((string) ($forgeStory['keeper_note'] ?? '')); ?></p>
+                        <?php endif; ?>
+                    </div>
+
                     <div class="gmrt-treasure-ledger" data-treasure-ledger>
                         <strong>The Keeper's Treasure Ledger</strong>
                         <span>Add, move, describe, reveal or mark treasure looted on this forged Scene.</span>
@@ -1973,6 +1993,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                 <span><input type="checkbox" data-dungeon-forge-secrets> Include secrets <small>(Dungeon only)</small></span>
                                 <span><input type="checkbox" data-dungeon-forge-traps> Include traps <small>(Dungeon only)</small></span>
                                 <span><input type="checkbox" data-dungeon-forge-treasure> Include treasure <small>(Dungeon only)</small></span>
+                                <span><input type="checkbox" data-dungeon-forge-story> Tell a story <small>(Dungeon only)</small></span>
                                 <small>Deterministically places a sparse mix of hidden Bestiary creatures. The Keeper decides when they join battle.</small>
                             </label>
                             <label data-dungeon-forge-lair-wrap>

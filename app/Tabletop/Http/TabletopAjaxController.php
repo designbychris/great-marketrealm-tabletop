@@ -220,6 +220,8 @@ final class TabletopAjaxController
             is_array($forge['treasure'] ?? null) ? $forge['treasure'] : [],
             static fn ($treasure): bool => is_array($treasure) && ! empty($treasure['revealed'])
         ));
+        // IV.36.6 — the generated adventure brief is Keeper preparation, never Player state.
+        unset($forge['story']);
         $integrations['dungeon_forge'] = $forge;
 
         return $integrations;

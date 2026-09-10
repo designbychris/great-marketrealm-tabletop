@@ -993,3 +993,6 @@ Dungeon Forge treasure preparation: deterministic hidden caches and Boss Hoards,
 
 ### Phase IV.36.5A — The Ledger Stops Folding Itself Away
 Corrective pass: Forge treasure controls restored, Player secrecy boundary aligned, live revision parity fixed, and DM Controls remain open across refreshes.
+
+### Phase IV.36.6 — The Forge Tells a Story
+The Forge can now weave entrance, inhabitants, discoveries, hazards, lair and rewards into one Keeper-facing adventure brief.

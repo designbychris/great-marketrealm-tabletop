@@ -274,6 +274,7 @@ final class TabletopServiceProvider
             new \GreatMarketrealmTabletop\Tabletop\Cartography\Services\ForgeSecretPlanner(),
             new \GreatMarketrealmTabletop\Tabletop\Cartography\Services\ForgeTrapPlanner(),
             new \GreatMarketrealmTabletop\Tabletop\Cartography\Services\ForgeTreasurePlanner(),
+            new \GreatMarketrealmTabletop\Tabletop\Cartography\Services\ForgeStoryPlanner(),
             \GreatMarketrealmTabletop\Tabletop\Atlas\Thresholds\Services\ThresholdManagerFactory::make(),
             BestiaryDeploymentManagerFactory::make()
         );

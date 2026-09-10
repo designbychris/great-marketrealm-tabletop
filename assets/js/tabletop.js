@@ -3804,6 +3804,7 @@
     const dungeonForgeSecrets = document.querySelector('[data-dungeon-forge-secrets]');
     const dungeonForgeTraps = document.querySelector('[data-dungeon-forge-traps]');
     const dungeonForgeTreasure = document.querySelector('[data-dungeon-forge-treasure]');
+    const dungeonForgeStory = document.querySelector('[data-dungeon-forge-story]');
     const updateDungeonForgeLairAvailability = () => {
         if (!dungeonForgeLair) return;
         const allowed = String(dungeonForgeSceneType?.value || 'dungeon') === 'dungeon'
@@ -4448,6 +4449,7 @@
         dungeonForgeDraft.include_secrets = String(dungeonForgeDraft.scene_type || 'dungeon') === 'dungeon' && Boolean(dungeonForgeSecrets?.checked);
         dungeonForgeDraft.include_traps = String(dungeonForgeDraft.scene_type || 'dungeon') === 'dungeon' && Boolean(dungeonForgeTraps?.checked);
         dungeonForgeDraft.include_treasure = String(dungeonForgeDraft.scene_type || 'dungeon') === 'dungeon' && Boolean(dungeonForgeTreasure?.checked);
+        dungeonForgeDraft.include_story = String(dungeonForgeDraft.scene_type || 'dungeon') === 'dungeon' && Boolean(dungeonForgeStory?.checked);
         renderDungeonForgePlan(dungeonForgeDraft, true);
         if (dungeonForgeBuild) dungeonForgeBuild.disabled = false;
         if (dungeonForgeClear) dungeonForgeClear.disabled = false;
@@ -5042,6 +5044,7 @@
     const atlasForgeSecrets = document.querySelector('[data-atlas-forge-secrets]');
     const atlasForgeTraps = document.querySelector('[data-atlas-forge-traps]');
     const atlasForgeTreasure = document.querySelector('[data-atlas-forge-treasure]');
+    const atlasForgeStory = document.querySelector('[data-atlas-forge-story]');
     const atlasForgeTheme = document.querySelector('[data-atlas-forge-theme]');
     const atlasForgeReroll = document.querySelector('[data-atlas-forge-reroll]');
     const atlasForgeCreate = document.querySelector('[data-atlas-forge-create]');
@@ -5110,6 +5113,7 @@
             plan.include_secrets = String(plan.scene_type || 'dungeon') === 'dungeon' && Boolean(atlasForgeSecrets?.checked);
             plan.include_traps = String(plan.scene_type || 'dungeon') === 'dungeon' && Boolean(atlasForgeTraps?.checked);
             plan.include_treasure = String(plan.scene_type || 'dungeon') === 'dungeon' && Boolean(atlasForgeTreasure?.checked);
+            plan.include_story = String(plan.scene_type || 'dungeon') === 'dungeon' && Boolean(atlasForgeStory?.checked);
         } catch (error) {
             const message = error?.message || 'Pippin could not prepare that Scene plan.';
             if (atlasForgeStatus) atlasForgeStatus.textContent = message;

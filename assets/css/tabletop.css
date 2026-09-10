@@ -6298,3 +6298,12 @@
 .gmrt-forge-treasure-controls::before{content:"";position:absolute;right:100%;top:0;width:4px;height:100%}.gmrt-forge-treasure-marker:hover .gmrt-forge-treasure-controls,.gmrt-forge-treasure-marker:focus-within .gmrt-forge-treasure-controls{display:flex}
 .gmrt-forge-treasure-controls strong,.gmrt-forge-treasure-controls small{width:100%}.gmrt-forge-treasure-controls small{font-size:.68rem;line-height:1.35;opacity:.82}.gmrt-forge-treasure-controls button{font-size:.68rem}
 @media (max-width:900px){.gmrt-treasure-ledger__tools,.gmrt-treasure-ledger__row{grid-template-columns:1fr}.gmrt-treasure-ledger__actions{justify-content:flex-start}}
+
+/* IV.36.6 — The Forge Tells a Story */
+.gmrt-forge-story{margin:1rem 0;padding:1rem;border:2px solid rgba(214,174,86,.55);background:rgba(19,15,11,.92);box-shadow:inset 0 0 0 2px rgba(0,0,0,.35)}
+.gmrt-forge-story>strong{display:block;text-transform:uppercase;letter-spacing:.08em}
+.gmrt-forge-story h4{margin:.55rem 0 .25rem;font-size:1.05rem}
+.gmrt-forge-story__hook{font-style:italic;margin:.35rem 0}
+.gmrt-forge-story__beats{margin:.75rem 0;padding-left:1.4rem}
+.gmrt-forge-story__beats li{margin:.4rem 0}
+.gmrt-forge-story__note{margin:.75rem 0 0;padding-top:.65rem;border-top:1px dashed rgba(214,174,86,.4)}

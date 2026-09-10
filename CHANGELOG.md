@@ -1314,3 +1314,8 @@ Adds optional deterministic Keeper-only concealed doors and hidden caches to for
 - Restores both Forge treasure toggles and the Player-side treasure presentation filter.
 - Aligns rendered/live Forge revisions by including treasure, stopping false heartbeat refreshes that collapsed Dungeon Master Controls.
 - Preserves open Dungeon Master Controls across legitimate Chamber fragment replacement.
+
+### Phase IV.36.6 — The Forge Tells a Story
+- Adds deterministic Keeper adventure briefs derived from semantic Dungeon Forge preparation.
+- Adds Tell a story to both Forge surfaces and Pippin’s Adventure Notes to Dungeon Master Controls.
+- Keeps generated story preparation entirely outside the Player presentation and AJAX boundaries.
