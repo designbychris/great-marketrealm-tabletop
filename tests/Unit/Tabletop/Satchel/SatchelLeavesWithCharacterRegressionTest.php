@@ -21,7 +21,19 @@ final class SatchelLeavesWithCharacterRegressionTest extends TestCase
     public function test_live_state_exposes_the_companion_projection_used_by_satchel_cleanup(): void
     {
         $controller = file_get_contents($this->root('app/Tabletop/Http/TabletopAjaxController.php'));
-        self::assertStringContainsString("'integrations' => \$state->integrations()", $controller);
+
+        // IV.36.4A now filters Keeper-only Forge metadata before it crosses the
+        // Player AJAX boundary. The Companion projection still travels inside
+        // the integrations payload and remains available to Satchel cleanup.
+        self::assertStringContainsString("'integrations' => \$integrations", $controller);
+        self::assertStringContainsString(
+            "\$integrations = \$this->visibleIntegrations(",
+            $controller
+        );
+        self::assertStringContainsString(
+            "\$integrations['dungeon_forge'] = \$forge",
+            $controller
+        );
     }
 
     public function test_live_refresh_removes_an_orphaned_satchel(): void

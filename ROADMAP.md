@@ -981,3 +981,6 @@ Trap lifecycle foundation: deterministic Forge placement, Keeper secrecy and con
 
 ### Phase IV.36.4A — Pippin Can Reach the Buttons
 Corrective browser pass: reachable trap controls, visible reveal state, live Player propagation, and AJAX secrecy parity.
+
+### Phase IV.36.4A.1 — The Satchel Reads the New Signpost
+Regression-only compatibility correction: Satchel cleanup now certifies the filtered live integrations boundary introduced by IV.36.4A.

@@ -1289,3 +1289,8 @@ Adds optional deterministic Keeper-only concealed doors and hidden caches to for
 - Applies Keeper-secret filtering to Player AJAX state as well as initial rendering.
 - Moves trap controls flush against their marker and adds a hover bridge.
 - Adds 4 browser-boundary regressions; expected suite 1,152.
+
+### Phase IV.36.4A.1 — The Satchel Reads the New Signpost
+- Updates the stale Satchel live-state regression for the IV.36.4A Player-safe integrations projection.
+- Preserves Companion integration data used by Satchel cleanup while continuing to filter only Keeper-only `dungeon_forge` metadata.
+- Expected suite remains 1,152 tests.
