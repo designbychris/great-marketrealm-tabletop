@@ -391,6 +391,11 @@ if ($state !== null && ! $state->isDungeonMaster() && $dungeonForge !== []) {
     $dungeonForge['secrets']=$visibleSecrets;
     $dungeonForge['traps']=array_values(array_filter(is_array($dungeonForge['traps']??null)?$dungeonForge['traps']:[],static fn($trap):bool=>is_array($trap)&&!empty($trap['revealed'])));
 }
+$visibleForgeRevision = hash('sha256', (string) json_encode([
+    'doors' => $dungeonForge['doors'] ?? [],
+    'secrets' => $dungeonForge['secrets'] ?? [],
+    'traps' => $dungeonForge['traps'] ?? [],
+], JSON_UNESCAPED_SLASHES));
 $lairBossTokenId = trim((string) ($dungeonForge['lair_occupant_token_id'] ?? ''));
 $lairBossCreatureId = trim((string) ($dungeonForge['lair_occupant_id'] ?? ''));
 $forgeOccupantTokenIds = [];
@@ -449,6 +454,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
     data-sync-revision="<?php echo esc_attr(
         $state?->syncRevision() ?? ''
     ); ?>"
+    data-forge-revision="<?php echo esc_attr($visibleForgeRevision); ?>"
     data-scene-id="<?php echo esc_attr((string) ($scene['id'] ?? '')); ?>"
     data-session-id="<?php echo esc_attr((string) ($session['id'] ?? '')); ?>"
     data-session-status="<?php echo esc_attr((string) ($session['status'] ?? '')); ?>"
@@ -2082,12 +2088,12 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                         <div class="gmrt-forge-trap-layer" data-forge-trap-layer aria-label="Dungeon traps">
                             <?php foreach($forgeTraps as $trap) : if(!is_array($trap)||empty($trap['id']))continue;
                                 $trapRevealed=!empty($trap['revealed']);$trapTriggered=!empty($trap['triggered']);$trapArmed=!empty($trap['armed']);
-                                if(!$state->isDungeonMaster()&&!$trapRevealed)continue; ?>
-                                <div class="gmrt-forge-trap-marker<?php echo $trapTriggered?' is-triggered':($trapArmed?' is-armed':' is-disarmed'); ?>"
+                                if(($state?->isDungeonMaster() ?? false) === false&&!$trapRevealed)continue; ?>
+                                <div class="gmrt-forge-trap-marker<?php echo !$trapRevealed?' is-concealed':($trapTriggered?' is-triggered':($trapArmed?' is-armed':' is-disarmed')); ?>"
                                     style="--gmrt-trap-x:<?php echo esc_attr((string)((float)($trap['x']??.5)*100)); ?>%;--gmrt-trap-y:<?php echo esc_attr((string)((float)($trap['y']??.5)*100)); ?>%;"
                                     data-forge-trap-id="<?php echo esc_attr((string)$trap['id']); ?>" title="<?php echo esc_attr((string)($trap['label']??'Trap')); ?>">
-                                    <span aria-hidden="true"><?php echo $trapTriggered?'💥':($trapArmed?'⚠':'✓'); ?></span>
-                                    <?php if($state->isDungeonMaster()) : ?><div class="gmrt-forge-trap-controls">
+                                    <span aria-hidden="true"><?php echo !$trapRevealed?'?':($trapTriggered?'💥':($trapArmed?'⚠':'✓')); ?></span>
+                                    <?php if($state?->isDungeonMaster() ?? false) : ?><div class="gmrt-forge-trap-controls">
                                         <strong><?php echo esc_html((string)($trap['label']??'Trap')); ?></strong>
                                         <?php if(!$trapRevealed): ?><button type="button" data-forge-trap-action="reveal">Reveal</button><?php endif; ?>
                                         <?php if($trapArmed&&!$trapTriggered): ?><button type="button" data-forge-trap-action="disarm">Disarm</button><button type="button" data-forge-trap-action="trigger">Spring</button><?php else: ?><button type="button" data-forge-trap-action="reset">Reset</button><?php endif; ?>

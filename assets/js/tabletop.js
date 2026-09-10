@@ -6298,6 +6298,21 @@
                 say('The Table stirred — the turn has changed.');
             }
 
+            const incomingForgeRevision = String(state.forge_revision || '');
+            const currentForgeRevision = String(root.dataset.forgeRevision || '');
+            if (incomingForgeRevision && currentForgeRevision && incomingForgeRevision !== currentForgeRevision) {
+                await replaceChamber(
+                    root.dataset.viewerRole === 'player'
+                        ? 'Something in the dungeon has changed.'
+                        : 'The Keeper has amended the dungeon.',
+                    null
+                );
+                return;
+            }
+            if (incomingForgeRevision) {
+                root.dataset.forgeRevision = incomingForgeRevision;
+            }
+
             if (state.sync_revision) {
                 root.dataset.syncRevision = String(state.sync_revision);
             }

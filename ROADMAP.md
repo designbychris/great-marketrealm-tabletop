@@ -978,3 +978,6 @@ Corrective browser-hardening pass for IV.36.3: secret projection filtering now r
 
 ### Phase IV.36.4 — Pippin Steps on Something
 Trap lifecycle foundation: deterministic Forge placement, Keeper secrecy and controls, movement-triggered discovery, persistent sprung/disarmed state.
+
+### Phase IV.36.4A — Pippin Can Reach the Buttons
+Corrective browser pass: reachable trap controls, visible reveal state, live Player propagation, and AJAX secrecy parity.

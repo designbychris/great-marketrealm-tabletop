@@ -6261,3 +6261,8 @@
 .gmrt-forge-trap-controls{display:none;position:absolute;left:1.9rem;top:-.4rem;min-width:12rem;padding:.45rem;background:#17120d;border:2px solid #b7954d;box-shadow:3px 3px 0 #0009;z-index:4}
 .gmrt-forge-trap-marker:hover .gmrt-forge-trap-controls,.gmrt-forge-trap-marker:focus-within .gmrt-forge-trap-controls{display:flex;gap:.3rem;align-items:center;flex-wrap:wrap}
 .gmrt-forge-trap-controls strong{width:100%;font-size:.75rem}.gmrt-forge-trap-controls button{font-size:.68rem}
+
+/* IV.36.4A — Pippin Can Reach the Buttons */
+.gmrt-forge-trap-marker.is-concealed{opacity:.72;border-style:dashed}
+.gmrt-forge-trap-controls{left:calc(100% - 2px);top:-2px;margin:0;pointer-events:auto}
+.gmrt-forge-trap-controls::before{content:"";position:absolute;right:100%;top:0;width:4px;height:100%}

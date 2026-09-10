@@ -1283,3 +1283,9 @@ Adds optional deterministic Keeper-only concealed doors and hidden caches to for
 - Adds persisted reveal/disarm/spring/reset lifecycle and Keeper controls.
 - Unrevealed traps are stripped from Player presentation.
 - Adds 7 regression tests; expected suite 1,148.
+
+### Phase IV.36.4A — Pippin Can Reach the Buttons
+- Makes trap Reveal visibly distinct and live-syncs revealed trap state to already-open Player Tabletops.
+- Applies Keeper-secret filtering to Player AJAX state as well as initial rendering.
+- Moves trap controls flush against their marker and adds a hover bridge.
+- Adds 4 browser-boundary regressions; expected suite 1,152.

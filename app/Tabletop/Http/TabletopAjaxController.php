@@ -35,6 +35,11 @@ final class TabletopAjaxController
                 $this->sceneId()
             );
 
+            $integrations = $this->visibleIntegrations(
+                $state->integrations(),
+                $state->isDungeonMaster()
+            );
+
             wp_send_json_success([
                 'table' => $state->table(),
                 'viewer' => $state->viewer(),
@@ -52,7 +57,8 @@ final class TabletopAjaxController
                 'arsenals' => $state->arsenals(),
                 'fog' => $state->fog(),
                 'vision_layer' => $state->visionLayer(),
-                'integrations' => $state->integrations(),
+                'integrations' => $integrations,
+                'forge_revision' => $this->forgeRevision($integrations),
                 'footsteps' => $state->footsteps(),
                 'preparation' => $state->preparation(),
                 'thresholds' => $state->thresholds(),
@@ -85,9 +91,15 @@ final class TabletopAjaxController
                 $this->sceneId()
             );
 
+            $integrations = $this->visibleIntegrations(
+                $state->integrations(),
+                $state->isDungeonMaster()
+            );
+
             wp_send_json_success([
                 'html' => $this->renderer->render($state),
                 'sync_revision' => $state->syncRevision(),
+                'forge_revision' => $this->forgeRevision($integrations),
             ]);
         } catch (TabletopAccessDenied $exception) {
             wp_send_json_error(
@@ -154,6 +166,73 @@ final class TabletopAjaxController
                 400
             );
         }
+    }
+
+    /**
+     * Keep Keeper-only Forge preparation out of Player AJAX state.
+     *
+     * @param array<string,mixed> $integrations
+     * @return array<string,mixed>
+     */
+    private function visibleIntegrations(array $integrations, bool $isDungeonMaster): array
+    {
+        if ($isDungeonMaster) {
+            return $integrations;
+        }
+
+        $forge = is_array($integrations['dungeon_forge'] ?? null)
+            ? $integrations['dungeon_forge']
+            : [];
+
+        if ($forge === []) {
+            return $integrations;
+        }
+
+        $hiddenDoorIndexes = [];
+        $visibleSecrets = [];
+        foreach (is_array($forge['secrets'] ?? null) ? $forge['secrets'] : [] as $secret) {
+            if (! is_array($secret)) {
+                continue;
+            }
+            if (! empty($secret['revealed'])) {
+                $visibleSecrets[] = $secret;
+                continue;
+            }
+            if (($secret['kind'] ?? '') === 'secret-door') {
+                $hiddenDoorIndexes[] = (int) ($secret['door_index'] ?? -1);
+            }
+        }
+
+        if ($hiddenDoorIndexes !== []) {
+            $forge['doors'] = array_values(array_filter(
+                is_array($forge['doors'] ?? null) ? $forge['doors'] : [],
+                static fn ($door, $index): bool => ! in_array((int) $index, $hiddenDoorIndexes, true),
+                ARRAY_FILTER_USE_BOTH
+            ));
+        }
+
+        $forge['secrets'] = $visibleSecrets;
+        $forge['traps'] = array_values(array_filter(
+            is_array($forge['traps'] ?? null) ? $forge['traps'] : [],
+            static fn ($trap): bool => is_array($trap) && ! empty($trap['revealed'])
+        ));
+        $integrations['dungeon_forge'] = $forge;
+
+        return $integrations;
+    }
+
+    /** @param array<string,mixed> $integrations */
+    private function forgeRevision(array $integrations): string
+    {
+        $forge = is_array($integrations['dungeon_forge'] ?? null)
+            ? $integrations['dungeon_forge']
+            : [];
+
+        return hash('sha256', (string) json_encode([
+            'doors' => $forge['doors'] ?? [],
+            'secrets' => $forge['secrets'] ?? [],
+            'traps' => $forge['traps'] ?? [],
+        ], JSON_UNESCAPED_SLASHES));
     }
 
     private function guard(): void
