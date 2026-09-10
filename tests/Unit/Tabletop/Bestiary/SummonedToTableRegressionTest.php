@@ -17,7 +17,8 @@ final class SummonedToTableRegressionTest extends TestCase
     {
         $service = file_get_contents($this->root('app/Tabletop/Bestiary/Services/BestiaryDeploymentManager.php'));
         self::assertStringContainsString('final class BestiaryDeploymentManager', $service);
-        self::assertStringContainsString('private BestiaryRepository $bestiary', $service);
+        self::assertStringContainsString('private ?BestiaryRepository $bestiary', $service);
+        self::assertStringContainsString('BestiaryRepositoryFactory::make($tableId, $viewerUserId)', $service);
         self::assertStringContainsString('private TableTokenManager $tokenManager', $service);
         self::assertStringContainsString("'gmrt-bestiary:' . \$creature->id()", $service);
         self::assertStringContainsString('TableTokenType::CREATURE', $service);

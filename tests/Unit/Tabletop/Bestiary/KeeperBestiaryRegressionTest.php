@@ -39,8 +39,11 @@ final class KeeperBestiaryRegressionTest extends TestCase
     public function test_bestiary_projection_is_dungeon_master_only(): void
     {
         $chamber = file_get_contents($this->root('app/Tabletop/Services/TabletopChamber.php'));
-        self::assertStringContainsString('$viewer->isDungeonMaster() && $this->bestiary !== null', $chamber);
-        self::assertStringContainsString('$this->bestiary->all()', $chamber);
+        self::assertStringContainsString('$viewer->isDungeonMaster()', $chamber);
+        self::assertStringContainsString('BestiaryRepositoryFactory::make(', $chamber);
+        self::assertStringContainsString('$tableId,', $chamber);
+        self::assertStringContainsString('$viewerUserId', $chamber);
+        self::assertStringContainsString('))->all()', $chamber);
         $state = file_get_contents($this->root('app/Tabletop/Models/TabletopChamberState.php'));
         self::assertStringContainsString('private array $bestiary = []', $state);
         self::assertStringContainsString('public function bestiary(): array', $state);
@@ -49,7 +52,13 @@ final class KeeperBestiaryRegressionTest extends TestCase
     public function test_factory_wires_the_tabletop_owned_bestiary_repository(): void
     {
         $factory = file_get_contents($this->root('app/Tabletop/Services/TabletopChamberFactory.php'));
-        self::assertStringContainsString('BestiaryRepositoryFactory::make()', $factory);
+        self::assertStringContainsString('new WordPressThresholdRepository(),', $factory);
+        self::assertStringContainsString('null,', $factory);
+
+        $chamber = file_get_contents($this->root('app/Tabletop/Services/TabletopChamber.php'));
+        self::assertStringContainsString('BestiaryRepositoryFactory::make(', $chamber);
+        self::assertStringContainsString('$tableId,', $chamber);
+        self::assertStringContainsString('$viewerUserId', $chamber);
     }
 
     public function test_live_state_exposes_only_the_already_authorized_bestiary_projection(): void
