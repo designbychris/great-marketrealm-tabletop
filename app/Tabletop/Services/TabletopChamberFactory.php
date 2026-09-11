@@ -23,6 +23,7 @@ use GreatMarketrealmTabletop\Tables\Memberships\Repositories\WordPressTableMembe
 use GreatMarketrealmTabletop\Integration\Companion\WordPressCompanionCharacterGateway;
 use GreatMarketrealmTabletop\Tabletop\Chronicle\Repositories\WordPressChamberChronicleRepository;
 use GreatMarketrealmTabletop\Tabletop\Chronicle\Presentation\ChamberChronicleProjector;
+use GreatMarketrealmTabletop\Tabletop\Chronicle\Presentation\AdventureProgressProjector;
 use GreatMarketrealmTabletop\Tabletop\Footsteps\Repositories\WordPressFootstepTrailRepository;
 use GreatMarketrealmTabletop\Tabletop\Footsteps\Presentation\FootstepTrailProjector;
 use GreatMarketrealmTabletop\Tabletop\Light\Repositories\WordPressCarriedLightRepository;
@@ -71,7 +72,8 @@ final class TabletopChamberFactory
             new WordPressEnvironmentalLightRepository(),
             new WordPressDungeonForgeRepository(),
             new WordPressTableSessionRepository(),
-            new WordPressSessionRecapRepository()
+            new WordPressSessionRecapRepository(),
+            new AdventureProgressProjector()
         );
     }
 }

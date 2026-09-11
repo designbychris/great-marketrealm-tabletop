@@ -28,6 +28,7 @@ use GreatMarketrealmTabletop\Integration\Companion\CompanionGateway;
 use GreatMarketrealmTabletop\Integration\Companion\CompanionCharacterGateway;
 use GreatMarketrealmTabletop\Tabletop\Chronicle\Contracts\ChamberChronicleRepository;
 use GreatMarketrealmTabletop\Tabletop\Chronicle\Presentation\ChamberChronicleProjector;
+use GreatMarketrealmTabletop\Tabletop\Chronicle\Presentation\AdventureProgressProjector;
 use GreatMarketrealmTabletop\Tabletop\Footsteps\Contracts\FootstepTrailRepository;
 use GreatMarketrealmTabletop\Tabletop\Footsteps\Presentation\FootstepTrailProjector;
 use GreatMarketrealmTabletop\Tabletop\Light\Contracts\CarriedLightRepository;
@@ -80,7 +81,8 @@ final class TabletopChamber
         private ?EnvironmentalLightRepository $environmentalLights = null,
         private ?DungeonForgeRepository $dungeonForge = null,
         private ?TableSessionRepository $sessions = null,
-        private ?WordPressSessionRecapRepository $sessionRecaps = null
+        private ?WordPressSessionRecapRepository $sessionRecaps = null,
+        private ?AdventureProgressProjector $adventureProgressProjector = null
     ) {}
 
     public function state(
@@ -450,6 +452,16 @@ $worldLightSourceModels[] = $environmentalLight;
             );
         }
 
+        // IV.37.2 adventure facts are Keeper working notes until a later recap
+        // deliberately publishes them. Never leak them through the ordinary
+        // Player-facing Chamber Chronicle.
+        if (! $viewer->isDungeonMaster()) {
+            $chamberLog = array_values(array_filter(
+                $chamberLog,
+                static fn (array $entry): bool => (string) ($entry['kind'] ?? '') !== 'adventure'
+            ));
+        }
+
         $coloursByUser = [];
         foreach ($members as $memberProjection) {
             $coloursByUser[(int) ($memberProjection['user_id'] ?? 0)] = [
@@ -491,6 +503,28 @@ $worldLightSourceModels[] = $environmentalLight;
             }
         }
 
+        $currentSession = $this->sessions?->currentForTable($tableId);
+        $adventureProgress = [];
+
+        if (
+            $viewer->isDungeonMaster()
+            && $activeScene !== null
+            && $this->dungeonForge !== null
+            && $this->adventureProgressProjector !== null
+            && $currentSession !== null
+            && $this->chamberEvents !== null
+        ) {
+            $forgeProjection = $this->dungeonForge->forScene($tableId, $activeScene->id()) ?? [];
+            $story = is_array($forgeProjection['story'] ?? null) ? $forgeProjection['story'] : [];
+
+            if ($story !== []) {
+                $adventureProgress = $this->adventureProgressProjector->project(
+                    $story,
+                    $this->chamberEvents->forSession($tableId, $currentSession->id())
+                );
+            }
+        }
+
         return new TabletopChamberState(
             $table->toArray(),
             array_merge($viewer->toArray(), ['table_colour' => $viewer->tableColour(), 'table_colour_hex' => \GreatMarketrealmTabletop\Tables\Memberships\Models\TableColourPalette::hex($viewer->tableColour())]),
@@ -510,6 +544,7 @@ $worldLightSourceModels[] = $environmentalLight;
                 'dungeon_forge' => $activeScene !== null && $this->dungeonForge !== null
                     ? ($this->dungeonForge->forScene($tableId, $activeScene->id()) ?? [])
                     : [],
+                'adventure_progress' => $viewer->isDungeonMaster() ? $adventureProgress : [],
                 'companion' => [
                     'available' => $this->companion?->available() ?? false,
                     'version' => $this->companion?->version(),
@@ -554,7 +589,7 @@ $worldLightSourceModels[] = $environmentalLight;
                     ))->all()
                 )
                 : [],
-            $this->sessions?->currentForTable($tableId)?->toArray(),
+            $currentSession?->toArray(),
             $this->latestRecap($tableId)
         );
     }

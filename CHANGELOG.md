@@ -1,3 +1,12 @@
+## Phase IV.37.3 — Pippin Compares Notes
+
+- Adds a Keeper-only **Plan vs. Table** comparison beside Pippin's Adventure Notes.
+- Projects prepared Forge story beats against structured Adventure facts from the current Session.
+- Adds live counts for revealed secrets, triggered traps, claimed treasure and resolved beats.
+- Keeps comparisons factual rather than inferring unsupported relationships.
+- Hardens Player secrecy by removing raw `adventure` Chronicle working events from Player Chamber logs.
+- Leaves final plan-vs-reality narrative synthesis for a later IV.37 phase.
+
 ## Phase IV.37.2 — That Was Not in Pippin's Notes
 
 - Adds a narrow `AdventureEventRecorder` bridge into the existing Chamber Chronicle.

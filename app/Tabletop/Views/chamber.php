@@ -1879,6 +1879,70 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                             </ol>
                             <span class="gmrt-forge-story__status" data-story-beat-status role="status" aria-live="polite">Pippin’s notes are ready for the Keeper to run at the table.</span>
                             <p class="gmrt-forge-story__note"><?php echo esc_html((string) ($forgeStory['keeper_note'] ?? '')); ?></p>
+
+                            <?php
+                            $adventureProgress = is_array($state?->integrations()['adventure_progress'] ?? null)
+                                ? $state->integrations()['adventure_progress']
+                                : [];
+                            ?>
+                            <?php if ($state?->isDungeonMaster() && $adventureProgress !== []) : ?>
+                                <section class="gmrt-adventure-progress" data-adventure-progress>
+                                    <header class="gmrt-adventure-progress__header">
+                                        <p class="gmrt-adventure-progress__eyebrow">IV.37.3 · Pippin Compares Notes</p>
+                                        <h4>Plan vs. Table</h4>
+                                        <p>Pippin has placed the prepared route beside the facts the Chronicle has actually recorded this Session.</p>
+                                    </header>
+
+                                    <div class="gmrt-adventure-progress__columns">
+                                        <section class="gmrt-adventure-progress__column">
+                                            <h5>Prepared Route</h5>
+                                            <ol class="gmrt-adventure-progress__prepared">
+                                                <?php foreach (is_array($adventureProgress['prepared'] ?? null) ? $adventureProgress['prepared'] : [] as $preparedBeat) :
+                                                    if (! is_array($preparedBeat)) continue;
+                                                    $preparedStatus = (string) ($preparedBeat['status'] ?? 'pending');
+                                                ?>
+                                                    <li class="is-<?php echo esc_attr($preparedStatus); ?>">
+                                                        <span class="gmrt-adventure-progress__status"><?php
+                                                            echo esc_html(
+                                                                $preparedStatus === 'active'
+                                                                    ? 'Current'
+                                                                    : ($preparedStatus === 'resolved' ? 'Resolved' : 'Waiting')
+                                                            );
+                                                        ?></span>
+                                                        <strong><?php echo esc_html((string) ($preparedBeat['stage'] ?? 'Adventure beat')); ?></strong>
+                                                        <span><?php echo esc_html((string) ($preparedBeat['text'] ?? '')); ?></span>
+                                                    </li>
+                                                <?php endforeach; ?>
+                                            </ol>
+                                        </section>
+
+                                        <section class="gmrt-adventure-progress__column">
+                                            <h5>What Actually Happened</h5>
+                                            <?php $actualAdventureFacts = is_array($adventureProgress['actual'] ?? null) ? $adventureProgress['actual'] : []; ?>
+                                            <?php if ($actualAdventureFacts === []) : ?>
+                                                <p class="gmrt-adventure-progress__empty">Nothing has contradicted the paperwork yet. Pippin remains suspicious.</p>
+                                            <?php else : ?>
+                                                <ol class="gmrt-adventure-progress__actual">
+                                                    <?php foreach ($actualAdventureFacts as $fact) : if (! is_array($fact)) continue; ?>
+                                                        <li>
+                                                            <span class="gmrt-adventure-progress__fact-kind"><?php echo esc_html(ucwords(str_replace('-', ' ', (string) ($fact['action'] ?? 'adventure')))); ?></span>
+                                                            <strong><?php echo esc_html((string) ($fact['summary'] ?? 'Adventure fact recorded.')); ?></strong>
+                                                        </li>
+                                                    <?php endforeach; ?>
+                                                </ol>
+                                            <?php endif; ?>
+                                        </section>
+                                    </div>
+
+                                    <?php $factCounts = is_array($adventureProgress['fact_counts'] ?? null) ? $adventureProgress['fact_counts'] : []; ?>
+                                    <footer class="gmrt-adventure-progress__summary">
+                                        <span><?php echo esc_html((string) ((int) ($factCounts['secret-revealed'] ?? 0))); ?> secrets revealed</span>
+                                        <span><?php echo esc_html((string) ((int) ($factCounts['trap-triggered'] ?? 0))); ?> traps triggered</span>
+                                        <span><?php echo esc_html((string) ((int) ($factCounts['treasure-looted'] ?? 0))); ?> treasures claimed</span>
+                                        <span><?php echo esc_html((string) ((int) ($factCounts['story-beat-resolved'] ?? 0))); ?> beats resolved</span>
+                                    </footer>
+                                </section>
+                            <?php endif; ?>
                         <?php endif; ?>
                     </div>
 

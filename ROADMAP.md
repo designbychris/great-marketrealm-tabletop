@@ -1045,3 +1045,16 @@ Regression-only correction for the story-beat endpoint registration assertion; n
 - [ ] Narrative plan-vs-reality synthesis remains a later IV.37 phase.
 - [ ] Server certification.
 - [ ] Browser certification.
+
+
+### Phase IV.37.3 — Pippin Compares Notes
+- [x] Compare prepared Forge story beats with current-Session Adventure facts.
+- [x] Add Keeper-only Plan vs. Table presentation.
+- [x] Show Waiting / Current / Resolved prepared state beside actual Chronicle facts.
+- [x] Count revealed secrets, triggered traps, claimed treasure and resolved beats.
+- [x] Keep the comparison factual; do not infer unsupported beat-to-event relationships.
+- [x] Hide raw Adventure Chronicle working events from Player Chamber logs.
+- [x] Keep Adventure Progress absent from Player integrations.
+- [ ] Narrative synthesis remains a later IV.37 phase.
+- [ ] Server certification.
+- [ ] Browser certification.
