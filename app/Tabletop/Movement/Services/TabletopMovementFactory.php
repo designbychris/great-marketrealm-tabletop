@@ -15,6 +15,9 @@ use GreatMarketrealmTabletop\Tabletop\Footsteps\Repositories\WordPressFootstepTr
 use GreatMarketrealmTabletop\Tabletop\Footsteps\Services\FootstepTrailRecorder;
 use GreatMarketrealmTabletop\Tabletop\Cartography\Repositories\WordPressDungeonForgeRepository;
 use GreatMarketrealmTabletop\Tabletop\Cartography\Services\ForgeTrapTrigger;
+use GreatMarketrealmTabletop\Tabletop\Chronicle\Services\AdventureEventRecorder;
+use GreatMarketrealmTabletop\Tabletop\Chronicle\Repositories\WordPressChamberChronicleRepository;
+use GreatMarketrealmTabletop\Tables\Services\SystemTableClock;
 
 defined('ABSPATH') || exit;
 
@@ -32,7 +35,13 @@ final class TabletopMovementFactory
             new ConditionCombatRules(),
             FogOfWarFactory::make(),
             new FootstepTrailRecorder(new WordPressFootstepTrailRepository()),
-            new ForgeTrapTrigger(new WordPressDungeonForgeRepository())
+            new ForgeTrapTrigger(
+                new WordPressDungeonForgeRepository(),
+                new AdventureEventRecorder(
+                    new WordPressChamberChronicleRepository(),
+                    new SystemTableClock()
+                )
+            )
         );
     }
 }

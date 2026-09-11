@@ -27,6 +27,7 @@ use GreatMarketrealmTabletop\Tabletop\SceneObjects\Models\SceneObject;
 use GreatMarketrealmTabletop\Tabletop\Atlas\Thresholds\Services\ThresholdManager;
 use GreatMarketrealmTabletop\Tabletop\Bestiary\Services\BestiaryDeploymentManager;
 use GreatMarketrealmTabletop\Tabletop\Bestiary\Services\BestiaryRepositoryFactory;
+use GreatMarketrealmTabletop\Tabletop\Chronicle\Services\AdventureEventRecorder;
 use RuntimeException;
 use Throwable;
 
@@ -61,7 +62,8 @@ final class DungeonForgeAjaxController
         private ForgeTreasurePlanner $treasure,
         private ForgeStoryPlanner $story,
         private ThresholdManager $thresholds,
-        private BestiaryDeploymentManager $bestiaryDeployment
+        private BestiaryDeploymentManager $bestiaryDeployment,
+        private ?AdventureEventRecorder $adventureEvents = null
     ) {}
 
     public function build(): void
@@ -162,6 +164,13 @@ final class DungeonForgeAjaxController
             }
             if(!$found) throw new RuntimeException('That dungeon secret could not be found.');
             $this->forge->save($tableId,$sceneId,$projection);
+            $this->adventureEvents?->record(
+                $tableId,
+                $userId,
+                'secret-revealed',
+                'A dungeon secret was revealed.',
+                ['scene_id' => $sceneId, 'secret_id' => $secretId]
+            );
             return ['message'=>'The secret is revealed. Pippin has reluctantly amended the map.','secret_id'=>$secretId];
         });
     }
@@ -298,6 +307,22 @@ final class DungeonForgeAjaxController
 
             $this->forge->save($tableId, $sceneId, $projection);
             $updated = $projection['traps'][$foundIndex];
+
+            if ($action === 'trigger') {
+                $this->adventureEvents?->record(
+                    $tableId,
+                    $userId,
+                    'trap-triggered',
+                    $label . ' was triggered.',
+                    [
+                        'scene_id' => $sceneId,
+                        'trap_id' => $trapId,
+                        'trap_type' => (string) ($updated['trap_type'] ?? ''),
+                        'source' => 'keeper',
+                    ]
+                );
+            }
+
             $messages = [
                 'update' => 'Trap details updated.',
                 'move' => 'Trap moved. Pippin has amended the dangerous part of the map.',
@@ -370,6 +395,20 @@ final class DungeonForgeAjaxController
             $stage = trim((string) ($beats[$beatIndex]['stage'] ?? 'Adventure beat'));
             if ($stage === '') {
                 $stage = 'Adventure beat';
+            }
+
+            if ($action === 'resolve') {
+                $this->adventureEvents?->record(
+                    $tableId,
+                    $userId,
+                    'story-beat-resolved',
+                    $stage . ' was resolved.',
+                    [
+                        'scene_id' => $sceneId,
+                        'beat_index' => $beatIndex,
+                        'stage' => $stage,
+                    ]
+                );
             }
 
             $messages = [
@@ -488,6 +527,23 @@ final class DungeonForgeAjaxController
 
             $this->forge->save($tableId, $sceneId, $projection);
             $updated = $projection['treasure'][$foundIndex];
+
+            if ($action === 'loot') {
+                $label = trim((string) ($updated['label'] ?? 'Treasure')) ?: 'Treasure';
+                $this->adventureEvents?->record(
+                    $tableId,
+                    $userId,
+                    'treasure-looted',
+                    $label . ' was claimed.',
+                    [
+                        'scene_id' => $sceneId,
+                        'treasure_id' => $treasureId,
+                        'treasure_type' => (string) ($updated['treasure_type'] ?? ''),
+                        'label' => $label,
+                    ]
+                );
+            }
+
             $messages = [
                 'update' => 'Treasure details updated.',
                 'move' => 'Treasure moved. Pippin has redrawn the suspiciously valuable X.',

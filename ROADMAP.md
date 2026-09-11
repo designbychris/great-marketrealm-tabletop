@@ -1030,3 +1030,18 @@ Keeper tools for actually running the adventure during a Session.
 
 ### Phase IV.37.1A — Pippin Escapes the Quotation Marks
 Regression-only correction for the story-beat endpoint registration assertion; no production behaviour changes.
+
+
+### Phase IV.37.2 — That Was Not in Pippin's Notes
+- [x] Establish structured Adventure facts inside the existing Chamber Chronicle.
+- [x] Record secret revelations.
+- [x] Record Keeper-triggered traps.
+- [x] Record movement-triggered traps.
+- [x] Record looted treasure.
+- [x] Record resolved prepared story beats.
+- [x] Preserve Scene/token/object identifiers in structured payloads.
+- [x] Reuse Chamber Chronicle persistence; no parallel Adventure repository.
+- [x] Feed naturally into the existing Session recap fact stream.
+- [ ] Narrative plan-vs-reality synthesis remains a later IV.37 phase.
+- [ ] Server certification.
+- [ ] Browser certification.

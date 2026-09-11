@@ -1,3 +1,12 @@
+## Phase IV.37.2 — That Was Not in Pippin's Notes
+
+- Adds a narrow `AdventureEventRecorder` bridge into the existing Chamber Chronicle.
+- Records structured adventure facts for secret reveals, trap triggers, treasure looting and resolved story beats.
+- Captures both Keeper-triggered and movement-triggered traps through the same Chronicle boundary.
+- Preserves useful Scene/object/token identifiers in event payloads for later recap projection.
+- Adds no competing Adventure event repository or database store.
+- Leaves prose plan-vs-reality synthesis for a later IV.37 phase.
+
 ## Phase IV.37.1A — Pippin Escapes the Quotation Marks
 
 - Corrects the IV.37.1 endpoint-registration regression so `$this->dungeonForgeAjax` is asserted as literal source text rather than interpolated by PHP.

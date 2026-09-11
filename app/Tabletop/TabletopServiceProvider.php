@@ -67,6 +67,7 @@ use GreatMarketrealmTabletop\Tabletop\Satchel\Services\SpellPouchRoller;
 use GreatMarketrealmTabletop\Tabletop\Battle\Services\SecureD20Roller;
 use GreatMarketrealmTabletop\Tabletop\Battle\Services\SecureDamageDieRoller;
 use GreatMarketrealmTabletop\Tabletop\Chronicle\Services\TableChronicleRecorder;
+use GreatMarketrealmTabletop\Tabletop\Chronicle\Services\AdventureEventRecorder;
 use GreatMarketrealmTabletop\Tabletop\Chronicle\Repositories\WordPressChamberChronicleRepository;
 use GreatMarketrealmTabletop\Tabletop\Battle\Repositories\WordPressBattleEventRepository;
 use GreatMarketrealmTabletop\Tables\Services\SystemTableClock;
@@ -276,7 +277,11 @@ final class TabletopServiceProvider
             new \GreatMarketrealmTabletop\Tabletop\Cartography\Services\ForgeTreasurePlanner(),
             new \GreatMarketrealmTabletop\Tabletop\Cartography\Services\ForgeStoryPlanner(),
             \GreatMarketrealmTabletop\Tabletop\Atlas\Thresholds\Services\ThresholdManagerFactory::make(),
-            BestiaryDeploymentManagerFactory::make()
+            BestiaryDeploymentManagerFactory::make(),
+            new AdventureEventRecorder(
+                new WordPressChamberChronicleRepository(),
+                new SystemTableClock()
+            )
         );
 
         $this->fogAjax = new FogOfWarAjaxController(
