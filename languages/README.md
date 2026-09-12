@@ -30,3 +30,7 @@ From the plugin root, with WP-CLI's i18n command available:
 ```bash
 wp i18n make-pot . languages/great-marketrealm-tabletop.pot --domain=great-marketrealm-tabletop --exclude=vendor,node_modules
 ```
+
+## Available packs
+
+- `nl_NL` — Dutch (Netherlands), first proof-of-concept production pack. See `docs/Dutch-Language-Pack.md`.

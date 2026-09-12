@@ -1,0 +1,758 @@
+msgid ""
+msgstr "Project-Id-Version: The Great MarketRealm\\nReport-Msgid-Bugs-To: \\nPOT-Creation-Date: 2026-09-12 20:21+0000\\nPO-Revision-Date: 2026-09-12 20:21+0000\\nLast-Translator: Great MarketRealm Translation Team\\nLanguage-Team: Dutch\\nLanguage: nl_NL\\nMIME-Version: 1.0\\nContent-Type: text/plain; charset=UTF-8\\nContent-Transfer-Encoding: 8bit\\nPlural-Forms: nplurals=2; plural=(n != 1);\\nX-Domain: great-marketrealm-tabletop\\n"
+
+msgid "(optional)"
+msgstr "(optioneel)"
+
+msgid "Abilities"
+msgstr "Eigenschappen"
+
+msgid "Ability"
+msgstr "Eigenschap"
+
+msgid "Active Scene"
+msgstr "Actieve scène"
+
+msgid "Add Map to Atlas"
+msgstr "Kaart aan Atlas toevoegen"
+
+msgid "Add, move, rename, reveal, disarm or remove traps prepared on this forged Scene."
+msgstr "Voeg vallen toe, verplaats of hernoem ze, onthul, ontwapen of verwijder vallen op deze gegenereerde scène."
+
+msgid "Adjust"
+msgstr "Aanpassen"
+
+msgid "Adventure notes updated."
+msgstr "Avontuurnotities bijgewerkt."
+
+msgid "Adventurer"
+msgstr "Avonturier"
+
+msgid "Adventurer's Satchel"
+msgstr "Avonturierstas"
+
+msgid "Arrival & Deployment"
+msgstr "Aankomst en plaatsing"
+
+msgid "Ask Pippin to Forge a Scene"
+msgstr "Vraag Pippin een scène te smeden"
+
+msgid "Atlas"
+msgstr "Atlas"
+
+msgid "Attack"
+msgstr "Aanval"
+
+msgid "Battle"
+msgstr "Gevecht"
+
+msgid "Battle Actions"
+msgstr "Gevechtsacties"
+
+msgid "Battlemap, Veil, lights, traps, sight, grid and furniture."
+msgstr "Gevechtskaart, Sluier, verlichting, vallen, zicht, raster en meubilair."
+
+msgid "Begin with a Blank Table"
+msgstr "Begin met een lege Tafel"
+
+msgid "Bestiary"
+msgstr "Bestiarium"
+
+msgid "Between Sessions"
+msgstr "Tussen sessies"
+
+msgid "Brazier"
+msgstr "Vuurkom"
+
+msgid "Call Session"
+msgstr "Sessie starten"
+
+msgid "Call the Next Gathering"
+msgstr "Start de volgende bijeenkomst"
+
+msgid "Call the Session"
+msgstr "Start de sessie"
+
+msgid "Called"
+msgstr "Gestart"
+
+msgid "Campaign description"
+msgstr "Campagnebeschrijving"
+
+msgid "Campaign linked."
+msgstr "Campagne gekoppeld."
+
+msgid "Campaign name"
+msgstr "Campagnenaam"
+
+msgid "Candle"
+msgstr "Kaars"
+
+msgid "Change the Scene artwork used at this Table."
+msgstr "Wijzig de scène-afbeelding die aan deze Tafel wordt gebruikt."
+
+msgid "Chest closed. Pippin is pretending this solves the problem."
+msgstr "Kist gesloten. Pippin doet alsof dit het probleem oplost."
+
+msgid "Chest opened. Pippin has taken three prudent steps backwards."
+msgstr "Kist geopend. Pippin heeft drie verstandige stappen achteruit gezet."
+
+msgid "Choose Battlemap"
+msgstr "Gevechtskaart kiezen"
+
+msgid "Choose a Companion Campaign…"
+msgstr "Kies een Companion-campagne…"
+
+msgid "Choose a Mimic from the Bestiary first."
+msgstr "Kies eerst een Mimic uit het Bestiarium."
+
+msgid "Choose a check, save, skill, Initiative roll, readied weapon or spell."
+msgstr "Kies een proef, reddingsworp, vaardigheid, initiatiefworp, gereed wapen of spreuk."
+
+msgid "Choose a creature from the Bestiary first."
+msgstr "Kies eerst een wezen uit het Bestiarium."
+
+msgid "Choose a destination Scene…"
+msgstr "Kies een bestemmingsscène…"
+
+msgid "Choose a light source to begin."
+msgstr "Kies een lichtbron om te beginnen."
+
+msgid "Choose a light, then click the battlemap to place it. Scene-owned lights may be prepared Behind the Curtain."
+msgstr "Kies een lichtbron en klik vervolgens op de gevechtskaart om die te plaatsen. Scènegebonden verlichting kan Achter het Gordijn worden voorbereid."
+
+msgid "Choose a map…"
+msgstr "Kies een kaart…"
+
+msgid "Choose a marker, then click the map. Party thresholds welcome adventurers who do not already have a remembered token in this Scene. Monster thresholds are reserved for the Keeper's Bestiary."
+msgstr "Kies een markering en klik daarna op de kaart. Groepsdrempels verwelkomen avonturiers die nog geen onthouden token in deze scène hebben. Monsterdrempels zijn voorbehouden aan het Bestiarium van de Keeper."
+
+msgid "Choose a trap, then place or tend it."
+msgstr "Kies een val en plaats of beheer die daarna."
+
+msgid "Choose from the Atlas"
+msgstr "Kies uit de Atlas"
+
+msgid "Choose the saved Atlas map Pippin should place first."
+msgstr "Kies de opgeslagen Atlaskaart die Pippin als eerste moet plaatsen."
+
+msgid "Close"
+msgstr "Sluiten"
+
+msgid "Close Farewell"
+msgstr "Afscheid sluiten"
+
+msgid "Close the Keeper's Atlas"
+msgstr "Atlas van de Keeper sluiten"
+
+msgid "Close the Keeper's Bestiary"
+msgstr "Bestiarium van de Keeper sluiten"
+
+msgid "Close the Keeper's Tools"
+msgstr "Gereedschap van de Keeper sluiten"
+
+msgid "Close the Session Desk"
+msgstr "Sessietafel sluiten"
+
+msgid "Closing that seat…"
+msgstr "Die stoel wordt gesloten…"
+
+msgid "Closing the Session ledger…"
+msgstr "Sessiegrootboek wordt gesloten…"
+
+msgid "Companion Campaign"
+msgstr "Companion-campagne"
+
+msgid "Companion-certified"
+msgstr "Door Companion gecertificeerd"
+
+msgid "Completed Session details"
+msgstr "Details van voltooide sessie"
+
+msgid "Create a New Tabletop"
+msgstr "Nieuwe Tabletop maken"
+
+msgid "Current HP"
+msgstr "Huidige HP"
+
+msgid "Current Tabletop Scene"
+msgstr "Huidige Tabletop-scène"
+
+msgid "Damage"
+msgstr "Schade"
+
+msgid "Disarm"
+msgstr "Ontwapenen"
+
+msgid "Disarm this disguised Mimic? The furnishing will remain."
+msgstr "Deze vermomde Mimic ontwapenen? Het meubel blijft staan."
+
+msgid "Draw Route"
+msgstr "Route tekenen"
+
+msgid "Dungeon Master"
+msgstr "Dungeon Master"
+
+msgid "Dungeon Master's Drawer"
+msgstr "Lade van de Dungeon Master"
+
+msgid "Duration"
+msgstr "Duur"
+
+msgid "Enable Fog of War"
+msgstr "Mist van oorlog inschakelen"
+
+msgid "End Session"
+msgstr "Sessie beëindigen"
+
+msgid "End the current Session? The campaign itself will remain active and can be resumed in a new Session later."
+msgstr "De huidige sessie beëindigen? De campagne blijft actief en kan later in een nieuwe sessie worden hervat."
+
+msgid "Ended"
+msgstr "Beëindigd"
+
+msgid "Enter the Tabletop"
+msgstr "Tabletop betreden"
+
+msgid "Erase Route"
+msgstr "Route wissen"
+
+msgid "Every road back to the adventure, carefully recorded. Probably in the correct pocket."
+msgstr "Elke weg terug naar het avontuur is zorgvuldig vastgelegd. Waarschijnlijk in de juiste zak."
+
+msgid "Existing Tabletop Sessions are copied into the Companion Session Ledger when the link is made."
+msgstr "Bestaande Tabletop-sessies worden bij het koppelen naar het Companion-sessiegrootboek gekopieerd."
+
+msgid "Exploration Mode"
+msgstr "Verkenningsmodus"
+
+msgid "Filter Bestiary records by deployment"
+msgstr "Bestiariumrecords filteren op plaatsing"
+
+msgid "Finish / Cancel"
+msgstr "Voltooien / Annuleren"
+
+msgid "Furniture"
+msgstr "Meubilair"
+
+msgid "Furniture duplicated. Pippin is counting again."
+msgstr "Meubilair gedupliceerd. Pippin telt opnieuw."
+
+msgid "Furniture move cancelled."
+msgstr "Verplaatsen van meubilair geannuleerd."
+
+msgid "Furniture moved. Pippin has amended the floor plan."
+msgstr "Meubilair verplaatst. Pippin heeft de plattegrond aangepast."
+
+msgid "Furniture removed. Pippin has reclaimed the floor space."
+msgstr "Meubilair verwijderd. Pippin heeft de vloerruimte teruggewonnen."
+
+msgid "Furniture resized. Pippin disputes the new dimensions."
+msgstr "Afmetingen van meubilair gewijzigd. Pippin betwist de nieuwe maten."
+
+msgid "Furniture rotated. Pippin has rotated the paper too."
+msgstr "Meubilair gedraaid. Pippin heeft het papier ook gedraaid."
+
+msgid "Furniture selection cleared."
+msgstr "Meubelselectie gewist."
+
+msgid "Gather, recap and close the book without taking height from the battlefield."
+msgstr "Verzamel, vat samen en sluit het boek zonder hoogte van het speelveld in te nemen."
+
+msgid "Healing"
+msgstr "Genezing"
+
+msgid "Hide Recap"
+msgstr "Samenvatting verbergen"
+
+msgid "In Progress"
+msgstr "Bezig"
+
+msgid "Initiative"
+msgstr "Initiatief"
+
+msgid "Interact"
+msgstr "Interactie"
+
+msgid "Invitation sent."
+msgstr "Uitnodiging verstuurd."
+
+msgid "Keep me signed in on this device"
+msgstr "Aangemeld blijven op dit apparaat"
+
+msgid "Keeper Atlas"
+msgstr "Keeper-atlas"
+
+msgid "Keeper Bestiary"
+msgstr "Keeper-bestiarium"
+
+msgid "Keeper Tools"
+msgstr "Keeper-gereedschap"
+
+msgid "Keeper Workspace"
+msgstr "Werkruimte van de Keeper"
+
+msgid "Keeper workspaces"
+msgstr "Werkruimtes van de Keeper"
+
+msgid "Keeper-controlled. Arrivals use the destination Scene's Party Arrival Threshold."
+msgstr "Door de Keeper bestuurd. Aankomsten gebruiken de groepsaankomstdrempel van de bestemmingsscène."
+
+msgid "Lantern"
+msgstr "Lantaarn"
+
+msgid "Level"
+msgstr "Niveau"
+
+msgid "Link Campaign"
+msgstr "Campagne koppelen"
+
+msgid "Live Scene"
+msgstr "Live-scène"
+
+msgid "Magical Light"
+msgstr "Magisch licht"
+
+msgid "Maximum HP:"
+msgstr "Maximale HP:"
+
+msgid "Mimic disguise disarmed. Pippin remains unconvinced."
+msgstr "Mimic-vermomming ontwapend. Pippin is nog steeds niet overtuigd."
+
+msgid "Move"
+msgstr "Verplaatsen"
+
+msgid "Move selected — click the battlemap for the trap’s new position."
+msgstr "Verplaatsen geselecteerd — klik op de gevechtskaart voor de nieuwe positie van de val."
+
+msgid "Move selected — click the battlemap for the treasure’s new position."
+msgstr "Verplaatsen geselecteerd — klik op de gevechtskaart voor de nieuwe positie van de schat."
+
+msgid "Name the campaign, then tell Pippin how its first map should arrive."
+msgstr "Geef de campagne een naam en vertel Pippin vervolgens hoe de eerste kaart moet verschijnen."
+
+msgid "No active DM Companion Campaigns are available. The Tabletop can still be played independently."
+msgstr "Er zijn geen actieve DM Companion-campagnes beschikbaar. Tabletop kan nog steeds zelfstandig worden gespeeld."
+
+msgid "No active Scene"
+msgstr "Geen actieve scène"
+
+msgid "No furniture selected"
+msgstr "Geen meubilair geselecteerd"
+
+msgid "No spells are currently recorded in this adventurer's Companion spellbook."
+msgstr "Er staan momenteel geen spreuken in het Companion-spreukenboek van deze avonturier."
+
+msgid "No traps on this Scene yet."
+msgstr "Nog geen vallen op deze scène."
+
+msgid "No weapon is currently readied in the Companion Adventurer's Pack."
+msgstr "Er is momenteel geen wapen gereed in het Companion-avonturierspakket."
+
+msgid "Open"
+msgstr "Openen"
+
+msgid "Open Scene"
+msgstr "Scène openen"
+
+msgid "Optional Session title"
+msgstr "Optionele sessietitel"
+
+msgid "Passive Perception"
+msgstr "Passieve Waarneming"
+
+msgid "Password"
+msgstr "Wachtwoord"
+
+msgid "Pippin Peppercorn presents"
+msgstr "Pippin Peppercorn presenteert"
+
+msgid "Pippin could not amend that treasure record."
+msgstr "Pippin kon dat schatregister niet aanpassen."
+
+msgid "Pippin could not rearrange that furnishing."
+msgstr "Pippin kon dat meubel niet verplaatsen."
+
+msgid "Pippin could not tend that trap."
+msgstr "Pippin kon die val niet beheren."
+
+msgid "Pippin could not turn that page."
+msgstr "Pippin kon die pagina niet omslaan."
+
+msgid "Pippin has no saved roads for you yet. A Keeper can set a new Table, or an Adventurer can return after receiving a Summons."
+msgstr "Pippin heeft nog geen opgeslagen routes voor je. Een Keeper kan een nieuwe Tafel opzetten, of een Avonturier kan terugkeren na een Oproep."
+
+msgid "Pippin is clearing a workbench beside the Forge…"
+msgstr "Pippin maakt een werkbank naast de Forge vrij…"
+
+msgid "Pippin is erasing this road from the atlas…"
+msgstr "Pippin wist deze route uit de atlas…"
+
+msgid "Pippin is finding a suitable patch of table…"
+msgstr "Pippin zoekt een geschikt stukje tafel…"
+
+msgid "Pippin is joining the Table Atlas to the Companion Ledger…"
+msgstr "Pippin koppelt de Tafelatlas aan het Companion-grootboek…"
+
+msgid "Pippin's Table Atlas"
+msgstr "Pippins Tafelatlas"
+
+msgid "Pippin's field notes · Keeper draft"
+msgstr "Pippins veldnotities · Keeper-concept"
+
+msgid "Place Monster Deployment"
+msgstr "Monsterplaatsing plaatsen"
+
+msgid "Place Party Arrival"
+msgstr "Aankomst van groep plaatsen"
+
+msgid "Place Trap"
+msgstr "Val plaatsen"
+
+msgid "Placement cancelled. Pippin has put the tape measure away."
+msgstr "Plaatsing geannuleerd. Pippin heeft het meetlint opgeborgen."
+
+msgid "Placement remains armed; click again or cancel."
+msgstr "Plaatsing blijft actief; klik opnieuw of annuleer."
+
+msgid "Player removed."
+msgstr "Speler verwijderd."
+
+msgid "Prepare Scene"
+msgstr "Scène voorbereiden"
+
+msgid "Prepare Test Table"
+msgstr "Testtafel voorbereiden"
+
+msgid "Preparing…"
+msgstr "Voorbereiden…"
+
+msgid "Pressure Plate"
+msgstr "Drukplaat"
+
+msgid "Preview Player Fog"
+msgstr "Spelersmist bekijken"
+
+msgid "Previous Session · Pippin Peppercorn presents"
+msgstr "Vorige sessie · Pippin Peppercorn presenteert"
+
+msgid "Previously, in the MarketRealm…"
+msgstr "Eerder, in de MarketRealm…"
+
+msgid "Proficiency"
+msgstr "Vaardigheid"
+
+msgid "Re-arm"
+msgstr "Opnieuw activeren"
+
+msgid "Remove"
+msgstr "Verwijderen"
+
+msgid "Remove Tabletop"
+msgstr "Tabletop verwijderen"
+
+msgid "Remove from Atlas"
+msgstr "Uit Atlas verwijderen"
+
+msgid "Remove from Chamber"
+msgstr "Uit kamer verwijderen"
+
+msgid "Remove this Tabletop"
+msgstr "Deze Tabletop verwijderen"
+
+msgid "Remove this furnishing from the Scene?"
+msgstr "Dit meubel uit de scène verwijderen?"
+
+msgid "Remove this trap from the Scene?"
+msgstr "Deze val uit de scène verwijderen?"
+
+msgid "Remove this treasure from the Scene?"
+msgstr "Deze schat uit de scène verwijderen?"
+
+msgid "Reset & Conceal"
+msgstr "Resetten en verbergen"
+
+msgid "Reset Exploration"
+msgstr "Verkenning resetten"
+
+msgid "Sage is preparing the Training Grounds…"
+msgstr "Sage bereidt de Trainingsgronden voor…"
+
+msgid "Satchel"
+msgstr "Tas"
+
+msgid "Save"
+msgstr "Opslaan"
+
+msgid "Save DC"
+msgstr "Reddingsworp-DC"
+
+msgid "Save Measures"
+msgstr "Waarden opslaan"
+
+msgid "Saved Atlas map"
+msgstr "Opgeslagen Atlaskaart"
+
+msgid "Saving Throws"
+msgstr "Reddingsworpen"
+
+msgid "Selected character"
+msgstr "Geselecteerd personage"
+
+msgid "Send Summons"
+msgstr "Oproep versturen"
+
+msgid "Sending the Summons…"
+msgstr "Oproep wordt verstuurd…"
+
+msgid "Session"
+msgstr "Sessie"
+
+msgid "Session Desk"
+msgstr "Sessietafel"
+
+msgid "Set the Table"
+msgstr "Dek de Tafel"
+
+msgid "Show Recap"
+msgstr "Samenvatting tonen"
+
+msgid "Sight"
+msgstr "Zicht"
+
+msgid "Skills"
+msgstr "Vaardigheden"
+
+msgid "Snap to Grid disabled. Pippin is trying not to look."
+msgstr "Vastklikken op raster uitgeschakeld. Pippin probeert niet te kijken."
+
+msgid "Snap to Grid enabled. Pippin has restored order."
+msgstr "Vastklikken op raster ingeschakeld. Pippin heeft de orde hersteld."
+
+msgid "Speed"
+msgstr "Snelheid"
+
+msgid "Spell Attack"
+msgstr "Spreukaanval"
+
+msgid "Spell Pouch"
+msgstr "Spreukentas"
+
+msgid "Spell slots"
+msgstr "Spreukslots"
+
+msgid "Spring"
+msgstr "Activeren"
+
+msgid "Start Session"
+msgstr "Sessie starten"
+
+msgid "Summon a player"
+msgstr "Roep een speler op"
+
+msgid "Table"
+msgstr "Tafel"
+
+msgid "Table Session"
+msgstr "Tafelsessie"
+
+msgid "Table role and status"
+msgstr "Tafelrol en status"
+
+msgid "Tabletop removed."
+msgstr "Tabletop verwijderd."
+
+msgid "Take the Party Through"
+msgstr "Groep erdoorheen leiden"
+
+msgid "Temporary HP"
+msgstr "Tijdelijke HP"
+
+msgid "The Adventure Continues"
+msgstr "Het avontuur gaat verder"
+
+msgid "The Battlemap"
+msgstr "De gevechtskaart"
+
+msgid "The Companion Campaign could not be linked."
+msgstr "De Companion-campagne kon niet worden gekoppeld."
+
+msgid "The Gathering"
+msgstr "De bijeenkomst"
+
+msgid "The Gathering at the Table"
+msgstr "De bijeenkomst aan de Tafel"
+
+msgid "The Keeper has not called today's Session yet."
+msgstr "De Keeper heeft de sessie van vandaag nog niet gestart."
+
+msgid "The Keeper is calling the Session…"
+msgstr "De Keeper start de sessie…"
+
+msgid "The Keeper's Atlas"
+msgstr "Atlas van de Keeper"
+
+msgid "The Keeper's Bestiary"
+msgstr "Bestiarium van de Keeper"
+
+msgid "The Keeper's Lantern Rack"
+msgstr "Het lantaarnrek van de Keeper"
+
+msgid "The Keeper's Session Desk"
+msgstr "De sessietafel van de Keeper"
+
+msgid "The Keeper's Tools"
+msgstr "Gereedschap van de Keeper"
+
+msgid "The Keeper's Trap Cabinet"
+msgstr "De valkast van de Keeper"
+
+msgid "The Keeper\\'s Atlas"
+msgstr "Atlas van de Keeper"
+
+msgid "The Keeper\\'s Bestiary"
+msgstr "Bestiarium van de Keeper"
+
+msgid "The Keeper\\'s Lantern Rack"
+msgstr "Het lantaarnrek van de Keeper"
+
+msgid "The Keeper\\'s Tools"
+msgstr "Gereedschap van de Keeper"
+
+msgid "The Next Gathering"
+msgstr "De volgende bijeenkomst"
+
+msgid "The Session Desk"
+msgstr "De sessietafel"
+
+msgid "The Session could not be ended."
+msgstr "De sessie kon niet worden beëindigd."
+
+msgid "The Session could not be started."
+msgstr "De sessie kon niet worden gestart."
+
+msgid "The Session has begun — the Table remembers tonight."
+msgstr "De sessie is begonnen — de Tafel onthoudt deze avond."
+
+msgid "The Table remembers where you left it."
+msgstr "De Tafel onthoudt waar je gebleven bent."
+
+msgid "The Tabletop could not be created."
+msgstr "De Tabletop kon niet worden gemaakt."
+
+msgid "The Tabletop could not be removed."
+msgstr "De Tabletop kon niet worden verwijderd."
+
+msgid "The Tabletop rejected that request."
+msgstr "De Tabletop heeft dat verzoek geweigerd."
+
+msgid "The Veil of the Unknown"
+msgstr "De Sluier van het Onbekende"
+
+msgid "The chamber awaits"
+msgstr "De kamer wacht"
+
+msgid "The deeds of the Table have been recorded. Pippin has filed the Keeper draft, and the campaign remains active exactly where you left it."
+msgstr "De daden aan de Tafel zijn vastgelegd. Pippin heeft het Keeper-concept opgeborgen en de campagne blijft actief precies waar je die achterliet."
+
+msgid "The first map on the Table"
+msgstr "De eerste kaart op de Tafel"
+
+msgid "The furniture was a Mimic. Pippin would like the record to show that he objected."
+msgstr "Het meubel was een Mimic. Pippin wil graag dat in het verslag staat dat hij bezwaar maakte."
+
+msgid "The live Chamber could not be refreshed."
+msgstr "De live Kamer kon niet worden vernieuwd."
+
+msgid "The next gathering awaits the Keeper."
+msgstr "De volgende bijeenkomst wacht op de Keeper."
+
+msgid "The player could not be invited."
+msgstr "De speler kon niet worden uitgenodigd."
+
+msgid "The player could not be removed."
+msgstr "De speler kon niet worden verwijderd."
+
+msgid "The refreshed Chamber markup was not found."
+msgstr "De vernieuwde Kamer-opmaak werd niet gevonden."
+
+msgid "The test Table could not be prepared."
+msgstr "De testtafel kon niet worden voorbereid."
+
+msgid "The trap could not be placed."
+msgstr "De val kon niet worden geplaatst."
+
+msgid "The treasure could not be placed."
+msgstr "De schat kon niet worden geplaatst."
+
+msgid "This Scene has no Forge projection yet, so there is no trap shelf to manage."
+msgstr "Deze scène heeft nog geen Forge-projectie, dus er is nog geen vallenplank om te beheren."
+
+msgid "This permanently removes the campaign from the Table Atlas and closes its saved route. This cannot be undone."
+msgstr "Hiermee wordt de campagne permanent uit de Tafelatlas verwijderd en wordt de opgeslagen route gesloten. Dit kan niet ongedaan worden gemaakt."
+
+msgid "Tools"
+msgstr "Gereedschap"
+
+msgid "Torch"
+msgstr "Fakkel"
+
+msgid "Trap placement cancelled. Pippin has lifted his feet very carefully."
+msgstr "Plaatsing van de val geannuleerd. Pippin heeft zijn voeten heel voorzichtig opgetild."
+
+msgid "Trap position updated."
+msgstr "Positie van val bijgewerkt."
+
+msgid "Trap selected — click the battlemap to place it."
+msgstr "Val geselecteerd — klik op de gevechtskaart om die te plaatsen."
+
+msgid "Trap updated."
+msgstr "Val bijgewerkt."
+
+msgid "Treasure placement cancelled. Pippin has stopped drawing little X marks."
+msgstr "Plaatsing van de schat geannuleerd. Pippin is gestopt met kleine kruisjes tekenen."
+
+msgid "Treasure position updated."
+msgstr "Positie van schat bijgewerkt."
+
+msgid "Treasure selected — click the battlemap to place it."
+msgstr "Schat geselecteerd — klik op de gevechtskaart om die te plaatsen."
+
+msgid "Treasure updated."
+msgstr "Schat bijgewerkt."
+
+msgid "Tripwire"
+msgstr "Struikeldraad"
+
+msgid "Until Next Time…"
+msgstr "Tot de volgende keer…"
+
+msgid "Until next time — this Session has concluded."
+msgstr "Tot de volgende keer — deze sessie is afgelopen."
+
+msgid "View Recap"
+msgstr "Samenvatting bekijken"
+
+msgid "Weapons to Hand"
+msgstr "Wapens bij de hand"
+
+msgid "Weave / Quench"
+msgstr "Weven / Doven"
+
+msgid "YOUR TURN"
+msgstr "JOUW BEURT"
+
+msgid "Your Attack, Dash, Disengage, Dodge and Help controls appear here when this adventurer has the turn."
+msgstr "Je bediening voor Aanval, Sprint, Losmaken, Ontwijken en Helpen verschijnt hier wanneer deze avonturier aan de beurt is."
+
+msgid "Your chair is waiting"
+msgstr "Je stoel staat klaar"
+
+msgid "selected"
+msgstr "geselecteerd"
+
+msgid "temp"
+msgstr "tijdelijk"
+
+msgid "◆ proficient · ◆◆ expertise. Weapons and spells are projected from the Companion; the Tabletop does not duplicate their mechanics."
+msgstr "◆ vaardig · ◆◆ expertise. Wapens en spreuken worden vanuit de Companion geprojecteerd; de Tabletop dupliceert hun spelregels niet."
