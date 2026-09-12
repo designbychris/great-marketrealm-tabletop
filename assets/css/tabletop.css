@@ -6792,3 +6792,56 @@
     }
 }
 
+
+/* USER TESTING — The Keeper Finds His Reading Glasses.
+ * Raise the smallest operational text without changing the scale of map art,
+ * headings, token marks or other deliberately pictorial elements.
+ */
+.gmrt-chamber {
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.gmrt-chamber__eyebrow,
+.gmrt-board__heading > span,
+.gmrt-cartographers-lens__hint,
+.gmrt-atlas-card__active,
+.gmrt-atlas__add label,
+.gmrt-bestiary-card__measures dt,
+.gmrt-lantern-rack__state,
+.gmrt-dungeon-forge__controls label,
+.gmrt-dungeon-forge__legend,
+.gmrt-session-recap__eyebrow,
+.gmrt-furniture-palette__status,
+.gmrt-furniture-editor > span,
+.gmrt-furniture-snap,
+.gmrt-trap-cabinet__tools label,
+.gmrt-treasure-ledger__tools label {
+    font-size: .82rem;
+    line-height: 1.4;
+}
+
+.gmrt-satchel__measures span,
+.gmrt-satchel__abilities span,
+.gmrt-spellcasting-measures span,
+.gmrt-weapon-card header small,
+.gmrt-weapon-card__properties,
+.gmrt-spell-slots span,
+.gmrt-spell-card small,
+.gmrt-spell-card__meta {
+    font-size: .78rem;
+    line-height: 1.4;
+}
+
+.gmrt-chamber :where(label) {
+    font-weight: 700;
+}
+
+.gmrt-chamber :where(input, select, textarea) {
+    font-size: .9rem;
+    line-height: 1.45;
+}
+
+.gmrt-chamber :where(button) {
+    font-weight: 700;
+}
