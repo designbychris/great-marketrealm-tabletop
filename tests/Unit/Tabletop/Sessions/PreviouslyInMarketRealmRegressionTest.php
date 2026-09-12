@@ -32,7 +32,7 @@ final class PreviouslyInMarketRealmRegressionTest extends TestCase
     public function test_viewer_status_anchors_the_command_header_after_session_controls(): void
     {
         $source = $this->source('app/Tabletop/Views/chamber.php');
-        $viewer = strpos($source, 'class="gmrt-chamber__viewer" aria-label="Table role and status"');
+        $viewer = strpos($source, 'class="gmrt-chamber__viewer"');
         $session = strpos($source, 'class="gmrt-table-session" data-table-session');
 
         self::assertNotFalse($viewer);

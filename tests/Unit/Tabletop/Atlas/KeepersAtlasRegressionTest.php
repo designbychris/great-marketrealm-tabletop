@@ -21,7 +21,7 @@ final class KeepersAtlasRegressionTest extends TestCase
         self::assertStringContainsString('$viewer->isDungeonMaster()', $chamber);
         self::assertStringContainsString('? array_map(', $chamber);
         self::assertStringContainsString(': []', $chamber);
-        self::assertStringContainsString("The Keeper's Atlas", $view);
+        self::assertStringContainsString("esc_html_e('The Keeper\\'s Atlas', 'great-marketrealm-tabletop')", $view);
         self::assertStringContainsString('$state->isDungeonMaster()', $view);
     }
 

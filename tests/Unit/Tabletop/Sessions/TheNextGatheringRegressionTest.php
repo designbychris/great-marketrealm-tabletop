@@ -39,7 +39,7 @@ final class TheNextGatheringRegressionTest extends TestCase
 
         $window = substr($script, max(0, $start - 700), 1500);
         self::assertStringContainsString("request('gmrt_start_table_session', { title })", $window);
-        self::assertStringContainsString("replaceChamber('The Session has begun — the Table remembers tonight.'", $window);
+        self::assertStringContainsString("replaceChamber(t('sessionBegan', 'The Session has begun — the Table remembers tonight.')", $window);
         self::assertStringNotContainsString('reset', strtolower($window));
         self::assertStringNotContainsString('delete', strtolower($window));
         self::assertStringNotContainsString('clear', strtolower($window));

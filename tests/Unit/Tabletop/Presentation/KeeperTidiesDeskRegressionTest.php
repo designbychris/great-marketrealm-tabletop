@@ -50,7 +50,7 @@ final class KeeperTidiesDeskRegressionTest extends TestCase
         self::assertStringContainsString('data-keeper-tools-toggle', $view);
         self::assertStringContainsString('id="gmrt-keeper-tools-panel"', $view);
         self::assertStringContainsString("esc_html_e('The Keeper\\'s Tools', 'great-marketrealm-tabletop')", $view);
-        self::assertStringContainsString("The Keeper's Lantern Rack", $view);
+        self::assertStringContainsString("esc_html_e('The Keeper\\'s Lantern Rack', 'great-marketrealm-tabletop')", $view);
         self::assertStringContainsString('Sight Beyond the Door', $view);
         self::assertStringContainsString('data-cartographers-lens', $view);
         self::assertStringNotContainsString('class="gmrt-cartographers-lens"', $view);

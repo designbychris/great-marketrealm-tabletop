@@ -71,7 +71,7 @@ final class KeeperBestiaryRegressionTest extends TestCase
     {
         $view = file_get_contents($this->root('app/Tabletop/Views/chamber.php'));
         self::assertStringContainsString('data-keepers-bestiary', $view);
-        self::assertStringContainsString("The Keeper's Bestiary", $view);
+        self::assertStringContainsString("esc_html_e('The Keeper\\'s Bestiary', 'great-marketrealm-tabletop')", $view);
         self::assertStringContainsString('data-bestiary-search', $view);
         self::assertStringContainsString('data-bestiary-card', $view);
         self::assertStringContainsString('data-bestiary-place', $view);

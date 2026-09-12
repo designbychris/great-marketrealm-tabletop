@@ -42,7 +42,7 @@ final class KeeperTrapCabinetRegressionTest extends TestCase
         self::assertIsString($controller);
         self::assertStringContainsString("if (\$action === 'rearm')", $controller);
         self::assertStringContainsString("'rearm' => 'Trap re-armed and left revealed.'", $controller);
-        self::assertStringContainsString('Reset &amp; Conceal', file_get_contents(dirname(__DIR__, 4) . '/app/Tabletop/Views/chamber.php'));
+        self::assertStringContainsString("esc_html_e('Reset & Conceal', 'great-marketrealm-tabletop')", file_get_contents(dirname(__DIR__, 4) . '/app/Tabletop/Views/chamber.php'));
     }
 
     public function test_trap_actions_send_the_active_scene_id_explicitly(): void

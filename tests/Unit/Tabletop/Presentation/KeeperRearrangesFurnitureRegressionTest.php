@@ -35,7 +35,7 @@ final class KeeperRearrangesFurnitureRegressionTest extends TestCase
 
         self::assertStringContainsString('gmrt-table-command__scene', $view);
         self::assertStringContainsString('Current Tabletop Scene', $view);
-        self::assertStringContainsString("\$encounter !== null ? 'Battle' : 'Exploration Mode'", $view);
+        self::assertStringContainsString("\$encounter !== null ? __('Battle', 'great-marketrealm-tabletop') : __('Exploration Mode', 'great-marketrealm-tabletop')", $view);
         self::assertStringContainsString('--gmrt-command-width: 1650px', $css);
     }
 
