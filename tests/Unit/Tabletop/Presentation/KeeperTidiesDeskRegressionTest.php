@@ -43,11 +43,13 @@ final class KeeperTidiesDeskRegressionTest extends TestCase
         self::assertStringContainsString('background: var(--gmrt-swatch) !important;', $css);
     }
 
-    public function test_keeper_battlefield_tools_are_collapsed_into_one_disclosure_and_lens_help_is_removed(): void
+    public function test_keeper_battlefield_tools_live_in_their_own_rail_drawer_and_lens_help_is_removed(): void
     {
         $view = $this->source('app/Tabletop/Views/chamber.php');
-        self::assertStringContainsString('class="gmrt-keeper-controls" data-keeper-controls', $view);
-        self::assertStringContainsString('<summary>Dungeon Master Controls</summary>', $view);
+        self::assertStringContainsString('class="gmrt-keeper-controls gmrt-keeper-tools-drawer" data-keeper-controls data-keeper-tools', $view);
+        self::assertStringContainsString('data-keeper-tools-toggle', $view);
+        self::assertStringContainsString('id="gmrt-keeper-tools-panel"', $view);
+        self::assertStringContainsString("<h2>The Keeper's Tools</h2>", $view);
         self::assertStringContainsString("The Keeper's Lantern Rack", $view);
         self::assertStringContainsString('Sight Beyond the Door', $view);
         self::assertStringContainsString('data-cartographers-lens', $view);

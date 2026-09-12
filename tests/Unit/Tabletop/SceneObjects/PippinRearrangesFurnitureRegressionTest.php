@@ -18,7 +18,7 @@ final class PippinRearrangesFurnitureRegressionTest extends TestCase
         $view = file_get_contents($this->root('app/Tabletop/Views/chamber.php'));
         $controls = strpos($view, 'data-keeper-controls');
         $palette = strpos($view, 'data-furniture-palette');
-        $controlsClose = strpos($view, '</details>', $palette === false ? 0 : $palette);
+        $controlsClose = strpos($view, '</aside>', $palette === false ? 0 : $palette);
 
         self::assertNotFalse($controls);
         self::assertNotFalse($palette);

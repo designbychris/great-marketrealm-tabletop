@@ -11,36 +11,36 @@
         const root = document.querySelector('.gmrt-chamber');
         if (!root) return;
 
-        const atlasDrawer = document.querySelector('[data-keepers-atlas]');
-        const atlasToggle = document.querySelector('[data-atlas-toggle]');
-        const bestiaryDrawer = document.querySelector('[data-keepers-bestiary]');
-        const bestiaryToggle = document.querySelector('[data-bestiary-toggle]');
+        const drawers = {
+            tools: {
+                drawer: document.querySelector('[data-keeper-tools]'),
+                toggle: document.querySelector('[data-keeper-tools-toggle]')
+            },
+            atlas: {
+                drawer: document.querySelector('[data-keepers-atlas]'),
+                toggle: document.querySelector('[data-atlas-toggle]')
+            },
+            bestiary: {
+                drawer: document.querySelector('[data-keepers-bestiary]'),
+                toggle: document.querySelector('[data-bestiary-toggle]')
+            }
+        };
 
-        if (kind === 'atlas') {
-            if (!atlasDrawer || !atlasToggle) return;
-            if (open) {
-                if (bestiaryDrawer) bestiaryDrawer.dataset.open = 'false';
-                if (bestiaryToggle) bestiaryToggle.setAttribute('aria-expanded', 'false');
-            }
-            atlasDrawer.dataset.open = open ? 'true' : 'false';
-            root.dataset.keeperDrawerOpen = open ? 'atlas' : '';
-            atlasToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-            return;
-        }
+        const active = drawers[kind];
+        if (!active?.drawer || !active?.toggle) return;
 
-        if (kind === 'bestiary') {
-            if (!bestiaryDrawer || !bestiaryToggle) return;
-            if (open) {
-                if (atlasDrawer) atlasDrawer.dataset.open = 'false';
-                if (atlasToggle) atlasToggle.setAttribute('aria-expanded', 'false');
-            }
-            bestiaryDrawer.dataset.open = open ? 'true' : 'false';
-            root.dataset.keeperDrawerOpen = open ? 'bestiary' : '';
-            bestiaryToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-            if (open) {
-                const search = document.querySelector('[data-bestiary-search]');
-                if (search) window.setTimeout(() => search.focus(), 210);
-            }
+        Object.entries(drawers).forEach(([candidateKind, candidate]) => {
+            if (!candidate.drawer || !candidate.toggle) return;
+            const candidateOpen = open && candidateKind === kind;
+            candidate.drawer.dataset.open = candidateOpen ? 'true' : 'false';
+            candidate.toggle.setAttribute('aria-expanded', candidateOpen ? 'true' : 'false');
+        });
+
+        root.dataset.keeperDrawerOpen = open ? kind : '';
+
+        if (open && kind === 'bestiary') {
+            const search = document.querySelector('[data-bestiary-search]');
+            if (search) window.setTimeout(() => search.focus(), 210);
         }
     }
 
@@ -150,6 +150,20 @@
             return;
         }
 
+        const keeperToolsToggle = event.target.closest('[data-keeper-tools-toggle]');
+        if (keeperToolsToggle) {
+            event.preventDefault();
+            const drawer = document.querySelector('[data-keeper-tools]');
+            setKeeperDrawerOpen('tools', drawer?.dataset.open !== 'true');
+            return;
+        }
+
+        if (event.target.closest('[data-keeper-tools-close]')) {
+            event.preventDefault();
+            setKeeperDrawerOpen('tools', false);
+            return;
+        }
+
         const atlasToggle = event.target.closest('[data-atlas-toggle]');
         if (atlasToggle) {
             event.preventDefault();
@@ -181,9 +195,7 @@
     async function replaceChamber(message, sceneId = null) {
         const current = document.querySelector('.gmrt-chamber');
         const liveStatus = document.querySelector('#gmrt-tabletop-status');
-        const keeperControlsWasOpen = Boolean(
-            current?.querySelector('[data-keeper-controls]')?.open
-        );
+        const keeperDrawerWasOpen = current?.dataset.keeperDrawerOpen || '';
 
         if (!current || !window.gmrtTabletop) {
             return;
@@ -234,15 +246,12 @@
             activeRefreshTimer = null;
         }
 
-        if (keeperControlsWasOpen) {
-            const incomingKeeperControls = incoming.querySelector('[data-keeper-controls]');
-            if (incomingKeeperControls) {
-                incomingKeeperControls.open = true;
-            }
-        }
-
         current.replaceWith(incoming);
         bootTabletop();
+
+        if (['tools', 'atlas', 'bestiary'].includes(keeperDrawerWasOpen)) {
+            setKeeperDrawerOpen(keeperDrawerWasOpen, true);
+        }
     }
 
     function bootTabletop() {

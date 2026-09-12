@@ -1708,9 +1708,25 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                 </div>
 
                 <?php if ($state->isDungeonMaster()) : ?>
-                    <details class="gmrt-keeper-controls" data-keeper-controls>
-                        <summary>Dungeon Master Controls</summary>
-                        <div class="gmrt-keeper-controls__body">
+                    <aside class="gmrt-keeper-controls gmrt-keeper-tools-drawer" data-keeper-controls data-keeper-tools data-open="false" aria-label="The Keeper's Tools">
+                        <button
+                            class="gmrt-keeper-tools-drawer__toggle"
+                            type="button"
+                            data-keeper-tools-toggle
+                            aria-expanded="false"
+                            aria-controls="gmrt-keeper-tools-panel"
+                            title="Keeper Tools"
+                        ><span aria-hidden="true">⚒</span><span>Tools</span></button>
+                        <div class="gmrt-keeper-tools-drawer__panel" id="gmrt-keeper-tools-panel">
+                            <header class="gmrt-keeper-tools-drawer__header">
+                                <div>
+                                    <p class="gmrt-chamber__eyebrow">Dungeon Master's Drawer</p>
+                                    <h2>The Keeper's Tools</h2>
+                                    <small>Battlemap, Veil, lights, traps, sight, grid and furniture.</small>
+                                </div>
+                                <button type="button" data-keeper-tools-close aria-label="Close the Keeper's Tools">×</button>
+                            </header>
+                            <div class="gmrt-keeper-controls__body">
                     <div class="gmrt-keeper-controls__scene-tools">
                         <strong>The Battlemap</strong>
                         <span>Change the Scene artwork used at this Table.</span>
@@ -2296,8 +2312,9 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                         Battlemap artwork may be changed without moving tokens
                         or changing the rules grid.
                     </p>
+                            </div>
                         </div>
-                    </details>
+                    </aside>
                 <?php endif; ?>
 
                 <div class="gmrt-board__lens-stage" data-lens-stage>

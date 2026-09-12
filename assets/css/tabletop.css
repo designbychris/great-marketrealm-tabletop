@@ -6499,3 +6499,234 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* ========================================================================== 
+   Keeper Tool Rail — user-testing workspace pass
+   Tools, Atlas and Bestiary remain separate workspaces but share one rail and
+   one-open-at-a-time lifecycle. The rail follows the active drawer's outer
+   edge, keeping every Keeper workspace reachable without occupying the map.
+   ========================================================================== */
+.gmrt-chamber {
+    --gmrt-keeper-rail-width: 3.45rem;
+    --gmrt-keeper-rail-top: 7.75rem;
+    --gmrt-keeper-rail-tab-height: 5.65rem;
+}
+
+.gmrt-keeper-tools-drawer,
+.gmrt-atlas-drawer,
+.gmrt-bestiary-drawer {
+    position: fixed;
+    right: 0;
+    top: var(--gmrt-keeper-rail-top);
+    bottom: 1rem;
+    z-index: 82;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    transform: translateX(calc(100% - var(--gmrt-keeper-rail-width)));
+    transition: transform .2s ease;
+}
+
+.gmrt-keeper-tools-drawer[data-open="true"],
+.gmrt-atlas-drawer[data-open="true"],
+.gmrt-bestiary-drawer[data-open="true"] {
+    z-index: 84;
+    transform: translateX(0);
+}
+
+.gmrt-keeper-tools-drawer__panel,
+.gmrt-atlas-drawer__panel,
+.gmrt-bestiary-drawer__panel {
+    position: relative;
+    top: 0;
+    width: min(var(--gmrt-keeper-drawer-width, 700px), calc(100vw - 4rem));
+    min-height: 0;
+    height: 100%;
+    overflow-y: auto;
+    visibility: hidden;
+}
+
+.gmrt-keeper-tools-drawer[data-open="true"] .gmrt-keeper-tools-drawer__panel,
+.gmrt-atlas-drawer[data-open="true"] .gmrt-atlas-drawer__panel,
+.gmrt-bestiary-drawer[data-open="true"] .gmrt-bestiary-drawer__panel {
+    visibility: visible;
+}
+
+.gmrt-keeper-tools-drawer__toggle,
+.gmrt-atlas-drawer__toggle,
+.gmrt-bestiary-drawer__toggle {
+    width: var(--gmrt-keeper-rail-width);
+    min-width: var(--gmrt-keeper-rail-width);
+    min-height: var(--gmrt-keeper-rail-tab-height);
+    height: var(--gmrt-keeper-rail-tab-height);
+    margin: 0;
+    padding: .45rem .25rem;
+    border: 2px solid var(--gmrt-pixel-gold-low, #806438);
+    border-right: 0;
+    border-radius: 2px 0 0 2px;
+    background: #241d16;
+    color: var(--gmrt-pixel-parchment, #f4ead6);
+    box-shadow: -4px 4px 0 rgba(0,0,0,.44);
+    display: grid;
+    grid-template-rows: auto 1fr;
+    place-items: center;
+    gap: .2rem;
+    cursor: pointer;
+    font-family: ui-monospace, "Courier New", monospace;
+    text-shadow: 1px 1px 0 #000;
+}
+
+.gmrt-keeper-tools-drawer__toggle { margin-top: 0; }
+.gmrt-atlas-drawer__toggle { margin-top: calc(var(--gmrt-keeper-rail-tab-height) + .3rem); }
+.gmrt-bestiary-drawer__toggle { margin-top: calc(var(--gmrt-keeper-rail-tab-height) + var(--gmrt-keeper-rail-tab-height) + .6rem); }
+
+.gmrt-keeper-tools-drawer__toggle span:last-child,
+.gmrt-atlas-drawer__toggle span:last-child,
+.gmrt-bestiary-drawer__toggle span:last-child {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    font-size: .68rem;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.gmrt-keeper-tools-drawer__toggle span:first-child,
+.gmrt-bestiary-drawer__toggle span:first-child {
+    font-size: .9rem;
+    line-height: 1;
+}
+
+.gmrt-atlas-drawer__toggle::before {
+    margin: 0;
+    font-size: .72rem;
+}
+
+.gmrt-keeper-tools-drawer[data-open="true"] .gmrt-keeper-tools-drawer__toggle,
+.gmrt-atlas-drawer[data-open="true"] .gmrt-atlas-drawer__toggle,
+.gmrt-bestiary-drawer[data-open="true"] .gmrt-bestiary-drawer__toggle {
+    background: #35291d;
+    color: var(--gmrt-pixel-gold-hi, #f4d688);
+}
+
+/* When a workspace is open, all three tabs travel with its outer edge. The
+   inactive panels remain hidden and non-interactive; only their tabs remain
+   available so switching workspace is a single click. */
+.gmrt-chamber[data-keeper-drawer-open="tools"] .gmrt-atlas-drawer,
+.gmrt-chamber[data-keeper-drawer-open="tools"] .gmrt-bestiary-drawer,
+.gmrt-chamber[data-keeper-drawer-open="atlas"] .gmrt-keeper-tools-drawer,
+.gmrt-chamber[data-keeper-drawer-open="atlas"] .gmrt-bestiary-drawer,
+.gmrt-chamber[data-keeper-drawer-open="bestiary"] .gmrt-keeper-tools-drawer,
+.gmrt-chamber[data-keeper-drawer-open="bestiary"] .gmrt-atlas-drawer {
+    transform: translateX(0);
+    pointer-events: none;
+}
+
+.gmrt-chamber[data-keeper-drawer-open="tools"] .gmrt-atlas-drawer__toggle,
+.gmrt-chamber[data-keeper-drawer-open="tools"] .gmrt-bestiary-drawer__toggle,
+.gmrt-chamber[data-keeper-drawer-open="atlas"] .gmrt-keeper-tools-drawer__toggle,
+.gmrt-chamber[data-keeper-drawer-open="atlas"] .gmrt-bestiary-drawer__toggle,
+.gmrt-chamber[data-keeper-drawer-open="bestiary"] .gmrt-keeper-tools-drawer__toggle,
+.gmrt-chamber[data-keeper-drawer-open="bestiary"] .gmrt-atlas-drawer__toggle {
+    pointer-events: auto;
+}
+
+.gmrt-keeper-tools-drawer__panel {
+    padding: 0;
+    border: 2px solid var(--gmrt-pixel-gold-low, #806438);
+    border-top-color: var(--gmrt-pixel-gold, #d8ad4f);
+    border-left-color: var(--gmrt-pixel-gold, #d8ad4f);
+    border-right: 0;
+    border-radius: 2px 0 0 2px;
+    background:
+        linear-gradient(rgba(255,255,255,.018) 50%, transparent 50%) 0 0 / 100% 4px,
+        #1b1712;
+    color: var(--gmrt-pixel-parchment, #f4ead6);
+    box-shadow: -6px 6px 0 rgba(0,0,0,.54);
+    scrollbar-color: var(--gmrt-pixel-gold-low, #806438) #17120d;
+    scrollbar-width: thin;
+}
+
+.gmrt-keeper-tools-drawer__header {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: .85rem 1rem .8rem;
+    border-bottom: 2px solid var(--gmrt-pixel-gold-low, #806438);
+    background:
+        linear-gradient(90deg, rgba(215,184,110,.08), transparent 44%),
+        #211b16;
+    box-shadow: 0 3px 0 rgba(0,0,0,.34);
+}
+
+.gmrt-keeper-tools-drawer__header h2,
+.gmrt-keeper-tools-drawer__header p,
+.gmrt-keeper-tools-drawer__header small {
+    margin: 0;
+}
+
+.gmrt-keeper-tools-drawer__header h2 {
+    margin-top: .15rem;
+}
+
+.gmrt-keeper-tools-drawer__header small {
+    display: block;
+    margin-top: .2rem;
+    color: rgba(244,234,214,.7);
+}
+
+.gmrt-keeper-tools-drawer__header > button {
+    min-width: 2rem;
+    min-height: 2rem;
+    padding: .2rem;
+    font-size: 1.15rem;
+}
+
+.gmrt-keeper-tools-drawer .gmrt-keeper-controls__body {
+    display: grid;
+    gap: .7rem;
+    padding: .8rem;
+}
+
+.gmrt-keeper-tools-drawer .gmrt-keeper-controls__body > * {
+    min-width: 0;
+}
+
+.gmrt-keeper-tools-drawer__toggle:focus-visible,
+.gmrt-atlas-drawer__toggle:focus-visible,
+.gmrt-bestiary-drawer__toggle:focus-visible {
+    outline: 3px solid var(--gmrt-pixel-gold-hi, #f4d688);
+    outline-offset: 2px;
+}
+
+@media (max-width: 760px) {
+    .gmrt-chamber {
+        --gmrt-keeper-rail-top: 5.75rem;
+        --gmrt-keeper-rail-tab-height: 4.9rem;
+    }
+
+    .gmrt-keeper-tools-drawer__panel,
+    .gmrt-atlas-drawer__panel,
+    .gmrt-bestiary-drawer__panel {
+        top: 0;
+        width: calc(100vw - 4rem);
+        min-height: 0;
+        height: 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gmrt-keeper-tools-drawer,
+    .gmrt-atlas-drawer,
+    .gmrt-bestiary-drawer {
+        transition: none;
+    }
+}

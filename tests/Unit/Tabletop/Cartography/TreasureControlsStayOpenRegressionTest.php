@@ -30,12 +30,13 @@ final class TreasureControlsStayOpenRegressionTest extends TestCase
         self::assertStringContainsString("!empty(\$treasure['revealed'])", $view);
     }
 
-    public function test_live_fragment_replacement_preserves_open_dm_controls(): void
+    public function test_live_fragment_replacement_preserves_the_open_keeper_drawer(): void
     {
         $javascript = (string) file_get_contents($this->root('assets/js/tabletop.js'));
 
-        self::assertStringContainsString('keeperControlsWasOpen', $javascript);
-        self::assertStringContainsString('incomingKeeperControls.open = true', $javascript);
+        self::assertStringContainsString('keeperDrawerWasOpen', $javascript);
+        self::assertStringContainsString("['tools', 'atlas', 'bestiary'].includes(keeperDrawerWasOpen)", $javascript);
+        self::assertStringContainsString('setKeeperDrawerOpen(keeperDrawerWasOpen, true);', $javascript);
     }
 
     public function test_live_state_guard_still_requires_nonce(): void

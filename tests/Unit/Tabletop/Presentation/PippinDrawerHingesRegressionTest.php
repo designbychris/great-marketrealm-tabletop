@@ -18,12 +18,15 @@ final class PippinDrawerHingesRegressionTest extends TestCase
         $js = file_get_contents($this->root . '/assets/js/tabletop.js');
 
         self::assertStringContainsString('function setKeeperDrawerOpen(kind, open)', $js);
+        self::assertStringContainsString("event.target.closest('[data-keeper-tools-toggle]')", $js);
         self::assertStringContainsString("event.target.closest('[data-atlas-toggle]')", $js);
         self::assertStringContainsString("event.target.closest('[data-bestiary-toggle]')", $js);
+        self::assertStringContainsString("setKeeperDrawerOpen('tools', drawer?.dataset.open !== 'true');", $js);
         self::assertStringContainsString("setKeeperDrawerOpen('atlas', drawer?.dataset.open !== 'true');", $js);
         self::assertStringContainsString("setKeeperDrawerOpen('bestiary', drawer?.dataset.open !== 'true');", $js);
-        self::assertStringContainsString("root.dataset.keeperDrawerOpen = open ? 'atlas' : '';", $js);
-        self::assertStringContainsString("root.dataset.keeperDrawerOpen = open ? 'bestiary' : '';", $js);
+        self::assertStringContainsString("root.dataset.keeperDrawerOpen = open ? kind : '';", $js);
+        self::assertStringContainsString("Object.entries(drawers).forEach", $js);
+        self::assertStringContainsString("const candidateOpen = open && candidateKind === kind;", $js);
     }
 
     public function test_generated_scene_names_are_unslashed_before_sanitising(): void
