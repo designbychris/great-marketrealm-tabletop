@@ -76,15 +76,21 @@ final class KeeperToolRailRegressionTest extends TestCase
         self::assertStringContainsString('setKeeperDrawerOpen(keeperDrawerWasOpen, true);', $js);
     }
 
-    public function test_rail_presentation_has_three_stacked_tabs_and_hidden_inactive_panels(): void
+    public function test_rail_presentation_has_one_compact_three_tab_rail_and_independent_drawers(): void
     {
+        $view = $this->source('app/Tabletop/Views/chamber.php');
         $css = $this->source('assets/css/tabletop.css');
 
-        self::assertStringContainsString('--gmrt-keeper-rail-tab-height:', $css);
-        self::assertStringContainsString('.gmrt-keeper-tools-drawer__toggle { margin-top: 0; }', $css);
-        self::assertStringContainsString('.gmrt-atlas-drawer__toggle { margin-top: calc(var(--gmrt-keeper-rail-tab-height) + .3rem); }', $css);
-        self::assertStringContainsString('.gmrt-bestiary-drawer__toggle { margin-top: calc(var(--gmrt-keeper-rail-tab-height) + var(--gmrt-keeper-rail-tab-height) + .6rem); }', $css);
-        self::assertStringContainsString('.gmrt-keeper-tools-drawer[data-open="true"] .gmrt-keeper-tools-drawer__panel,', $css);
-        self::assertStringContainsString('.gmrt-chamber[data-keeper-drawer-open="tools"] .gmrt-atlas-drawer,', $css);
+        self::assertStringContainsString('class="gmrt-keeper-rail"', $view);
+        self::assertStringContainsString('gmrt-keeper-rail__tab--tools', $view);
+        self::assertStringContainsString('gmrt-keeper-rail__tab--atlas', $view);
+        self::assertStringContainsString('gmrt-keeper-rail__tab--bestiary', $view);
+        self::assertStringContainsString('--gmrt-keeper-rail-top: 9rem;', $css);
+        self::assertStringContainsString('gap: .28rem;', $css);
+        self::assertStringContainsString('.gmrt-keeper-rail__tab--bestiary {', $css);
+        self::assertStringContainsString('min-height: 6.35rem;', $css);
+        self::assertStringContainsString('right: var(--gmrt-keeper-drawer-width);', $css);
+        self::assertStringContainsString('.gmrt-keeper-tools-drawer[data-open="true"],', $css);
+        self::assertStringContainsString('transform: translateX(100%);', $css);
     }
 }

@@ -5305,10 +5305,7 @@
             board.classList.add('is-threshold-placing');
             showThresholdPlacementNotice(type);
 
-            const atlasDrawer = document.querySelector('[data-keepers-atlas]');
-            const atlasToggle = document.querySelector('[data-atlas-toggle]');
-            if (atlasDrawer) atlasDrawer.dataset.open = 'false';
-            if (atlasToggle) atlasToggle.setAttribute('aria-expanded', 'false');
+            setAtlasOpen(false);
 
             say(type === 'party'
                 ? 'Party Arrival armed — click the map to place the Threshold.'

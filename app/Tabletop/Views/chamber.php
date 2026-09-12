@@ -753,8 +753,36 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
 
 
     <?php if ($state !== null && $state->isDungeonMaster()) : ?>
+        <nav class="gmrt-keeper-rail" aria-label="Keeper workspaces">
+            <button
+                class="gmrt-keeper-rail__tab gmrt-keeper-rail__tab--tools"
+                type="button"
+                data-keeper-tools-toggle
+                aria-expanded="false"
+                aria-controls="gmrt-keeper-tools-panel"
+                title="Keeper Tools"
+            ><span aria-hidden="true">⚒</span><span>Tools</span></button>
+            <button
+                class="gmrt-keeper-rail__tab gmrt-keeper-rail__tab--atlas"
+                type="button"
+                data-atlas-toggle
+                aria-expanded="false"
+                aria-controls="gmrt-keepers-atlas-panel"
+                title="Keeper Atlas"
+            ><span aria-hidden="true">◆</span><span>Atlas</span></button>
+            <button
+                class="gmrt-keeper-rail__tab gmrt-keeper-rail__tab--bestiary"
+                type="button"
+                data-bestiary-toggle
+                aria-expanded="false"
+                aria-controls="gmrt-keepers-bestiary-panel"
+                title="Keeper Bestiary"
+            ><span aria-hidden="true">🐲</span><span>Bestiary</span></button>
+        </nav>
+    <?php endif; ?>
+
+    <?php if ($state !== null && $state->isDungeonMaster()) : ?>
         <aside class="gmrt-atlas-drawer" data-keepers-atlas data-open="false" aria-label="The Keeper's Atlas">
-            <button class="gmrt-atlas-drawer__toggle" type="button" data-atlas-toggle aria-expanded="false" aria-controls="gmrt-keepers-atlas-panel"><span>Atlas</span></button>
             <div class="gmrt-atlas gmrt-atlas-drawer__panel" id="gmrt-keepers-atlas-panel">
             <header class="gmrt-atlas__header"><div><p class="gmrt-chamber__eyebrow">Dungeon Master's Drawer</p><h2>The Keeper's Atlas</h2><small><?php echo esc_html((string) count($scenes)); ?> mapped place<?php echo count($scenes) === 1 ? '' : 's'; ?></small></div><button type="button" data-atlas-close aria-label="Close the Keeper's Atlas">×</button></header>
             <div class="gmrt-atlas__body">
@@ -967,7 +995,6 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
 
     <?php if ($state !== null && $state->isDungeonMaster()) : ?>
         <aside class="gmrt-bestiary-drawer" data-keepers-bestiary data-open="false" aria-label="The Keeper's Bestiary">
-            <button class="gmrt-bestiary-drawer__toggle" type="button" data-bestiary-toggle aria-expanded="false" aria-controls="gmrt-keepers-bestiary-panel"><span aria-hidden="true">🐲</span><span>Bestiary</span></button>
             <div class="gmrt-bestiary gmrt-bestiary-drawer__panel" id="gmrt-keepers-bestiary-panel">
                 <header class="gmrt-bestiary__header">
                     <div><p class="gmrt-chamber__eyebrow">Dungeon Master's Drawer · IV.29D</p><h2>The Keeper's Bestiary</h2><small><?php echo esc_html((string) count($bestiary)); ?> creature record<?php echo count($bestiary) === 1 ? '' : 's'; ?></small></div>
@@ -1709,14 +1736,6 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
 
                 <?php if ($state->isDungeonMaster()) : ?>
                     <aside class="gmrt-keeper-controls gmrt-keeper-tools-drawer" data-keeper-controls data-keeper-tools data-open="false" aria-label="The Keeper's Tools">
-                        <button
-                            class="gmrt-keeper-tools-drawer__toggle"
-                            type="button"
-                            data-keeper-tools-toggle
-                            aria-expanded="false"
-                            aria-controls="gmrt-keeper-tools-panel"
-                            title="Keeper Tools"
-                        ><span aria-hidden="true">⚒</span><span>Tools</span></button>
                         <div class="gmrt-keeper-tools-drawer__panel" id="gmrt-keeper-tools-panel">
                             <header class="gmrt-keeper-tools-drawer__header">
                                 <div>
