@@ -18,10 +18,14 @@ final class KeeperRearrangesFurnitureRegressionTest extends TestCase
         $css = file_get_contents($this->root . '/assets/css/tabletop.css');
         $js = file_get_contents($this->root . '/assets/js/tabletop.js');
 
+        self::assertStringContainsString('data-keeper-drawer-open="tools"', $css);
         self::assertStringContainsString('data-keeper-drawer-open="atlas"', $css);
         self::assertStringContainsString('data-keeper-drawer-open="bestiary"', $css);
-        self::assertStringContainsString("root.dataset.keeperDrawerOpen = open ? 'atlas' : '';", $js);
-        self::assertStringContainsString("root.dataset.keeperDrawerOpen = open ? 'bestiary' : '';", $js);
+        self::assertStringContainsString('function setKeeperDrawerOpen(kind, open)', $js);
+        self::assertStringContainsString("root.dataset.keeperDrawerOpen = open ? kind : '';", $js);
+        self::assertStringContainsString("setKeeperDrawerOpen('tools'", $js);
+        self::assertStringContainsString("setKeeperDrawerOpen('atlas'", $js);
+        self::assertStringContainsString("setKeeperDrawerOpen('bestiary'", $js);
     }
 
     public function test_table_command_header_carries_scene_and_mode_identity(): void
