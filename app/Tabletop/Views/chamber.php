@@ -2215,9 +2215,9 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                             </div>
                         </header>
                         <label class="gmrt-furniture-snap">
-                            <input type="checkbox" data-furniture-snap checked>
+                            <input type="checkbox" data-furniture-snap>
                             <span>Snap to Grid</span>
-                            <small>Turn off for free placement and delightfully crooked chairs.</small>
+                            <small>Off by default for precise free placement. Turn on when the calibrated grid is useful.</small>
                         </label>
                         <div class="gmrt-furniture-palette__choices" role="group" aria-label="Furniture to place">
                             <?php foreach ($furnitureCatalogue->all() as $furnitureKind => $furnitureDefinition) : ?>

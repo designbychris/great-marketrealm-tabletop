@@ -623,6 +623,7 @@
     let selectedSceneObjectId = '';
     let sceneObjectDrag = null;
     let sceneObjectBusy = false;
+    let tokenDragInProgress = false;
 
     function sceneObjectElement(objectId) {
         if (!objectId) return null;
@@ -831,18 +832,28 @@
         sceneObjectDrag = {
             id: object.dataset.sceneObjectId || '',
             pointerId: event.pointerId,
-            object
+            object,
+            startX: event.clientX,
+            startY: event.clientY,
+            moved: false,
+            threshold: 3
         };
-        object.classList.add('is-dragging');
         object.setPointerCapture?.(event.pointerId);
-        board?.classList.add('is-furniture-moving');
-        if (furnitureStatus) {
-            furnitureStatus.textContent = 'Moving ' + (object.dataset.sceneObjectLabel || 'furniture') + ' — release to place it.';
-        }
     });
 
     window.addEventListener('pointermove', (event) => {
         if (!sceneObjectDrag) return;
+        const dx = event.clientX - sceneObjectDrag.startX;
+        const dy = event.clientY - sceneObjectDrag.startY;
+        if (!sceneObjectDrag.moved && Math.hypot(dx, dy) < sceneObjectDrag.threshold) return;
+
+        sceneObjectDrag.moved = true;
+        sceneObjectDrag.object.classList.add('is-dragging');
+        board?.classList.add('is-furniture-moving');
+        if (furnitureStatus) {
+            furnitureStatus.textContent = 'Moving ' + (sceneObjectDrag.object.dataset.sceneObjectLabel || 'furniture') + ' — release to place it.';
+        }
+
         event.preventDefault();
         const point = furniturePoint(coordinatesFromPointer(event));
         sceneObjectDrag.object.dataset.sceneObjectX = String(point.x);
@@ -858,6 +869,13 @@
         drag.object.classList.remove('is-dragging');
         board?.classList.remove('is-furniture-moving');
         drag.object.releasePointerCapture?.(event.pointerId);
+
+        if (!drag.moved) {
+            if (furnitureStatus) {
+                furnitureStatus.textContent = (drag.object.dataset.sceneObjectLabel || 'Furniture') + ' selected.';
+            }
+            return;
+        }
 
         const moved = await submitSceneObjectAction('move', {
             gmrt_scene_object_id: drag.id,
@@ -6504,6 +6522,10 @@
     }
 
     async function refresh() {
+        if (tokenDragInProgress || sceneObjectDrag) {
+            return;
+        }
+
         if (!tableId) {
             return;
         }
@@ -6780,6 +6802,7 @@
             select(token);
             tokenDrag.active = true;
             tokenDrag.moved = false;
+            tokenDragInProgress = true;
             tokenDrag.pointerId = event.pointerId;
             tokenDrag.startX = event.clientX;
             tokenDrag.startY = event.clientY;
@@ -6833,7 +6856,7 @@
             );
         });
 
-        const finishTokenDrag = (event) => {
+        const finishTokenDrag = async (event) => {
             if (
                 !tokenDrag.active
                 || event.pointerId !== tokenDrag.pointerId
@@ -6860,10 +6883,12 @@
                 event.stopPropagation();
                 const point = tokenDrag.lastValidPoint || tokenPoint(token);
                 token.classList.remove('is-movement-blocked');
-                moveSelected(point.x, point.y);
+                await moveSelected(point.x, point.y);
                 tokenDrag.lastValidPoint = null;
                 tokenDrag.blocked = false;
             }
+
+            tokenDragInProgress = false;
         };
 
         token.addEventListener('pointerup', finishTokenDrag);

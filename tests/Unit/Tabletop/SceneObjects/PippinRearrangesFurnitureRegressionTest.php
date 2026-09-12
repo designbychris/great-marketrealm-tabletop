@@ -65,7 +65,8 @@ final class PippinRearrangesFurnitureRegressionTest extends TestCase
         $view = file_get_contents($this->root('app/Tabletop/Views/chamber.php'));
         $js = file_get_contents($this->root('assets/js/tabletop.js'));
 
-        self::assertStringContainsString('data-furniture-snap checked', $view);
+        self::assertStringContainsString('data-furniture-snap>', $view);
+        self::assertStringNotContainsString('data-furniture-snap checked', $view);
         self::assertStringContainsString('data-scene-width=', $view);
         self::assertStringContainsString('data-scene-height=', $view);
         self::assertStringContainsString('data-grid-size=', $view);
