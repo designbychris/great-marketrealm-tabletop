@@ -12,7 +12,7 @@ final class DungeonForgeCornerTileRegressionTest extends TestCase
         self::assertIsString($view);
         self::assertStringContainsString('data-atlas-toggle', $view);
         self::assertStringNotContainsString('🗺️', $view);
-        self::assertStringContainsString('<span>Atlas</span>', $view);
+        self::assertStringContainsString("esc_html_e('Atlas', 'great-marketrealm-tabletop')", $view);
     }
 
     public function test_generated_barriers_are_converted_from_surface_to_rules_grid_coordinates(): void

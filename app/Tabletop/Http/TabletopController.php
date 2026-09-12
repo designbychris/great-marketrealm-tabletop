@@ -6,6 +6,7 @@ namespace GreatMarketrealmTabletop\Tabletop\Http;
 
 use GreatMarketrealmTabletop\Tabletop\Exceptions\TabletopAccessDenied;
 use GreatMarketrealmTabletop\Tabletop\Presentation\TabletopChamberRenderer;
+use GreatMarketrealmTabletop\Tabletop\Presentation\TabletopI18n;
 use GreatMarketrealmTabletop\Tabletop\Routing\TabletopRoute;
 use GreatMarketrealmTabletop\Tabletop\Services\TabletopChamber;
 use Throwable;
@@ -94,6 +95,7 @@ final class TabletopController
                 'nonce' => wp_create_nonce(
                     TabletopAjaxController::NONCE_ACTION
                 ),
+                'strings' => TabletopI18n::strings(),
             ]
         );
     }

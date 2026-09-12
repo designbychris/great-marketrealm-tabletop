@@ -1,6 +1,9 @@
 (function () {
     'use strict';
 
+    const i18nStrings = (window.gmrtTabletop && window.gmrtTabletop.strings) || {};
+    const t = (key, fallback) => i18nStrings[key] || fallback;
+
     let activeRefreshTimer = null;
 
     // Phase IV.32.5A — Keeper Drawer lifecycle rail.
@@ -63,7 +66,7 @@
 
         recap.classList.toggle('is-collapsed', !expanded);
         toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
-        toggle.textContent = expanded ? 'Hide Recap' : 'Show Recap';
+        toggle.textContent = expanded ? t('hideRecap', 'Hide Recap') : t('showRecap', 'Show Recap');
         content.hidden = !expanded;
 
         if (remember) {
@@ -245,7 +248,7 @@
             throw new Error(
                 result.data && result.data.message
                     ? result.data.message
-                    : 'The live Chamber could not be refreshed.'
+                    : t('liveRefreshFailed', 'The live Chamber could not be refreshed.')
             );
         }
 
@@ -256,7 +259,7 @@
         const incoming = parsed.querySelector('.gmrt-chamber');
 
         if (!incoming) {
-            throw new Error('The refreshed Chamber markup was not found.');
+            throw new Error(t('refreshedMarkupMissing', 'The refreshed Chamber markup was not found.'));
         }
 
         if (activeRefreshTimer) {
@@ -337,7 +340,7 @@
         if (!data.success) {
             const message = data.data && data.data.message
                 ? data.data.message
-                : 'The Tabletop rejected that request.';
+                : t('requestRejected', 'The Tabletop rejected that request.');
             throw new Error(message);
         }
 
@@ -367,8 +370,8 @@
     trapNewType?.addEventListener('change', () => {
         if (!trapNewLabel) return;
         const current = trapNewLabel.value.trim();
-        if (current === '' || current === 'Pressure Plate' || current === 'Tripwire') {
-            trapNewLabel.value = trapNewType.value === 'tripwire' ? 'Tripwire' : 'Pressure Plate';
+        if (current === '' || current === t('pressurePlate', 'Pressure Plate') || current === t('tripwire', 'Tripwire')) {
+            trapNewLabel.value = trapNewType.value === 'tripwire' ? t('tripwire', 'Tripwire') : t('pressurePlate', 'Pressure Plate');
         }
     });
 
@@ -382,11 +385,11 @@
         board?.classList.add('is-trap-placing');
         trapPlace.classList.add('is-active');
         if (trapPlaceCancel) trapPlaceCancel.disabled = false;
-        if (trapStatus) trapStatus.textContent = 'Trap selected — click the battlemap to place it.';
+        if (trapStatus) trapStatus.textContent = t('trapSelected', 'Trap selected — click the battlemap to place it.');
     });
 
     trapPlaceCancel?.addEventListener('click', () => {
-        finishTrapPlacement('Trap placement cancelled. Pippin has lifted his feet very carefully.');
+        finishTrapPlacement(t('trapCancelled', 'Trap placement cancelled. Pippin has lifted his feet very carefully.'));
     });
 
     trapRoster?.addEventListener('click', async (event) => {
@@ -401,11 +404,11 @@
             trapPlacement = {mode: 'move', trapId};
             board?.classList.add('is-trap-placing');
             if (trapPlaceCancel) trapPlaceCancel.disabled = false;
-            if (trapStatus) trapStatus.textContent = 'Move selected — click the battlemap for the trap\'s new position.';
+            if (trapStatus) trapStatus.textContent = t('trapMoveSelected', 'Move selected — click the battlemap for the trap’s new position.');
             return;
         }
 
-        if (action === 'remove' && !window.confirm('Remove this trap from the Scene?')) return;
+        if (action === 'remove' && !window.confirm(t('removeTrapConfirm', 'Remove this trap from the Scene?'))) return;
 
         button.disabled = true;
         try {
@@ -419,11 +422,11 @@
                 values.trap_type = String(row.querySelector('[data-trap-type]')?.value || 'pressure-plate');
             }
             const data = await request('gmrt_forge_trap_action', values);
-            if (trapStatus) trapStatus.textContent = data.message || 'Trap updated.';
-            await replaceChamber(data.message || 'Trap updated.', trapSceneId() || null);
+            if (trapStatus) trapStatus.textContent = data.message || t('trapUpdated', 'Trap updated.');
+            await replaceChamber(data.message || t('trapUpdated', 'Trap updated.'), trapSceneId() || null);
         } catch (error) {
             button.disabled = false;
-            if (trapStatus) trapStatus.textContent = error?.message || 'Pippin could not tend that trap.';
+            if (trapStatus) trapStatus.textContent = error?.message || t('trapFailed', 'Pippin could not tend that trap.');
         }
     });
 
@@ -449,10 +452,10 @@
                 values.label = placement.label;
             }
             const data = await request('gmrt_forge_trap_action', values);
-            finishTrapPlacement(data.message || 'Trap position updated.');
-            await replaceChamber(data.message || 'Trap position updated.', trapSceneId() || null);
+            finishTrapPlacement(data.message || t('trapPositionUpdated', 'Trap position updated.'));
+            await replaceChamber(data.message || t('trapPositionUpdated', 'Trap position updated.'), trapSceneId() || null);
         } catch (error) {
-            if (trapStatus) trapStatus.textContent = (error?.message || 'The trap could not be placed.') + ' Placement remains armed; click again or cancel.';
+            if (trapStatus) trapStatus.textContent = (error?.message || t('trapPlacementFailed', 'The trap could not be placed.')) + ' ' + t('placementRemainsArmed', 'Placement remains armed; click again or cancel.');
         }
     }, true);
 
@@ -483,17 +486,17 @@
             });
 
             if (storyBeatStatus) {
-                storyBeatStatus.textContent = data.message || 'Adventure notes updated.';
+                storyBeatStatus.textContent = data.message || t('adventureNotesUpdated', 'Adventure notes updated.');
             }
 
             await replaceChamber(
-                data.message || 'Adventure notes updated.',
+                data.message || t('adventureNotesUpdated', 'Adventure notes updated.'),
                 storySceneId() || null
             );
         } catch (error) {
             button.disabled = false;
             if (storyBeatStatus) {
-                storyBeatStatus.textContent = error?.message || 'Pippin could not turn that page.';
+                storyBeatStatus.textContent = error?.message || t('adventureNotesFailed', 'Pippin could not turn that page.');
             }
         }
     });
@@ -551,11 +554,11 @@
         board?.classList.add('is-treasure-placing');
         treasurePlace.classList.add('is-active');
         if (treasurePlaceCancel) treasurePlaceCancel.disabled = false;
-        if (treasureStatus) treasureStatus.textContent = 'Treasure selected — click the battlemap to place it.';
+        if (treasureStatus) treasureStatus.textContent = t('treasureSelected', 'Treasure selected — click the battlemap to place it.');
     });
 
     treasurePlaceCancel?.addEventListener('click', () => {
-        finishTreasurePlacement('Treasure placement cancelled. Pippin has stopped drawing little X marks.');
+        finishTreasurePlacement(t('treasureCancelled', 'Treasure placement cancelled. Pippin has stopped drawing little X marks.'));
     });
 
     treasureRoster?.addEventListener('click', async (event) => {
@@ -570,11 +573,11 @@
             treasurePlacement = {mode: 'move', treasureId};
             board?.classList.add('is-treasure-placing');
             if (treasurePlaceCancel) treasurePlaceCancel.disabled = false;
-            if (treasureStatus) treasureStatus.textContent = 'Move selected — click the battlemap for the treasure’s new position.';
+            if (treasureStatus) treasureStatus.textContent = t('treasureMoveSelected', 'Move selected — click the battlemap for the treasure’s new position.');
             return;
         }
 
-        if (action === 'remove' && !window.confirm('Remove this treasure from the Scene?')) return;
+        if (action === 'remove' && !window.confirm(t('removeTreasureConfirm', 'Remove this treasure from the Scene?'))) return;
 
         button.disabled = true;
         try {
@@ -589,11 +592,11 @@
                 values.contents = String(row.querySelector('[data-treasure-contents]')?.value || '').trim();
             }
             const data = await request('gmrt_forge_treasure_action', values);
-            if (treasureStatus) treasureStatus.textContent = data.message || 'Treasure updated.';
-            await replaceChamber(data.message || 'Treasure updated.', treasureSceneId() || null);
+            if (treasureStatus) treasureStatus.textContent = data.message || t('treasureUpdated', 'Treasure updated.');
+            await replaceChamber(data.message || t('treasureUpdated', 'Treasure updated.'), treasureSceneId() || null);
         } catch (error) {
             button.disabled = false;
-            if (treasureStatus) treasureStatus.textContent = error?.message || 'Pippin could not amend that treasure record.';
+            if (treasureStatus) treasureStatus.textContent = error?.message || t('treasureFailed', 'Pippin could not amend that treasure record.');
         }
     });
 
@@ -618,10 +621,10 @@
                 values.contents = placement.contents;
             }
             const data = await request('gmrt_forge_treasure_action', values);
-            finishTreasurePlacement(data.message || 'Treasure position updated.');
-            await replaceChamber(data.message || 'Treasure position updated.', treasureSceneId() || null);
+            finishTreasurePlacement(data.message || t('treasurePositionUpdated', 'Treasure position updated.'));
+            await replaceChamber(data.message || t('treasurePositionUpdated', 'Treasure position updated.'), treasureSceneId() || null);
         } catch (error) {
-            if (treasureStatus) treasureStatus.textContent = (error?.message || 'The treasure could not be placed.') + ' Placement remains armed; click again or cancel.';
+            if (treasureStatus) treasureStatus.textContent = (error?.message || t('treasurePlacementFailed', 'The treasure could not be placed.')) + ' ' + t('placementRemainsArmed', 'Placement remains armed; click again or cancel.');
         }
     }, true);
 
@@ -667,8 +670,8 @@
             const interaction = object?.dataset.sceneObjectInteraction || 'none';
             furnitureInteract.disabled = !enabled || interaction === 'none';
             furnitureInteract.textContent = interaction === 'open_close'
-                ? (object?.dataset.sceneObjectOpen === 'true' ? 'Close' : 'Open')
-                : 'Interact';
+                ? (object?.dataset.sceneObjectOpen === 'true' ? t('close', 'Close') : t('open', 'Open'))
+                : t('interact', 'Interact');
         }
         if (furnitureMimic || furnitureArmMimic || furnitureRevealMimic || furnitureDisarmMimic) {
             const object = enabled ? sceneObjectElement(selectedSceneObjectId) : null;
@@ -701,8 +704,8 @@
 
         if (furnitureSelection) {
             furnitureSelection.textContent = object
-                ? (object.dataset.sceneObjectLabel || 'Furniture') + ' selected'
-                : 'No furniture selected';
+                ? (object.dataset.sceneObjectLabel || t('furniture', 'Furniture')) + ' selected'
+                : t('noFurnitureSelected', 'No furniture selected');
         }
     }
 
@@ -742,13 +745,13 @@
                 headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'},
                 body
             });
-            if (!response.ok) throw new Error('Pippin could not rearrange that furnishing.');
+            if (!response.ok) throw new Error(t('furnitureRearrangeFailed', 'Pippin could not rearrange that furnishing.'));
             const html = await response.text();
             syncSceneObjectLayer(new DOMParser().parseFromString(html, 'text/html'));
             return true;
         } catch (error) {
             if (furnitureStatus) {
-                furnitureStatus.textContent = error.message || 'Pippin could not rearrange that furnishing.';
+                furnitureStatus.textContent = error.message || t('furnitureRearrangeFailed', 'Pippin could not rearrange that furnishing.');
             }
             return false;
         } finally {
@@ -781,8 +784,8 @@
     furnitureSnap?.addEventListener('change', () => {
         if (furnitureStatus) {
             furnitureStatus.textContent = furnitureSnap.checked
-                ? 'Snap to Grid enabled. Pippin has restored order.'
-                : 'Snap to Grid disabled. Pippin is trying not to look.';
+                ? t('snapEnabled', 'Snap to Grid enabled. Pippin has restored order.')
+                : t('snapDisabled', 'Snap to Grid disabled. Pippin is trying not to look.');
         }
     });
 
@@ -802,7 +805,7 @@
             selectSceneObject(null);
             furniturePlacement = {
                 kind: String(button.dataset.furnitureKind || ''),
-                label: String(button.dataset.furnitureLabel || 'Furniture')
+                label: String(button.dataset.furnitureLabel || t('furniture', 'Furniture'))
             };
             furnitureButtons.forEach((choice) => {
                 const active = choice === button;
@@ -818,7 +821,7 @@
     });
 
     furnitureCancel?.addEventListener('click', () => {
-        finishFurniturePlacement('Placement cancelled. Pippin has put the tape measure away.');
+        finishFurniturePlacement(t('furniturePlacementCancelled', 'Placement cancelled. Pippin has put the tape measure away.'));
     });
 
     // Furniture placement owns the next battlefield pointer in capture phase.
@@ -899,7 +902,7 @@
 
         if (!drag.moved) {
             if (furnitureStatus) {
-                furnitureStatus.textContent = (drag.object.dataset.sceneObjectLabel || 'Furniture') + ' selected.';
+                furnitureStatus.textContent = (drag.object.dataset.sceneObjectLabel || t('furniture', 'Furniture')) + ' selected.';
             }
             return;
         }
@@ -910,7 +913,7 @@
             y: drag.object.dataset.sceneObjectY || '0.5'
         });
         if (moved && furnitureStatus) {
-            furnitureStatus.textContent = 'Furniture moved. Pippin has amended the floor plan.';
+            furnitureStatus.textContent = t('furnitureMoved', 'Furniture moved. Pippin has amended the floor plan.');
         }
     });
 
@@ -919,7 +922,7 @@
         sceneObjectDrag.object.classList.remove('is-dragging');
         sceneObjectDrag = null;
         board?.classList.remove('is-furniture-moving');
-        if (furnitureStatus) furnitureStatus.textContent = 'Furniture move cancelled.';
+        if (furnitureStatus) furnitureStatus.textContent = t('furnitureMoveCancelled', 'Furniture move cancelled.');
     });
 
     sceneObjectLayer?.addEventListener('keydown', (event) => {
@@ -942,7 +945,7 @@
                 gmrt_scene_object_id: selectedSceneObjectId,
                 rotation
             });
-            if (changed && furnitureStatus) furnitureStatus.textContent = 'Furniture rotated. Pippin has rotated the paper too.';
+            if (changed && furnitureStatus) furnitureStatus.textContent = t('furnitureRotated', 'Furniture rotated. Pippin has rotated the paper too.');
         });
     });
 
@@ -958,7 +961,7 @@
                 gmrt_scene_object_id: selectedSceneObjectId,
                 scale
             });
-            if (changed && furnitureStatus) furnitureStatus.textContent = 'Furniture resized. Pippin disputes the new dimensions.';
+            if (changed && furnitureStatus) furnitureStatus.textContent = t('furnitureResized', 'Furniture resized. Pippin disputes the new dimensions.');
         });
     });
 
@@ -972,8 +975,8 @@
             const restored = sceneObjectElement(selectedSceneObjectId);
             const isOpen = restored?.dataset.sceneObjectOpen === 'true';
             furnitureStatus.textContent = isOpen
-                ? 'Chest opened. Pippin has taken three prudent steps backwards.'
-                : 'Chest closed. Pippin is pretending this solves the problem.';
+                ? t('chestOpened', 'Chest opened. Pippin has taken three prudent steps backwards.')
+                : t('chestClosed', 'Chest closed. Pippin is pretending this solves the problem.');
         }
     });
 
@@ -989,7 +992,7 @@
     mimicArm?.addEventListener('click', async () => {
         const creatureId = String(mimicCreature?.value || '');
         if (!creatureId) {
-            if (furnitureStatus) furnitureStatus.textContent = 'Choose a Mimic from the Bestiary first.';
+            if (furnitureStatus) furnitureStatus.textContent = t('chooseMimic', 'Choose a Mimic from the Bestiary first.');
             return;
         }
         mimicDialog?.close();
@@ -1000,13 +1003,13 @@
         if (changed && furnitureStatus) {
             const restored = sceneObjectElement(selectedSceneObjectId);
             const mimicName = restored?.dataset.mimicName || 'a Mimic';
-            furnitureStatus.textContent = `${restored?.dataset.sceneObjectLabel || 'Furniture'} is armed as ${mimicName}. It still looks completely innocent.`;
+            furnitureStatus.textContent = `${restored?.dataset.sceneObjectLabel || t('furniture', 'Furniture')} is armed as ${mimicName}. It still looks completely innocent.`;
         }
     });
     mimicConfirm?.addEventListener('click', async () => {
         const creatureId = String(mimicCreature?.value || '');
         if (!creatureId) {
-            if (furnitureStatus) furnitureStatus.textContent = 'Choose a creature from the Bestiary first.';
+            if (furnitureStatus) furnitureStatus.textContent = t('chooseCreature', 'Choose a creature from the Bestiary first.');
             return;
         }
         mimicDialog?.close();
@@ -1015,7 +1018,7 @@
             gmrt_mimic_creature_id: creatureId
         });
         if (changed) {
-            const message = 'The furniture was a Mimic. Pippin would like the record to show that he objected.';
+            const message = t('mimicRevealed', 'The furniture was a Mimic. Pippin would like the record to show that he objected.');
             if (furnitureStatus) furnitureStatus.textContent = message;
             await replaceChamber(message, null);
         }
@@ -1026,7 +1029,7 @@
         if (!object || object.dataset.mimicArmed !== 'true') return;
         if (!window.confirm(`Reveal ${object.dataset.mimicName || 'this Mimic'} now?`)) return;
 
-        const message = `${object.dataset.sceneObjectLabel || 'Furniture'} reveals itself!`;
+        const message = `${object.dataset.sceneObjectLabel || t('furniture', 'Furniture')} reveals itself!`;
         const changed = await submitSceneObjectAction('reveal_mimic', {
             gmrt_scene_object_id: selectedSceneObjectId
         });
@@ -1039,13 +1042,13 @@
     furnitureDisarmMimic?.addEventListener('click', async () => {
         const object = sceneObjectElement(selectedSceneObjectId);
         if (!object || object.dataset.mimicArmed !== 'true') return;
-        if (!window.confirm('Disarm this disguised Mimic? The furnishing will remain.')) return;
+        if (!window.confirm(t('disarmMimicConfirm', 'Disarm this disguised Mimic? The furnishing will remain.'))) return;
 
         const changed = await submitSceneObjectAction('disarm_mimic', {
             gmrt_scene_object_id: selectedSceneObjectId
         });
         if (changed && furnitureStatus) {
-            furnitureStatus.textContent = 'Mimic disguise disarmed. Pippin remains unconvinced.';
+            furnitureStatus.textContent = t('mimicDisarmed', 'Mimic disguise disarmed. Pippin remains unconvinced.');
         }
     });
 
@@ -1054,26 +1057,26 @@
         const changed = await submitSceneObjectAction('duplicate', {
             gmrt_scene_object_id: selectedSceneObjectId
         });
-        if (changed && furnitureStatus) furnitureStatus.textContent = 'Furniture duplicated. Pippin is counting again.';
+        if (changed && furnitureStatus) furnitureStatus.textContent = t('furnitureDuplicated', 'Furniture duplicated. Pippin is counting again.');
     });
 
     furnitureRemove?.addEventListener('click', async () => {
         if (!selectedSceneObjectId) return;
-        if (!window.confirm('Remove this furnishing from the Scene?')) return;
+        if (!window.confirm(t('removeFurnitureConfirm', 'Remove this furnishing from the Scene?'))) return;
         const objectId = selectedSceneObjectId;
         const changed = await submitSceneObjectAction('delete', {
             gmrt_scene_object_id: objectId
         });
         if (changed) {
             selectSceneObject(null);
-            if (furnitureStatus) furnitureStatus.textContent = 'Furniture removed. Pippin has reclaimed the floor space.';
+            if (furnitureStatus) furnitureStatus.textContent = t('furnitureRemoved', 'Furniture removed. Pippin has reclaimed the floor space.');
         }
     });
 
     window.addEventListener('keydown', (event) => {
         if (event.key === 'Escape' && selectedSceneObjectId) {
             selectSceneObject(null);
-            if (furnitureStatus) furnitureStatus.textContent = 'Furniture selection cleared.';
+            if (furnitureStatus) furnitureStatus.textContent = t('furnitureSelectionCleared', 'Furniture selection cleared.');
         }
     });
 
@@ -1131,8 +1134,8 @@
     if (prepareTestTableButton) {
         prepareTestTableButton.addEventListener('click', async () => {
             prepareTestTableButton.disabled = true;
-            prepareTestTableButton.textContent = 'Preparing…';
-            say('Sage is preparing the Training Grounds…');
+            prepareTestTableButton.textContent = t('preparing', 'Preparing…');
+            say(t('trainingGroundsPreparing', 'Sage is preparing the Training Grounds…'));
 
             try {
                 const data = await request('gmrt_prepare_test_table', {});
@@ -1140,9 +1143,9 @@
                 url.searchParams.set('table', data.table_id);
                 window.location.assign(url.toString());
             } catch (error) {
-                say(error.message || 'The test Table could not be prepared.');
+                say(error.message || t('testTableFailed', 'The test Table could not be prepared.'));
                 prepareTestTableButton.disabled = false;
-                prepareTestTableButton.textContent = 'Prepare Test Table';
+                prepareTestTableButton.textContent = t('prepareTestTable', 'Prepare Test Table');
             }
         });
     }
@@ -1168,13 +1171,13 @@
             const atlasSource = String(form.get('atlas_source') || '');
             const [sourceTableId = '', sourceSceneId = ''] = atlasSource.split('::', 2);
             if (firstMap === 'atlas' && (!sourceTableId || !sourceSceneId)) {
-                if (status) status.textContent = 'Choose the saved Atlas map Pippin should place first.';
+                if (status) status.textContent = t('chooseAtlasMap', 'Choose the saved Atlas map Pippin should place first.');
                 return;
             }
             if (button) button.disabled = true;
             if (status) status.textContent = firstMap === 'forge'
-                ? 'Pippin is clearing a workbench beside the Forge…'
-                : 'Pippin is finding a suitable patch of table…';
+                ? t('forgePreparing', 'Pippin is clearing a workbench beside the Forge…')
+                : t('tablePreparing', 'Pippin is finding a suitable patch of table…');
             try {
                 const data = await request('gmrt_create_tabletop', {
                     name: form.get('name') || '',
@@ -1192,7 +1195,7 @@
                 }
                 window.location.assign(url.toString());
             } catch (error) {
-                if (status) status.textContent = error.message || 'The Tabletop could not be created.';
+                if (status) status.textContent = error.message || t('tableCreateFailed', 'The Tabletop could not be created.');
                 if (button) button.disabled = false;
             }
         });
@@ -1222,16 +1225,16 @@
             const status = form.parentElement?.querySelector('[data-companion-campaign-status]');
             if (!tableId || !campaignId) return;
             if (button) button.disabled = true;
-            if (status) status.textContent = 'Pippin is joining the Table Atlas to the Companion Ledger…';
+            if (status) status.textContent = t('campaignLinking', 'Pippin is joining the Table Atlas to the Companion Ledger…');
             try {
                 const data = await request('gmrt_link_companion_campaign', { table_id: tableId, campaign_id: campaignId });
                 const count = Number(data.sessions_synchronised || 0);
                 if (status) status.textContent = count > 0
-                    ? `${data.message || 'Campaign linked.'} ${count} existing Session${count === 1 ? '' : 's'} synchronised.`
-                    : (data.message || 'Campaign linked.');
+                    ? `${data.message || t('campaignLinked', 'Campaign linked.')} ${count} existing Session${count === 1 ? '' : 's'} synchronised.`
+                    : (data.message || t('campaignLinked', 'Campaign linked.'));
                 window.setTimeout(() => window.location.reload(), 650);
             } catch (error) {
-                if (status) status.textContent = error.message || 'The Companion Campaign could not be linked.';
+                if (status) status.textContent = error.message || t('campaignLinkFailed', 'The Companion Campaign could not be linked.');
                 if (button) button.disabled = false;
             }
         });
@@ -1248,13 +1251,13 @@
             const campaignTableId = form.dataset.tableId || '';
             if (!player || !campaignTableId) return;
             if (button) button.disabled = true;
-            if (status) status.textContent = 'Sending the Summons…';
+            if (status) status.textContent = t('sendingSummons', 'Sending the Summons…');
             try {
                 const data = await request('gmrt_invite_table_player', { table_id: campaignTableId, player });
-                if (status) status.textContent = data.message || 'Invitation sent.';
+                if (status) status.textContent = data.message || t('invitationSent', 'Invitation sent.');
                 window.setTimeout(() => window.location.reload(), 450);
             } catch (error) {
-                if (status) status.textContent = error.message || 'The player could not be invited.';
+                if (status) status.textContent = error.message || t('inviteFailed', 'The player could not be invited.');
                 if (button) button.disabled = false;
             }
         });
@@ -1268,13 +1271,13 @@
         const status = button.closest('.gmrt-campaign-card__roster')?.querySelector('[data-campaign-gathering-status]');
         if (!campaignTableId || !userId) return;
         button.disabled = true;
-        if (status) status.textContent = 'Closing that seat…';
+        if (status) status.textContent = t('closingSeat', 'Closing that seat…');
         try {
             const data = await request('gmrt_remove_table_player', { table_id: campaignTableId, user_id: userId });
-            if (status) status.textContent = data.message || 'Player removed.';
+            if (status) status.textContent = data.message || t('playerRemoved', 'Player removed.');
             window.setTimeout(() => window.location.reload(), 450);
         } catch (error) {
-            if (status) status.textContent = error.message || 'The player could not be removed.';
+            if (status) status.textContent = error.message || t('removePlayerFailed', 'The player could not be removed.');
             button.disabled = false;
         }
     });
@@ -1289,10 +1292,10 @@
         if (!campaignTableId) return;
         if (!window.confirm(`Remove “${tableName}” permanently? This cannot be undone.`)) return;
         button.disabled = true;
-        if (status) status.textContent = 'Pippin is erasing this road from the atlas…';
+        if (status) status.textContent = t('tableRemoving', 'Pippin is erasing this road from the atlas…');
         try {
             const data = await request('gmrt_remove_tabletop', { table_id: campaignTableId });
-            if (status) status.textContent = data.message || 'Tabletop removed.';
+            if (status) status.textContent = data.message || t('tableRemoved', 'Tabletop removed.');
 
             const card = button.closest('.gmrt-campaign-card');
             const shelf = card?.closest('.gmrt-campaign-lobby__shelf');
@@ -1303,11 +1306,11 @@
             if (shelf && !shelf.querySelector('.gmrt-campaign-card')) {
                 const empty = document.createElement('p');
                 empty.className = 'gmrt-campaign-lobby__empty';
-                empty.textContent = 'Pippin has no saved roads for you yet. A Keeper can set a new Table, or an Adventurer can return after receiving a Summons.';
+                empty.textContent = t('noSavedRoads', 'Pippin has no saved roads for you yet. A Keeper can set a new Table, or an Adventurer can return after receiving a Summons.');
                 shelf.replaceWith(empty);
             }
         } catch (error) {
-            if (status) status.textContent = error.message || 'The Tabletop could not be removed.';
+            if (status) status.textContent = error.message || t('tableRemoveFailed', 'The Tabletop could not be removed.');
             button.disabled = false;
         }
     });
@@ -1321,12 +1324,12 @@
             const sessionStatus = startSessionForm.closest('[data-table-session]')?.querySelector('[data-table-session-status]');
             const title = String(startSessionForm.querySelector('[name="title"]')?.value || '').trim();
             if (button) button.disabled = true;
-            if (sessionStatus) sessionStatus.textContent = 'The Keeper is calling the Session…';
+            if (sessionStatus) sessionStatus.textContent = t('sessionCalling', 'The Keeper is calling the Session…');
             try {
                 await request('gmrt_start_table_session', { title });
-                await replaceChamber('The Session has begun — the Table remembers tonight.', null);
+                await replaceChamber(t('sessionBegan', 'The Session has begun — the Table remembers tonight.'), null);
             } catch (error) {
-                if (sessionStatus) sessionStatus.textContent = error.message || 'The Session could not be started.';
+                if (sessionStatus) sessionStatus.textContent = error.message || t('sessionStartFailed', 'The Session could not be started.');
                 if (button) button.disabled = false;
             }
         });
@@ -1336,16 +1339,16 @@
     if (endSessionButton) {
         endSessionButton.addEventListener('click', async () => {
             const sessionStatus = endSessionButton.closest('[data-table-session]')?.querySelector('[data-table-session-status]');
-            if (!window.confirm('End the current Session? The campaign itself will remain active and can be resumed in a new Session later.')) return;
+            if (!window.confirm(t('endSessionConfirm', 'End the current Session? The campaign itself will remain active and can be resumed in a new Session later.'))) return;
             endSessionButton.disabled = true;
-            if (sessionStatus) sessionStatus.textContent = 'Closing the Session ledger…';
+            if (sessionStatus) sessionStatus.textContent = t('sessionClosing', 'Closing the Session ledger…');
             try {
                 const endingSessionId = root.dataset.sessionId || '';
                 await request('gmrt_end_table_session', {});
                 rememberSessionClosing(tableId, endingSessionId);
-                await replaceChamber('Until next time — this Session has concluded.', null);
+                await replaceChamber(t('sessionEnded', 'Until next time — this Session has concluded.'), null);
             } catch (error) {
-                if (sessionStatus) sessionStatus.textContent = error.message || 'The Session could not be ended.';
+                if (sessionStatus) sessionStatus.textContent = error.message || t('sessionEndFailed', 'The Session could not be ended.');
                 endSessionButton.disabled = false;
             }
         });
@@ -1417,7 +1420,7 @@
                 : '';
             const characterName = companionCharacter && companionCharacter.name
                 ? String(companionCharacter.name)
-                : 'Selected character';
+                : t('selectedCharacter', 'Selected character');
 
             roleBadge.className = 'gmrt-party__role gmrt-party__seat' + (characterImage ? ' has-character' : '');
             if (role === 'dungeon-master') {
@@ -1554,11 +1557,11 @@
 
         try {
             const data = await request('gmrt_invite_table_player', { player });
-            gatheringSay(data.message || 'Invitation sent.');
+            gatheringSay(data.message || t('invitationSent', 'Invitation sent.'));
             if (input) input.value = '';
             await refresh();
         } catch (error) {
-            gatheringSay(error.message || 'The player could not be invited.');
+            gatheringSay(error.message || t('inviteFailed', 'The player could not be invited.'));
             if (button) button.disabled = false;
         }
     });
@@ -1592,10 +1595,10 @@
         gatheringSay('Removing the player from the Table…');
         try {
             const data = await request('gmrt_remove_table_player', { user_id: userId });
-            gatheringSay(data.message || 'Player removed.');
+            gatheringSay(data.message || t('playerRemoved', 'Player removed.'));
             await refresh();
         } catch (error) {
-            gatheringSay(error.message || 'The player could not be removed.');
+            gatheringSay(error.message || t('removePlayerFailed', 'The player could not be removed.'));
             button.disabled = false;
         }
     });
@@ -3575,7 +3578,7 @@
                     const toggle = document.createElement('button');
                     toggle.type = 'button';
                     toggle.dataset.visionToggle = String(barrier.id);
-                    toggle.textContent = barrier.open ? 'Close' : 'Open';
+                    toggle.textContent = barrier.open ? t('close', 'Close') : t('open', 'Open');
                     item.append(toggle);
                 }
 
@@ -5241,7 +5244,7 @@
             if (!sceneId) return;
             button.disabled = true;
             const previousLabel = button.textContent;
-            button.textContent = 'Preparing…';
+            button.textContent = t('preparing', 'Preparing…');
             if (atlasStatus) atlasStatus.textContent = 'Drawing the curtain around the chosen Scene…';
             try {
                 await replaceChamber('Behind the Curtain — private Scene preparation.', sceneId);

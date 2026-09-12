@@ -276,6 +276,7 @@ final class TabletopShortcode
                 'nonce' => wp_create_nonce(
                     \GreatMarketrealmTabletop\Tabletop\Http\TabletopAjaxController::NONCE_ACTION
                 ),
+                'strings' => TabletopI18n::strings(),
             ]
         );
     }

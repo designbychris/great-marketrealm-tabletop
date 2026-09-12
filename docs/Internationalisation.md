@@ -35,3 +35,7 @@ The Tabletop has substantial browser-side UI copy. It will be migrated to `wp.i1
 ## Translation extraction
 
 See `languages/README.md` for the WP-CLI extraction command and file naming conventions.
+
+## JavaScript interface strings
+
+The live Tabletop browser receives interface translations through `gmrtTabletop.strings`. The extractable PHP catalogue lives in `TabletopI18n::strings()`. New browser status, confirmation, button-state, error and accessibility copy should be added there instead of being introduced as an English-only JavaScript literal.
