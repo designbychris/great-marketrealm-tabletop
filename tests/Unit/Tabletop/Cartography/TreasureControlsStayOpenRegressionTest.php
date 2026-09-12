@@ -35,7 +35,7 @@ final class TreasureControlsStayOpenRegressionTest extends TestCase
         $javascript = (string) file_get_contents($this->root('assets/js/tabletop.js'));
 
         self::assertStringContainsString('keeperDrawerWasOpen', $javascript);
-        self::assertStringContainsString("['tools', 'atlas', 'bestiary'].includes(keeperDrawerWasOpen)", $javascript);
+        self::assertStringContainsString("['session', 'tools', 'atlas', 'bestiary'].includes(keeperDrawerWasOpen)", $javascript);
         self::assertStringContainsString('setKeeperDrawerOpen(keeperDrawerWasOpen, true);', $javascript);
     }
 
