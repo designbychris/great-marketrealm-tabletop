@@ -6,6 +6,7 @@
  * Version:     0.32.0-alpha.8
  * Author:      Great Marketrealm
  * Text Domain: great-marketrealm-tabletop
+ * Domain Path: /languages
  * Requires PHP: 8.1
  */
 
@@ -17,6 +18,25 @@ define('GMRT_VERSION', '0.32.0-alpha.8');
 define('GMRT_FILE', __FILE__);
 define('GMRT_PATH', plugin_dir_path(__FILE__));
 define('GMRT_URL', plugin_dir_url(__FILE__));
+
+/**
+ * Load Tabletop interface translations from the bundled language-pack directory.
+ *
+ * Locale packs translate the application chrome and controls. Canonical MarketRealm
+ * rules/lore remain a separate content-translation concern so names and wordplay can
+ * be curated rather than mechanically rewritten.
+ */
+add_action(
+    'init',
+    static function (): void {
+        load_plugin_textdomain(
+            'great-marketrealm-tabletop',
+            false,
+            dirname(plugin_basename(GMRT_FILE)) . '/languages'
+        );
+    },
+    1
+);
 
 require_once GMRT_PATH . 'autoload.php';
 
