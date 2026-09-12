@@ -6502,8 +6502,8 @@
 
 /* ========================================================================== 
    Keeper Tool Rail — user-testing workspace pass
-   One persistent rail owns the three workspace tabs. Tools, Atlas and Bestiary
-   remain independent drawers, and only one can be open at a time.
+   One persistent rail owns the four workspace tabs. Session, Tools, Atlas and
+   Bestiary remain independent drawers, and only one can be open at a time.
    ========================================================================== */
 .gmrt-chamber {
     --gmrt-keeper-rail-width: 3.65rem;
@@ -6524,6 +6524,7 @@
     transition: right .2s ease;
 }
 
+.gmrt-chamber[data-keeper-drawer-open="session"] .gmrt-keeper-rail,
 .gmrt-chamber[data-keeper-drawer-open="tools"] .gmrt-keeper-rail,
 .gmrt-chamber[data-keeper-drawer-open="atlas"] .gmrt-keeper-rail,
 .gmrt-chamber[data-keeper-drawer-open="bestiary"] .gmrt-keeper-rail {
@@ -6549,6 +6550,10 @@
     cursor: pointer;
     font-family: ui-monospace, "Courier New", monospace;
     text-shadow: 1px 1px 0 #000;
+}
+
+.gmrt-keeper-rail__tab--session {
+    min-height: 5.9rem;
 }
 
 .gmrt-keeper-rail__tab--bestiary {
@@ -6580,6 +6585,7 @@
     outline-offset: 2px;
 }
 
+.gmrt-session-drawer,
 .gmrt-keeper-tools-drawer,
 .gmrt-atlas-drawer,
 .gmrt-bestiary-drawer {
@@ -6599,6 +6605,7 @@
     pointer-events: none;
 }
 
+.gmrt-session-drawer[data-open="true"],
 .gmrt-keeper-tools-drawer[data-open="true"],
 .gmrt-atlas-drawer[data-open="true"],
 .gmrt-bestiary-drawer[data-open="true"] {
@@ -6606,6 +6613,7 @@
     pointer-events: auto;
 }
 
+.gmrt-session-drawer__panel,
 .gmrt-keeper-tools-drawer__panel,
 .gmrt-atlas-drawer__panel,
 .gmrt-bestiary-drawer__panel {
@@ -6618,10 +6626,91 @@
     visibility: hidden;
 }
 
+.gmrt-session-drawer[data-open="true"] .gmrt-session-drawer__panel,
 .gmrt-keeper-tools-drawer[data-open="true"] .gmrt-keeper-tools-drawer__panel,
 .gmrt-atlas-drawer[data-open="true"] .gmrt-atlas-drawer__panel,
 .gmrt-bestiary-drawer[data-open="true"] .gmrt-bestiary-drawer__panel {
     visibility: visible;
+}
+
+.gmrt-session-drawer__panel {
+    padding: 0;
+    border: 2px solid var(--gmrt-pixel-gold-low, #806438);
+    border-top-color: var(--gmrt-pixel-gold, #d8ad4f);
+    border-left-color: var(--gmrt-pixel-gold, #d8ad4f);
+    border-right: 0;
+    border-radius: 2px 0 0 2px;
+    background:
+        linear-gradient(rgba(255,255,255,.018) 50%, transparent 50%) 0 0 / 100% 4px,
+        #1b1712;
+    color: var(--gmrt-pixel-parchment, #f4ead6);
+    box-shadow: -6px 6px 0 rgba(0,0,0,.54);
+    scrollbar-color: var(--gmrt-pixel-gold-low, #806438) #17120d;
+    scrollbar-width: thin;
+}
+
+.gmrt-session-drawer__header {
+    position: sticky;
+    top: 0;
+    z-index: 4;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: .85rem 1rem .8rem;
+    border-bottom: 2px solid var(--gmrt-pixel-gold-low, #806438);
+    background:
+        linear-gradient(90deg, rgba(215,184,110,.08), transparent 44%),
+        #211b16;
+    box-shadow: 0 3px 0 rgba(0,0,0,.34);
+}
+
+.gmrt-session-drawer__header h2,
+.gmrt-session-drawer__header p,
+.gmrt-session-drawer__header small { margin: 0; }
+.gmrt-session-drawer__header h2 { margin-top: .15rem; }
+.gmrt-session-drawer__header small {
+    display: block;
+    margin-top: .2rem;
+    color: rgba(244,234,214,.7);
+}
+.gmrt-session-drawer__header > button {
+    min-width: 2rem;
+    min-height: 2rem;
+    padding: .2rem;
+    font-size: 1.15rem;
+}
+
+/* The old command masthead is now the Session Desk contents for Keepers. */
+.gmrt-session-drawer .gmrt-chamber__masthead {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    gap: .75rem;
+    margin: 0;
+    padding: .9rem;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+}
+.gmrt-session-drawer .gmrt-chamber__masthead > *,
+.gmrt-session-drawer .gmrt-table-command__scene,
+.gmrt-session-drawer .gmrt-table-session,
+.gmrt-session-drawer .gmrt-chamber__viewer {
+    grid-column: 1;
+    grid-row: auto;
+    min-width: 0;
+}
+.gmrt-session-drawer .gmrt-table-command__scene,
+.gmrt-session-drawer .gmrt-table-session,
+.gmrt-session-drawer .gmrt-chamber__viewer {
+    border-right: 0;
+    border-left: 0;
+    padding-inline: 0;
+}
+.gmrt-session-drawer .gmrt-session-recap {
+    grid-column: 1;
+    padding-inline: 0;
 }
 
 .gmrt-keeper-tools-drawer__panel {
@@ -6689,11 +6778,13 @@
         --gmrt-keeper-drawer-width: calc(100vw - 4rem);
     }
     .gmrt-keeper-rail__tab { min-height: 4.7rem; }
+    .gmrt-keeper-rail__tab--session { min-height: 5.25rem; }
     .gmrt-keeper-rail__tab--bestiary { min-height: 5.55rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
     .gmrt-keeper-rail,
+    .gmrt-session-drawer,
     .gmrt-keeper-tools-drawer,
     .gmrt-atlas-drawer,
     .gmrt-bestiary-drawer {

@@ -12,6 +12,10 @@
         if (!root) return;
 
         const drawers = {
+            session: {
+                drawer: document.querySelector('[data-keeper-session]'),
+                toggle: document.querySelector('[data-keeper-session-toggle]')
+            },
             tools: {
                 drawer: document.querySelector('[data-keeper-tools]'),
                 toggle: document.querySelector('[data-keeper-tools-toggle]')
@@ -150,6 +154,20 @@
             return;
         }
 
+        const keeperSessionToggle = event.target.closest('[data-keeper-session-toggle]');
+        if (keeperSessionToggle) {
+            event.preventDefault();
+            const drawer = document.querySelector('[data-keeper-session]');
+            setKeeperDrawerOpen('session', drawer?.dataset.open !== 'true');
+            return;
+        }
+
+        if (event.target.closest('[data-keeper-session-close]')) {
+            event.preventDefault();
+            setKeeperDrawerOpen('session', false);
+            return;
+        }
+
         const keeperToolsToggle = event.target.closest('[data-keeper-tools-toggle]');
         if (keeperToolsToggle) {
             event.preventDefault();
@@ -249,7 +267,7 @@
         current.replaceWith(incoming);
         bootTabletop();
 
-        if (['tools', 'atlas', 'bestiary'].includes(keeperDrawerWasOpen)) {
+        if (['session', 'tools', 'atlas', 'bestiary'].includes(keeperDrawerWasOpen)) {
             setKeeperDrawerOpen(keeperDrawerWasOpen, true);
         }
     }

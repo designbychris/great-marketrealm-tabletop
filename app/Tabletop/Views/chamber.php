@@ -594,6 +594,18 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
     <?php endif; ?>
 
     <?php if (! is_array($entryDoor) && ! is_array($invitation) && ! is_array($campaignLobby)) : ?>
+    <?php if ($state !== null && $state->isDungeonMaster()) : ?>
+        <aside class="gmrt-session-drawer" data-keeper-session data-open="false" aria-label="The Keeper's Session Desk">
+            <div class="gmrt-session-drawer__panel" id="gmrt-keeper-session-panel">
+                <header class="gmrt-session-drawer__header">
+                    <div>
+                        <p class="gmrt-chamber__eyebrow">Keeper Workspace</p>
+                        <h2>The Session Desk</h2>
+                        <small>Gather, recap and close the book without taking height from the battlefield.</small>
+                    </div>
+                    <button type="button" data-keeper-session-close aria-label="Close the Session Desk">×</button>
+                </header>
+    <?php endif; ?>
     <header class="gmrt-chamber__masthead">
         <div>
             <p class="gmrt-chamber__eyebrow">
@@ -749,11 +761,23 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
 
         <?php endif; ?>
     </header>
+    <?php if ($state !== null && $state->isDungeonMaster()) : ?>
+            </div>
+        </aside>
+    <?php endif; ?>
     <?php endif; ?>
 
 
     <?php if ($state !== null && $state->isDungeonMaster()) : ?>
         <nav class="gmrt-keeper-rail" aria-label="Keeper workspaces">
+            <button
+                class="gmrt-keeper-rail__tab gmrt-keeper-rail__tab--session"
+                type="button"
+                data-keeper-session-toggle
+                aria-expanded="false"
+                aria-controls="gmrt-keeper-session-panel"
+                title="Session Desk"
+            ><span aria-hidden="true">▤</span><span>Session</span></button>
             <button
                 class="gmrt-keeper-rail__tab gmrt-keeper-rail__tab--tools"
                 type="button"

@@ -13,16 +13,19 @@ final class KeeperToolRailRegressionTest extends TestCase
         return (string) file_get_contents(dirname(__DIR__, 4) . '/' . $path);
     }
 
-    public function test_tools_atlas_and_bestiary_remain_three_separate_keeper_drawers(): void
+    public function test_session_tools_atlas_and_bestiary_remain_four_separate_keeper_drawers(): void
     {
         $view = $this->source('app/Tabletop/Views/chamber.php');
 
+        self::assertStringContainsString('data-keeper-session data-open="false"', $view);
         self::assertStringContainsString('data-keeper-tools data-open="false"', $view);
         self::assertStringContainsString('data-keepers-atlas data-open="false"', $view);
         self::assertStringContainsString('data-keepers-bestiary data-open="false"', $view);
+        self::assertStringContainsString('data-keeper-session-toggle', $view);
         self::assertStringContainsString('data-keeper-tools-toggle', $view);
         self::assertStringContainsString('data-atlas-toggle', $view);
         self::assertStringContainsString('data-bestiary-toggle', $view);
+        self::assertStringContainsString('aria-controls="gmrt-keeper-session-panel"', $view);
         self::assertStringContainsString('aria-controls="gmrt-keeper-tools-panel"', $view);
         self::assertStringContainsString('aria-controls="gmrt-keepers-atlas-panel"', $view);
         self::assertStringContainsString('aria-controls="gmrt-keepers-bestiary-panel"', $view);
@@ -58,6 +61,7 @@ final class KeeperToolRailRegressionTest extends TestCase
     {
         $js = $this->source('assets/js/tabletop.js');
 
+        self::assertStringContainsString("session: {", $js);
         self::assertStringContainsString("tools: {", $js);
         self::assertStringContainsString("atlas: {", $js);
         self::assertStringContainsString("bestiary: {", $js);
@@ -72,16 +76,17 @@ final class KeeperToolRailRegressionTest extends TestCase
         $js = $this->source('assets/js/tabletop.js');
 
         self::assertStringContainsString("const keeperDrawerWasOpen = current?.dataset.keeperDrawerOpen || '';", $js);
-        self::assertStringContainsString("['tools', 'atlas', 'bestiary'].includes(keeperDrawerWasOpen)", $js);
+        self::assertStringContainsString("['session', 'tools', 'atlas', 'bestiary'].includes(keeperDrawerWasOpen)", $js);
         self::assertStringContainsString('setKeeperDrawerOpen(keeperDrawerWasOpen, true);', $js);
     }
 
-    public function test_rail_presentation_has_one_compact_three_tab_rail_and_independent_drawers(): void
+    public function test_rail_presentation_has_one_compact_four_tab_rail_and_independent_drawers(): void
     {
         $view = $this->source('app/Tabletop/Views/chamber.php');
         $css = $this->source('assets/css/tabletop.css');
 
         self::assertStringContainsString('class="gmrt-keeper-rail"', $view);
+        self::assertStringContainsString('gmrt-keeper-rail__tab--session', $view);
         self::assertStringContainsString('gmrt-keeper-rail__tab--tools', $view);
         self::assertStringContainsString('gmrt-keeper-rail__tab--atlas', $view);
         self::assertStringContainsString('gmrt-keeper-rail__tab--bestiary', $view);
@@ -93,4 +98,36 @@ final class KeeperToolRailRegressionTest extends TestCase
         self::assertStringContainsString('.gmrt-keeper-tools-drawer[data-open="true"],', $css);
         self::assertStringContainsString('transform: translateX(100%);', $css);
     }
+    public function test_keeper_session_administration_lives_in_its_own_drawer(): void
+    {
+        $view = $this->source('app/Tabletop/Views/chamber.php');
+        $sessionDrawer = strpos($view, 'data-keeper-session data-open="false"');
+        $masthead = strpos($view, 'class="gmrt-chamber__masthead"');
+        $sessionControls = strpos($view, 'class="gmrt-table-session" data-table-session');
+        $recap = strpos($view, 'data-session-recap');
+        $rail = strpos($view, 'class="gmrt-keeper-rail"');
+
+        self::assertNotFalse($sessionDrawer);
+        self::assertNotFalse($masthead);
+        self::assertNotFalse($sessionControls);
+        self::assertNotFalse($recap);
+        self::assertNotFalse($rail);
+        self::assertGreaterThan($sessionDrawer, $masthead);
+        self::assertGreaterThan($sessionDrawer, $sessionControls);
+        self::assertGreaterThan($sessionDrawer, $recap);
+        self::assertGreaterThan($recap, $rail);
+    }
+
+    public function test_session_drawer_uses_the_same_keeper_workspace_lifecycle(): void
+    {
+        $js = $this->source('assets/js/tabletop.js');
+        $css = $this->source('assets/css/tabletop.css');
+
+        self::assertStringContainsString("setKeeperDrawerOpen('session'", $js);
+        self::assertStringContainsString('[data-keeper-session-close]', $js);
+        self::assertStringContainsString('[data-keeper-drawer-open="session"] .gmrt-keeper-rail', $css);
+        self::assertStringContainsString('.gmrt-session-drawer[data-open="true"]', $css);
+        self::assertStringContainsString('.gmrt-session-drawer .gmrt-chamber__masthead', $css);
+    }
+
 }
