@@ -19,6 +19,34 @@ define('GMRT_FILE', __FILE__);
 define('GMRT_PATH', plugin_dir_path(__FILE__));
 define('GMRT_URL', plugin_dir_url(__FILE__));
 
+
+/**
+ * Honour the same per-user interface-language preference used by Companion.
+ * This keeps locale personal to each participant at a shared Table rather than
+ * making language a campaign-wide setting.
+ */
+add_filter(
+    'determine_locale',
+    static function (string $locale): string {
+        if (! function_exists('get_current_user_id') || ! function_exists('get_user_meta')) {
+            return $locale;
+        }
+
+        $userId = get_current_user_id();
+        if ($userId < 1) {
+            return $locale;
+        }
+
+        $preferred = (string) get_user_meta($userId, 'gmrc_interface_locale', true);
+        if (in_array($preferred, ['en_GB', 'nl_NL'], true)) {
+            return $preferred;
+        }
+
+        return $locale;
+    },
+    1
+);
+
 /**
  * Load Tabletop interface translations from the bundled language-pack directory.
  *
