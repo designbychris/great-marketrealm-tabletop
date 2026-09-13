@@ -18,9 +18,9 @@ final class AtlasFindsTheDoorRegressionTest extends TestCase
         $view = $this->source('app/Tabletop/Views/chamber.php');
 
         self::assertStringContainsString('data-atlas-forge-entry', $view);
-        self::assertStringContainsString('<option value="none" selected>None</option>', $view);
-        self::assertStringContainsString('<option value="entrance">Main entrance</option>', $view);
-        self::assertStringContainsString('<option value="portal">Arrival portal</option>', $view);
+        self::assertStringContainsString('<option value="none" selected><?php esc_html_e(\'None\', \'great-marketrealm-tabletop\'); ?></option>', $view);
+        self::assertStringContainsString('<option value="entrance"><?php esc_html_e(\'Main entrance\', \'great-marketrealm-tabletop\'); ?></option>', $view);
+        self::assertStringContainsString('<option value="portal"><?php esc_html_e(\'Arrival portal\', \'great-marketrealm-tabletop\'); ?></option>', $view);
     }
 
     public function test_atlas_forge_reads_the_way_in_selection(): void

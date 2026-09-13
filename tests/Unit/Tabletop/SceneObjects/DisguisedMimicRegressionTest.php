@@ -15,8 +15,8 @@ final class DisguisedMimicRegressionTest extends TestCase
     public function test_keeper_can_choose_between_immediate_conversion_and_arming_a_disguise(): void
     {
         $view = $this->source('app/Tabletop/Views/chamber.php');
-        self::assertStringContainsString('data-mimic-confirm>Convert Now', $view);
-        self::assertStringContainsString('data-mimic-arm>Arm Disguise', $view);
+        self::assertStringContainsString("data-mimic-confirm><?php esc_html_e('Convert Now', 'great-marketrealm-tabletop'); ?>", $view);
+        self::assertStringContainsString("data-mimic-arm><?php esc_html_e('Arm Disguise', 'great-marketrealm-tabletop'); ?>", $view);
     }
 
     public function test_armed_mimic_remains_a_scene_object_with_persistent_bestiary_identity(): void

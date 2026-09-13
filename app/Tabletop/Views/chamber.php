@@ -914,7 +914,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
 
                 <!-- Legacy IV.30.2 UI contracts: Generate Dungeon · The Cartographer's Dungeon Forge -->
                 <details class="gmrt-atlas-forge" data-atlas-dungeon-forge>
-                    <summary><span aria-hidden="true">⚒</span> Generate Scene</summary>
+                    <summary><span aria-hidden="true">⚒</span> <?php esc_html_e('Generate Scene', 'great-marketrealm-tabletop'); ?></summary>
                     <div class="gmrt-atlas-forge__body">
                         <p>Pippin can create a complete playable Scene from nothing. No background image is required. Scene Type chooses the topology; Theme chooses its Great Marketrealm surface treatment. Grid, vision, Fog and Keeper lights remain Tabletop-native.</p>
 

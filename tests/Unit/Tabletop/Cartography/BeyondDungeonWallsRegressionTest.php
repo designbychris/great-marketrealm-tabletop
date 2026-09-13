@@ -20,9 +20,9 @@ final class BeyondDungeonWallsRegressionTest extends TestCase
 
         self::assertStringContainsString('data-atlas-forge-scene-type', $view);
         self::assertStringContainsString('data-dungeon-forge-scene-type', $view);
-        self::assertStringContainsString('<option value="dungeon" selected>Dungeon</option>', $view);
-        self::assertStringContainsString('<option value="forest">Forest</option>', $view);
-        self::assertStringContainsString('<option value="village">Village</option>', $view);
+        self::assertStringContainsString('<option value="dungeon" selected><?php esc_html_e(\'Dungeon\', \'great-marketrealm-tabletop\'); ?></option>', $view);
+        self::assertStringContainsString('<option value="forest"><?php esc_html_e(\'Forest\', \'great-marketrealm-tabletop\'); ?></option>', $view);
+        self::assertStringContainsString('<option value="village"><?php esc_html_e(\'Village\', \'great-marketrealm-tabletop\'); ?></option>', $view);
         self::assertStringContainsString('generateSceneForgePlan(sceneType, seed, style, theme', $js);
     }
 

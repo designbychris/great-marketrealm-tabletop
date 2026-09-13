@@ -17,9 +17,9 @@ final class EveryDungeonNeedsADoorRegressionTest extends TestCase
     {
         $view = $this->source('app/Tabletop/Views/chamber.php');
         self::assertStringContainsString('data-dungeon-forge-entry', $view);
-        self::assertStringContainsString('<option value="none" selected>None</option>', $view);
-        self::assertStringContainsString('<option value="entrance">Main entrance</option>', $view);
-        self::assertStringContainsString('<option value="portal">Arrival portal</option>', $view);
+        self::assertStringContainsString('<option value="none" selected><?php esc_html_e(\'None\', \'great-marketrealm-tabletop\'); ?></option>', $view);
+        self::assertStringContainsString('<option value="entrance"><?php esc_html_e(\'Main entrance\', \'great-marketrealm-tabletop\'); ?></option>', $view);
+        self::assertStringContainsString('<option value="portal"><?php esc_html_e(\'Arrival portal\', \'great-marketrealm-tabletop\'); ?></option>', $view);
     }
 
     public function test_dungeon_entrance_is_cut_into_an_exterior_boundary_not_painted_as_furniture(): void
