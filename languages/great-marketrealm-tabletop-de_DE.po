@@ -692,7 +692,7 @@ msgid "This permanently removes the campaign from the Table Atlas and closes its
 msgstr ""
 
 msgid "Tools"
-msgstr ""
+msgstr "Werkzeuge"
 
 msgid "Torch"
 msgstr "Fackel"
