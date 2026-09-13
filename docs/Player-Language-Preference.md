@@ -5,3 +5,6 @@ Tabletop does not maintain a second language preference. It honours the Companio
 Supported values in the first multilingual milestone are `en_GB` and `nl_NL`; an empty or unavailable value falls back to WordPress's normal site/default locale.
 
 This makes language personal to each participant rather than a Table or Campaign setting.
+
+
+- `de_DE` — German (Germany), tester-review pack.
