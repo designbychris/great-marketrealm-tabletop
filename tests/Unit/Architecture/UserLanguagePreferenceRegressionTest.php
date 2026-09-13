@@ -14,7 +14,7 @@ final class UserLanguagePreferenceRegressionTest extends TestCase
 
         self::assertIsString($plugin);
         self::assertStringContainsString("add_filter(\n    'determine_locale'", $plugin);
-        self::assertStringContainsString("get_user_meta($userId, 'gmrc_interface_locale', true)", $plugin);
+        self::assertStringContainsString("get_user_meta(\$userId, 'gmrc_interface_locale', true)", $plugin);
         self::assertStringContainsString("['en_GB', 'nl_NL']", $plugin);
         self::assertStringContainsString("load_plugin_textdomain(\n            'great-marketrealm-tabletop'", $plugin);
     }
