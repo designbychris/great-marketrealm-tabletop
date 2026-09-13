@@ -909,7 +909,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                         <span><input type="number" min="1" max="500" value="64" data-atlas-grid-size> px</span>
                     </label>
                     <button type="button" data-atlas-add-map><?php esc_html_e('Add Map to Atlas', 'great-marketrealm-tabletop'); ?></button>
-                    <small>The new map is added safely in the background. It does not become active until you open it.</small>
+                    <small><?php esc_html_e('The new map is added safely in the background. It does not become active until you open it.', 'great-marketrealm-tabletop'); ?></small>
                 </div>
 
                 <!-- Legacy IV.30.2 UI contracts: Generate Dungeon · The Cartographer's Dungeon Forge -->
@@ -919,13 +919,13 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                         <p>Pippin can create a complete playable Scene from nothing. No background image is required. Scene Type chooses the topology; Theme chooses its Great Marketrealm surface treatment. Grid, vision, Fog and Keeper lights remain Tabletop-native.</p>
 
                         <details class="gmrt-pippin-desk">
-                            <summary>Meet the Wandering Cartographer</summary>
+                            <summary><?php esc_html_e('Meet the Wandering Cartographer', 'great-marketrealm-tabletop'); ?></summary>
                             <div class="gmrt-pippin-desk__portrait">
                                 <img src="<?php echo esc_url(GMRT_URL . 'assets/images/pippin-peppercorn-cartographer.png'); ?>" alt="Pippin Peppercorn surveying a dungeon while a Milk Mimic lurks behind him." loading="lazy">
                             </div>
                             <div class="gmrt-pippin-desk__copy">
                                 <strong>Pippin Peppercorn</strong>
-                                <span>The Wandering Cartographer</span>
+                                <span><?php esc_html_e('The Wandering Cartographer', 'great-marketrealm-tabletop'); ?></span>
                                 <p>Surveyor of dungeons, forests, villages and anything else that stays still long enough to be measured. Pippin remains professionally suspicious of grass.</p>
                             </div>
                         </details>
@@ -933,7 +933,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                         <aside class="gmrt-pippin-note" data-pippin-field-note aria-label="Pippin's Field Note">
                             <img class="gmrt-pippin-note__portrait" src="<?php echo esc_url(GMRT_URL . 'assets/images/pippin-peppercorn-pixel.png'); ?>" alt="" aria-hidden="true">
                             <div class="gmrt-pippin-note__bubble">
-                                <span class="gmrt-pippin-note__label">Pippin's Field Note</span>
+                                <span class="gmrt-pippin-note__label"><?php esc_html_e("Pippin's Field Note", 'great-marketrealm-tabletop'); ?></span>
                                 <p data-pippin-field-note-copy>Same seed, Scene Type and scale means the same terrain. Change the Theme and I shall redecorate without moving the walls. Cartographical integrity!</p>
                             </div>
                         </aside>
@@ -946,9 +946,9 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                             <label>
                                 Environment
                                 <select data-atlas-forge-scene-type>
-                                    <option value="dungeon" selected>Dungeon</option>
-                                    <option value="forest">Forest</option>
-                                    <option value="village">Village</option>
+                                    <option value="dungeon" selected><?php esc_html_e('Dungeon', 'great-marketrealm-tabletop'); ?></option>
+                                    <option value="forest"><?php esc_html_e('Forest', 'great-marketrealm-tabletop'); ?></option>
+                                    <option value="village"><?php esc_html_e('Village', 'great-marketrealm-tabletop'); ?></option>
                                 </select>
                             </label>
                             <label>
@@ -958,17 +958,17 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                             <label>
                                 Scale
                                 <select data-atlas-forge-style>
-                                    <option value="compact">Compact</option>
-                                    <option value="standard" selected>Standard</option>
-                                    <option value="grand">Grand</option>
+                                    <option value="compact"><?php esc_html_e('Compact', 'great-marketrealm-tabletop'); ?></option>
+                                    <option value="standard" selected><?php esc_html_e('Standard', 'great-marketrealm-tabletop'); ?></option>
+                                    <option value="grand"><?php esc_html_e('Grand', 'great-marketrealm-tabletop'); ?></option>
                                 </select>
                             </label>
                             <label>
                                 Way in
                                 <select data-atlas-forge-entry>
-                                    <option value="none" selected>None</option>
-                                    <option value="entrance">Main entrance</option>
-                                    <option value="portal">Arrival portal</option>
+                                    <option value="none" selected><?php esc_html_e('None', 'great-marketrealm-tabletop'); ?></option>
+                                    <option value="entrance"><?php esc_html_e('Main entrance', 'great-marketrealm-tabletop'); ?></option>
+                                    <option value="portal"><?php esc_html_e('Arrival portal', 'great-marketrealm-tabletop'); ?></option>
                                 </select>
                             </label>
                             <label class="gmrt-forge-population">
@@ -986,14 +986,14 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                             </label>
                             <div class="gmrt-forge-lair-occupant" data-atlas-forge-lair-occupant-wrap hidden>
                                 <label>Something waiting in the lair
-                                    <select data-atlas-forge-lair-occupant><option value="">Leave the lair empty</option>
+                                    <select data-atlas-forge-lair-occupant><option value=""><?php esc_html_e('Leave the lair empty', 'great-marketrealm-tabletop'); ?></option>
                                         <?php foreach ($bestiary as $creature) : if (! is_array($creature) || empty($creature['id'])) continue; ?>
                                             <option value="<?php echo esc_attr((string) $creature['id']); ?>"><?php echo esc_html((string) ($creature['name'] ?? 'Unknown creature')); ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                 </label>
                                 <label><input type="checkbox" data-atlas-forge-lair-occupant-hidden checked> Keep occupant hidden from Players</label>
-                                <small>Deployed at the centre of the Boss Lair and provisioned for combat.</small>
+                                <small><?php esc_html_e('Deployed at the centre of the Boss Lair and provisioned for combat.', 'great-marketrealm-tabletop'); ?></small>
                             </div>
                             <label>
                                 Theme
@@ -1006,10 +1006,10 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                     <option value="mushroom-grotto">Mushroom Grotto</option>
                                 </select>
                             </label>
-                            <button type="button" data-atlas-forge-reroll>New Seed</button>
-                            <button type="button" data-atlas-forge-create>Forge New Scene</button>
+                            <button type="button" data-atlas-forge-reroll><?php esc_html_e('New Seed', 'great-marketrealm-tabletop'); ?></button>
+                            <button type="button" data-atlas-forge-create><?php esc_html_e('Forge New Scene', 'great-marketrealm-tabletop'); ?></button>
                         </div>
-                        <small data-atlas-forge-status role="status" aria-live="polite">The Forge will add a new Scene to the Atlas and open it Behind the Curtain for inspection.</small>
+                        <small data-atlas-forge-status role="status" aria-live="polite"><?php esc_html_e('The Forge will add a new Scene to the Atlas and open it Behind the Curtain for inspection.', 'great-marketrealm-tabletop'); ?></small>
                     </div>
                 </details>
             </div>
@@ -1026,7 +1026,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                 </header>
                 <div class="gmrt-bestiary__body">
                     <p class="gmrt-bestiary__introduction">Browse the Keeper’s Menagerie: Tabletop training creatures, published Companion creatures, and monsters from Almanacs shared with this linked Campaign. Summoned creatures become Scene-owned snapshots.</p>
-                    <label class="gmrt-bestiary__search">Search the shelves<input type="search" autocomplete="off" placeholder="Name, kind, attack, damage…" data-bestiary-search></label>
+                    <label class="gmrt-bestiary__search"><?php esc_html_e('Search the shelves', 'great-marketrealm-tabletop'); ?><input type="search" autocomplete="off" placeholder="Name, kind, attack, damage…" data-bestiary-search></label>
                     <div class="gmrt-bestiary__filters" role="group" aria-label="<?php echo esc_attr__('Filter Bestiary records by deployment', 'great-marketrealm-tabletop'); ?>">
                         <button type="button" data-bestiary-filter="all" aria-pressed="true">All <span data-bestiary-filter-count="all"><?php echo esc_html((string) count($bestiary)); ?></span></button>
                         <button type="button" data-bestiary-filter="on-map" aria-pressed="false">On This Map <span data-bestiary-filter-count="on-map">0</span></button>
@@ -1069,7 +1069,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                 <header><div class="gmrt-bestiary-card__sigil" aria-hidden="true">◆</div><div><strong><?php echo esc_html((string) ($creature['name'] ?? 'Unknown Creature')); ?></strong><small><?php echo esc_html((string) ($creature['size'] ?? 'Unknown')); ?> · <?php echo esc_html((string) ($creature['kind'] ?? 'creature')); ?></small><?php if ($expansionLabel !== '') : ?><span class="gmrt-bestiary-card__expansion-badge">ALMANAC · <?php echo esc_html($expansionLabel); ?></span><?php endif; ?></div><?php if ($deployedInstances !== []) : ?><span class="gmrt-bestiary-card__map-badge">ON MAP · ×<?php echo esc_html((string) count($deployedInstances)); ?></span><?php endif; ?></header>
                                 <dl class="gmrt-bestiary-card__measures"><div><dt>AC</dt><dd><?php echo esc_html((string) ($creature['armor_class'] ?? '—')); ?></dd></div><div><dt>HP</dt><dd><?php echo esc_html((string) ($creature['hit_points'] ?? '—')); ?></dd></div><div><dt>Speed</dt><dd><?php echo esc_html((string) ($creature['speed_feet'] ?? '—')); ?> ft</dd></div></dl>
                                 <details class="gmrt-bestiary-card__record">
-                                    <summary>Inspect creature record</summary>
+                                    <summary><?php esc_html_e('Inspect creature record', 'great-marketrealm-tabletop'); ?></summary>
                                     <?php if ($attacks !== []) : ?><section><h3>Actions</h3><ul><?php foreach ($attacks as $attack) : if (! is_array($attack)) continue; $damage = is_array($attack['damage'] ?? null) ? $attack['damage'] : []; ?><li><strong><?php echo esc_html((string) ($attack['name'] ?? 'Attack')); ?></strong><span>+<?php echo esc_html((string) ($attack['attack_modifier'] ?? 0)); ?> · <?php echo esc_html((string) ($attack['range_feet'] ?? 5)); ?><?php if ((int) ($attack['long_range_feet'] ?? 5) > (int) ($attack['range_feet'] ?? 5)) : ?>/<?php echo esc_html((string) ($attack['long_range_feet'] ?? 5)); ?><?php endif; ?> ft · <?php echo esc_html((string) ($damage['dice_count'] ?? 1)); ?>d<?php echo esc_html((string) ($damage['die_sides'] ?? 4)); ?><?php $mod = (int) ($damage['modifier'] ?? 0); if ($mod !== 0) echo esc_html(($mod > 0 ? '+' : '') . (string) $mod); ?> <?php echo esc_html((string) ($damage['type'] ?? 'damage')); ?></span></li><?php endforeach; ?></ul></section><?php endif; ?>
                                     <?php if ($referenceActions !== []) : ?><section><h3>Sourcebook Actions</h3><ul><?php foreach ($referenceActions as $referenceAction) : ?><li><?php echo esc_html((string) $referenceAction); ?></li><?php endforeach; ?></ul><p><small>Reference text only — Tabletop does not guess live attack mechanics from prose.</small></p></section><?php endif; ?>
                                     <?php if ($resistances !== [] || $immunities !== [] || $weaknesses !== []) : ?><section><h3>Defences</h3><?php if ($resistances !== []) : ?><p><strong>Resists:</strong> <?php echo esc_html(implode(', ', $resistances)); ?></p><?php endif; ?><?php if ($immunities !== []) : ?><p><strong>Immune:</strong> <?php echo esc_html(implode(', ', $immunities)); ?></p><?php endif; ?><?php if ($weaknesses !== []) : ?><p><strong>Weak:</strong> <?php echo esc_html(implode(', ', $weaknesses)); ?></p><?php endif; ?></section><?php endif; ?>
@@ -1078,7 +1078,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                 </details>
                                 <?php if ($deployedInstances !== []) : ?>
                                     <section class="gmrt-bestiary-card__instances" aria-label="Deployed instances">
-                                        <h3>At the Table</h3>
+                                        <h3><?php esc_html_e('At the Table', 'great-marketrealm-tabletop'); ?></h3>
                                         <?php foreach ($deployedInstances as $instance) :
                                             $instanceId = (string) ($instance['id'] ?? '');
                                             $instanceVitality = is_array($vitality[$instanceId] ?? null) ? $vitality[$instanceId] : [];
@@ -1091,7 +1091,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                                     <?php if ($instanceVitality !== []) : ?><small><span data-bestiary-instance-hp><?php echo esc_html((string) ($instanceVitality['current_hp'] ?? '—')); ?>/<?php echo esc_html((string) ($instanceVitality['maximum_hp'] ?? '—')); ?></span> HP</small><?php endif; ?>
                                                     <small data-bestiary-instance-conditions><?php echo esc_html($instanceConditions === [] ? 'No conditions' : implode(', ', array_map(static fn (array $condition): string => (string) ($condition['condition'] ?? $condition['type'] ?? ''), $instanceConditions))); ?></small>
                                                 </div>
-                                                <span class="gmrt-bestiary-instance__turn"<?php echo $instanceHasTurn ? '' : ' hidden'; ?> data-bestiary-turn-badge>ACTIVE TURN</span>
+                                                <span class="gmrt-bestiary-instance__turn"<?php echo $instanceHasTurn ? '' : ' hidden'; ?> data-bestiary-turn-badge><?php esc_html_e('ACTIVE TURN', 'great-marketrealm-tabletop'); ?></span>
                                                 <div data-bestiary-combat-mount></div>
                                             </div>
                                         <?php endforeach; ?>
@@ -1103,15 +1103,15 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                         <label class="gmrt-bestiary-card__hidden"><input type="checkbox" data-bestiary-hidden> Hidden from Players</label>
                                     </div>
                                     <div class="gmrt-bestiary-card__deployment-actions">
-                                        <button type="button" class="gmrt-bestiary-card__summon" data-bestiary-place>Place on Map</button>
-                                        <button type="button" class="gmrt-bestiary-card__summon" data-bestiary-threshold>Use Monster Threshold</button>
+                                        <button type="button" class="gmrt-bestiary-card__summon" data-bestiary-place><?php esc_html_e('Place on Map', 'great-marketrealm-tabletop'); ?></button>
+                                        <button type="button" class="gmrt-bestiary-card__summon" data-bestiary-threshold><?php esc_html_e('Use Monster Threshold', 'great-marketrealm-tabletop'); ?></button>
                                     </div>
                                     <small>Target: <?php echo esc_html((string) ($scene['name'] ?? 'Current Scene')); ?><?php echo $isPreparingScene ? ' · private preparation' : ' · live Scene'; ?></small>
                                 </div>
                             </article>
                         <?php endforeach; ?>
                     </div>
-                    <p class="gmrt-bestiary__empty" data-bestiary-empty hidden>No creature records match the current search and map filter.</p>
+                    <p class="gmrt-bestiary__empty" data-bestiary-empty hidden><?php esc_html_e('No creature records match the current search and map filter.', 'great-marketrealm-tabletop'); ?></p>
                 </div>
             </div>
         </aside>
@@ -1119,8 +1119,8 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
 
     <?php if ($state !== null && $state->isDungeonMaster() && $isPreparingScene && $scene !== null) : ?>
         <section class="gmrt-preparation-banner" data-preparation-banner>
-            <div><p class="gmrt-chamber__eyebrow">Behind the Curtain</p><strong>Preparing <?php echo esc_html((string) ($scene['name'] ?? 'Scene')); ?></strong><span>Players remain on the live Scene. Cartography changes here are bound only to this prepared map.</span></div>
-            <button type="button" data-exit-preparation>Return to Live Scene</button>
+            <div><p class="gmrt-chamber__eyebrow"><?php esc_html_e('Behind the Curtain', 'great-marketrealm-tabletop'); ?></p><strong>Preparing <?php echo esc_html((string) ($scene['name'] ?? 'Scene')); ?></strong><span>Players remain on the live Scene. Cartography changes here are bound only to this prepared map.</span></div>
+            <button type="button" data-exit-preparation><?php esc_html_e('Return to Live Scene', 'great-marketrealm-tabletop'); ?></button>
         </section>
     <?php endif; ?>
 
@@ -1135,7 +1135,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                     <span>Attack</span>
                     <select data-arsenal-attack<?php echo $currentArsenal === [] ? ' disabled' : ''; ?>>
                         <?php if ($currentArsenal === []) : ?>
-                            <option value="">No attack readied</option>
+                            <option value=""><?php esc_html_e('No attack readied', 'great-marketrealm-tabletop'); ?></option>
                         <?php else : ?>
                             <?php foreach ($currentArsenal as $arsenalAttack) :
                                 $combat = $arsenalAttack['combat'] ?? [];
@@ -1156,9 +1156,9 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                     </select>
                 </label>
                 <label class="gmrt-deeds__target">
-                    <span>Target</span>
+                    <span><?php esc_html_e('Target', 'great-marketrealm-tabletop'); ?></span>
                     <select data-attack-target>
-                        <option value="">Choose target…</option>
+                        <option value=""><?php esc_html_e('Choose target…', 'great-marketrealm-tabletop'); ?></option>
                         <?php foreach ($tokens as $targetToken) :
                             if ((string) ($targetToken['id'] ?? '') === $currentTokenId) continue;
                         ?>
@@ -1174,8 +1174,8 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                         <button type="button" class="gmrt-deed" data-battle-deed="<?php echo esc_attr($deedKey); ?>"><?php echo esc_html($deedLabel); ?></button>
                     <?php endforeach; ?>
                 </div>
-                <span class="gmrt-target-range" data-target-range-status role="status" aria-live="polite" aria-label="Target status">NO TARGET SELECTED</span>
-                <small class="gmrt-combat-dock__hint">Choose a visible battlefield target for attacks. Range and legality are reported in Turn of Battle.</small>
+                <span class="gmrt-target-range" data-target-range-status role="status" aria-live="polite" aria-label="<?php echo esc_attr__('Target status', 'great-marketrealm-tabletop'); ?>"><?php esc_html_e('NO TARGET SELECTED', 'great-marketrealm-tabletop'); ?></span>
+                <small class="gmrt-combat-dock__hint"><?php esc_html_e('Choose a visible battlefield target for attacks. Range and legality are reported in Turn of Battle.', 'great-marketrealm-tabletop'); ?></small>
             </div>
 
     <div data-live-lifecycle>
@@ -1187,16 +1187,15 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
         >
             <div>
                 <p class="gmrt-chamber__eyebrow">Peace upon the path</p>
-                <h2 id="gmrt-exploration-title">Exploration Mode</h2>
+                <h2 id="gmrt-exploration-title"><?php esc_html_e('Exploration Mode', 'great-marketrealm-tabletop'); ?></h2>
                 <p class="gmrt-exploration-strip__copy">
-                    Move through the Scene freely. The Living Veil, doors, walls
-                    and remembered route remain active without rounds or turns.
+                    <?php esc_html_e('Move through the Scene freely. The Living Veil, doors, walls and remembered route remain active without rounds or turns.', 'great-marketrealm-tabletop'); ?>
                 </p>
             </div>
 
             <?php if ($state->isDungeonMaster() && $scene !== null && $tokens !== []) : ?>
                 <details class="gmrt-start-encounter" data-start-encounter-panel>
-                    <summary>Start Encounter ⚔</summary>
+                    <summary><?php esc_html_e('Start Encounter', 'great-marketrealm-tabletop'); ?> ⚔</summary>
                     <div class="gmrt-start-encounter__body">
                         <label>
                             Encounter name
@@ -1207,7 +1206,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                             >
                         </label>
                         <fieldset>
-                            <legend>Combatants &amp; initiative</legend>
+                            <legend><?php esc_html_e('Combatants & initiative', 'great-marketrealm-tabletop'); ?></legend>
                             <?php foreach ($tokens as $token) : ?>
                                 <?php $tokenId = (string) ($token['id'] ?? ''); ?>
                                 <?php if ($tokenId === '') { continue; } ?>
@@ -1348,12 +1347,12 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                         is_array($currentDeathSaves)
                         && ! empty($currentDeathSaves['dead'])
                     ) : ?>
-                        <span>Death confirmed</span>
+                        <span><?php esc_html_e('Death confirmed', 'great-marketrealm-tabletop'); ?></span>
                     <?php elseif (
                         is_array($currentDeathSaves)
                         && ! empty($currentDeathSaves['stable'])
                     ) : ?>
-                        <span>Stable</span>
+                        <span><?php esc_html_e('Stable', 'great-marketrealm-tabletop'); ?></span>
                     <?php else : ?>
                         <span>
                             Saves <?php echo esc_html(
@@ -1371,8 +1370,8 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
             <?php endif; ?>
 
             <div class="gmrt-combat-guidance" data-combat-guidance>
-                <span class="gmrt-combat-turn-badge" data-combat-turn-badge hidden>YOUR TURN</span>
-                <span>Battle actions live with the combatant.</span>
+                <span class="gmrt-combat-turn-badge" data-combat-turn-badge hidden><?php esc_html_e('YOUR TURN', 'great-marketrealm-tabletop'); ?></span>
+                <span><?php esc_html_e('Battle actions live with the combatant.', 'great-marketrealm-tabletop'); ?></span>
                 <strong data-combat-guidance-copy>
                     <?php echo $state !== null && $state->isDungeonMaster()
                         ? 'Use the Keeper\'s Bestiary for creature actions; End Turn remains here.'
@@ -1385,9 +1384,9 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
 
             <?php if ($state !== null && $state->isDungeonMaster()) : ?>
                 <div class="gmrt-afflictions" data-affliction-controls>
-                    <strong>Afflictions</strong>
+                    <strong><?php esc_html_e('Afflictions', 'great-marketrealm-tabletop'); ?></strong>
                     <select data-condition-target aria-label="Condition target">
-                        <option value="">Choose combatant…</option>
+                        <option value=""><?php esc_html_e('Choose combatant…', 'great-marketrealm-tabletop'); ?></option>
                         <?php foreach ($tokens as $conditionToken) : ?>
                             <option value="<?php echo esc_attr(
                                 (string) ($conditionToken['id'] ?? '')
@@ -1410,7 +1409,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                         <?php endforeach; ?>
                     </select>
                     <label>
-                        <span class="screen-reader-text">Duration in turns</span>
+                        <span class="screen-reader-text"><?php esc_html_e('Duration in turns', 'great-marketrealm-tabletop'); ?></span>
                         <input
                             type="number"
                             min="0"
@@ -1436,7 +1435,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                 hidden
             >
                 <div class="gmrt-diceworks__heading">
-                    <span>Guild Diceworks</span>
+                    <span><?php esc_html_e('Guild Diceworks', 'great-marketrealm-tabletop'); ?></span>
                     <strong data-diceworks-mode>D20</strong>
                 </div>
                 <div class="gmrt-diceworks__tray" aria-hidden="true">
@@ -1491,7 +1490,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
             </div>
             <div class="gmrt-table-door__panel">
                 <p class="gmrt-chamber__eyebrow">Great Marketrealm Tabletop</p>
-                <h1 id="gmrt-table-door-title">Beyond This Door, the Table Awaits</h1>
+                <h1 id="gmrt-table-door-title"><?php esc_html_e('Beyond This Door, the Table Awaits', 'great-marketrealm-tabletop'); ?></h1>
                 <p class="gmrt-table-door__lede">
                     Sign in with your Great Marketrealm Companion account. The Tabletop uses the same account and the same trusted WordPress session beneath the Door.
                 </p>
@@ -1504,7 +1503,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                     <input type="hidden" name="gmrt_tabletop_login" value="1">
                     <input type="hidden" name="gmrt_tabletop_login_nonce" value="<?php echo esc_attr((string) ($entryDoor['nonce'] ?? '')); ?>">
                     <label>
-                        <span>Username or email</span>
+                        <span><?php esc_html_e('Username or email', 'great-marketrealm-tabletop'); ?></span>
                         <input type="text" name="log" autocomplete="username" required autofocus>
                     </label>
                     <label>
@@ -1686,7 +1685,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                     </form>
                 <?php endif; ?>
 
-                <?php if (! empty($canPrepareTestTable)) : ?><details class="gmrt-testing-grounds"><summary>Development tools</summary><button type="button" class="gmrt-test-table-button" data-prepare-test-table>Prepare Test Table</button><small class="gmrt-test-table-note">Creates Sage's Combat Testing Grounds for regression and screen testing.</small></details><?php endif; ?>
+                <?php if (! empty($canPrepareTestTable)) : ?><details class="gmrt-testing-grounds"><summary><?php esc_html_e('Development tools', 'great-marketrealm-tabletop'); ?></summary><button type="button" class="gmrt-test-table-button" data-prepare-test-table><?php esc_html_e('Prepare Test Table', 'great-marketrealm-tabletop'); ?></button><small class="gmrt-test-table-note">Creates Sage's Combat Testing Grounds for regression and screen testing.</small></details><?php endif; ?>
             </div>
         </section>
     <?php elseif ($message !== null) : ?>
@@ -2079,7 +2078,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                     </div>
 
                     <div class="gmrt-vision-controls" data-vision-controls>
-                        <strong>Sight Beyond the Door</strong>
+                        <strong><?php esc_html_e('Sight Beyond the Door', 'great-marketrealm-tabletop'); ?></strong>
                         <span>Teach the Veil where sight must stop.</span>
                         <button type="button" data-vision-tool="wall">Draw Wall</button>
                         <button type="button" data-vision-tool="door">Place Door</button>
@@ -2089,7 +2088,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                         <div class="gmrt-vision-roster" data-vision-roster></div>
 
                         <details class="gmrt-cartography-assistant" data-cartography-assistant>
-                            <summary>Keeper's Cartography Assistant</summary>
+                            <summary><?php esc_html_e("Keeper's Cartography Assistant", 'great-marketrealm-tabletop'); ?></summary>
                             <div class="gmrt-cartography-assistant__body">
                                 <p>
                                     Let the Assistant inspect this Scene's artwork against the calibrated square grid.
@@ -2127,9 +2126,9 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                     <label>
                                         Environment
                                         <select data-dungeon-forge-scene-type>
-                                            <option value="dungeon" selected>Dungeon</option>
-                                            <option value="forest">Forest</option>
-                                            <option value="village">Village</option>
+                                            <option value="dungeon" selected><?php esc_html_e('Dungeon', 'great-marketrealm-tabletop'); ?></option>
+                                            <option value="forest"><?php esc_html_e('Forest', 'great-marketrealm-tabletop'); ?></option>
+                                            <option value="village"><?php esc_html_e('Village', 'great-marketrealm-tabletop'); ?></option>
                                         </select>
                                     </label>
                                     <label>
@@ -2139,17 +2138,17 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                     <label>
                                         Scale
                                         <select data-dungeon-forge-style>
-                                            <option value="compact">Compact</option>
-                                            <option value="standard" selected>Standard</option>
-                                            <option value="grand">Grand</option>
+                                            <option value="compact"><?php esc_html_e('Compact', 'great-marketrealm-tabletop'); ?></option>
+                                            <option value="standard" selected><?php esc_html_e('Standard', 'great-marketrealm-tabletop'); ?></option>
+                                            <option value="grand"><?php esc_html_e('Grand', 'great-marketrealm-tabletop'); ?></option>
                                         </select>
                                     </label>
                                     <label>
                                         Way in
                                         <select data-dungeon-forge-entry>
-                                            <option value="none" selected>None</option>
-                                            <option value="entrance">Main entrance</option>
-                                            <option value="portal">Arrival portal</option>
+                                            <option value="none" selected><?php esc_html_e('None', 'great-marketrealm-tabletop'); ?></option>
+                                            <option value="entrance"><?php esc_html_e('Main entrance', 'great-marketrealm-tabletop'); ?></option>
+                                            <option value="portal"><?php esc_html_e('Arrival portal', 'great-marketrealm-tabletop'); ?></option>
                                         </select>
                                     </label>
                                     <label class="gmrt-forge-population">
@@ -2167,14 +2166,14 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                     </label>
                                     <div class="gmrt-forge-lair-occupant" data-dungeon-forge-lair-occupant-wrap hidden>
                                         <label>Something waiting in the lair
-                                            <select data-dungeon-forge-lair-occupant><option value="">Leave the lair empty</option>
+                                            <select data-dungeon-forge-lair-occupant><option value=""><?php esc_html_e('Leave the lair empty', 'great-marketrealm-tabletop'); ?></option>
                                                 <?php foreach ($bestiary as $creature) : if (! is_array($creature) || empty($creature['id'])) continue; ?>
                                                     <option value="<?php echo esc_attr((string) $creature['id']); ?>"><?php echo esc_html((string) ($creature['name'] ?? 'Unknown creature')); ?></option>
                                                 <?php endforeach; ?>
                                             </select>
                                         </label>
                                         <label><input type="checkbox" data-dungeon-forge-lair-occupant-hidden checked> Keep occupant hidden from Players</label>
-                                        <small>Deployed at the centre of the Boss Lair and provisioned for combat.</small>
+                                        <small><?php esc_html_e('Deployed at the centre of the Boss Lair and provisioned for combat.', 'great-marketrealm-tabletop'); ?></small>
                                     </div>
                                     <label>
                                         Theme
@@ -2188,7 +2187,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                         </select>
                                     </label>
                                     <button type="button" data-dungeon-forge-generate>Forge Draft</button>
-                                    <button type="button" data-dungeon-forge-reroll>New Seed</button>
+                                    <button type="button" data-dungeon-forge-reroll><?php esc_html_e('New Seed', 'great-marketrealm-tabletop'); ?></button>
                                     <button type="button" data-dungeon-forge-build disabled>Build Scene</button>
                                     <button type="button" data-dungeon-forge-clear disabled>Clear Draft</button>
                                 </div>
@@ -2210,7 +2209,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
 
                 <?php if (($scene['grid_type'] ?? '') === 'square') : ?>
                     <details class="gmrt-grid-calibrator" data-grid-calibrator>
-                        <summary>Calibrate Grid</summary>
+                        <summary><?php esc_html_e('Calibrate Grid', 'great-marketrealm-tabletop'); ?></summary>
                         <div class="gmrt-grid-calibrator__controls">
                             <label>
                                 Square
@@ -2275,7 +2274,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                         </header>
                         <label class="gmrt-furniture-snap">
                             <input type="checkbox" data-furniture-snap>
-                            <span>Snap to Grid</span>
+                            <span><?php esc_html_e('Snap to Grid', 'great-marketrealm-tabletop'); ?></span>
                             <small>Off by default for precise free placement. Turn on when the calibrated grid is useful.</small>
                         </label>
                         <div class="gmrt-furniture-palette__choices" role="group" aria-label="Furniture to place">
@@ -2297,23 +2296,23 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                     <span><?php echo esc_html((string) $furnitureDefinition['label']); ?></span>
                                 </button>
                             <?php endforeach; ?>
-                            <button type="button" class="gmrt-furniture-palette__cancel" data-furniture-cancel disabled>Cancel placement</button>
+                            <button type="button" class="gmrt-furniture-palette__cancel" data-furniture-cancel disabled><?php esc_html_e('Cancel placement', 'great-marketrealm-tabletop'); ?></button>
                         </div>
                         <div class="gmrt-furniture-editor" data-furniture-editor aria-label="Selected furniture controls">
-                            <strong data-furniture-selection>No furniture selected</strong>
+                            <strong data-furniture-selection><?php esc_html_e('No furniture selected', 'great-marketrealm-tabletop'); ?></strong>
                             <span>Drag selected furniture on the map, or use the controls below.</span>
                             <div class="gmrt-furniture-editor__tools">
                                 <button type="button" data-scene-object-rotate="-15" disabled>↶ Rotate</button>
                                 <button type="button" data-scene-object-rotate="15" disabled>Rotate ↷</button>
                                 <button type="button" data-scene-object-scale="-0.25" disabled>− Smaller</button>
                                 <button type="button" data-scene-object-scale="0.25" disabled>+ Larger</button>
-                                <button type="button" data-scene-object-duplicate disabled>Duplicate</button>
-                                <button type="button" data-scene-object-interact disabled>Interact</button>
+                                <button type="button" data-scene-object-duplicate disabled><?php esc_html_e('Duplicate', 'great-marketrealm-tabletop'); ?></button>
+                                <button type="button" data-scene-object-interact disabled><?php esc_html_e('Interact', 'great-marketrealm-tabletop'); ?></button>
                                 <button type="button" data-scene-object-mimic disabled>⚠ Convert to Mimic</button>
                                 <button type="button" data-scene-object-arm-mimic disabled>Arm as Disguised Mimic</button>
                                 <button type="button" data-scene-object-reveal-mimic disabled>Reveal Mimic</button>
                                 <button type="button" data-scene-object-disarm-mimic disabled>Disarm Mimic</button>
-                                <button type="button" class="gmrt-furniture-editor__delete" data-scene-object-remove disabled>Delete</button>
+                                <button type="button" class="gmrt-furniture-editor__delete" data-scene-object-remove disabled><?php esc_html_e('Delete', 'great-marketrealm-tabletop'); ?></button>
                             </div>
                         </div>
                         <dialog class="gmrt-mimic-dialog" data-mimic-dialog>
@@ -2335,9 +2334,9 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                 </label>
                                 <p><strong>Pippin’s advice:</strong><br><strong>“Don’t.”</strong></p>
                                 <div class="gmrt-mimic-dialog__actions">
-                                    <button type="button" data-mimic-confirm>Convert Now</button>
-                                    <button type="button" data-mimic-arm>Arm Disguise</button>
-                                    <button type="button" data-mimic-cancel>Cancel</button>
+                                    <button type="button" data-mimic-confirm><?php esc_html_e('Convert Now', 'great-marketrealm-tabletop'); ?></button>
+                                    <button type="button" data-mimic-arm><?php esc_html_e('Arm Disguise', 'great-marketrealm-tabletop'); ?></button>
+                                    <button type="button" data-mimic-cancel><?php esc_html_e('Cancel', 'great-marketrealm-tabletop'); ?></button>
                                 </div>
                             </form>
                         </dialog>
@@ -2801,14 +2800,14 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                 aria-labelledby="gmrt-party-title"
             >
                 <p class="gmrt-chamber__eyebrow">
-                    The Gathering
+                    <?php esc_html_e('The Gathering', 'great-marketrealm-tabletop'); ?>
                 </p>
                 <h2 id="gmrt-party-title">
-                    Adventurers at the Table
+                    <?php esc_html_e('Adventurers at the Table', 'great-marketrealm-tabletop'); ?>
                 </h2>
 
                 <div class="gmrt-fellowship-colour" data-fellowship-colour-picker>
-                    <span>Your Fellowship Ribbon</span>
+                    <span><?php esc_html_e('Your Fellowship Ribbon', 'great-marketrealm-tabletop'); ?></span>
                     <div class="gmrt-fellowship-colour__swatches" role="group" aria-label="Choose your Great Marketrealm Table colour">
                     <?php foreach (TableColourPalette::all() as $colourKey => $colour) : ?>
                         <button type="button" data-table-colour="<?php echo esc_attr($colourKey); ?>" style="--gmrt-swatch: <?php echo esc_attr($colour['hex']); ?>" aria-pressed="<?php echo $viewerColour === $colourKey ? 'true' : 'false'; ?>" title="<?php echo esc_attr($colour['label']); ?>"><span class="screen-reader-text"><?php echo esc_html($colour['label']); ?></span></button>
@@ -3034,7 +3033,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
 
                 <?php if ($state->isDungeonMaster()) : ?>
                     <div class="gmrt-gathering-controls">
-                        <strong>The Summons to the Table</strong>
+                        <strong><?php esc_html_e('The Summons to the Table', 'great-marketrealm-tabletop'); ?></strong>
                         <p>Invite an existing WordPress user by username, email, or user ID. Their seat is reserved immediately and WordPress will also attempt to email a direct Table link.</p>
                         <form data-gathering-invite-form>
                             <label>

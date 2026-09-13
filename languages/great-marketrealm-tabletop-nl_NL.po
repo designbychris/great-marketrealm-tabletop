@@ -756,3 +756,232 @@ msgstr "tijdelijk"
 
 msgid "◆ proficient · ◆◆ expertise. Weapons and spells are projected from the Companion; the Tabletop does not duplicate their mechanics."
 msgstr "◆ vaardig · ◆◆ expertise. Wapens en spreuken worden vanuit de Companion geprojecteerd; de Tabletop dupliceert hun spelregels niet."
+
+msgid "Start Encounter"
+msgstr "Start ontmoeting"
+
+msgid "Move through the Scene freely. The Living Veil, doors, walls and remembered route remain active without rounds or turns."
+msgstr "Beweeg vrij door de scène. De Levende Sluier, deuren, muren en herinnerde route blijven actief zonder rondes of beurten."
+
+msgid "Adventurers at the Table"
+msgstr "Avonturiers aan de Tafel"
+
+msgid "Your Fellowship Ribbon"
+msgstr "Jouw Fellowship-lint"
+
+msgid "The Summons to the Table"
+msgstr "De oproep naar de Tafel"
+
+msgid "The new map is added safely in the background. It does not become active until you open it."
+msgstr "De nieuwe kaart wordt veilig op de achtergrond toegevoegd. Hij wordt pas actief wanneer je hem opent."
+
+msgid "Generate Scene"
+msgstr "Scène genereren"
+
+msgid "Meet the Wandering Cartographer"
+msgstr "Ontmoet de Zwervende Cartograaf"
+
+msgid "The Wandering Cartographer"
+msgstr "De Zwervende Cartograaf"
+
+msgid "Pippin's Field Note"
+msgstr "Pippins veldnotitie"
+
+msgid "Dungeon"
+msgstr "Kerker"
+
+msgid "Forest"
+msgstr "Bos"
+
+msgid "Village"
+msgstr "Dorp"
+
+msgid "Compact"
+msgstr "Compact"
+
+msgid "Standard"
+msgstr "Standaard"
+
+msgid "Grand"
+msgstr "Groots"
+
+msgid "None"
+msgstr "Geen"
+
+msgid "Main entrance"
+msgstr "Hoofdingang"
+
+msgid "Arrival portal"
+msgstr "Aankomstportaal"
+
+msgid "Populate ordinary rooms"
+msgstr "Vul gewone kamers"
+
+msgid "Include secrets"
+msgstr "Geheimen opnemen"
+
+msgid "Include traps"
+msgstr "Vallen opnemen"
+
+msgid "Include treasure"
+msgstr "Schatten opnemen"
+
+msgid "Tell a story"
+msgstr "Vertel een verhaal"
+
+msgid "Include Boss Lair"
+msgstr "Baaslair opnemen"
+
+msgid "Leave the lair empty"
+msgstr "Laat het lair leeg"
+
+msgid "Keep occupant hidden from Players"
+msgstr "Houd de bewoner verborgen voor spelers"
+
+msgid "Deployed at the centre of the Boss Lair and provisioned for combat."
+msgstr "Geplaatst in het midden van het Baaslair en klaargezet voor gevecht."
+
+msgid "New Seed"
+msgstr "Nieuwe seed"
+
+msgid "Forge New Scene"
+msgstr "Nieuwe scène smeden"
+
+msgid "The Forge will add a new Scene to the Atlas and open it Behind the Curtain for inspection."
+msgstr "De Smederij voegt een nieuwe scène toe aan de Atlas en opent die Achter het Gordijn voor inspectie."
+
+msgid "Search the shelves"
+msgstr "Doorzoek de planken"
+
+msgid "All"
+msgstr "Alles"
+
+msgid "On This Map"
+msgstr "Op deze kaart"
+
+msgid "Not On This Map"
+msgstr "Niet op deze kaart"
+
+msgid "Inspect creature record"
+msgstr "Wezendossier bekijken"
+
+msgid "At the Table"
+msgstr "Aan de Tafel"
+
+msgid "ACTIVE TURN"
+msgstr "ACTIEVE BEURT"
+
+msgid "Copies"
+msgstr "Exemplaren"
+
+msgid "Hidden from Players"
+msgstr "Verborgen voor spelers"
+
+msgid "Place on Map"
+msgstr "Op kaart plaatsen"
+
+msgid "Use Monster Threshold"
+msgstr "Monsterdrempel gebruiken"
+
+msgid "No creature records match the current search and map filter."
+msgstr "Geen wezendossiers komen overeen met de huidige zoekopdracht en kaartfilter."
+
+msgid "Behind the Curtain"
+msgstr "Achter het Gordijn"
+
+msgid "Return to Live Scene"
+msgstr "Terug naar live scène"
+
+msgid "No attack readied"
+msgstr "Geen aanval gereed"
+
+msgid "Combatants & initiative"
+msgstr "Strijders en initiatief"
+
+msgid "Death confirmed"
+msgstr "Overlijden bevestigd"
+
+msgid "Stable"
+msgstr "Stabiel"
+
+msgid "Battle actions live with the combatant."
+msgstr "Gevechtsacties horen bij de strijder."
+
+msgid "Afflictions"
+msgstr "Aandoeningen"
+
+msgid "Choose combatant…"
+msgstr "Kies strijder…"
+
+msgid "Duration in turns"
+msgstr "Duur in beurten"
+
+msgid "Guild Diceworks"
+msgstr "Gilde Dobbelwerk"
+
+msgid "Awaiting result"
+msgstr "Wacht op resultaat"
+
+msgid "Roll Damage"
+msgstr "Rol schade"
+
+msgid "Awaiting the roll…"
+msgstr "Wacht op de worp…"
+
+msgid "Beyond This Door, the Table Awaits"
+msgstr "Achter deze deur wacht de Tafel"
+
+msgid "Username or email"
+msgstr "Gebruikersnaam of e-mail"
+
+msgid "Manage Players"
+msgstr "Spelers beheren"
+
+msgid "Development tools"
+msgstr "Ontwikkeltools"
+
+msgid "Sight Beyond the Door"
+msgstr "Zicht voorbij de deur"
+
+msgid "Keeper's Cartography Assistant"
+msgstr "Cartografie-assistent van de Keeper"
+
+msgid "Calibrate Grid"
+msgstr "Raster kalibreren"
+
+msgid "Snap to Grid"
+msgstr "Aan raster uitlijnen"
+
+msgid "Cancel placement"
+msgstr "Plaatsing annuleren"
+
+msgid "Duplicate"
+msgstr "Dupliceren"
+
+msgid "Delete"
+msgstr "Verwijderen"
+
+msgid "Convert Now"
+msgstr "Nu omzetten"
+
+msgid "Arm Disguise"
+msgstr "Vermomming activeren"
+
+msgid "Cancel"
+msgstr "Annuleren"
+
+msgid "Target"
+msgstr "Doel"
+
+msgid "Choose target…"
+msgstr "Kies doel…"
+
+msgid "Target status"
+msgstr "Doelstatus"
+
+msgid "NO TARGET SELECTED"
+msgstr "GEEN DOEL GESELECTEERD"
+
+msgid "Choose a visible battlefield target for attacks. Range and legality are reported in Turn of Battle."
+msgstr "Kies een zichtbaar doelwit op het slagveld voor aanvallen. Bereik en geldigheid worden gemeld in de Gevechtsbeurt."
+
