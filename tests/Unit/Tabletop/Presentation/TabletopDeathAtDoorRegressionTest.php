@@ -28,7 +28,7 @@ final class TabletopDeathAtDoorRegressionTest extends TestCase
         );
     
         self::assertStringContainsString(
-            "<span><?php esc_html_e(\'Stable\', \'great-marketrealm-tabletop\'); ?></span>",
+            "<span><?php esc_html_e('Stable', 'great-marketrealm-tabletop'); ?></span>",
             $view
         );
     
