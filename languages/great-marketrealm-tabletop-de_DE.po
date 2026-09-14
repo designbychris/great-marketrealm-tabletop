@@ -876,3 +876,219 @@ msgstr "DU BIST DRAN"
 
 msgid "◆ proficient · ◆◆ expertise. Weapons and spells are projected from the Companion; the Tabletop does not duplicate their mechanics."
 msgstr "◆ geübt · ◆◆ Expertise. Waffen und Zauber werden aus dem Companion projiziert; Tabletop dupliziert ihre Mechaniken nicht."
+
+msgid "ACTIVE TURN"
+msgstr "AKTIVER ZUG"
+
+msgid "Adventurers at the Table"
+msgstr "Abenteurer am Tisch"
+
+msgid "Afflictions"
+msgstr "Beeinträchtigungen"
+
+msgid "All"
+msgstr "Alle"
+
+msgid "Arm Disguise"
+msgstr "Tarnung aktivieren"
+
+msgid "Arrival portal"
+msgstr "Ankunftsportal"
+
+msgid "At the Table"
+msgstr "Am Tisch"
+
+msgid "Battle actions live with the combatant."
+msgstr "Kampfaktionen gehören zum Kämpfer."
+
+msgid "Behind the Curtain"
+msgstr "Hinter dem Vorhang"
+
+msgid "Beyond This Door, the Table Awaits"
+msgstr "Hinter dieser Tür wartet der Spieltisch"
+
+msgid "Calibrate Grid"
+msgstr "Raster kalibrieren"
+
+msgid "Cancel"
+msgstr "Abbrechen"
+
+msgid "Cancel placement"
+msgstr "Platzierung abbrechen"
+
+msgid "Choose a visible battlefield target for attacks. Range and legality are reported in Turn of Battle."
+msgstr "Wähle ein sichtbares Ziel auf dem Schlachtfeld. Reichweite und Zulässigkeit werden im Kampfzug angezeigt."
+
+msgid "Choose combatant…"
+msgstr "Kämpfer wählen…"
+
+msgid "Choose target…"
+msgstr "Ziel wählen…"
+
+msgid "Combatants & initiative"
+msgstr "Kämpfer & Initiative"
+
+msgid "Compact"
+msgstr "Kompakt"
+
+msgid "Convert Now"
+msgstr "Jetzt verwandeln"
+
+msgid "Copies"
+msgstr "Kopien"
+
+msgid "Death confirmed"
+msgstr "Tod bestätigt"
+
+msgid "Delete"
+msgstr "Löschen"
+
+msgid "Deployed at the centre of the Boss Lair and provisioned for combat."
+msgstr "Im Zentrum des Bossverstecks eingesetzt und für den Kampf ausgerüstet."
+
+msgid "Development tools"
+msgstr "Entwicklungswerkzeuge"
+
+msgid "Dungeon"
+msgstr "Dungeon"
+
+msgid "Duplicate"
+msgstr "Duplizieren"
+
+msgid "Duration in turns"
+msgstr "Dauer in Zügen"
+
+msgid "Forest"
+msgstr "Wald"
+
+msgid "Forge New Scene"
+msgstr "Neue Szene schmieden"
+
+msgid "Generate Scene"
+msgstr "Szene erzeugen"
+
+msgid "Grand"
+msgstr "Groß"
+
+msgid "Guild Diceworks"
+msgstr "Gilden-Würfelwerk"
+
+msgid "Hidden from Players"
+msgstr "Vor Spielern verborgen"
+
+msgid "Include Boss Lair"
+msgstr "Bossversteck einbeziehen"
+
+msgid "Include secrets"
+msgstr "Geheimnisse einbeziehen"
+
+msgid "Include traps"
+msgstr "Fallen einbeziehen"
+
+msgid "Include treasure"
+msgstr "Schätze einbeziehen"
+
+msgid "Inspect creature record"
+msgstr "Kreatureneintrag ansehen"
+
+msgid "Keeper's Cartography Assistant"
+msgstr "Kartografie-Assistent des Keepers"
+
+msgid "Leave the lair empty"
+msgstr "Versteck leer lassen"
+
+msgid "Main entrance"
+msgstr "Haupteingang"
+
+msgid "Manage Players"
+msgstr "Spieler verwalten"
+
+msgid "Meet the Wandering Cartographer"
+msgstr "Triff den wandernden Kartografen"
+
+msgid "Move through the Scene freely. The Living Veil, doors, walls and remembered route remain active without rounds or turns."
+msgstr "Bewege dich frei durch die Szene. Der Lebende Schleier, Türen, Wände und der gemerkte Weg bleiben auch ohne Runden oder Züge aktiv."
+
+msgid "NO TARGET SELECTED"
+msgstr "KEIN ZIEL AUSGEWÄHLT"
+
+msgid "New Seed"
+msgstr "Neuer Seed"
+
+msgid "No attack readied"
+msgstr "Kein Angriff bereit"
+
+msgid "No creature records match the current search and map filter."
+msgstr "Keine Kreatureneinträge entsprechen der aktuellen Suche und dem Kartenfilter."
+
+msgid "None"
+msgstr "Keine"
+
+msgid "Not On This Map"
+msgstr "Nicht auf dieser Karte"
+
+msgid "On This Map"
+msgstr "Auf dieser Karte"
+
+msgid "Pippin's Field Note"
+msgstr "Pippins Feldnotiz"
+
+msgid "Place on Map"
+msgstr "Auf Karte platzieren"
+
+msgid "Populate ordinary rooms"
+msgstr "Gewöhnliche Räume bevölkern"
+
+msgid "Return to Live Scene"
+msgstr "Zur Live-Szene zurückkehren"
+
+msgid "Search the shelves"
+msgstr "Regale durchsuchen"
+
+msgid "Sight Beyond the Door"
+msgstr "Blick hinter die Tür"
+
+msgid "Snap to Grid"
+msgstr "Am Raster ausrichten"
+
+msgid "Stable"
+msgstr "Stabil"
+
+msgid "Standard"
+msgstr "Standard"
+
+msgid "Start Encounter"
+msgstr "Begegnung starten"
+
+msgid "Target"
+msgstr "Ziel"
+
+msgid "Target status"
+msgstr "Zielstatus"
+
+msgid "Tell a story"
+msgstr "Eine Geschichte erzählen"
+
+msgid "The Forge will add a new Scene to the Atlas and open it Behind the Curtain for inspection."
+msgstr "Die Schmiede fügt dem Atlas eine neue Szene hinzu und öffnet sie zur Prüfung Hinter dem Vorhang."
+
+msgid "The Summons to the Table"
+msgstr "Die Einladung an den Tisch"
+
+msgid "The Wandering Cartographer"
+msgstr "Der wandernde Kartograf"
+
+msgid "The new map is added safely in the background. It does not become active until you open it."
+msgstr "Die neue Karte wird sicher im Hintergrund hinzugefügt. Sie wird erst aktiv, wenn du sie öffnest."
+
+msgid "Use Monster Threshold"
+msgstr "Monster-Schwellenwert verwenden"
+
+msgid "Username or email"
+msgstr "Benutzername oder E-Mail"
+
+msgid "Village"
+msgstr "Dorf"
+
+msgid "Your Fellowship Ribbon"
+msgstr "Dein Gemeinschaftsband"
