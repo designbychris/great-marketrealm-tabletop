@@ -31,9 +31,11 @@ final class PartialContourRecoveryRegressionTest extends TestCase
         self::assertStringContainsString('partialContourRecovery: gapProtected', $script);
         self::assertStringContainsString("? 'protected-threshold-split'", $script);
         self::assertStringContainsString(": (entry.partial ? 'certified-open-chain' : 'closed-chain')", $script);
-        self::assertStringContainsString('unresolvedBoundaryEnds: entry.partial ? [points[0], points[points.length - 1]] : []', $script);
+        self::assertStringContainsString('unresolvedBoundaryEnds: partialContour ? [runPoints[0], runPoints[runPoints.length - 1]] : []', $script);
         self::assertStringContainsString("'unresolved-ends-preserved'", $script);
-        self::assertStringContainsString("evidenceModel: entry.partial ? 'living-contour-partial-v5'", $script);
+        self::assertStringContainsString('evidenceModel: gapProtected', $script);
+        self::assertStringContainsString("? 'living-contour-gap-classification-v5b'", $script);
+        self::assertStringContainsString(": (entry.partial ? 'living-contour-partial-v5' : 'living-contour-closed-v5')", $script);
     }
 
     public function test_hybrid_judgement_accepts_partial_organic_paths_without_upgrading_their_confidence(): void
