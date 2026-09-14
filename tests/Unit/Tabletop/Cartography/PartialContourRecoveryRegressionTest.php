@@ -28,7 +28,9 @@ final class PartialContourRecoveryRegressionTest extends TestCase
     {
         $script = (string) file_get_contents($this->root('assets/js/tabletop.js'));
 
-        self::assertStringContainsString("partialContourRecovery: entry.partial ? 'certified-open-chain' : 'closed-chain'", $script);
+        self::assertStringContainsString('partialContourRecovery: gapProtected', $script);
+        self::assertStringContainsString("? 'protected-threshold-split'", $script);
+        self::assertStringContainsString(": (entry.partial ? 'certified-open-chain' : 'closed-chain')", $script);
         self::assertStringContainsString('unresolvedBoundaryEnds: entry.partial ? [points[0], points[points.length - 1]] : []', $script);
         self::assertStringContainsString("'unresolved-ends-preserved'", $script);
         self::assertStringContainsString("evidenceModel: entry.partial ? 'living-contour-partial-v5'", $script);
