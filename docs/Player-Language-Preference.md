@@ -8,3 +8,5 @@ This makes language personal to each participant rather than a Table or Campaign
 
 
 - `de_DE` — German (Germany), tester-review pack.
+
+- `es_ES` — Spanish (Spain), tester-review pack.

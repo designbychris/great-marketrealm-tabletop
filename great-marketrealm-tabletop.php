@@ -38,7 +38,7 @@ add_filter(
         }
 
         $preferred = (string) get_user_meta($userId, 'gmrc_interface_locale', true);
-        if (in_array($preferred, ['en_GB', 'nl_NL', 'de_DE'], true)) {
+        if (in_array($preferred, ['en_GB', 'nl_NL', 'de_DE', 'es_ES'], true)) {
             return $preferred;
         }
 
