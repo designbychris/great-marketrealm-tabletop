@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace GreatMarketrealmTabletop\Tables\Services;
 
+use DateInterval;
 use GreatMarketrealmTabletop\Tables\Contracts\TableCapacityPolicy;
 use GreatMarketrealmTabletop\Tables\Contracts\TableClock;
 use GreatMarketrealmTabletop\Tables\Contracts\TableIdGenerator;
@@ -65,14 +66,7 @@ final class TableRegistry
     {
         $table = $this->required($id);
         $this->leases->reclaimExpired();
-        $limit = $this->capacity->limit();
-
-        if (
-            $this->tables->activeCount() >= $limit
-            && ! $this->override->mayBypassCapacity($table->dungeonMasterUserId())
-        ) {
-            throw TableCapacityExceeded::forLimit($limit);
-        }
+        $this->assertCapacityAvailable($table);
 
         $now = $this->clock->now();
         $table->activate($now, $this->leases->leaseExpiryFrom($now));
@@ -83,6 +77,49 @@ final class TableRegistry
     public function heartbeat(string $id): Table
     {
         return $this->leases->heartbeat($id);
+    }
+
+    /**
+     * Keep a persistent campaign Table writable while somebody is actually using it.
+     *
+     * The original live-table lease predates persistent campaigns. Older Tables may
+     * therefore be found in ENDED after an idle lease even though their campaign,
+     * scenes and sessions still legitimately exist. Wake those Tables on access and
+     * renew active leases only when they are approaching expiry, avoiding a write on
+     * every five-second state poll.
+     */
+    public function keepAlive(string $id): Table
+    {
+        $table = $this->required($id);
+        $now = $this->clock->now();
+
+        if ($table->status() === TableStatus::ENDED) {
+            $this->leases->reclaimExpired();
+            $this->assertCapacityAvailable($table);
+            $table->resume($now, $this->leases->leaseExpiryFrom($now));
+            $this->tables->save($table);
+            return $table;
+        }
+
+        if ($table->status() === TableStatus::PREPARING) {
+            return $this->activate($id);
+        }
+
+        if ($table->status() !== TableStatus::ACTIVE) {
+            return $table;
+        }
+
+        $renewBy = $now->add(new DateInterval('PT300S'));
+        $expiresAt = $table->leaseExpiresAt();
+        if ($expiresAt === null || $expiresAt <= $renewBy) {
+            // Persistent campaigns may still be ACTIVE with an already-expired
+            // lease until a reclamation pass runs. Renew in-place rather than
+            // allowing the legacy late-heartbeat path to end the campaign.
+            $table->heartbeat($now, $this->leases->leaseExpiryFrom($now));
+            $this->tables->save($table);
+        }
+
+        return $table;
     }
 
     public function reclaimExpired(): int
@@ -110,6 +147,18 @@ final class TableRegistry
             static fn (Table $table): bool => $table->dungeonMasterUserId() === $dungeonMasterUserId
                 && $table->status() !== 'ended'
         ));
+    }
+
+    private function assertCapacityAvailable(Table $table): void
+    {
+        $limit = $this->capacity->limit();
+
+        if (
+            $this->tables->activeCount() >= $limit
+            && ! $this->override->mayBypassCapacity($table->dungeonMasterUserId())
+        ) {
+            throw TableCapacityExceeded::forLimit($limit);
+        }
     }
 
     private function required(string $id): Table

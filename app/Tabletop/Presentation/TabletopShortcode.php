@@ -123,6 +123,11 @@ final class TabletopShortcode
         }
 
         try {
+            // Persistent campaign Tables may have been marked ENDED by the legacy
+            // browser lease while nobody was at the Table. Re-entering the campaign
+            // wakes that lease before any Scene/grid/Atlas mutation is attempted.
+            TableRegistryFactory::make()->keepAlive($tableId);
+
             $state = $this->chamber->state(
                 $tableId,
                 get_current_user_id()

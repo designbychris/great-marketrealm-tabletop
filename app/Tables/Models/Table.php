@@ -87,6 +87,27 @@ final class Table
         $this->leaseExpiresAt = $leaseExpiresAt ?? $when->modify('+17 minutes');
     }
 
+    /**
+     * Re-open a persistent campaign Table whose old live lease marked it ended.
+     *
+     * Tabletop campaigns outlive browser/session leases. The ended state is still
+     * retained for legacy lease accounting, but reopening the campaign must restore
+     * its live mutation boundary without losing scenes, tokens or campaign state.
+     */
+    public function resume(
+        DateTimeImmutable $when,
+        DateTimeImmutable $leaseExpiresAt
+    ): void {
+        if ($this->status !== TableStatus::ENDED) {
+            throw new InvalidTableTransition('Only an ended Table may be resumed.');
+        }
+
+        $this->status = TableStatus::ACTIVE;
+        $this->endedAt = null;
+        $this->lastHeartbeatAt = $when;
+        $this->leaseExpiresAt = $leaseExpiresAt;
+    }
+
     public function heartbeat(
         DateTimeImmutable $when,
         DateTimeImmutable $leaseExpiresAt

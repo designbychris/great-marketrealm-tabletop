@@ -189,7 +189,8 @@ final class TabletopServiceProvider
         $this->ajax = new TabletopAjaxController(
             $chamber,
             TabletopMovementFactory::make(),
-            new TabletopChamberRenderer()
+            new TabletopChamberRenderer(),
+            TableRegistryFactory::make()
         );
 
         $this->encounterAjax = new EncounterAjaxController(

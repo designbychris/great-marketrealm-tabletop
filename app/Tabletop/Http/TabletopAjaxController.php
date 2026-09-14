@@ -10,6 +10,7 @@ use GreatMarketrealmTabletop\Tabletop\Movement\Exceptions\TabletopMovementDenied
 use GreatMarketrealmTabletop\Tabletop\Movement\Services\TabletopMovement;
 use GreatMarketrealmTabletop\Tabletop\Presentation\TabletopChamberRenderer;
 use GreatMarketrealmTabletop\Tabletop\Services\TabletopChamber;
+use GreatMarketrealmTabletop\Tables\Services\TableRegistry;
 use Throwable;
 
 defined('ABSPATH') || exit;
@@ -21,7 +22,8 @@ final class TabletopAjaxController
     public function __construct(
         private TabletopChamber $chamber,
         private TabletopMovement $movement,
-        private TabletopChamberRenderer $renderer
+        private TabletopChamberRenderer $renderer,
+        private ?TableRegistry $tables = null
     ) {}
 
     public function state(): void
@@ -29,6 +31,7 @@ final class TabletopAjaxController
         $this->guard();
 
         try {
+            $this->tables?->keepAlive($this->tableId());
             $state = $this->chamber->state(
                 $this->tableId(),
                 get_current_user_id(),
@@ -85,6 +88,7 @@ final class TabletopAjaxController
         $this->guard();
 
         try {
+            $this->tables?->keepAlive($this->tableId());
             $state = $this->chamber->state(
                 $this->tableId(),
                 get_current_user_id(),
@@ -119,6 +123,7 @@ final class TabletopAjaxController
         $this->guard();
 
         try {
+            $this->tables?->keepAlive($this->tableId());
             $token = $this->movement->move(
                 $this->tableId(),
                 get_current_user_id(),
