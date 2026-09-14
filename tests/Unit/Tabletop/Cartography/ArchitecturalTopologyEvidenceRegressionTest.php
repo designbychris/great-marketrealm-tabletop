@@ -44,7 +44,8 @@ final class ArchitecturalTopologyEvidenceRegressionTest extends TestCase
         self::assertStringContainsString('const architectureBoost = (cornerCount * 4)', $script);
         self::assertStringContainsString('confidence: Math.max(42, Math.min(99, Math.round(wall.confidence + architectureBoost)))', $script);
         self::assertStringContainsString("evidenceModel: 'local-contrast-topology-v2'", $script);
-        self::assertStringContainsString('return architecturalWalls', $script);
+        self::assertStringContainsString('const noiseScreenedWalls = architecturalWalls.map((wall) =>', $script);
+        self::assertStringContainsString('return noiseScreenedWalls.concat(doorwayCandidates)', $script);
         self::assertStringContainsString('renderCartographyReview()', $script);
         self::assertStringContainsString('.filter((item) => item.selected)', $script);
     }

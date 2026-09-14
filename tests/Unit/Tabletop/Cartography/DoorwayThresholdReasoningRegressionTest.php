@@ -18,7 +18,7 @@ final class DoorwayThresholdReasoningRegressionTest extends TestCase
         $script = (string) file_get_contents($this->root('assets/js/tabletop.js'));
 
         self::assertStringContainsString('IV.30.1G.2 — Doorway & Threshold Reasoning', $script);
-        self::assertStringContainsString('const structuralByKey = new Map', $script);
+        self::assertStringContainsString('const structuralByKey = new Map(noiseScreenedWalls.map((wall) =>', $script);
         self::assertStringContainsString('const considerThreshold = (x1, y1, x2, y2, before, after, sideA, sideB) =>', $script);
         self::assertStringContainsString('if (!before || !after || structuralEdge(x1, y1, x2, y2)) return;', $script);
         self::assertStringContainsString("evidence.push('architectural-support')", $script);
@@ -32,18 +32,18 @@ final class DoorwayThresholdReasoningRegressionTest extends TestCase
         self::assertStringContainsString('const clearOpening = opening.density <= .16 && openingContrast >= 12', $script);
         self::assertStringContainsString('const crossThresholdFloor = floorA.plausible && floorB.plausible', $script);
         self::assertStringContainsString('if (!clearOpening || !crossThresholdFloor || continuityStrength < 52) return;', $script);
-        self::assertStringContainsString("thresholdEvidence: evidence", $script);
+        self::assertStringContainsString('thresholdEvidence: evidence', $script);
     }
 
     public function test_first_threshold_pass_is_conservative_and_explainable(): void
     {
         $script = (string) file_get_contents($this->root('assets/js/tabletop.js'));
 
-        self::assertStringContainsString("widthGridUnits: 1", $script);
+        self::assertStringContainsString('widthGridUnits: 1', $script);
         self::assertStringContainsString("evidenceModel: 'local-contrast-topology-threshold-v3'", $script);
         self::assertStringContainsString("suggestion.doorwayReasoning ? 'Likely doorway' : 'Possible door'", $script);
         self::assertStringContainsString("suggestion.thresholdEvidence.join(' + ')", $script);
-        self::assertStringContainsString('return architecturalWalls.concat(doorwayCandidates)', $script);
+        self::assertStringContainsString('return noiseScreenedWalls.concat(doorwayCandidates)', $script);
     }
 
     public function test_phase_remains_review_first_and_is_recorded_in_the_roadmap(): void
