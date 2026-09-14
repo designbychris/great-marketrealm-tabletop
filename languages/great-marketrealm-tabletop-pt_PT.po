@@ -1,16 +1,24 @@
+
 msgid ""
 msgstr ""
-"Project-Id-Version: The Great MarketRealm Tabletop\\n"
-"Language-Team: Portuguese (Portugal)\\n"
-"Language: pt_PT\\n"
-"MIME-Version: 1.0\\n"
-"Content-Type: text/plain; charset=UTF-8\\n"
-"Content-Transfer-Encoding: 8bit\\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\\n"
-"X-Domain: great-marketrealm-tabletop\\n"
+"Project-Id-Version: The Great MarketRealm Tabletop\\nLanguage-Team: Portuguese (Portugal)\\nLanguage: pt_PT\\nMIME-Version: 1.0\\nContent-Type: text/plain; charset=UTF-8\\nContent-Transfer-Encoding: 8bit\\nPlural-Forms: nplurals=2; plural=(n != 1);\\nX-Domain: great-marketrealm-tabletop\\n\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-09-14 09:00+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: pt_PT\n"
+"Language-Team: pt_PT <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
 
 msgid "(optional)"
-msgstr "(optional)"
+msgstr "(opcional)"
+
+msgid "ACTIVE TURN"
+msgstr "TURNO ATIVO"
 
 msgid "Abilities"
 msgstr "Atributos"
@@ -25,7 +33,7 @@ msgid "Add Map to Atlas"
 msgstr "Adicionar Mapa ao Atlas"
 
 msgid "Add, move, rename, reveal, disarm or remove traps prepared on this forged Scene."
-msgstr "Add, move, rename, reveal, disarm or remove traps prepared on this forged Scene."
+msgstr "Adiciona, move, muda o nome, revela, desarma ou remove armadilhas preparadas nesta Cena forjada."
 
 msgid "Adjust"
 msgstr "Ajustar"
@@ -39,8 +47,20 @@ msgstr "Aventureiro"
 msgid "Adventurer's Satchel"
 msgstr "Bolsa do Aventureiro"
 
+msgid "Adventurers at the Table"
+msgstr "Aventureiros à Mesa"
+
+msgid "Afflictions"
+msgstr "Condições"
+
+msgid "All"
+msgstr "Todos"
+
 msgid "Apply"
 msgstr "Aplicar"
+
+msgid "Arm Disguise"
+msgstr "Armar Disfarce"
 
 msgid "Arm as Disguised Mimic"
 msgstr "Armar como Mímico Disfarçado"
@@ -48,8 +68,14 @@ msgstr "Armar como Mímico Disfarçado"
 msgid "Arrival & Deployment"
 msgstr "Chegada e Posicionamento"
 
+msgid "Arrival portal"
+msgstr "Portal de chegada"
+
 msgid "Ask Pippin to Forge a Scene"
 msgstr "Pedir ao Pippin para Forjar uma Cena"
+
+msgid "At the Table"
+msgstr "À Mesa"
 
 msgid "Atlas"
 msgstr "Atlas"
@@ -69,8 +95,11 @@ msgstr "Combate"
 msgid "Battle Actions"
 msgstr "Ações de Combate"
 
+msgid "Battle actions live with the combatant."
+msgstr "As ações de combate acompanham o combatente."
+
 msgid "Battlemap, Veil, lights, traps, sight, grid and furniture."
-msgstr "Battlemap, Veil, lights, traps, sight, grid and furniture."
+msgstr "Mapa de batalha, Véu, luzes, armadilhas, visão, grelha e mobiliário."
 
 msgid "Begin Battle"
 msgstr "Iniciar Combate"
@@ -78,17 +107,26 @@ msgstr "Iniciar Combate"
 msgid "Begin with a Blank Table"
 msgstr "Começar com uma Mesa em Branco"
 
+msgid "Behind the Curtain"
+msgstr "Nos Bastidores"
+
 msgid "Bestiary"
 msgstr "Bestiário"
 
 msgid "Between Sessions"
 msgstr "Entre Sessões"
 
+msgid "Beyond This Door, the Table Awaits"
+msgstr "Para Além desta Porta, a Mesa Espera"
+
 msgid "Boss chamber"
 msgstr "Câmara do Chefe"
 
 msgid "Brazier"
 msgstr "Braseiro"
+
+msgid "Calibrate Grid"
+msgstr "Calibrar Grelha"
 
 msgid "Call Session"
 msgstr "Convocar Sessão"
@@ -111,23 +149,35 @@ msgstr "Campanha associada."
 msgid "Campaign name"
 msgstr "Nome da campanha"
 
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgid "Cancel placement"
+msgstr "Cancelar colocação"
+
 msgid "Candle"
 msgstr "Vela"
 
 msgid "Change the Scene artwork used at this Table."
-msgstr "Change the Scene artwork used at this Table."
+msgstr "Altera a ilustração da Cena usada nesta Mesa."
 
 msgid "Chest closed. Pippin is pretending this solves the problem."
-msgstr "Chest closed. Pippin is pretending this solves the problem."
+msgstr "Baú fechado. Pippin está a fingir que isto resolve o problema."
 
 msgid "Chest opened. Pippin has taken three prudent steps backwards."
-msgstr "Chest opened. Pippin has taken three prudent steps backwards."
+msgstr "Baú aberto. Pippin deu três prudentes passos para trás."
 
-msgid "Choose a check, save, skill, Initiative roll, readied weapon or spell."
-msgstr "Choose a check, save, skill, Initiative roll, readied weapon or spell."
+msgid "Choose Battlemap"
+msgstr "Escolher Mapa de Combate"
 
 msgid "Choose a Companion Campaign…"
 msgstr "Escolher uma Campanha do Companion…"
+
+msgid "Choose a Mimic from the Bestiary first."
+msgstr "Escolha primeiro um Mímico do Bestiário."
+
+msgid "Choose a check, save, skill, Initiative roll, readied weapon or spell."
+msgstr "Escolhe um teste, teste de resistência, perícia, lançamento de Iniciativa, arma preparada ou feitiço."
 
 msgid "Choose a creature from the Bestiary first."
 msgstr "Escolha primeiro uma criatura do Bestiário."
@@ -139,28 +189,31 @@ msgid "Choose a light source to begin."
 msgstr "Escolha uma fonte de luz para começar."
 
 msgid "Choose a light, then click the battlemap to place it. Scene-owned lights may be prepared Behind the Curtain."
-msgstr "Choose a light, then click the battlemap to place it. Scene-owned lights may be prepared Behind the Curtain."
+msgstr "Escolhe uma luz e depois clica no mapa de batalha para a colocar. As luzes pertencentes à Cena podem ser preparadas Nos Bastidores."
 
 msgid "Choose a map…"
 msgstr "Escolher um mapa…"
 
 msgid "Choose a marker, then click the map. Party thresholds welcome adventurers who do not already have a remembered token in this Scene. Monster thresholds are reserved for the Keeper's Bestiary."
-msgstr "Choose a marker, then click the map. Party thresholds welcome adventurers who do not already have a remembered token in this Scene. Monster thresholds are reserved for the Keeper's Bestiary."
-
-msgid "Choose a Mimic from the Bestiary first."
-msgstr "Escolha primeiro um Mímico do Bestiário."
+msgstr "Escolhe um marcador e depois clica no mapa. Os limiares do grupo recebem aventureiros que ainda não tenham uma ficha recordada nesta Cena. Os limiares de monstros estão reservados ao Bestiário do Guardião."
 
 msgid "Choose a trap, then place or tend it."
 msgstr "Escolha uma armadilha e depois coloque-a ou trate dela."
 
-msgid "Choose Battlemap"
-msgstr "Escolher Mapa de Combate"
+msgid "Choose a visible battlefield target for attacks. Range and legality are reported in Turn of Battle."
+msgstr "Escolhe um alvo visível no campo de batalha para os ataques. O alcance e a validade são indicados no Turno de Batalha."
+
+msgid "Choose combatant…"
+msgstr "Escolher combatente…"
 
 msgid "Choose from the Atlas"
 msgstr "Escolher no Atlas"
 
+msgid "Choose target…"
+msgstr "Escolher alvo…"
+
 msgid "Choose the saved Atlas map Pippin should place first."
-msgstr "Choose the saved Atlas map Pippin should place first."
+msgstr "Escolhe o mapa guardado do Atlas que Pippin deve colocar primeiro."
 
 msgid "Close"
 msgstr "Fechar"
@@ -181,10 +234,16 @@ msgid "Close the Session Desk"
 msgstr "Fechar a Secretária da Sessão"
 
 msgid "Closing that seat…"
-msgstr "Closing that seat…"
+msgstr "A fechar esse lugar…"
 
 msgid "Closing the Session ledger…"
-msgstr "Closing the Session ledger…"
+msgstr "A fechar o registo da Sessão…"
+
+msgid "Combatants & initiative"
+msgstr "Combatentes e iniciativa"
+
+msgid "Compact"
+msgstr "Compacto"
 
 msgid "Companion Campaign"
 msgstr "Campanha do Companion"
@@ -195,14 +254,17 @@ msgstr "Certificado pelo Companion"
 msgid "Completed Session details"
 msgstr "Detalhes da Sessão concluída"
 
+msgid "Convert Now"
+msgstr "Converter Agora"
+
 msgid "Convert to Mimic"
 msgstr "Converter em Mímico"
 
+msgid "Copies"
+msgstr "Cópias"
+
 msgid "Create a New Tabletop"
 msgstr "Criar uma Nova Mesa"
-
-msgid "Current combatant actions"
-msgstr "Ações do combatente atual"
 
 msgid "Current HP"
 msgstr "PV Atuais"
@@ -210,8 +272,23 @@ msgstr "PV Atuais"
 msgid "Current Tabletop Scene"
 msgstr "Cena Atual da Mesa"
 
+msgid "Current combatant actions"
+msgstr "Ações do combatente atual"
+
 msgid "Damage"
 msgstr "Dano"
+
+msgid "Death confirmed"
+msgstr "Morte confirmada"
+
+msgid "Delete"
+msgstr "Eliminar"
+
+msgid "Deployed at the centre of the Boss Lair and provisioned for combat."
+msgstr "Colocado no centro do Covil do Chefe e preparado para combate."
+
+msgid "Development tools"
+msgstr "Ferramentas de desenvolvimento"
 
 msgid "Disarm"
 msgstr "Desarmar"
@@ -220,10 +297,10 @@ msgid "Disarm Mimic"
 msgstr "Desarmar Mímico"
 
 msgid "Disarm this disguised Mimic? The furnishing will remain."
-msgstr "Disarm this disguised Mimic? The furnishing will remain."
+msgstr "Desarmar este Mimic disfarçado? O mobiliário permanecerá."
 
 msgid "Drag selected furniture on the map, or use the controls below."
-msgstr "Drag selected furniture on the map, or use the controls below."
+msgstr "Arrasta o mobiliário selecionado no mapa ou usa os controlos abaixo."
 
 msgid "Draw Route"
 msgstr "Desenhar Rota"
@@ -231,8 +308,8 @@ msgstr "Desenhar Rota"
 msgid "Draw Wall"
 msgstr "Desenhar Parede"
 
-msgid "Dungeon inhabitants"
-msgstr "Habitantes da masmorra"
+msgid "Dungeon"
+msgstr "Masmorra"
 
 msgid "Dungeon Master"
 msgstr "Mestre de Jogo"
@@ -240,8 +317,17 @@ msgstr "Mestre de Jogo"
 msgid "Dungeon Master's Drawer"
 msgstr "Gaveta do Mestre de Jogo"
 
+msgid "Dungeon inhabitants"
+msgstr "Habitantes da masmorra"
+
+msgid "Duplicate"
+msgstr "Duplicar"
+
 msgid "Duration"
 msgstr "Duração"
+
+msgid "Duration in turns"
+msgstr "Duração em turnos"
 
 msgid "Enable Fog of War"
 msgstr "Ativar Nevoeiro de Guerra"
@@ -255,11 +341,11 @@ msgstr "Terminar Encontro"
 msgid "End Session"
 msgstr "Terminar Sessão"
 
-msgid "End the current Session? The campaign itself will remain active and can be resumed in a new Session later."
-msgstr "End the current Session? The campaign itself will remain active and can be resumed in a new Session later."
-
 msgid "End Turn"
 msgstr "Terminar Turno"
+
+msgid "End the current Session? The campaign itself will remain active and can be resumed in a new Session later."
+msgstr "Terminar a Sessão atual? A campanha continuará ativa e poderá ser retomada numa nova Sessão mais tarde."
 
 msgid "Ended"
 msgstr "Terminada"
@@ -274,10 +360,10 @@ msgid "Erase Route"
 msgstr "Apagar Rota"
 
 msgid "Every road back to the adventure, carefully recorded. Probably in the correct pocket."
-msgstr "Every road back to the adventure, carefully recorded. Probably in the correct pocket."
+msgstr "Todos os caminhos de regresso à aventura, cuidadosamente registados. Provavelmente no bolso certo."
 
 msgid "Existing Tabletop Sessions are copied into the Companion Session Ledger when the link is made."
-msgstr "Existing Tabletop Sessions are copied into the Companion Session Ledger when the link is made."
+msgstr "As Sessões existentes do Tabletop são copiadas para o Registo de Sessões do Companion quando a ligação é efetuada."
 
 msgid "Exploration Mode"
 msgstr "Modo de Exploração"
@@ -291,35 +377,53 @@ msgstr "Detetar Grelha Impressa"
 msgid "Finish / Cancel"
 msgstr "Concluir / Cancelar"
 
+msgid "Forest"
+msgstr "Floresta"
+
+msgid "Forge New Scene"
+msgstr "Forjar Nova Cena"
+
 msgid "Furniture"
 msgstr "Mobiliário"
 
 msgid "Furniture duplicated. Pippin is counting again."
-msgstr "Furniture duplicated. Pippin is counting again."
+msgstr "Mobiliário duplicado. Pippin voltou a contar."
 
 msgid "Furniture move cancelled."
-msgstr "Furniture move cancelled."
+msgstr "Movimento do mobiliário cancelado."
 
 msgid "Furniture moved. Pippin has amended the floor plan."
-msgstr "Furniture moved. Pippin has amended the floor plan."
+msgstr "Mobiliário movido. Pippin corrigiu a planta."
 
 msgid "Furniture removed. Pippin has reclaimed the floor space."
-msgstr "Furniture removed. Pippin has reclaimed the floor space."
+msgstr "Mobiliário removido. Pippin recuperou o espaço no chão."
 
 msgid "Furniture resized. Pippin disputes the new dimensions."
-msgstr "Furniture resized. Pippin disputes the new dimensions."
+msgstr "Mobiliário redimensionado. Pippin contesta as novas dimensões."
 
 msgid "Furniture rotated. Pippin has rotated the paper too."
-msgstr "Furniture rotated. Pippin has rotated the paper too."
+msgstr "Mobiliário rodado. Pippin também rodou o papel."
 
 msgid "Furniture selection cleared."
-msgstr "Furniture selection cleared."
+msgstr "Seleção de mobiliário limpa."
 
 msgid "Gather, recap and close the book without taking height from the battlefield."
-msgstr "Gather, recap and close the book without taking height from the battlefield."
+msgstr "Reúne, recapitula e fecha o livro sem ocupar altura no campo de batalha."
+
+msgid "Generate Scene"
+msgstr "Gerar Cena"
+
+msgid "Grand"
+msgstr "Grandioso"
+
+msgid "Guild Diceworks"
+msgstr "Oficina de Dados da Guilda"
 
 msgid "Healing"
 msgstr "Cura"
+
+msgid "Hidden from Players"
+msgstr "Oculto dos Jogadores"
 
 msgid "Hide Recap"
 msgstr "Ocultar Resumo"
@@ -327,8 +431,23 @@ msgstr "Ocultar Resumo"
 msgid "In Progress"
 msgstr "Em Curso"
 
+msgid "Include Boss Lair"
+msgstr "Incluir Covil do Chefe"
+
+msgid "Include secrets"
+msgstr "Incluir segredos"
+
+msgid "Include traps"
+msgstr "Incluir armadilhas"
+
+msgid "Include treasure"
+msgstr "Incluir tesouro"
+
 msgid "Initiative"
 msgstr "Iniciativa"
+
+msgid "Inspect creature record"
+msgstr "Inspecionar registo da criatura"
 
 msgid "Interact"
 msgstr "Interagir"
@@ -357,11 +476,17 @@ msgstr "Área de Trabalho do Guardião"
 msgid "Keeper workspaces"
 msgstr "Áreas de trabalho do Guardião"
 
+msgid "Keeper's Cartography Assistant"
+msgstr "Assistente de Cartografia do Guardião"
+
 msgid "Keeper-controlled. Arrivals use the destination Scene's Party Arrival Threshold."
-msgstr "Keeper-controlled. Arrivals use the destination Scene's Party Arrival Threshold."
+msgstr "Controlado pelo Guardião. As chegadas usam o Limiar de Chegada do Grupo da Cena de destino."
 
 msgid "Lantern"
 msgstr "Lanterna"
+
+msgid "Leave the lair empty"
+msgstr "Deixar o covil vazio"
 
 msgid "Level"
 msgstr "Nível"
@@ -375,41 +500,74 @@ msgstr "Cena ao Vivo"
 msgid "Magical Light"
 msgstr "Luz Mágica"
 
+msgid "Main entrance"
+msgstr "Entrada principal"
+
+msgid "Manage Players"
+msgstr "Gerir Jogadores"
+
 msgid "Maximum HP:"
 msgstr "PV Máximos:"
 
+msgid "Meet the Wandering Cartographer"
+msgstr "Conhecer o Cartógrafo Errante"
+
 msgid "Mimic disguise disarmed. Pippin remains unconvinced."
-msgstr "Mimic disguise disarmed. Pippin remains unconvinced."
+msgstr "Disfarce de Mimic desarmado. Pippin continua pouco convencido."
 
 msgid "Move"
 msgstr "Mover"
 
 msgid "Move selected — click the battlemap for the trap’s new position."
-msgstr "Move selected — click the battlemap for the trap’s new position."
+msgstr "Movimento selecionado — clica no mapa de batalha para definir a nova posição da armadilha."
 
 msgid "Move selected — click the battlemap for the treasure’s new position."
-msgstr "Move selected — click the battlemap for the treasure’s new position."
+msgstr "Movimento selecionado — clica no mapa de batalha para definir a nova posição do tesouro."
+
+msgid "Move through the Scene freely. The Living Veil, doors, walls and remembered route remain active without rounds or turns."
+msgstr "Move-te livremente pela Cena. O Véu Vivo, as portas, as paredes e a rota recordada permanecem ativos sem rondas nem turnos."
+
+msgid "NO TARGET SELECTED"
+msgstr "NENHUM ALVO SELECIONADO"
 
 msgid "Name the campaign, then tell Pippin how its first map should arrive."
-msgstr "Name the campaign, then tell Pippin how its first map should arrive."
+msgstr "Dá um nome à campanha e depois diz a Pippin como deve chegar o primeiro mapa."
+
+msgid "New Seed"
+msgstr "Nova Semente"
 
 msgid "No active DM Companion Campaigns are available. The Tabletop can still be played independently."
-msgstr "No active DM Companion Campaigns are available. The Tabletop can still be played independently."
+msgstr "Não existem Campanhas ativas do Companion do Mestre disponíveis. O Tabletop pode continuar a ser usado de forma independente."
 
 msgid "No active Scene"
 msgstr "Sem Cena ativa"
+
+msgid "No attack readied"
+msgstr "Nenhum ataque preparado"
+
+msgid "No creature records match the current search and map filter."
+msgstr "Nenhum registo de criatura corresponde à pesquisa e ao filtro de mapa atuais."
 
 msgid "No furniture selected"
 msgstr "Nenhum mobiliário selecionado"
 
 msgid "No spells are currently recorded in this adventurer's Companion spellbook."
-msgstr "No spells are currently recorded in this adventurer's Companion spellbook."
+msgstr "Atualmente não há feitiços registados no grimório do Companion deste aventureiro."
 
 msgid "No traps on this Scene yet."
 msgstr "Ainda não há armadilhas nesta Cena."
 
 msgid "No weapon is currently readied in the Companion Adventurer's Pack."
-msgstr "No weapon is currently readied in the Companion Adventurer's Pack."
+msgstr "Atualmente não há nenhuma arma preparada na Mochila do Aventureiro do Companion."
+
+msgid "None"
+msgstr "Nenhum"
+
+msgid "Not On This Map"
+msgstr "Fora Deste Mapa"
+
+msgid "On This Map"
+msgstr "Neste Mapa"
 
 msgid "Open"
 msgstr "Abrir"
@@ -426,41 +584,44 @@ msgstr "Perceção Passiva"
 msgid "Password"
 msgstr "Palavra-passe"
 
-msgid "Pippin could not amend that treasure record."
-msgstr "Pippin could not amend that treasure record."
-
-msgid "Pippin could not rearrange that furnishing."
-msgstr "Pippin could not rearrange that furnishing."
-
-msgid "Pippin could not tend that trap."
-msgstr "Pippin could not tend that trap."
-
-msgid "Pippin could not turn that page."
-msgstr "Pippin could not turn that page."
-
-msgid "Pippin has no saved roads for you yet. A Keeper can set a new Table, or an Adventurer can return after receiving a Summons."
-msgstr "Pippin has no saved roads for you yet. A Keeper can set a new Table, or an Adventurer can return after receiving a Summons."
-
-msgid "Pippin is clearing a workbench beside the Forge…"
-msgstr "Pippin is clearing a workbench beside the Forge…"
-
-msgid "Pippin is erasing this road from the atlas…"
-msgstr "Pippin is erasing this road from the atlas…"
-
-msgid "Pippin is finding a suitable patch of table…"
-msgstr "Pippin is finding a suitable patch of table…"
-
-msgid "Pippin is joining the Table Atlas to the Companion Ledger…"
-msgstr "Pippin is joining the Table Atlas to the Companion Ledger…"
-
 msgid "Pippin Peppercorn presents"
 msgstr "Pippin Peppercorn apresenta"
 
-msgid "Pippin's field notes · Keeper draft"
-msgstr "Notas de campo do Pippin · rascunho do Guardião"
+msgid "Pippin could not amend that treasure record."
+msgstr "Pippin não conseguiu alterar esse registo de tesouro."
+
+msgid "Pippin could not rearrange that furnishing."
+msgstr "Pippin não conseguiu reorganizar esse mobiliário."
+
+msgid "Pippin could not tend that trap."
+msgstr "Pippin não conseguiu tratar dessa armadilha."
+
+msgid "Pippin could not turn that page."
+msgstr "Pippin não conseguiu virar essa página."
+
+msgid "Pippin has no saved roads for you yet. A Keeper can set a new Table, or an Adventurer can return after receiving a Summons."
+msgstr "Pippin ainda não tem caminhos guardados para ti. Um Guardião pode preparar uma nova Mesa, ou um Aventureiro pode regressar depois de receber uma Convocatória."
+
+msgid "Pippin is clearing a workbench beside the Forge…"
+msgstr "Pippin está a desimpedir uma bancada junto à Forja…"
+
+msgid "Pippin is erasing this road from the atlas…"
+msgstr "Pippin está a apagar este caminho do atlas…"
+
+msgid "Pippin is finding a suitable patch of table…"
+msgstr "Pippin está a procurar um pedaço de mesa adequado…"
+
+msgid "Pippin is joining the Table Atlas to the Companion Ledger…"
+msgstr "Pippin está a ligar o Atlas da Mesa ao Livro do Companion…"
+
+msgid "Pippin's Field Note"
+msgstr "Nota de Campo do Pippin"
 
 msgid "Pippin's Table Atlas"
 msgstr "Atlas de Mesa do Pippin"
+
+msgid "Pippin's field notes · Keeper draft"
+msgstr "Notas de campo do Pippin · rascunho do Guardião"
 
 msgid "Pippin’s Adventure Notes"
 msgstr "Notas de Aventura do Pippin"
@@ -471,23 +632,29 @@ msgstr "Colocar Porta"
 msgid "Place Monster Deployment"
 msgstr "Colocar Ponto de Posicionamento de Monstros"
 
-msgid "Place name"
-msgstr "Nome do local"
-
 msgid "Place Party Arrival"
 msgstr "Colocar Ponto de Chegada do Grupo"
 
 msgid "Place Trap"
 msgstr "Colocar Armadilha"
 
+msgid "Place name"
+msgstr "Nome do local"
+
+msgid "Place on Map"
+msgstr "Colocar no Mapa"
+
 msgid "Placement cancelled. Pippin has put the tape measure away."
-msgstr "Placement cancelled. Pippin has put the tape measure away."
+msgstr "Colocação cancelada. Pippin guardou a fita métrica."
 
 msgid "Placement remains armed; click again or cancel."
-msgstr "Placement remains armed; click again or cancel."
+msgstr "A colocação continua preparada; clica novamente ou cancela."
 
 msgid "Player removed."
 msgstr "Jogador removido."
+
+msgid "Populate ordinary rooms"
+msgstr "Povoar salas normais"
 
 msgid "Prepare Scene"
 msgstr "Preparar Cena"
@@ -519,26 +686,26 @@ msgstr "Rearmar"
 msgid "Remove"
 msgstr "Remover"
 
+msgid "Remove Tabletop"
+msgstr "Remover Mesa"
+
 msgid "Remove from Atlas"
 msgstr "Remover do Atlas"
 
 msgid "Remove from Chamber"
 msgstr "Remover da Câmara"
 
-msgid "Remove Tabletop"
-msgstr "Remover Mesa"
-
-msgid "Remove this furnishing from the Scene?"
-msgstr "Remove this furnishing from the Scene?"
-
 msgid "Remove this Tabletop"
 msgstr "Remover esta Mesa"
 
+msgid "Remove this furnishing from the Scene?"
+msgstr "Remover este mobiliário da Cena?"
+
 msgid "Remove this trap from the Scene?"
-msgstr "Remove this trap from the Scene?"
+msgstr "Remover esta armadilha da Cena?"
 
 msgid "Remove this treasure from the Scene?"
-msgstr "Remove this treasure from the Scene?"
+msgstr "Remover este tesouro da Cena?"
 
 msgid "Reset & Conceal"
 msgstr "Repor e Ocultar"
@@ -548,6 +715,9 @@ msgstr "Repor Exploração"
 
 msgid "Reset Preview"
 msgstr "Repor Pré-visualização"
+
+msgid "Return to Live Scene"
+msgstr "Voltar à Cena ao Vivo"
 
 msgid "Reveal Mimic"
 msgstr "Revelar Mímico"
@@ -588,11 +758,11 @@ msgstr "Escala"
 msgid "Scene name"
 msgstr "Nome da Cena"
 
+msgid "Search the shelves"
+msgstr "Pesquisar nas prateleiras"
+
 msgid "Seed"
 msgstr "Semente"
-
-msgid "selected"
-msgstr "selecionado"
 
 msgid "Selected character"
 msgstr "Personagem selecionada"
@@ -621,14 +791,20 @@ msgstr "Mostrar Resumo"
 msgid "Sight"
 msgstr "Visão"
 
+msgid "Sight Beyond the Door"
+msgstr "Visão Para Além da Porta"
+
 msgid "Skills"
 msgstr "Perícias"
 
+msgid "Snap to Grid"
+msgstr "Ajustar à Grelha"
+
 msgid "Snap to Grid disabled. Pippin is trying not to look."
-msgstr "Snap to Grid disabled. Pippin is trying not to look."
+msgstr "Ajuste à Grelha desativado. Pippin está a tentar não olhar."
 
 msgid "Snap to Grid enabled. Pippin has restored order."
-msgstr "Snap to Grid enabled. Pippin has restored order."
+msgstr "Ajuste à Grelha ativado. Pippin restaurou a ordem."
 
 msgid "Something waiting in the lair"
 msgstr "Algo à espera no covil"
@@ -648,6 +824,15 @@ msgstr "Espaços de magia"
 msgid "Spring"
 msgstr "Disparar"
 
+msgid "Stable"
+msgstr "Estável"
+
+msgid "Standard"
+msgstr "Padrão"
+
+msgid "Start Encounter"
+msgstr "Iniciar Encontro"
+
 msgid "Start Session"
 msgstr "Iniciar Sessão"
 
@@ -660,11 +845,11 @@ msgstr "Convidar um jogador"
 msgid "Table"
 msgstr "Mesa"
 
-msgid "Table role and status"
-msgstr "Função e estado na mesa"
-
 msgid "Table Session"
 msgstr "Sessão da Mesa"
+
+msgid "Table role and status"
+msgstr "Função e estado na mesa"
 
 msgid "Tabletop removed."
 msgstr "Mesa removida."
@@ -672,11 +857,17 @@ msgstr "Mesa removida."
 msgid "Take the Party Through"
 msgstr "Levar o Grupo Através"
 
-msgid "Teach the Veil where sight must stop."
-msgstr "Teach the Veil where sight must stop."
+msgid "Target"
+msgstr "Alvo"
 
-msgid "temp"
-msgstr "temp."
+msgid "Target status"
+msgstr "Estado do alvo"
+
+msgid "Teach the Veil where sight must stop."
+msgstr "Ensina ao Véu onde a visão deve parar."
+
+msgid "Tell a story"
+msgstr "Contar uma história"
 
 msgid "Temporary HP"
 msgstr "PV Temporários"
@@ -687,20 +878,11 @@ msgstr "A Aventura Continua"
 msgid "The Battlemap"
 msgstr "O Mapa de Combate"
 
-msgid "The chamber awaits"
-msgstr "A câmara aguarda"
-
 msgid "The Companion Campaign could not be linked."
-msgstr "The Companion Campaign could not be linked."
+msgstr "Não foi possível ligar a Campanha do Companion."
 
-msgid "The deeds of the Table have been recorded. Pippin has filed the Keeper draft, and the campaign remains active exactly where you left it."
-msgstr "The deeds of the Table have been recorded. Pippin has filed the Keeper draft, and the campaign remains active exactly where you left it."
-
-msgid "The first map on the Table"
-msgstr "O primeiro mapa na Mesa"
-
-msgid "The furniture was a Mimic. Pippin would like the record to show that he objected."
-msgstr "The furniture was a Mimic. Pippin would like the record to show that he objected."
+msgid "The Forge will add a new Scene to the Atlas and open it Behind the Curtain for inspection."
+msgstr "A Forja adicionará uma nova Cena ao Atlas e abri-la-á Nos Bastidores para inspeção."
 
 msgid "The Gathering"
 msgstr "O Encontro"
@@ -709,10 +891,10 @@ msgid "The Gathering at the Table"
 msgstr "O Encontro à Mesa"
 
 msgid "The Keeper has not called today's Session yet."
-msgstr "The Keeper has not called today's Session yet."
+msgstr "O Guardião ainda não convocou a Sessão de hoje."
 
 msgid "The Keeper is calling the Session…"
-msgstr "The Keeper is calling the Session…"
+msgstr "O Guardião está a convocar a Sessão…"
 
 msgid "The Keeper's Atlas"
 msgstr "O Atlas do Guardião"
@@ -750,56 +932,35 @@ msgstr "O Suporte de Lanternas do Guardião"
 msgid "The Keeper\\'s Tools"
 msgstr "As Ferramentas do Guardião"
 
-msgid "The live Chamber could not be refreshed."
-msgstr "The live Chamber could not be refreshed."
-
 msgid "The Next Gathering"
 msgstr "O Próximo Encontro"
-
-msgid "The next gathering awaits the Keeper."
-msgstr "The next gathering awaits the Keeper."
-
-msgid "The player could not be invited."
-msgstr "The player could not be invited."
-
-msgid "The player could not be removed."
-msgstr "The player could not be removed."
-
-msgid "The refreshed Chamber markup was not found."
-msgstr "The refreshed Chamber markup was not found."
-
-msgid "The Session could not be ended."
-msgstr "The Session could not be ended."
-
-msgid "The Session could not be started."
-msgstr "The Session could not be started."
 
 msgid "The Session Desk"
 msgstr "A Secretária da Sessão"
 
+msgid "The Session could not be ended."
+msgstr "Não foi possível terminar a Sessão."
+
+msgid "The Session could not be started."
+msgstr "Não foi possível iniciar a Sessão."
+
 msgid "The Session has begun — the Table remembers tonight."
-msgstr "The Session has begun — the Table remembers tonight."
+msgstr "A Sessão começou — a Mesa recordará esta noite."
+
+msgid "The Summons to the Table"
+msgstr "O Convite para a Mesa"
 
 msgid "The Table remembers where you left it."
 msgstr "A Mesa recorda onde a deixou."
 
 msgid "The Tabletop could not be created."
-msgstr "The Tabletop could not be created."
+msgstr "Não foi possível criar o Tabletop."
 
 msgid "The Tabletop could not be removed."
-msgstr "The Tabletop could not be removed."
+msgstr "Não foi possível remover o Tabletop."
 
 msgid "The Tabletop rejected that request."
-msgstr "The Tabletop rejected that request."
-
-msgid "The test Table could not be prepared."
-msgstr "The test Table could not be prepared."
-
-msgid "The trap could not be placed."
-msgstr "The trap could not be placed."
-
-msgid "The treasure could not be placed."
-msgstr "The treasure could not be placed."
+msgstr "O Tabletop rejeitou esse pedido."
 
 msgid "The Turn of Battle"
 msgstr "O Turno de Combate"
@@ -807,14 +968,56 @@ msgstr "O Turno de Combate"
 msgid "The Veil of the Unknown"
 msgstr "O Véu do Desconhecido"
 
+msgid "The Wandering Cartographer"
+msgstr "O Cartógrafo Errante"
+
+msgid "The chamber awaits"
+msgstr "A câmara aguarda"
+
+msgid "The deeds of the Table have been recorded. Pippin has filed the Keeper draft, and the campaign remains active exactly where you left it."
+msgstr "Os feitos da Mesa foram registados. Pippin arquivou o rascunho do Guardião e a campanha continua ativa exatamente onde a deixaste."
+
+msgid "The first map on the Table"
+msgstr "O primeiro mapa na Mesa"
+
+msgid "The furniture was a Mimic. Pippin would like the record to show that he objected."
+msgstr "O mobiliário era um Mimic. Pippin gostaria que ficasse registado que se opôs."
+
+msgid "The live Chamber could not be refreshed."
+msgstr "Não foi possível atualizar a Câmara em direto."
+
+msgid "The new map is added safely in the background. It does not become active until you open it."
+msgstr "O novo mapa é adicionado em segurança em segundo plano. Só fica ativo quando o abrires."
+
+msgid "The next gathering awaits the Keeper."
+msgstr "O próximo encontro aguarda o Guardião."
+
+msgid "The player could not be invited."
+msgstr "Não foi possível convidar o jogador."
+
+msgid "The player could not be removed."
+msgstr "Não foi possível remover o jogador."
+
+msgid "The refreshed Chamber markup was not found."
+msgstr "Não foi encontrada a marcação atualizada da Câmara."
+
+msgid "The test Table could not be prepared."
+msgstr "Não foi possível preparar a Mesa de teste."
+
+msgid "The trap could not be placed."
+msgstr "Não foi possível colocar a armadilha."
+
+msgid "The treasure could not be placed."
+msgstr "Não foi possível colocar o tesouro."
+
 msgid "Theme"
 msgstr "Tema"
 
-msgid "This permanently removes the campaign from the Table Atlas and closes its saved route. This cannot be undone."
-msgstr "This permanently removes the campaign from the Table Atlas and closes its saved route. This cannot be undone."
-
 msgid "This Scene has no Forge projection yet, so there is no trap shelf to manage."
-msgstr "This Scene has no Forge projection yet, so there is no trap shelf to manage."
+msgstr "Esta Cena ainda não tem uma projeção da Forja, por isso não há uma prateleira de armadilhas para gerir."
+
+msgid "This permanently removes the campaign from the Table Atlas and closes its saved route. This cannot be undone."
+msgstr "Isto remove permanentemente a campanha do Atlas da Mesa e fecha a rota guardada. Esta ação não pode ser anulada."
 
 msgid "Tools"
 msgstr "Ferramentas"
@@ -823,28 +1026,28 @@ msgid "Torch"
 msgstr "Tocha"
 
 msgid "Trap placement cancelled. Pippin has lifted his feet very carefully."
-msgstr "Trap placement cancelled. Pippin has lifted his feet very carefully."
+msgstr "Colocação da armadilha cancelada. Pippin levantou os pés com extremo cuidado."
 
 msgid "Trap position updated."
-msgstr "Trap position updated."
+msgstr "Posição da armadilha atualizada."
 
 msgid "Trap selected — click the battlemap to place it."
-msgstr "Trap selected — click the battlemap to place it."
+msgstr "Armadilha selecionada — clica no mapa de batalha para a colocar."
 
 msgid "Trap updated."
-msgstr "Trap updated."
+msgstr "Armadilha atualizada."
 
 msgid "Treasure placement cancelled. Pippin has stopped drawing little X marks."
-msgstr "Treasure placement cancelled. Pippin has stopped drawing little X marks."
+msgstr "Colocação do tesouro cancelada. Pippin deixou de desenhar pequenos X."
 
 msgid "Treasure position updated."
-msgstr "Treasure position updated."
+msgstr "Posição do tesouro atualizada."
 
 msgid "Treasure selected — click the battlemap to place it."
-msgstr "Treasure selected — click the battlemap to place it."
+msgstr "Tesouro selecionado — clica no mapa de batalha para o colocar."
 
 msgid "Treasure updated."
-msgstr "Treasure updated."
+msgstr "Tesouro atualizado."
 
 msgid "Tripwire"
 msgstr "Fio de Tropeçar"
@@ -855,14 +1058,23 @@ msgstr "Turno:"
 msgid "Undo Last"
 msgstr "Desfazer Último"
 
-msgid "Until next time — this Session has concluded."
-msgstr "Until next time — this Session has concluded."
-
 msgid "Until Next Time…"
 msgstr "Até à Próxima…"
 
+msgid "Until next time — this Session has concluded."
+msgstr "Até à próxima — esta Sessão terminou."
+
+msgid "Use Monster Threshold"
+msgstr "Usar Ponto de Posicionamento de Monstros"
+
+msgid "Username or email"
+msgstr "Nome de utilizador ou email"
+
 msgid "View Recap"
 msgstr "Ver Resumo"
+
+msgid "Village"
+msgstr "Aldeia"
 
 msgid "Way in"
 msgstr "Entrada"
@@ -873,230 +1085,24 @@ msgstr "Armas à Mão"
 msgid "Weave / Quench"
 msgstr "Acender / Extinguir"
 
-msgid "Your Attack, Dash, Disengage, Dodge and Help controls appear here when this adventurer has the turn."
-msgstr "Your Attack, Dash, Disengage, Dodge and Help controls appear here when this adventurer has the turn."
-
-msgid "Your chair is waiting"
-msgstr "Your chair is waiting"
-
 msgid "YOUR TURN"
 msgstr "É O SEU TURNO"
 
-msgid "◆ proficient · ◆◆ expertise. Weapons and spells are projected from the Companion; the Tabletop does not duplicate their mechanics."
-msgstr "◆ proficient · ◆◆ expertise. Weapons and spells are projected from the Companion; the Tabletop does not duplicate their mechanics."
-
-msgid "ACTIVE TURN"
-msgstr "ACTIVE TURN"
-
-msgid "Adventurers at the Table"
-msgstr "Aventureiros à Mesa"
-
-msgid "Afflictions"
-msgstr "Condições"
-
-msgid "All"
-msgstr "Todos"
-
-msgid "Arm Disguise"
-msgstr "Armar Disfarce"
-
-msgid "Arrival portal"
-msgstr "Portal de chegada"
-
-msgid "At the Table"
-msgstr "À Mesa"
-
-msgid "Battle actions live with the combatant."
-msgstr "As ações de combate acompanham o combatente."
-
-msgid "Behind the Curtain"
-msgstr "Nos Bastidores"
-
-msgid "Beyond This Door, the Table Awaits"
-msgstr "Para Além desta Porta, a Mesa Espera"
-
-msgid "Calibrate Grid"
-msgstr "Calibrar Grelha"
-
-msgid "Cancel"
-msgstr "Cancelar"
-
-msgid "Cancel placement"
-msgstr "Cancelar colocação"
-
-msgid "Choose a visible battlefield target for attacks. Range and legality are reported in Turn of Battle."
-msgstr "Choose a visible battlefield target for attacks. Range and legality are reported in Turn of Battle."
-
-msgid "Choose combatant…"
-msgstr "Escolher combatente…"
-
-msgid "Choose target…"
-msgstr "Escolher alvo…"
-
-msgid "Combatants & initiative"
-msgstr "Combatentes e iniciativa"
-
-msgid "Compact"
-msgstr "Compacto"
-
-msgid "Convert Now"
-msgstr "Converter Agora"
-
-msgid "Copies"
-msgstr "Cópias"
-
-msgid "Death confirmed"
-msgstr "Morte confirmada"
-
-msgid "Delete"
-msgstr "Eliminar"
-
-msgid "Deployed at the centre of the Boss Lair and provisioned for combat."
-msgstr "Deployed at the centre of the Boss Lair and provisioned for combat."
-
-msgid "Development tools"
-msgstr "Ferramentas de desenvolvimento"
-
-msgid "Dungeon"
-msgstr "Masmorra"
-
-msgid "Duplicate"
-msgstr "Duplicar"
-
-msgid "Duration in turns"
-msgstr "Duração em turnos"
-
-msgid "Forest"
-msgstr "Floresta"
-
-msgid "Forge New Scene"
-msgstr "Forjar Nova Cena"
-
-msgid "Generate Scene"
-msgstr "Gerar Cena"
-
-msgid "Grand"
-msgstr "Grandioso"
-
-msgid "Guild Diceworks"
-msgstr "Oficina de Dados da Guilda"
-
-msgid "Hidden from Players"
-msgstr "Oculto dos Jogadores"
-
-msgid "Include Boss Lair"
-msgstr "Incluir Covil do Chefe"
-
-msgid "Include secrets"
-msgstr "Incluir segredos"
-
-msgid "Include traps"
-msgstr "Incluir armadilhas"
-
-msgid "Include treasure"
-msgstr "Incluir tesouro"
-
-msgid "Inspect creature record"
-msgstr "Inspecionar registo da criatura"
-
-msgid "Keeper's Cartography Assistant"
-msgstr "Assistente de Cartografia do Guardião"
-
-msgid "Leave the lair empty"
-msgstr "Deixar o covil vazio"
-
-msgid "Main entrance"
-msgstr "Entrada principal"
-
-msgid "Manage Players"
-msgstr "Gerir Jogadores"
-
-msgid "Meet the Wandering Cartographer"
-msgstr "Conhecer o Cartógrafo Errante"
-
-msgid "Move through the Scene freely. The Living Veil, doors, walls and remembered route remain active without rounds or turns."
-msgstr "Move through the Scene freely. The Living Veil, doors, walls and remembered route remain active without rounds or turns."
-
-msgid "NO TARGET SELECTED"
-msgstr "NO TARGET SELECTED"
-
-msgid "New Seed"
-msgstr "Nova Semente"
-
-msgid "No attack readied"
-msgstr "Nenhum ataque preparado"
-
-msgid "No creature records match the current search and map filter."
-msgstr "No creature records match the current search and map filter."
-
-msgid "None"
-msgstr "Nenhum"
-
-msgid "Not On This Map"
-msgstr "Fora Deste Mapa"
-
-msgid "On This Map"
-msgstr "Neste Mapa"
-
-msgid "Pippin's Field Note"
-msgstr "Nota de Campo do Pippin"
-
-msgid "Place on Map"
-msgstr "Colocar no Mapa"
-
-msgid "Populate ordinary rooms"
-msgstr "Povoar salas normais"
-
-msgid "Return to Live Scene"
-msgstr "Voltar à Cena ao Vivo"
-
-msgid "Search the shelves"
-msgstr "Pesquisar nas prateleiras"
-
-msgid "Sight Beyond the Door"
-msgstr "Visão Para Além da Porta"
-
-msgid "Snap to Grid"
-msgstr "Ajustar à Grelha"
-
-msgid "Stable"
-msgstr "Estável"
-
-msgid "Standard"
-msgstr "Padrão"
-
-msgid "Start Encounter"
-msgstr "Iniciar Encontro"
-
-msgid "Target"
-msgstr "Alvo"
-
-msgid "Target status"
-msgstr "Estado do alvo"
-
-msgid "Tell a story"
-msgstr "Contar uma história"
-
-msgid "The Forge will add a new Scene to the Atlas and open it Behind the Curtain for inspection."
-msgstr "The Forge will add a new Scene to the Atlas and open it Behind the Curtain for inspection."
-
-msgid "The Summons to the Table"
-msgstr "O Convite para a Mesa"
-
-msgid "The Wandering Cartographer"
-msgstr "O Cartógrafo Errante"
-
-msgid "The new map is added safely in the background. It does not become active until you open it."
-msgstr "The new map is added safely in the background. It does not become active until you open it."
-
-msgid "Use Monster Threshold"
-msgstr "Usar Ponto de Posicionamento de Monstros"
-
-msgid "Username or email"
-msgstr "Nome de utilizador ou email"
-
-msgid "Village"
-msgstr "Aldeia"
+msgid "Your Attack, Dash, Disengage, Dodge and Help controls appear here when this adventurer has the turn."
+msgstr "Os controlos de Ataque, Corrida, Desengajar, Esquiva e Ajuda aparecem aqui quando este aventureiro tem o turno."
 
 msgid "Your Fellowship Ribbon"
 msgstr "A sua Fita de Fellowship"
+
+msgid "Your chair is waiting"
+msgstr "O teu lugar está à espera"
+
+msgid "selected"
+msgstr "selecionado"
+
+msgid "temp"
+msgstr "temp."
+
+msgid "◆ proficient · ◆◆ expertise. Weapons and spells are projected from the Companion; the Tabletop does not duplicate their mechanics."
+msgstr "◆ proficiente · ◆◆ especialização. As armas e os feitiços são projetados a partir do Companion; o Tabletop não duplica as suas mecânicas."
+

@@ -29,5 +29,8 @@ final class PortuguesePortugalLanguagePackTest extends TestCase
         self::assertStringContainsString("msgid \"Exploration Mode\"\nmsgstr \"Modo de Exploração\"", $po);
         self::assertStringContainsString("msgid \"The Keeper's Tools\"\nmsgstr \"As Ferramentas do Guardião\"", $po);
         self::assertStringContainsString("msgid \"Start Encounter\"\nmsgstr \"Iniciar Encontro\"", $po);
+        self::assertStringContainsString("msgid \"Furniture duplicated. Pippin is counting again.\"\nmsgstr \"Mobiliário duplicado. Pippin voltou a contar.\"", $po);
+        self::assertStringContainsString("msgid \"ACTIVE TURN\"\nmsgstr \"TURNO ATIVO\"", $po);
+        self::assertStringContainsString("msgid \"NO TARGET SELECTED\"\nmsgstr \"NENHUM ALVO SELECIONADO\"", $po);
     }
 }
