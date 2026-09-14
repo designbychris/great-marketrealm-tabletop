@@ -14,6 +14,7 @@ Compiled locale packs should follow WordPress conventions, for example:
 - `great-marketrealm-tabletop-de_DE.po` / `.mo`
 - `great-marketrealm-tabletop-fr_FR.po` / `.mo`
 - `great-marketrealm-tabletop-es_ES.po` / `.mo`
+- `great-marketrealm-tabletop-pt_PT.po` / `.mo`
 
 JavaScript catalogues may be added later using WordPress JSON translation files when a script has been migrated to `wp.i18n`.
 
@@ -34,3 +35,6 @@ wp i18n make-pot . languages/great-marketrealm-tabletop.pot --domain=great-marke
 ## Available packs
 
 - `nl_NL` — Dutch (Netherlands), first proof-of-concept production pack. See `docs/Dutch-Language-Pack.md`.
+- `de_DE` — German (Germany).
+- `es_ES` — Spanish (Spain).
+- `pt_PT` — Portuguese (Portugal), first Portuguese production/test pack.

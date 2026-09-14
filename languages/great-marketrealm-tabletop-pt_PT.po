@@ -1,0 +1,1102 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: The Great MarketRealm Tabletop\\n"
+"Language-Team: Portuguese (Portugal)\\n"
+"Language: pt_PT\\n"
+"MIME-Version: 1.0\\n"
+"Content-Type: text/plain; charset=UTF-8\\n"
+"Content-Transfer-Encoding: 8bit\\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\\n"
+"X-Domain: great-marketrealm-tabletop\\n"
+
+msgid "(optional)"
+msgstr "(optional)"
+
+msgid "Abilities"
+msgstr "Atributos"
+
+msgid "Ability"
+msgstr "Atributo"
+
+msgid "Active Scene"
+msgstr "Cena Ativa"
+
+msgid "Add Map to Atlas"
+msgstr "Adicionar Mapa ao Atlas"
+
+msgid "Add, move, rename, reveal, disarm or remove traps prepared on this forged Scene."
+msgstr "Add, move, rename, reveal, disarm or remove traps prepared on this forged Scene."
+
+msgid "Adjust"
+msgstr "Ajustar"
+
+msgid "Adventure notes updated."
+msgstr "Notas da aventura atualizadas."
+
+msgid "Adventurer"
+msgstr "Aventureiro"
+
+msgid "Adventurer's Satchel"
+msgstr "Bolsa do Aventureiro"
+
+msgid "Apply"
+msgstr "Aplicar"
+
+msgid "Arm as Disguised Mimic"
+msgstr "Armar como Mímico Disfarçado"
+
+msgid "Arrival & Deployment"
+msgstr "Chegada e Posicionamento"
+
+msgid "Ask Pippin to Forge a Scene"
+msgstr "Pedir ao Pippin para Forjar uma Cena"
+
+msgid "Atlas"
+msgstr "Atlas"
+
+msgid "Attack"
+msgstr "Ataque"
+
+msgid "Awaiting result"
+msgstr "A aguardar resultado"
+
+msgid "Awaiting the roll…"
+msgstr "A aguardar o lançamento…"
+
+msgid "Battle"
+msgstr "Combate"
+
+msgid "Battle Actions"
+msgstr "Ações de Combate"
+
+msgid "Battlemap, Veil, lights, traps, sight, grid and furniture."
+msgstr "Battlemap, Veil, lights, traps, sight, grid and furniture."
+
+msgid "Begin Battle"
+msgstr "Iniciar Combate"
+
+msgid "Begin with a Blank Table"
+msgstr "Começar com uma Mesa em Branco"
+
+msgid "Bestiary"
+msgstr "Bestiário"
+
+msgid "Between Sessions"
+msgstr "Entre Sessões"
+
+msgid "Boss chamber"
+msgstr "Câmara do Chefe"
+
+msgid "Brazier"
+msgstr "Braseiro"
+
+msgid "Call Session"
+msgstr "Convocar Sessão"
+
+msgid "Call the Next Gathering"
+msgstr "Convocar o Próximo Encontro"
+
+msgid "Call the Session"
+msgstr "Convocar a Sessão"
+
+msgid "Called"
+msgstr "Convocada"
+
+msgid "Campaign description"
+msgstr "Descrição da campanha"
+
+msgid "Campaign linked."
+msgstr "Campanha associada."
+
+msgid "Campaign name"
+msgstr "Nome da campanha"
+
+msgid "Candle"
+msgstr "Vela"
+
+msgid "Change the Scene artwork used at this Table."
+msgstr "Change the Scene artwork used at this Table."
+
+msgid "Chest closed. Pippin is pretending this solves the problem."
+msgstr "Chest closed. Pippin is pretending this solves the problem."
+
+msgid "Chest opened. Pippin has taken three prudent steps backwards."
+msgstr "Chest opened. Pippin has taken three prudent steps backwards."
+
+msgid "Choose a check, save, skill, Initiative roll, readied weapon or spell."
+msgstr "Choose a check, save, skill, Initiative roll, readied weapon or spell."
+
+msgid "Choose a Companion Campaign…"
+msgstr "Escolher uma Campanha do Companion…"
+
+msgid "Choose a creature from the Bestiary first."
+msgstr "Escolha primeiro uma criatura do Bestiário."
+
+msgid "Choose a destination Scene…"
+msgstr "Escolher uma Cena de destino…"
+
+msgid "Choose a light source to begin."
+msgstr "Escolha uma fonte de luz para começar."
+
+msgid "Choose a light, then click the battlemap to place it. Scene-owned lights may be prepared Behind the Curtain."
+msgstr "Choose a light, then click the battlemap to place it. Scene-owned lights may be prepared Behind the Curtain."
+
+msgid "Choose a map…"
+msgstr "Escolher um mapa…"
+
+msgid "Choose a marker, then click the map. Party thresholds welcome adventurers who do not already have a remembered token in this Scene. Monster thresholds are reserved for the Keeper's Bestiary."
+msgstr "Choose a marker, then click the map. Party thresholds welcome adventurers who do not already have a remembered token in this Scene. Monster thresholds are reserved for the Keeper's Bestiary."
+
+msgid "Choose a Mimic from the Bestiary first."
+msgstr "Escolha primeiro um Mímico do Bestiário."
+
+msgid "Choose a trap, then place or tend it."
+msgstr "Escolha uma armadilha e depois coloque-a ou trate dela."
+
+msgid "Choose Battlemap"
+msgstr "Escolher Mapa de Combate"
+
+msgid "Choose from the Atlas"
+msgstr "Escolher no Atlas"
+
+msgid "Choose the saved Atlas map Pippin should place first."
+msgstr "Choose the saved Atlas map Pippin should place first."
+
+msgid "Close"
+msgstr "Fechar"
+
+msgid "Close Farewell"
+msgstr "Fechar Despedida"
+
+msgid "Close the Keeper's Atlas"
+msgstr "Fechar o Atlas do Guardião"
+
+msgid "Close the Keeper's Bestiary"
+msgstr "Fechar o Bestiário do Guardião"
+
+msgid "Close the Keeper's Tools"
+msgstr "Fechar as Ferramentas do Guardião"
+
+msgid "Close the Session Desk"
+msgstr "Fechar a Secretária da Sessão"
+
+msgid "Closing that seat…"
+msgstr "Closing that seat…"
+
+msgid "Closing the Session ledger…"
+msgstr "Closing the Session ledger…"
+
+msgid "Companion Campaign"
+msgstr "Campanha do Companion"
+
+msgid "Companion-certified"
+msgstr "Certificado pelo Companion"
+
+msgid "Completed Session details"
+msgstr "Detalhes da Sessão concluída"
+
+msgid "Convert to Mimic"
+msgstr "Converter em Mímico"
+
+msgid "Create a New Tabletop"
+msgstr "Criar uma Nova Mesa"
+
+msgid "Current combatant actions"
+msgstr "Ações do combatente atual"
+
+msgid "Current HP"
+msgstr "PV Atuais"
+
+msgid "Current Tabletop Scene"
+msgstr "Cena Atual da Mesa"
+
+msgid "Damage"
+msgstr "Dano"
+
+msgid "Disarm"
+msgstr "Desarmar"
+
+msgid "Disarm Mimic"
+msgstr "Desarmar Mímico"
+
+msgid "Disarm this disguised Mimic? The furnishing will remain."
+msgstr "Disarm this disguised Mimic? The furnishing will remain."
+
+msgid "Drag selected furniture on the map, or use the controls below."
+msgstr "Drag selected furniture on the map, or use the controls below."
+
+msgid "Draw Route"
+msgstr "Desenhar Rota"
+
+msgid "Draw Wall"
+msgstr "Desenhar Parede"
+
+msgid "Dungeon inhabitants"
+msgstr "Habitantes da masmorra"
+
+msgid "Dungeon Master"
+msgstr "Mestre de Jogo"
+
+msgid "Dungeon Master's Drawer"
+msgstr "Gaveta do Mestre de Jogo"
+
+msgid "Duration"
+msgstr "Duração"
+
+msgid "Enable Fog of War"
+msgstr "Ativar Nevoeiro de Guerra"
+
+msgid "Encounter name"
+msgstr "Nome do encontro"
+
+msgid "End Encounter"
+msgstr "Terminar Encontro"
+
+msgid "End Session"
+msgstr "Terminar Sessão"
+
+msgid "End the current Session? The campaign itself will remain active and can be resumed in a new Session later."
+msgstr "End the current Session? The campaign itself will remain active and can be resumed in a new Session later."
+
+msgid "End Turn"
+msgstr "Terminar Turno"
+
+msgid "Ended"
+msgstr "Terminada"
+
+msgid "Enter the Tabletop"
+msgstr "Entrar na Mesa"
+
+msgid "Environment"
+msgstr "Ambiente"
+
+msgid "Erase Route"
+msgstr "Apagar Rota"
+
+msgid "Every road back to the adventure, carefully recorded. Probably in the correct pocket."
+msgstr "Every road back to the adventure, carefully recorded. Probably in the correct pocket."
+
+msgid "Existing Tabletop Sessions are copied into the Companion Session Ledger when the link is made."
+msgstr "Existing Tabletop Sessions are copied into the Companion Session Ledger when the link is made."
+
+msgid "Exploration Mode"
+msgstr "Modo de Exploração"
+
+msgid "Filter Bestiary records by deployment"
+msgstr "Filtrar registos do Bestiário por posicionamento"
+
+msgid "Find Printed Grid"
+msgstr "Detetar Grelha Impressa"
+
+msgid "Finish / Cancel"
+msgstr "Concluir / Cancelar"
+
+msgid "Furniture"
+msgstr "Mobiliário"
+
+msgid "Furniture duplicated. Pippin is counting again."
+msgstr "Furniture duplicated. Pippin is counting again."
+
+msgid "Furniture move cancelled."
+msgstr "Furniture move cancelled."
+
+msgid "Furniture moved. Pippin has amended the floor plan."
+msgstr "Furniture moved. Pippin has amended the floor plan."
+
+msgid "Furniture removed. Pippin has reclaimed the floor space."
+msgstr "Furniture removed. Pippin has reclaimed the floor space."
+
+msgid "Furniture resized. Pippin disputes the new dimensions."
+msgstr "Furniture resized. Pippin disputes the new dimensions."
+
+msgid "Furniture rotated. Pippin has rotated the paper too."
+msgstr "Furniture rotated. Pippin has rotated the paper too."
+
+msgid "Furniture selection cleared."
+msgstr "Furniture selection cleared."
+
+msgid "Gather, recap and close the book without taking height from the battlefield."
+msgstr "Gather, recap and close the book without taking height from the battlefield."
+
+msgid "Healing"
+msgstr "Cura"
+
+msgid "Hide Recap"
+msgstr "Ocultar Resumo"
+
+msgid "In Progress"
+msgstr "Em Curso"
+
+msgid "Initiative"
+msgstr "Iniciativa"
+
+msgid "Interact"
+msgstr "Interagir"
+
+msgid "Invitation sent."
+msgstr "Convite enviado."
+
+msgid "Keep me signed in on this device"
+msgstr "Manter sessão iniciada neste dispositivo"
+
+msgid "Keep occupant hidden from Players"
+msgstr "Manter ocupante oculto dos Jogadores"
+
+msgid "Keeper Atlas"
+msgstr "Atlas do Guardião"
+
+msgid "Keeper Bestiary"
+msgstr "Bestiário do Guardião"
+
+msgid "Keeper Tools"
+msgstr "Ferramentas do Guardião"
+
+msgid "Keeper Workspace"
+msgstr "Área de Trabalho do Guardião"
+
+msgid "Keeper workspaces"
+msgstr "Áreas de trabalho do Guardião"
+
+msgid "Keeper-controlled. Arrivals use the destination Scene's Party Arrival Threshold."
+msgstr "Keeper-controlled. Arrivals use the destination Scene's Party Arrival Threshold."
+
+msgid "Lantern"
+msgstr "Lanterna"
+
+msgid "Level"
+msgstr "Nível"
+
+msgid "Link Campaign"
+msgstr "Associar Campanha"
+
+msgid "Live Scene"
+msgstr "Cena ao Vivo"
+
+msgid "Magical Light"
+msgstr "Luz Mágica"
+
+msgid "Maximum HP:"
+msgstr "PV Máximos:"
+
+msgid "Mimic disguise disarmed. Pippin remains unconvinced."
+msgstr "Mimic disguise disarmed. Pippin remains unconvinced."
+
+msgid "Move"
+msgstr "Mover"
+
+msgid "Move selected — click the battlemap for the trap’s new position."
+msgstr "Move selected — click the battlemap for the trap’s new position."
+
+msgid "Move selected — click the battlemap for the treasure’s new position."
+msgstr "Move selected — click the battlemap for the treasure’s new position."
+
+msgid "Name the campaign, then tell Pippin how its first map should arrive."
+msgstr "Name the campaign, then tell Pippin how its first map should arrive."
+
+msgid "No active DM Companion Campaigns are available. The Tabletop can still be played independently."
+msgstr "No active DM Companion Campaigns are available. The Tabletop can still be played independently."
+
+msgid "No active Scene"
+msgstr "Sem Cena ativa"
+
+msgid "No furniture selected"
+msgstr "Nenhum mobiliário selecionado"
+
+msgid "No spells are currently recorded in this adventurer's Companion spellbook."
+msgstr "No spells are currently recorded in this adventurer's Companion spellbook."
+
+msgid "No traps on this Scene yet."
+msgstr "Ainda não há armadilhas nesta Cena."
+
+msgid "No weapon is currently readied in the Companion Adventurer's Pack."
+msgstr "No weapon is currently readied in the Companion Adventurer's Pack."
+
+msgid "Open"
+msgstr "Abrir"
+
+msgid "Open Scene"
+msgstr "Abrir Cena"
+
+msgid "Optional Session title"
+msgstr "Título opcional da Sessão"
+
+msgid "Passive Perception"
+msgstr "Perceção Passiva"
+
+msgid "Password"
+msgstr "Palavra-passe"
+
+msgid "Pippin could not amend that treasure record."
+msgstr "Pippin could not amend that treasure record."
+
+msgid "Pippin could not rearrange that furnishing."
+msgstr "Pippin could not rearrange that furnishing."
+
+msgid "Pippin could not tend that trap."
+msgstr "Pippin could not tend that trap."
+
+msgid "Pippin could not turn that page."
+msgstr "Pippin could not turn that page."
+
+msgid "Pippin has no saved roads for you yet. A Keeper can set a new Table, or an Adventurer can return after receiving a Summons."
+msgstr "Pippin has no saved roads for you yet. A Keeper can set a new Table, or an Adventurer can return after receiving a Summons."
+
+msgid "Pippin is clearing a workbench beside the Forge…"
+msgstr "Pippin is clearing a workbench beside the Forge…"
+
+msgid "Pippin is erasing this road from the atlas…"
+msgstr "Pippin is erasing this road from the atlas…"
+
+msgid "Pippin is finding a suitable patch of table…"
+msgstr "Pippin is finding a suitable patch of table…"
+
+msgid "Pippin is joining the Table Atlas to the Companion Ledger…"
+msgstr "Pippin is joining the Table Atlas to the Companion Ledger…"
+
+msgid "Pippin Peppercorn presents"
+msgstr "Pippin Peppercorn apresenta"
+
+msgid "Pippin's field notes · Keeper draft"
+msgstr "Notas de campo do Pippin · rascunho do Guardião"
+
+msgid "Pippin's Table Atlas"
+msgstr "Atlas de Mesa do Pippin"
+
+msgid "Pippin’s Adventure Notes"
+msgstr "Notas de Aventura do Pippin"
+
+msgid "Place Door"
+msgstr "Colocar Porta"
+
+msgid "Place Monster Deployment"
+msgstr "Colocar Ponto de Posicionamento de Monstros"
+
+msgid "Place name"
+msgstr "Nome do local"
+
+msgid "Place Party Arrival"
+msgstr "Colocar Ponto de Chegada do Grupo"
+
+msgid "Place Trap"
+msgstr "Colocar Armadilha"
+
+msgid "Placement cancelled. Pippin has put the tape measure away."
+msgstr "Placement cancelled. Pippin has put the tape measure away."
+
+msgid "Placement remains armed; click again or cancel."
+msgstr "Placement remains armed; click again or cancel."
+
+msgid "Player removed."
+msgstr "Jogador removido."
+
+msgid "Prepare Scene"
+msgstr "Preparar Cena"
+
+msgid "Prepare Test Table"
+msgstr "Preparar Mesa de Teste"
+
+msgid "Preparing…"
+msgstr "A preparar…"
+
+msgid "Pressure Plate"
+msgstr "Placa de Pressão"
+
+msgid "Preview Player Fog"
+msgstr "Pré-visualizar Nevoeiro do Jogador"
+
+msgid "Previous Session · Pippin Peppercorn presents"
+msgstr "Sessão Anterior · Pippin Peppercorn apresenta"
+
+msgid "Previously, in the MarketRealm…"
+msgstr "Anteriormente, no MarketRealm…"
+
+msgid "Proficiency"
+msgstr "Proficiência"
+
+msgid "Re-arm"
+msgstr "Rearmar"
+
+msgid "Remove"
+msgstr "Remover"
+
+msgid "Remove from Atlas"
+msgstr "Remover do Atlas"
+
+msgid "Remove from Chamber"
+msgstr "Remover da Câmara"
+
+msgid "Remove Tabletop"
+msgstr "Remover Mesa"
+
+msgid "Remove this furnishing from the Scene?"
+msgstr "Remove this furnishing from the Scene?"
+
+msgid "Remove this Tabletop"
+msgstr "Remover esta Mesa"
+
+msgid "Remove this trap from the Scene?"
+msgstr "Remove this trap from the Scene?"
+
+msgid "Remove this treasure from the Scene?"
+msgstr "Remove this treasure from the Scene?"
+
+msgid "Reset & Conceal"
+msgstr "Repor e Ocultar"
+
+msgid "Reset Exploration"
+msgstr "Repor Exploração"
+
+msgid "Reset Preview"
+msgstr "Repor Pré-visualização"
+
+msgid "Reveal Mimic"
+msgstr "Revelar Mímico"
+
+msgid "Roll Damage"
+msgstr "Lançar Dano"
+
+msgid "Round"
+msgstr "Ronda"
+
+msgid "Sage is preparing the Training Grounds…"
+msgstr "Sage está a preparar os Campos de Treino…"
+
+msgid "Satchel"
+msgstr "Bolsa"
+
+msgid "Save"
+msgstr "Guardar"
+
+msgid "Save DC"
+msgstr "CD de Resistência"
+
+msgid "Save Grid"
+msgstr "Guardar Grelha"
+
+msgid "Save Measures"
+msgstr "Guardar Medidas"
+
+msgid "Saved Atlas map"
+msgstr "Mapa do Atlas guardado"
+
+msgid "Saving Throws"
+msgstr "Testes de Resistência"
+
+msgid "Scale"
+msgstr "Escala"
+
+msgid "Scene name"
+msgstr "Nome da Cena"
+
+msgid "Seed"
+msgstr "Semente"
+
+msgid "selected"
+msgstr "selecionado"
+
+msgid "Selected character"
+msgstr "Personagem selecionada"
+
+msgid "Selected furniture controls"
+msgstr "Controlos do mobiliário selecionado"
+
+msgid "Send Summons"
+msgstr "Enviar Convite"
+
+msgid "Sending the Summons…"
+msgstr "A enviar o convite…"
+
+msgid "Session"
+msgstr "Sessão"
+
+msgid "Session Desk"
+msgstr "Secretária da Sessão"
+
+msgid "Set the Table"
+msgstr "Preparar a Mesa"
+
+msgid "Show Recap"
+msgstr "Mostrar Resumo"
+
+msgid "Sight"
+msgstr "Visão"
+
+msgid "Skills"
+msgstr "Perícias"
+
+msgid "Snap to Grid disabled. Pippin is trying not to look."
+msgstr "Snap to Grid disabled. Pippin is trying not to look."
+
+msgid "Snap to Grid enabled. Pippin has restored order."
+msgstr "Snap to Grid enabled. Pippin has restored order."
+
+msgid "Something waiting in the lair"
+msgstr "Algo à espera no covil"
+
+msgid "Speed"
+msgstr "Deslocamento"
+
+msgid "Spell Attack"
+msgstr "Ataque Mágico"
+
+msgid "Spell Pouch"
+msgstr "Bolsa de Magias"
+
+msgid "Spell slots"
+msgstr "Espaços de magia"
+
+msgid "Spring"
+msgstr "Disparar"
+
+msgid "Start Session"
+msgstr "Iniciar Sessão"
+
+msgid "Starting grid"
+msgstr "Grelha inicial"
+
+msgid "Summon a player"
+msgstr "Convidar um jogador"
+
+msgid "Table"
+msgstr "Mesa"
+
+msgid "Table role and status"
+msgstr "Função e estado na mesa"
+
+msgid "Table Session"
+msgstr "Sessão da Mesa"
+
+msgid "Tabletop removed."
+msgstr "Mesa removida."
+
+msgid "Take the Party Through"
+msgstr "Levar o Grupo Através"
+
+msgid "Teach the Veil where sight must stop."
+msgstr "Teach the Veil where sight must stop."
+
+msgid "temp"
+msgstr "temp."
+
+msgid "Temporary HP"
+msgstr "PV Temporários"
+
+msgid "The Adventure Continues"
+msgstr "A Aventura Continua"
+
+msgid "The Battlemap"
+msgstr "O Mapa de Combate"
+
+msgid "The chamber awaits"
+msgstr "A câmara aguarda"
+
+msgid "The Companion Campaign could not be linked."
+msgstr "The Companion Campaign could not be linked."
+
+msgid "The deeds of the Table have been recorded. Pippin has filed the Keeper draft, and the campaign remains active exactly where you left it."
+msgstr "The deeds of the Table have been recorded. Pippin has filed the Keeper draft, and the campaign remains active exactly where you left it."
+
+msgid "The first map on the Table"
+msgstr "O primeiro mapa na Mesa"
+
+msgid "The furniture was a Mimic. Pippin would like the record to show that he objected."
+msgstr "The furniture was a Mimic. Pippin would like the record to show that he objected."
+
+msgid "The Gathering"
+msgstr "O Encontro"
+
+msgid "The Gathering at the Table"
+msgstr "O Encontro à Mesa"
+
+msgid "The Keeper has not called today's Session yet."
+msgstr "The Keeper has not called today's Session yet."
+
+msgid "The Keeper is calling the Session…"
+msgstr "The Keeper is calling the Session…"
+
+msgid "The Keeper's Atlas"
+msgstr "O Atlas do Guardião"
+
+msgid "The Keeper's Bestiary"
+msgstr "O Bestiário do Guardião"
+
+msgid "The Keeper's Furniture Palette"
+msgstr "A Paleta de Mobiliário do Guardião"
+
+msgid "The Keeper's Lantern Rack"
+msgstr "O Suporte de Lanternas do Guardião"
+
+msgid "The Keeper's Session Desk"
+msgstr "A Secretária de Sessão do Guardião"
+
+msgid "The Keeper's Tools"
+msgstr "As Ferramentas do Guardião"
+
+msgid "The Keeper's Trap Cabinet"
+msgstr "O Armário de Armadilhas do Guardião"
+
+msgid "The Keeper's Treasure Ledger"
+msgstr "O Registo de Tesouros do Guardião"
+
+msgid "The Keeper\\'s Atlas"
+msgstr "O Atlas do Guardião"
+
+msgid "The Keeper\\'s Bestiary"
+msgstr "O Bestiário do Guardião"
+
+msgid "The Keeper\\'s Lantern Rack"
+msgstr "O Suporte de Lanternas do Guardião"
+
+msgid "The Keeper\\'s Tools"
+msgstr "As Ferramentas do Guardião"
+
+msgid "The live Chamber could not be refreshed."
+msgstr "The live Chamber could not be refreshed."
+
+msgid "The Next Gathering"
+msgstr "O Próximo Encontro"
+
+msgid "The next gathering awaits the Keeper."
+msgstr "The next gathering awaits the Keeper."
+
+msgid "The player could not be invited."
+msgstr "The player could not be invited."
+
+msgid "The player could not be removed."
+msgstr "The player could not be removed."
+
+msgid "The refreshed Chamber markup was not found."
+msgstr "The refreshed Chamber markup was not found."
+
+msgid "The Session could not be ended."
+msgstr "The Session could not be ended."
+
+msgid "The Session could not be started."
+msgstr "The Session could not be started."
+
+msgid "The Session Desk"
+msgstr "A Secretária da Sessão"
+
+msgid "The Session has begun — the Table remembers tonight."
+msgstr "The Session has begun — the Table remembers tonight."
+
+msgid "The Table remembers where you left it."
+msgstr "A Mesa recorda onde a deixou."
+
+msgid "The Tabletop could not be created."
+msgstr "The Tabletop could not be created."
+
+msgid "The Tabletop could not be removed."
+msgstr "The Tabletop could not be removed."
+
+msgid "The Tabletop rejected that request."
+msgstr "The Tabletop rejected that request."
+
+msgid "The test Table could not be prepared."
+msgstr "The test Table could not be prepared."
+
+msgid "The trap could not be placed."
+msgstr "The trap could not be placed."
+
+msgid "The treasure could not be placed."
+msgstr "The treasure could not be placed."
+
+msgid "The Turn of Battle"
+msgstr "O Turno de Combate"
+
+msgid "The Veil of the Unknown"
+msgstr "O Véu do Desconhecido"
+
+msgid "Theme"
+msgstr "Tema"
+
+msgid "This permanently removes the campaign from the Table Atlas and closes its saved route. This cannot be undone."
+msgstr "This permanently removes the campaign from the Table Atlas and closes its saved route. This cannot be undone."
+
+msgid "This Scene has no Forge projection yet, so there is no trap shelf to manage."
+msgstr "This Scene has no Forge projection yet, so there is no trap shelf to manage."
+
+msgid "Tools"
+msgstr "Ferramentas"
+
+msgid "Torch"
+msgstr "Tocha"
+
+msgid "Trap placement cancelled. Pippin has lifted his feet very carefully."
+msgstr "Trap placement cancelled. Pippin has lifted his feet very carefully."
+
+msgid "Trap position updated."
+msgstr "Trap position updated."
+
+msgid "Trap selected — click the battlemap to place it."
+msgstr "Trap selected — click the battlemap to place it."
+
+msgid "Trap updated."
+msgstr "Trap updated."
+
+msgid "Treasure placement cancelled. Pippin has stopped drawing little X marks."
+msgstr "Treasure placement cancelled. Pippin has stopped drawing little X marks."
+
+msgid "Treasure position updated."
+msgstr "Treasure position updated."
+
+msgid "Treasure selected — click the battlemap to place it."
+msgstr "Treasure selected — click the battlemap to place it."
+
+msgid "Treasure updated."
+msgstr "Treasure updated."
+
+msgid "Tripwire"
+msgstr "Fio de Tropeçar"
+
+msgid "Turn:"
+msgstr "Turno:"
+
+msgid "Undo Last"
+msgstr "Desfazer Último"
+
+msgid "Until next time — this Session has concluded."
+msgstr "Until next time — this Session has concluded."
+
+msgid "Until Next Time…"
+msgstr "Até à Próxima…"
+
+msgid "View Recap"
+msgstr "Ver Resumo"
+
+msgid "Way in"
+msgstr "Entrada"
+
+msgid "Weapons to Hand"
+msgstr "Armas à Mão"
+
+msgid "Weave / Quench"
+msgstr "Acender / Extinguir"
+
+msgid "Your Attack, Dash, Disengage, Dodge and Help controls appear here when this adventurer has the turn."
+msgstr "Your Attack, Dash, Disengage, Dodge and Help controls appear here when this adventurer has the turn."
+
+msgid "Your chair is waiting"
+msgstr "Your chair is waiting"
+
+msgid "YOUR TURN"
+msgstr "É O SEU TURNO"
+
+msgid "◆ proficient · ◆◆ expertise. Weapons and spells are projected from the Companion; the Tabletop does not duplicate their mechanics."
+msgstr "◆ proficient · ◆◆ expertise. Weapons and spells are projected from the Companion; the Tabletop does not duplicate their mechanics."
+
+msgid "ACTIVE TURN"
+msgstr "ACTIVE TURN"
+
+msgid "Adventurers at the Table"
+msgstr "Aventureiros à Mesa"
+
+msgid "Afflictions"
+msgstr "Condições"
+
+msgid "All"
+msgstr "Todos"
+
+msgid "Arm Disguise"
+msgstr "Armar Disfarce"
+
+msgid "Arrival portal"
+msgstr "Portal de chegada"
+
+msgid "At the Table"
+msgstr "À Mesa"
+
+msgid "Battle actions live with the combatant."
+msgstr "As ações de combate acompanham o combatente."
+
+msgid "Behind the Curtain"
+msgstr "Nos Bastidores"
+
+msgid "Beyond This Door, the Table Awaits"
+msgstr "Para Além desta Porta, a Mesa Espera"
+
+msgid "Calibrate Grid"
+msgstr "Calibrar Grelha"
+
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgid "Cancel placement"
+msgstr "Cancelar colocação"
+
+msgid "Choose a visible battlefield target for attacks. Range and legality are reported in Turn of Battle."
+msgstr "Choose a visible battlefield target for attacks. Range and legality are reported in Turn of Battle."
+
+msgid "Choose combatant…"
+msgstr "Escolher combatente…"
+
+msgid "Choose target…"
+msgstr "Escolher alvo…"
+
+msgid "Combatants & initiative"
+msgstr "Combatentes e iniciativa"
+
+msgid "Compact"
+msgstr "Compacto"
+
+msgid "Convert Now"
+msgstr "Converter Agora"
+
+msgid "Copies"
+msgstr "Cópias"
+
+msgid "Death confirmed"
+msgstr "Morte confirmada"
+
+msgid "Delete"
+msgstr "Eliminar"
+
+msgid "Deployed at the centre of the Boss Lair and provisioned for combat."
+msgstr "Deployed at the centre of the Boss Lair and provisioned for combat."
+
+msgid "Development tools"
+msgstr "Ferramentas de desenvolvimento"
+
+msgid "Dungeon"
+msgstr "Masmorra"
+
+msgid "Duplicate"
+msgstr "Duplicar"
+
+msgid "Duration in turns"
+msgstr "Duração em turnos"
+
+msgid "Forest"
+msgstr "Floresta"
+
+msgid "Forge New Scene"
+msgstr "Forjar Nova Cena"
+
+msgid "Generate Scene"
+msgstr "Gerar Cena"
+
+msgid "Grand"
+msgstr "Grandioso"
+
+msgid "Guild Diceworks"
+msgstr "Oficina de Dados da Guilda"
+
+msgid "Hidden from Players"
+msgstr "Oculto dos Jogadores"
+
+msgid "Include Boss Lair"
+msgstr "Incluir Covil do Chefe"
+
+msgid "Include secrets"
+msgstr "Incluir segredos"
+
+msgid "Include traps"
+msgstr "Incluir armadilhas"
+
+msgid "Include treasure"
+msgstr "Incluir tesouro"
+
+msgid "Inspect creature record"
+msgstr "Inspecionar registo da criatura"
+
+msgid "Keeper's Cartography Assistant"
+msgstr "Assistente de Cartografia do Guardião"
+
+msgid "Leave the lair empty"
+msgstr "Deixar o covil vazio"
+
+msgid "Main entrance"
+msgstr "Entrada principal"
+
+msgid "Manage Players"
+msgstr "Gerir Jogadores"
+
+msgid "Meet the Wandering Cartographer"
+msgstr "Conhecer o Cartógrafo Errante"
+
+msgid "Move through the Scene freely. The Living Veil, doors, walls and remembered route remain active without rounds or turns."
+msgstr "Move through the Scene freely. The Living Veil, doors, walls and remembered route remain active without rounds or turns."
+
+msgid "NO TARGET SELECTED"
+msgstr "NO TARGET SELECTED"
+
+msgid "New Seed"
+msgstr "Nova Semente"
+
+msgid "No attack readied"
+msgstr "Nenhum ataque preparado"
+
+msgid "No creature records match the current search and map filter."
+msgstr "No creature records match the current search and map filter."
+
+msgid "None"
+msgstr "Nenhum"
+
+msgid "Not On This Map"
+msgstr "Fora Deste Mapa"
+
+msgid "On This Map"
+msgstr "Neste Mapa"
+
+msgid "Pippin's Field Note"
+msgstr "Nota de Campo do Pippin"
+
+msgid "Place on Map"
+msgstr "Colocar no Mapa"
+
+msgid "Populate ordinary rooms"
+msgstr "Povoar salas normais"
+
+msgid "Return to Live Scene"
+msgstr "Voltar à Cena ao Vivo"
+
+msgid "Search the shelves"
+msgstr "Pesquisar nas prateleiras"
+
+msgid "Sight Beyond the Door"
+msgstr "Visão Para Além da Porta"
+
+msgid "Snap to Grid"
+msgstr "Ajustar à Grelha"
+
+msgid "Stable"
+msgstr "Estável"
+
+msgid "Standard"
+msgstr "Padrão"
+
+msgid "Start Encounter"
+msgstr "Iniciar Encontro"
+
+msgid "Target"
+msgstr "Alvo"
+
+msgid "Target status"
+msgstr "Estado do alvo"
+
+msgid "Tell a story"
+msgstr "Contar uma história"
+
+msgid "The Forge will add a new Scene to the Atlas and open it Behind the Curtain for inspection."
+msgstr "The Forge will add a new Scene to the Atlas and open it Behind the Curtain for inspection."
+
+msgid "The Summons to the Table"
+msgstr "O Convite para a Mesa"
+
+msgid "The Wandering Cartographer"
+msgstr "O Cartógrafo Errante"
+
+msgid "The new map is added safely in the background. It does not become active until you open it."
+msgstr "The new map is added safely in the background. It does not become active until you open it."
+
+msgid "Use Monster Threshold"
+msgstr "Usar Ponto de Posicionamento de Monstros"
+
+msgid "Username or email"
+msgstr "Nome de utilizador ou email"
+
+msgid "Village"
+msgstr "Aldeia"
+
+msgid "Your Fellowship Ribbon"
+msgstr "A sua Fita de Fellowship"
