@@ -2656,6 +2656,90 @@
             return sum / Math.max(1, count);
         };
 
+        // IV.30.1G — Adaptive Evidence Model.
+        // Imported maps do not agree on what "dark" means: parchment scans, pale
+        // stone, charcoal caves and digital maps all place their wall ink at very
+        // different absolute luminance values. Build summed-area tables once so the
+        // specialist readers can judge a sample against its *local* neighbourhood in
+        // constant time instead of relying on one global darkness threshold.
+        const luminanceIntegralWidth = canvas.width + 1;
+        const luminanceIntegral = new Float64Array((canvas.width + 1) * (canvas.height + 1));
+        const luminanceSquaredIntegral = new Float64Array((canvas.width + 1) * (canvas.height + 1));
+        const luminanceHistogram = new Uint32Array(256);
+        for (let y = 0; y < canvas.height; y += 1) {
+            let rowSum = 0;
+            let rowSquaredSum = 0;
+            for (let x = 0; x < canvas.width; x += 1) {
+                const value = luminance(x, y);
+                rowSum += value;
+                rowSquaredSum += value * value;
+                const index = ((y + 1) * luminanceIntegralWidth) + (x + 1);
+                luminanceIntegral[index] = luminanceIntegral[index - luminanceIntegralWidth] + rowSum;
+                luminanceSquaredIntegral[index] = luminanceSquaredIntegral[index - luminanceIntegralWidth] + rowSquaredSum;
+                luminanceHistogram[Math.max(0, Math.min(255, Math.round(value)))] += 1;
+            }
+        }
+        const luminancePercentile = (fraction) => {
+            const target = Math.max(1, Math.round(canvas.width * canvas.height * fraction));
+            let seen = 0;
+            for (let value = 0; value < luminanceHistogram.length; value += 1) {
+                seen += luminanceHistogram[value];
+                if (seen >= target) return value;
+            }
+            return 255;
+        };
+        const mapTone = {
+            dark: luminancePercentile(.18),
+            middle: luminancePercentile(.50),
+            light: luminancePercentile(.82)
+        };
+        const luminanceRegionStats = (x1, y1, x2, y2) => {
+            const left = Math.max(0, Math.min(canvas.width - 1, Math.floor(Math.min(x1, x2))));
+            const top = Math.max(0, Math.min(canvas.height - 1, Math.floor(Math.min(y1, y2))));
+            const right = Math.min(canvas.width, Math.max(left + 1, Math.ceil(Math.max(x1, x2))));
+            const bottom = Math.min(canvas.height, Math.max(top + 1, Math.ceil(Math.max(y1, y2))));
+            const sumAt = (table, x, y) => table[(y * luminanceIntegralWidth) + x];
+            const area = Math.max(1, (right - left) * (bottom - top));
+            const sum = sumAt(luminanceIntegral, right, bottom)
+                - sumAt(luminanceIntegral, left, bottom)
+                - sumAt(luminanceIntegral, right, top)
+                + sumAt(luminanceIntegral, left, top);
+            const squared = sumAt(luminanceSquaredIntegral, right, bottom)
+                - sumAt(luminanceSquaredIntegral, left, bottom)
+                - sumAt(luminanceSquaredIntegral, right, top)
+                + sumAt(luminanceSquaredIntegral, left, top);
+            const mean = sum / area;
+            const variance = Math.max(0, (squared / area) - (mean * mean));
+            return { mean, deviation: Math.sqrt(variance), area };
+        };
+        const adaptiveInkEvidence = (x1, y1, x2, y2, neighbourhoodRadius) => {
+            const sample = luminanceRegionStats(x1, y1, x2, y2);
+            const centerX = (x1 + x2) / 2;
+            const centerY = (y1 + y2) / 2;
+            const neighbourhood = luminanceRegionStats(
+                centerX - neighbourhoodRadius,
+                centerY - neighbourhoodRadius,
+                centerX + neighbourhoodRadius,
+                centerY + neighbourhoodRadius
+            );
+            const localContrast = neighbourhood.mean - sample.mean;
+            // Busy hatch/stone needs more separation than quiet floor before a mark is
+            // trusted. Pale walls can therefore qualify through relative contrast,
+            // while globally dark floors are not automatically promoted to wall ink.
+            const requiredContrast = Math.max(9, Math.min(32, 8 + (neighbourhood.deviation * .38)));
+            const relativeInk = localContrast >= requiredContrast;
+            const tonalGuard = sample.mean <= Math.max(mapTone.middle - 4, mapTone.dark + 52);
+            return {
+                sampleMean: sample.mean,
+                localMean: neighbourhood.mean,
+                localDeviation: neighbourhood.deviation,
+                localContrast,
+                requiredContrast,
+                relativeInk: relativeInk && tonalGuard,
+                strong: localContrast >= requiredContrast * 1.45 && tonalGuard
+            };
+        };
+
         const grid = visionGrid();
         const columns = Math.max(0, Math.floor((displayWidth - grid.offsetX) / grid.size));
         const rows = Math.max(0, Math.floor((displayHeight - grid.offsetY) / grid.size));
@@ -2703,28 +2787,36 @@
         }
 
         const structuralCartographyCandidates = () => {
+            // Keep the historic absolute threshold only as a conservative fallback for
+            // genuinely dark ink. IV.30.1G makes local contrast the primary evidence.
             const darkThreshold = 92;
+            const gridCanvas = Math.max(4, toCanvasX(grid.size));
             const sampleStep = Math.max(1, Math.round(Math.min(canvas.width, canvas.height) / 900));
             const dark = new Uint8Array(canvas.width * canvas.height);
+            const adaptiveNeighbourhood = Math.max(6, gridCanvas * .42);
             for (let y = 0; y < canvas.height; y += sampleStep) {
                 for (let x = 0; x < canvas.width; x += sampleStep) {
+                    const right = Math.min(canvas.width, x + sampleStep);
+                    const bottom = Math.min(canvas.height, y + sampleStep);
+                    const evidence = adaptiveInkEvidence(x, y, right, bottom, adaptiveNeighbourhood);
                     let darkSamples = 0;
                     let totalSamples = 0;
-                    for (let yy = y; yy < Math.min(canvas.height, y + sampleStep); yy += 1) {
-                        for (let xx = x; xx < Math.min(canvas.width, x + sampleStep); xx += 1) {
+                    for (let yy = y; yy < bottom; yy += 1) {
+                        for (let xx = x; xx < right; xx += 1) {
                             totalSamples += 1;
                             if (luminance(xx, yy) <= darkThreshold) darkSamples += 1;
                         }
                     }
-                    if (darkSamples / Math.max(1, totalSamples) >= .45) {
-                        for (let yy = y; yy < Math.min(canvas.height, y + sampleStep); yy += 1) {
-                            for (let xx = x; xx < Math.min(canvas.width, x + sampleStep); xx += 1) dark[(yy * canvas.width) + xx] = 1;
+                    const absoluteDarkInk = darkSamples / Math.max(1, totalSamples) >= .45
+                        && evidence.localContrast >= 4;
+                    if (evidence.relativeInk || absoluteDarkInk) {
+                        for (let yy = y; yy < bottom; yy += 1) {
+                            for (let xx = x; xx < right; xx += 1) dark[(yy * canvas.width) + xx] = 1;
                         }
                     }
                 }
             }
 
-            const gridCanvas = Math.max(4, toCanvasX(grid.size));
             const traceStep = Math.max(2, gridCanvas / 5);
             const traceRadius = Math.max(2, gridCanvas * .11);
             const minimumRun = Math.max(2, Math.round(gridCanvas * .28));
@@ -2739,7 +2831,11 @@
                 const dx = Math.abs(gx2 - gx1);
                 const dy = Math.abs(gy2 - gy1);
                 if (dx > 1 || dy > 1) return;
-                const suggestion = { x1: gx1, y1: gy1, x2: gx2, y2: gy2, type: 'wall', confidence, selected: true, structural: true };
+                const suggestion = {
+                    x1: gx1, y1: gy1, x2: gx2, y2: gy2,
+                    type: 'wall', confidence, selected: true, structural: true,
+                    adaptiveEvidence: true, evidenceModel: 'local-contrast-v1'
+                };
                 const key = cartographySuggestionKey(suggestion);
                 const previous = wallVotes.get(key);
                 if (!previous || previous.confidence < confidence) wallVotes.set(key, suggestion);
@@ -2765,12 +2861,25 @@
                 const sideB = densityAt(x - (normalX * sideOffset), y - (normalY * sideOffset));
                 const quietSide = Math.min(sideA, sideB);
                 const loudSide = Math.max(sideA, sideB);
+                const sampleRadius = Math.max(1.5, traceRadius * .72);
+                const adaptiveEvidence = adaptiveInkEvidence(
+                    x - sampleRadius, y - sampleRadius,
+                    x + sampleRadius, y + sampleRadius,
+                    Math.max(adaptiveNeighbourhood, gridCanvas * .34)
+                );
+                const densityStructure = center >= .18 && quietSide <= .16 && center >= loudSide * 1.25;
+                const adaptiveStructure = adaptiveEvidence.strong
+                    && center >= .12
+                    && quietSide <= .22
+                    && center >= loudSide * 1.08;
                 return {
                     center,
                     quietSide,
                     loudSide,
-                    structural: center >= .18 && quietSide <= .16 && center >= loudSide * 1.25,
+                    adaptiveEvidence,
+                    structural: densityStructure || adaptiveStructure,
                     continuity: center >= .10 && quietSide <= .20 && center >= loudSide * 1.05
+                        || (adaptiveEvidence.relativeInk && center >= .08 && quietSide <= .24)
                 };
             };
 
