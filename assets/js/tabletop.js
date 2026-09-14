@@ -2957,7 +2957,100 @@
                 }
             });
 
-            return Array.from(wallVotes.values());
+            // IV.30.1G.1 — Corners, Junctions & Wall Bodies.
+            // A single dark stroke is weak evidence. A stroke that participates in a
+            // recognisable architectural structure is much stronger: corners, T/X
+            // junctions, collinear continuation and a thick wall-body profile all add
+            // confidence. This is deliberately a scoring layer over the adaptive
+            // reader rather than a hard requirement, so damaged scans and incomplete
+            // walls are not erased merely because one neighbour is missing.
+            const rawStructuralWalls = Array.from(wallVotes.values());
+            const vertexKey = (x, y) => `${x}:${y}`;
+            const vertexWalls = new Map();
+            const addVertexWall = (key, index) => {
+                const attached = vertexWalls.get(key) || [];
+                attached.push(index);
+                vertexWalls.set(key, attached);
+            };
+            rawStructuralWalls.forEach((wall, index) => {
+                addVertexWall(vertexKey(wall.x1, wall.y1), index);
+                addVertexWall(vertexKey(wall.x2, wall.y2), index);
+            });
+            const directionFor = (wall) => {
+                const dx = Math.sign(wall.x2 - wall.x1);
+                const dy = Math.sign(wall.y2 - wall.y1);
+                return { dx, dy };
+            };
+            const collinearDirections = (a, b) => (a.dx === b.dx && a.dy === b.dy)
+                || (a.dx === -b.dx && a.dy === -b.dy);
+            const endpointArchitecture = (wall, wallIndex, x, y) => {
+                const direction = directionFor(wall);
+                const neighbours = (vertexWalls.get(vertexKey(x, y)) || [])
+                    .filter((index) => index !== wallIndex)
+                    .map((index) => rawStructuralWalls[index]);
+                const continuation = neighbours.some((other) => collinearDirections(direction, directionFor(other)));
+                const turns = neighbours.filter((other) => ! collinearDirections(direction, directionFor(other))).length;
+                return {
+                    degree: neighbours.length + 1,
+                    continuation,
+                    corner: turns >= 1 && neighbours.length === 1,
+                    junction: neighbours.length >= 2
+                };
+            };
+            const wallBodyProfile = (wall) => {
+                const direction = directionFor(wall);
+                const length = Math.hypot(direction.dx, direction.dy) || 1;
+                const normalX = -direction.dy / length;
+                const normalY = direction.dx / length;
+                const midpointX = toCanvasX(grid.offsetX) + (((wall.x1 + wall.x2) / 2) * gridCanvas);
+                const midpointY = toCanvasY(grid.offsetY) + (((wall.y1 + wall.y2) / 2) * gridCanvas);
+                const innerOffset = Math.max(1.5, traceRadius * .72);
+                const outerOffset = Math.max(innerOffset + 1, gridCanvas * .23);
+                const center = densityAt(midpointX, midpointY);
+                const innerA = densityAt(midpointX + (normalX * innerOffset), midpointY + (normalY * innerOffset));
+                const innerB = densityAt(midpointX - (normalX * innerOffset), midpointY - (normalY * innerOffset));
+                const outerA = densityAt(midpointX + (normalX * outerOffset), midpointY + (normalY * outerOffset));
+                const outerB = densityAt(midpointX - (normalX * outerOffset), midpointY - (normalY * outerOffset));
+                const innerSupport = Math.max(innerA, innerB);
+                const quietExterior = Math.min(outerA, outerB);
+                const supported = center >= .13 && innerSupport >= .08 && quietExterior <= .22;
+                return { supported, center, innerSupport, quietExterior };
+            };
+            const architecturalWalls = rawStructuralWalls.map((wall, wallIndex) => {
+                const start = endpointArchitecture(wall, wallIndex, wall.x1, wall.y1);
+                const end = endpointArchitecture(wall, wallIndex, wall.x2, wall.y2);
+                const body = wallBodyProfile(wall);
+                const cornerCount = Number(start.corner) + Number(end.corner);
+                const junctionCount = Number(start.junction) + Number(end.junction);
+                const continuationCount = Number(start.continuation) + Number(end.continuation);
+                const isolated = start.degree === 1 && end.degree === 1 && ! body.supported;
+                const architectureBoost = (cornerCount * 4)
+                    + (junctionCount * 7)
+                    + (continuationCount * 3)
+                    + (body.supported ? 5 : 0)
+                    - (isolated ? 8 : 0);
+                const evidence = [];
+                if (cornerCount > 0) evidence.push('corner');
+                if (junctionCount > 0) evidence.push('junction');
+                if (continuationCount > 0) evidence.push('continuation');
+                if (body.supported) evidence.push('wall-body');
+                if (isolated) evidence.push('isolated-stroke');
+                return {
+                    ...wall,
+                    confidence: Math.max(42, Math.min(99, Math.round(wall.confidence + architectureBoost))),
+                    architecturalEvidence: evidence,
+                    topologySupport: {
+                        cornerCount,
+                        junctionCount,
+                        continuationCount,
+                        isolated
+                    },
+                    wallBodyEvidence: body,
+                    evidenceModel: 'local-contrast-topology-v2'
+                };
+            });
+
+            return architecturalWalls;
         };
 
         // IV.30.1B — The Living Contour.
