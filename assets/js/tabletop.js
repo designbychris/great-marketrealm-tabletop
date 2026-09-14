@@ -3831,7 +3831,18 @@
             const structural = structuralCartographyCandidates();
             // IV.30.1D regression contract: const contours = livingContourCandidates()
             // Connected Dungeon now opts Hybrid Judgement into floor connectivity explicitly.
-            const contours = livingContourCandidates({ connectPlayableFloor: true });
+            // IV.30.1G.4A — Hybrid Partial-Contour Preservation.
+            // The connectivity pass is useful on maps with tiny floor seams, but on
+            // heavily-hatched cave maps it can legitimately prove *less* than the
+            // standalone Living Contour reader. Never turn that uncertainty into an
+            // empty Hybrid draft: keep a standard contour pass as a review-first
+            // fallback and preserve its unresolved ends exactly as certified.
+            const connectedContours = livingContourCandidates({ connectPlayableFloor: true });
+            const standaloneContours = connectedContours.length === 0
+                ? livingContourCandidates()
+                : [];
+            const contours = connectedContours.length > 0 ? connectedContours : standaloneContours;
+            const hybridContourSource = connectedContours.length > 0 ? 'connected-floor' : 'standalone-fallback';
 
             const orientation = (item) => {
                 const dx = Math.abs(Number(item.x2) - Number(item.x1));
@@ -3906,10 +3917,15 @@
                                     ? Math.max(76, Number(item.confidence) || 0)
                                     : Math.max(88, Number(item.confidence) || 0),
                                 hybridJudgement: true, hybridRegion: 'organic',
+                                hybridContourSource,
+                                hybridPartialPreservation: Boolean(item.partialContour),
                                 partialContour: Boolean(item.partialContour),
                                 unresolvedBoundaryEnds: Array.isArray(item.unresolvedBoundaryEnds)
                                     ? item.unresolvedBoundaryEnds
-                                    : []
+                                    : [],
+                                evidenceModel: item.partialContour
+                                    ? 'hybrid-partial-contour-v5a'
+                                    : (item.evidenceModel || 'hybrid-contour-v5a')
                             });
                         }
                     }
@@ -3935,17 +3951,67 @@
                 if (!previous || Number(previous.confidence) < Number(item.confidence)) unique.set(key, item);
             });
 
-            const organic = Array.from(unique.values()).filter((item) => item.hybridRegion === 'organic');
+            const organicUsefulness = (item) => {
+                const points = Array.isArray(item.points) ? item.points : [];
+                let pathLength = 0;
+                for (let index = 0; index < points.length - 1; index += 1) {
+                    pathLength += Math.hypot(
+                        Number(points[index + 1].x) - Number(points[index].x),
+                        Number(points[index + 1].y) - Number(points[index].y)
+                    );
+                }
+                // Partial evidence remains valuable, but a long certified path should
+                // outrank a tiny fragment if a pathological map reaches the review cap.
+                return (Number(item.confidence) || 0)
+                    + Math.min(24, pathLength * 1.8)
+                    + (item.partialContour ? 2 : 6);
+            };
+            const organic = Array.from(unique.values())
+                .filter((item) => item.hybridRegion === 'organic')
+                .sort((a, b) => organicUsefulness(b) - organicUsefulness(a));
             const built = Array.from(unique.values())
                 .filter((item) => item.hybridRegion === 'structural')
                 .sort((a, b) => (b.localStructuralSupport - a.localStructuralSupport) || (b.confidence - a.confidence));
 
-            // Polyline paths represent much more geometry per review object, so keep
-            // every safe organic path first and spend the remaining object budget on
-            // the strongest locally-supported constructed linework. No scan-order cut.
-            if (organic.length > maximumReviewSuggestions) return [];
-            const remaining = maximumReviewSuggestions - organic.length;
-            return organic.concat(built.slice(0, remaining));
+            // Polyline paths represent much more geometry per review object. G.4A no
+            // longer rejects the entire Hybrid draft when organic fragmentation reaches
+            // the cap: retain the strongest certified paths, then spend any remaining
+            // review objects on constructed linework. Unresolved ends remain open.
+            const retainedOrganic = organic.slice(0, maximumReviewSuggestions);
+            const remaining = maximumReviewSuggestions - retainedOrganic.length;
+            let combined = retainedOrganic.concat(built.slice(0, remaining));
+
+            // A connected-floor pass can produce contours that are all locally covered
+            // by Structural evidence and therefore disappear during overlap trimming.
+            // If that leaves Hybrid empty, fall back once to the standalone Living
+            // Contour evidence rather than telling the Keeper that nothing is known.
+            if (combined.length === 0 && hybridContourSource === 'connected-floor') {
+                const fallbackContours = livingContourCandidates();
+                const fallbackOrganic = fallbackContours
+                    .filter((item) => Array.isArray(item.points) && item.points.length > 1)
+                    .map((item) => ({
+                        ...item,
+                        confidence: item.partialContour
+                            ? Math.max(74, Number(item.confidence) || 0)
+                            : Math.max(86, Number(item.confidence) || 0),
+                        hybridJudgement: true,
+                        hybridRegion: 'organic',
+                        hybridContourSource: 'standalone-post-trim-fallback',
+                        hybridPartialPreservation: Boolean(item.partialContour),
+                        partialContour: Boolean(item.partialContour),
+                        unresolvedBoundaryEnds: Array.isArray(item.unresolvedBoundaryEnds)
+                            ? item.unresolvedBoundaryEnds
+                            : [],
+                        evidenceModel: item.partialContour
+                            ? 'hybrid-partial-contour-v5a'
+                            : (item.evidenceModel || 'hybrid-contour-v5a')
+                    }))
+                    .sort((a, b) => organicUsefulness(b) - organicUsefulness(a))
+                    .slice(0, maximumReviewSuggestions);
+                combined = fallbackOrganic;
+            }
+
+            return combined;
         };
 
         const scores = candidates.map((item) => item.score).sort((a, b) => a - b);
