@@ -25,7 +25,7 @@ final class PassTheTurnRegressionTest extends TestCase
     public function testActiveEncounterOffersEndTurnControl(): void
     {
         self::assertStringContainsString('data-end-turn', $this->view);
-        self::assertStringContainsString('End Turn ▶', $this->view);
+        self::assertStringContainsString("esc_html_e('End Turn', 'great-marketrealm-tabletop');", $this->view);
     }
 
     public function testEndTurnControlIsDungeonMasterOnly(): void

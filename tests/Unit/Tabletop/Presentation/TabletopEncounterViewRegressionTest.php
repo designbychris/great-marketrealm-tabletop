@@ -16,7 +16,7 @@ final class TabletopEncounterViewRegressionTest extends TestCase
         );
 
         self::assertStringContainsString('The Turn of Battle', $source);
-        self::assertStringContainsString('Round ', $source);
+        self::assertStringContainsString("esc_html_e('Round', 'great-marketrealm-tabletop');", $source);
         self::assertStringContainsString('current_token_id', $source);
         self::assertStringContainsString('data-encounter-revision', $source);
     }
