@@ -22,6 +22,7 @@ final class PersistentTableLifecycleRegressionTest extends TestCase
         self::assertStringContainsString('$this->status = TableStatus::ACTIVE;', $table);
         self::assertStringContainsString('$this->endedAt = null;', $table);
         self::assertStringContainsString('public function keepAlive(string $id): Table', $registry);
+        self::assertStringContainsString('use GreatMarketrealmTabletop\\Tables\\Models\\TableStatus;', $registry);
         self::assertStringContainsString('$table->resume($now, $this->leases->leaseExpiryFrom($now));', $registry);
     }
 

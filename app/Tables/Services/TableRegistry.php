@@ -12,6 +12,7 @@ use GreatMarketrealmTabletop\Tables\Contracts\TableRepository;
 use GreatMarketrealmTabletop\Tables\Contracts\TableStewardOverride;
 use GreatMarketrealmTabletop\Tables\Exceptions\TableCapacityExceeded;
 use GreatMarketrealmTabletop\Tables\Models\Table;
+use GreatMarketrealmTabletop\Tables\Models\TableStatus;
 use GreatMarketrealmTabletop\Tables\Memberships\Services\TableGathering;
 use GreatMarketrealmTabletop\Tables\Policies\WordPressTableLeasePolicy;
 use GreatMarketrealmTabletop\Tables\Policies\WordPressTableStewardOverride;
