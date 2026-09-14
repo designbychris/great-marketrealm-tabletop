@@ -2569,9 +2569,12 @@
             const thresholdReason = suggestion.doorwayReasoning && Array.isArray(suggestion.thresholdEvidence)
                 ? ` · ${suggestion.thresholdEvidence.join(' + ')}`
                 : '';
+            const noiseReason = !suggestion.doorwayReasoning && Array.isArray(suggestion.noiseEvidence) && suggestion.noiseEvidence.length > 0
+                ? ` · screened: ${suggestion.noiseEvidence.join(' + ')}`
+                : '';
             text.textContent = pathVertices > 2
                 ? `${hybridPrefix ? `${hybridPrefix} · ` : ''}Living wall path · ${pathVertices - 1} connected spans · ${confidence}%`
-                : `${hybridPrefix ? `${hybridPrefix} · ` : ''}${suggestion.type === 'door' ? (suggestion.doorwayReasoning ? 'Likely doorway' : 'Possible door') : 'Room / wall boundary'} · (${suggestion.x1},${suggestion.y1}) → (${suggestion.x2},${suggestion.y2}) · ${confidence}%${thresholdReason}`;
+                : `${hybridPrefix ? `${hybridPrefix} · ` : ''}${suggestion.type === 'door' ? (suggestion.doorwayReasoning ? 'Likely doorway' : 'Possible door') : 'Room / wall boundary'} · (${suggestion.x1},${suggestion.y1}) → (${suggestion.x2},${suggestion.y2}) · ${confidence}%${thresholdReason}${noiseReason}`;
             label.append(checkbox, text);
             fragment.append(label);
         });
@@ -2856,6 +2859,106 @@
                 return hits / Math.max(1, total);
             };
 
+            // IV.30.1G.3 — Noise, Furniture & Annotation Rejection.
+            // Text, stair marks, furniture outlines, rubble and hatch clusters can all
+            // contain locally dark strokes. Build a deliberately coarse component map
+            // over the adaptive ink mask so short compact marks and isotropic clutter
+            // can be demoted before doorway reasoning mistakes them for architecture.
+            const noiseStep = Math.max(2, Math.round(gridCanvas * .08));
+            const noiseColumns = Math.max(1, Math.ceil(canvas.width / noiseStep));
+            const noiseRows = Math.max(1, Math.ceil(canvas.height / noiseStep));
+            const noiseOccupied = new Uint8Array(noiseColumns * noiseRows);
+            const noiseLabels = new Int32Array(noiseColumns * noiseRows);
+            const noiseComponents = new Map();
+            const noiseCellIndex = (column, row) => (row * noiseColumns) + column;
+            for (let row = 0; row < noiseRows; row += 1) {
+                for (let column = 0; column < noiseColumns; column += 1) {
+                    const left = column * noiseStep;
+                    const top = row * noiseStep;
+                    const right = Math.min(canvas.width, left + noiseStep);
+                    const bottom = Math.min(canvas.height, top + noiseStep);
+                    let ink = 0;
+                    let total = 0;
+                    for (let yy = top; yy < bottom; yy += 1) {
+                        for (let xx = left; xx < right; xx += 1) {
+                            total += 1;
+                            ink += dark[(yy * canvas.width) + xx];
+                        }
+                    }
+                    if (ink / Math.max(1, total) >= .20) noiseOccupied[noiseCellIndex(column, row)] = 1;
+                }
+            }
+            let nextNoiseLabel = 1;
+            const noiseNeighbours = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+            for (let row = 0; row < noiseRows; row += 1) {
+                for (let column = 0; column < noiseColumns; column += 1) {
+                    const startIndex = noiseCellIndex(column, row);
+                    if (!noiseOccupied[startIndex] || noiseLabels[startIndex] !== 0) continue;
+                    const label = nextNoiseLabel++;
+                    const queue = [[column, row]];
+                    noiseLabels[startIndex] = label;
+                    let cells = 0;
+                    let minX = column;
+                    let maxX = column;
+                    let minY = row;
+                    let maxY = row;
+                    while (queue.length > 0) {
+                        const [cx, cy] = queue.pop();
+                        cells += 1;
+                        minX = Math.min(minX, cx); maxX = Math.max(maxX, cx);
+                        minY = Math.min(minY, cy); maxY = Math.max(maxY, cy);
+                        noiseNeighbours.forEach(([dx, dy]) => {
+                            const nx = cx + dx;
+                            const ny = cy + dy;
+                            if (nx < 0 || ny < 0 || nx >= noiseColumns || ny >= noiseRows) return;
+                            const index = noiseCellIndex(nx, ny);
+                            if (!noiseOccupied[index] || noiseLabels[index] !== 0) return;
+                            noiseLabels[index] = label;
+                            queue.push([nx, ny]);
+                        });
+                    }
+                    const widthCells = (maxX - minX) + 1;
+                    const heightCells = (maxY - minY) + 1;
+                    const widthGridUnits = (widthCells * noiseStep) / gridCanvas;
+                    const heightGridUnits = (heightCells * noiseStep) / gridCanvas;
+                    const longestGridSpan = Math.max(widthGridUnits, heightGridUnits);
+                    const shortestGridSpan = Math.max(.01, Math.min(widthGridUnits, heightGridUnits));
+                    noiseComponents.set(label, {
+                        label, cells, minX, maxX, minY, maxY,
+                        widthGridUnits,
+                        heightGridUnits,
+                        longestGridSpan,
+                        elongation: longestGridSpan / shortestGridSpan,
+                        fillRatio: cells / Math.max(1, widthCells * heightCells)
+                    });
+                }
+            }
+            const noiseComponentAt = (x, y) => {
+                const column = Math.max(0, Math.min(noiseColumns - 1, Math.floor(x / noiseStep)));
+                const row = Math.max(0, Math.min(noiseRows - 1, Math.floor(y / noiseStep)));
+                const label = noiseLabels[noiseCellIndex(column, row)];
+                return label > 0 ? (noiseComponents.get(label) || null) : null;
+            };
+            const localClutterProfile = (x, y) => {
+                const radius = Math.max(traceRadius * .8, gridCanvas * .18);
+                const samples = [
+                    densityAt(x - radius, y), densityAt(x + radius, y),
+                    densityAt(x, y - radius), densityAt(x, y + radius),
+                    densityAt(x - radius * .7, y - radius * .7), densityAt(x + radius * .7, y - radius * .7),
+                    densityAt(x - radius * .7, y + radius * .7), densityAt(x + radius * .7, y + radius * .7)
+                ];
+                const mean = samples.reduce((sum, value) => sum + value, 0) / samples.length;
+                const minimum = Math.min(...samples);
+                const maximum = Math.max(...samples);
+                return {
+                    mean,
+                    minimum,
+                    maximum,
+                    isotropic: minimum >= .11 && mean >= .20,
+                    busy: mean >= .24 && (maximum - minimum) <= .24
+                };
+            };
+
             const traces = [];
             const structuralScore = (x, y, normalX, normalY) => {
                 const center = densityAt(x, y);
@@ -3053,13 +3156,66 @@
                 };
             });
 
+            // Apply the noise screen after topology has had a chance to defend a
+            // genuine corner/junction, but before threshold reasoning. Strong connected
+            // architecture survives busy art; isolated compact marks are the primary
+            // rejection target. Nothing is discarded on texture evidence alone.
+            const noiseScreenedWalls = architecturalWalls.map((wall) => {
+                const midpointX = toCanvasX(grid.offsetX) + (((wall.x1 + wall.x2) / 2) * gridCanvas);
+                const midpointY = toCanvasY(grid.offsetY) + (((wall.y1 + wall.y2) / 2) * gridCanvas);
+                const component = noiseComponentAt(midpointX, midpointY);
+                const clutter = localClutterProfile(midpointX, midpointY);
+                const isolated = Boolean(wall.topologySupport?.isolated);
+                const compactMark = Boolean(component)
+                    && component.longestGridSpan <= .95
+                    && component.elongation <= 2.15
+                    && component.fillRatio >= .30;
+                const furnitureOutline = Boolean(component)
+                    && component.longestGridSpan >= .70
+                    && component.longestGridSpan <= 2.8
+                    && component.elongation <= 1.7
+                    && component.fillRatio >= .16
+                    && component.fillRatio <= .62;
+                const textureCluster = clutter.isotropic || clutter.busy;
+                const evidence = [];
+                let penalty = 0;
+                if (compactMark) { evidence.push('compact-annotation'); penalty += 12; }
+                if (furnitureOutline && isolated) { evidence.push('furniture-like-outline'); penalty += 9; }
+                if (textureCluster) { evidence.push('busy-texture'); penalty += 8; }
+                if (!isolated && (wall.topologySupport?.cornerCount || wall.topologySupport?.junctionCount || wall.topologySupport?.continuationCount)) {
+                    penalty = Math.max(0, penalty - 7);
+                    evidence.push('topology-defends-wall');
+                }
+                const rejected = isolated && compactMark && textureCluster && (wall.confidence - penalty) < 64;
+                return {
+                    ...wall,
+                    confidence: Math.max(36, Math.min(99, Math.round(wall.confidence - penalty))),
+                    noiseEvidence: evidence,
+                    noisePenalty: penalty,
+                    noiseRejection: {
+                        rejected,
+                        compactMark,
+                        furnitureOutline,
+                        textureCluster,
+                        component: component ? {
+                            longestGridSpan: component.longestGridSpan,
+                            elongation: component.elongation,
+                            fillRatio: component.fillRatio,
+                            cells: component.cells
+                        } : null,
+                        clutter
+                    },
+                    evidenceModel: 'local-contrast-topology-noise-v4'
+                };
+            }).filter((wall) => !wall.noiseRejection.rejected);
+
             // IV.30.1G.2 — Doorway & Threshold Reasoning.
             // A bright interruption in ink is not automatically a door. A threshold
             // candidate must sit between two supported wall runs, contain a genuinely
             // quieter/lighter opening, and have plausible traversable floor on both
             // sides. The Assistant records why it believes the gap matters; the Keeper
             // still decides whether the draft becomes an authoritative VTT door.
-            const structuralByKey = new Map(architecturalWalls.map((wall) => [cartographySuggestionKey(wall), wall]));
+            const structuralByKey = new Map(noiseScreenedWalls.map((wall) => [cartographySuggestionKey(wall), wall]));
             const structuralEdge = (x1, y1, x2, y2) => structuralByKey.get(cartographySuggestionKey({ x1, y1, x2, y2, type: 'wall' })) || null;
             const canvasPointForGrid = (gx, gy) => ({
                 x: toCanvasX(grid.offsetX) + (gx * gridCanvas),
@@ -3175,7 +3331,7 @@
                 }
             }
 
-            return architecturalWalls.concat(doorwayCandidates);
+            return noiseScreenedWalls.concat(doorwayCandidates);
         };
 
         // IV.30.1B — The Living Contour.
