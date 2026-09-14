@@ -12,8 +12,9 @@ final class GermanCatalogueParityRegressionTest extends TestCase
     {
         $root = dirname(__DIR__, 3);
         $po = (string) file_get_contents($root . '/languages/great-marketrealm-tabletop-de_DE.po');
-        self::assertStringContainsString('msgid "Behind the Curtain"\nmsgstr "Hinter dem Vorhang"', $po);
-        self::assertStringContainsString('msgid "Adventurers at the Table"\nmsgstr "Abenteurer am Tisch"', $po);
-        self::assertStringContainsString('msgid "Forge New Scene"\nmsgstr "Neue Szene schmieden"', $po);
+
+        self::assertStringContainsString("msgid \"Behind the Curtain\"\nmsgstr \"Hinter dem Vorhang\"", $po);
+        self::assertStringContainsString("msgid \"Adventurers at the Table\"\nmsgstr \"Abenteurer am Tisch\"", $po);
+        self::assertStringContainsString("msgid \"Forge New Scene\"\nmsgstr \"Neue Szene schmieden\"", $po);
     }
 }
