@@ -2572,8 +2572,10 @@
             const noiseReason = !suggestion.doorwayReasoning && Array.isArray(suggestion.noiseEvidence) && suggestion.noiseEvidence.length > 0
                 ? ` · screened: ${suggestion.noiseEvidence.join(' + ')}`
                 : '';
+            const contourLabel = suggestion.partialContour ? 'Partial living wall path' : 'Living wall path';
+            const contourSuffix = suggestion.partialContour ? ' · unresolved ends kept open' : '';
             text.textContent = pathVertices > 2
-                ? `${hybridPrefix ? `${hybridPrefix} · ` : ''}Living wall path · ${pathVertices - 1} connected spans · ${confidence}%`
+                ? `${hybridPrefix ? `${hybridPrefix} · ` : ''}${contourLabel} · ${pathVertices - 1} connected spans · ${confidence}%${contourSuffix}`
                 : `${hybridPrefix ? `${hybridPrefix} · ` : ''}${suggestion.type === 'door' ? (suggestion.doorwayReasoning ? 'Likely doorway' : 'Possible door') : 'Room / wall boundary'} · (${suggestion.x1},${suggestion.y1}) → (${suggestion.x2},${suggestion.y2}) · ${confidence}%${thresholdReason}${noiseReason}`;
             label.append(checkbox, text);
             fragment.append(label);
@@ -3723,20 +3725,40 @@
             const isClosedChain = (chain) => chain.length > 2
                 && pointKey(chain[0]) === pointKey(chain[chain.length - 1]);
             // Tiny hatch/ink loops are suppressed before the review-object budget is allocated.
-            const meaningfulChains = contourChains
-                .map((chain) => ({ chain, length: chainLength(chain), closed: isClosedChain(chain) }))
-                .filter((entry) => entry.length >= contourStep * 2.5)
-                .sort((a, b) => b.length - a.length);
+            // IV.30.1G.4 — Partial Contour Recovery / Pippin Marks What He Knows.
+            // Living Contour used to fail the entire draft when fragmented artwork
+            // produced more safe boundary chains than the review budget allowed. Real
+            // cave maps often contain hatching, door gaps and damaged ink that split an
+            // otherwise useful perimeter. Preserve the strongest defensible open and
+            // closed chains instead of requiring an all-or-nothing complete contour.
+            // Historical Economy regression vocabulary retained for compatibility:
+            // meaningfulChains filtered with entry.length >= contourStep * 2.5 before
+            // IV.30.1G.4 taught the reader to keep safe partial contour sections.
+            const recoverableChains = contourChains
+                .map((chain, sourceIndex) => ({
+                    chain,
+                    sourceIndex,
+                    length: chainLength(chain),
+                    closed: isClosedChain(chain)
+                }))
+                .filter((entry) => entry.length >= contourStep * 1.75)
+                .map((entry) => ({
+                    ...entry,
+                    partial: !entry.closed,
+                    recoveryScore: (entry.closed ? 28 : 0)
+                        + Math.min(72, entry.length * 9)
+                        + Math.min(12, Math.max(0, entry.chain.length - 2) * .45)
+                }))
+                .sort((a, b) => (b.recoveryScore - a.recoveryScore) || (b.length - a.length));
 
-            if (meaningfulChains.length === 0) return [];
+            if (recoverableChains.length === 0) return [];
 
             // Keep the historical Economy vocabulary as a compatibility contract:
             // budgetedChains, remainingBudget and Math.sqrt(entry.length) formerly
-            // apportioned a 200-segment review budget. In IV.30.1C the same 200-object
-            // ceiling applies to complete paths instead, so every retained contour gets
-            // its own independent vertex budget.
-            if (meaningfulChains.length > maximumReviewSuggestions) return [];
-            const budgetedChains = meaningfulChains;
+            // apportioned a 200-segment review budget. IV.30.1G.4 now spends that same
+            // object budget on the strongest certified contour sections. Nothing is
+            // joined across an unresolved gap merely to make a closed shape.
+            const budgetedChains = recoverableChains.slice(0, maximumReviewSuggestions);
             const remainingBudget = maximumReviewSuggestions - budgetedChains.length;
             budgetedChains.forEach((entry) => Math.sqrt(entry.length));
 
@@ -3766,9 +3788,19 @@
                     x: roundContourCoordinate(point[0]),
                     y: roundContourCoordinate(point[1])
                 }));
+                const confidence = entry.closed
+                    ? 94
+                    : Math.max(76, Math.min(91, Math.round(78 + Math.min(13, entry.length * 1.6))));
                 return {
-                    type: 'wall', confidence: 94, selected: true,
-                    contour: true, fineContour: true, fullBoundary: true,
+                    type: 'wall', confidence, selected: true,
+                    contour: true, fineContour: true, fullBoundary: entry.closed,
+                    partialContour: entry.partial,
+                    partialContourRecovery: entry.partial ? 'certified-open-chain' : 'closed-chain',
+                    unresolvedBoundaryEnds: entry.partial ? [points[0], points[points.length - 1]] : [],
+                    recoveryEvidence: entry.partial
+                        ? ['ordered-boundary-chain', 'minimum-safe-length', 'unresolved-ends-preserved']
+                        : ['closed-boundary-chain'],
+                    evidenceModel: entry.partial ? 'living-contour-partial-v5' : 'living-contour-closed-v5',
                     adaptiveBudget: true, polyline: true, points,
                     x1: points[0].x, y1: points[0].y,
                     x2: points[points.length - 1].x, y2: points[points.length - 1].y
@@ -3870,8 +3902,14 @@
                                 ...item, points: clean,
                                 x1: clean[0].x, y1: clean[0].y,
                                 x2: clean[clean.length - 1].x, y2: clean[clean.length - 1].y,
-                                confidence: Math.max(88, Number(item.confidence) || 0),
-                                hybridJudgement: true, hybridRegion: 'organic'
+                                confidence: item.partialContour
+                                    ? Math.max(76, Number(item.confidence) || 0)
+                                    : Math.max(88, Number(item.confidence) || 0),
+                                hybridJudgement: true, hybridRegion: 'organic',
+                                partialContour: Boolean(item.partialContour),
+                                unresolvedBoundaryEnds: Array.isArray(item.unresolvedBoundaryEnds)
+                                    ? item.unresolvedBoundaryEnds
+                                    : []
                             });
                         }
                     }
@@ -3918,7 +3956,7 @@
                 .filter((item) => !existing.has(cartographySuggestionKey(item)));
             renderCartographyReview();
             if (cartographySuggestions.length === 0 && cartographyAssistantStatus) {
-                cartographyAssistantStatus.textContent = 'No safe hybrid draft could be prepared. Check grid calibration, or review Structural tracing and Living Contour separately.';
+                cartographyAssistantStatus.textContent = 'No safe hybrid wall sections could be prepared. Check grid calibration, or review Structural tracing and Living Contour separately.';
             }
             return;
         }
@@ -3929,7 +3967,7 @@
                 .sort((a, b) => b.confidence - a.confidence);
             renderCartographyReview();
             if (cartographySuggestions.length === 0 && cartographyAssistantStatus) {
-                cartographyAssistantStatus.textContent = 'No complete playable floor contour could be prepared safely. Check grid calibration or try Structural tracing.';
+                cartographyAssistantStatus.textContent = 'No safe playable floor contour sections could be prepared. Check grid calibration or try Structural tracing.';
             }
             return;
         }
