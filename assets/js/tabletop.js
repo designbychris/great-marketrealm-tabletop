@@ -2573,7 +2573,13 @@
                 ? ` · screened: ${suggestion.noiseEvidence.join(' + ')}`
                 : '';
             const contourLabel = suggestion.partialContour ? 'Partial living wall path' : 'Living wall path';
-            const contourSuffix = suggestion.partialContour ? ' · unresolved ends kept open' : '';
+            const protectedGapCount = Array.isArray(suggestion.protectedContourGaps) ? suggestion.protectedContourGaps.length : 0;
+            const gapTypes = Array.isArray(suggestion.gapClassifications)
+                ? Array.from(new Set(suggestion.gapClassifications.map((gap) => gap?.classification).filter(Boolean)))
+                : [];
+            const contourSuffix = suggestion.partialContour
+                ? ` · unresolved ends kept open${protectedGapCount > 0 ? ` · ${protectedGapCount} doorway/passage gap${protectedGapCount === 1 ? '' : 's'} protected` : ''}${gapTypes.length > 0 ? ` · ends: ${gapTypes.join(' / ')}` : ''}`
+                : '';
             text.textContent = pathVertices > 2
                 ? `${hybridPrefix ? `${hybridPrefix} · ` : ''}${contourLabel} · ${pathVertices - 1} connected spans · ${confidence}%${contourSuffix}`
                 : `${hybridPrefix ? `${hybridPrefix} · ` : ''}${suggestion.type === 'door' ? (suggestion.doorwayReasoning ? 'Likely doorway' : 'Possible door') : 'Room / wall boundary'} · (${suggestion.x1},${suggestion.y1}) → (${suggestion.x2},${suggestion.y2}) · ${confidence}%${thresholdReason}${noiseReason}`;
@@ -3724,6 +3730,103 @@
             };
             const isClosedChain = (chain) => chain.length > 2
                 && pointKey(chain[0]) === pointKey(chain[chain.length - 1]);
+
+            // IV.30.1G.4B — Gap & Threshold Classification.
+            // Living Contour now consumes the same review-first doorway evidence that
+            // Structural tracing already proved in G.2. A contour span which crosses a
+            // certified doorway/passage is split rather than sealed merely to make the
+            // organic boundary look complete. Other unresolved ends are classified for
+            // Keeper review, but uncertainty never grants permission to invent a bridge.
+            const contourThresholdCandidates = Array.isArray(options.thresholdCandidates)
+                ? options.thresholdCandidates.filter((item) => item?.type === 'door' && item?.doorwayReasoning)
+                : structuralCartographyCandidates().filter((item) => item?.type === 'door' && item?.doorwayReasoning);
+            const contourSpanOrientation = (a, b) => {
+                const dx = Math.abs(Number(b.x) - Number(a.x));
+                const dy = Math.abs(Number(b.y) - Number(a.y));
+                if (dy <= .0001 && dx > .0001) return 'horizontal';
+                if (dx <= .0001 && dy > .0001) return 'vertical';
+                return 'organic';
+            };
+            const contourThresholdMatch = (a, b) => {
+                const spanOrientation = contourSpanOrientation(a, b);
+                if (spanOrientation === 'organic') return null;
+                const spanMin = spanOrientation === 'horizontal'
+                    ? Math.min(Number(a.x), Number(b.x))
+                    : Math.min(Number(a.y), Number(b.y));
+                const spanMax = spanOrientation === 'horizontal'
+                    ? Math.max(Number(a.x), Number(b.x))
+                    : Math.max(Number(a.y), Number(b.y));
+                return contourThresholdCandidates.find((threshold) => {
+                    const thresholdA = { x: Number(threshold.x1), y: Number(threshold.y1) };
+                    const thresholdB = { x: Number(threshold.x2), y: Number(threshold.y2) };
+                    if (contourSpanOrientation(thresholdA, thresholdB) !== spanOrientation) return false;
+                    const crossDistance = spanOrientation === 'horizontal'
+                        ? Math.max(Math.abs(Number(a.y) - thresholdA.y), Math.abs(Number(b.y) - thresholdA.y))
+                        : Math.max(Math.abs(Number(a.x) - thresholdA.x), Math.abs(Number(b.x) - thresholdA.x));
+                    if (crossDistance > .42) return false;
+                    const thresholdMin = spanOrientation === 'horizontal'
+                        ? Math.min(thresholdA.x, thresholdB.x)
+                        : Math.min(thresholdA.y, thresholdB.y);
+                    const thresholdMax = spanOrientation === 'horizontal'
+                        ? Math.max(thresholdA.x, thresholdB.x)
+                        : Math.max(thresholdA.y, thresholdB.y);
+                    const overlap = Math.min(spanMax, thresholdMax) - Math.max(spanMin, thresholdMin);
+                    return overlap >= Math.min(.16, Math.max(.08, (spanMax - spanMin) * .28));
+                }) || null;
+            };
+            const classifyContourEndpoint = (point) => {
+                const x = Number(point.x);
+                const y = Number(point.y);
+                const edgeTolerance = Math.max(contourStep * 1.15, .18);
+                if (x <= edgeTolerance || y <= edgeTolerance
+                    || x >= columns - edgeTolerance || y >= rows - edgeTolerance) {
+                    return { classification: 'map-edge', evidence: ['analysis-envelope'] };
+                }
+                const nearbyThreshold = contourThresholdCandidates.find((threshold) => {
+                    const centerX = (Number(threshold.x1) + Number(threshold.x2)) / 2;
+                    const centerY = (Number(threshold.y1) + Number(threshold.y2)) / 2;
+                    return Math.hypot(centerX - x, centerY - y) <= .82;
+                });
+                if (nearbyThreshold) {
+                    return { classification: 'doorway-passage', evidence: ['structural-threshold', 'floor-continuity'] };
+                }
+                const canvasX = originX + (x * gridCanvasX);
+                const canvasY = originY + (y * gridCanvasY);
+                const radius = Math.max(2, Math.min(gridCanvasX, gridCanvasY) * .24);
+                const stats = luminanceRegionStats(canvasX - radius, canvasY - radius, canvasX + radius, canvasY + radius);
+                if (stats.deviation >= 48 && stats.mean <= mapTone.light - 6) {
+                    return { classification: 'noise-gap', evidence: ['locally-busy-ink', 'uncertain-boundary'] };
+                }
+                return { classification: 'uncertain-boundary', evidence: ['insufficient-gap-evidence'] };
+            };
+            const splitContourPathAtProtectedThresholds = (points) => {
+                if (!Array.isArray(points) || points.length < 2) return { runs: [], gaps: [] };
+                const runs = [];
+                const gaps = [];
+                let run = [points[0]];
+                for (let index = 0; index < points.length - 1; index += 1) {
+                    const a = points[index];
+                    const b = points[index + 1];
+                    const threshold = contourThresholdMatch(a, b);
+                    if (threshold) {
+                        if (run.length >= 2) runs.push(run);
+                        gaps.push({
+                            classification: 'doorway-passage',
+                            from: a,
+                            to: b,
+                            confidence: Number(threshold.confidence || 0),
+                            evidence: ['g2-structural-doorway', 'protected-open-gap', 'do-not-auto-bridge']
+                        });
+                        run = [b];
+                        continue;
+                    }
+                    if (run.length === 0) run.push(a);
+                    const previous = run[run.length - 1];
+                    if (!previous || previous.x !== b.x || previous.y !== b.y) run.push(b);
+                }
+                if (run.length >= 2) runs.push(run);
+                return { runs, gaps };
+            };
             // Tiny hatch/ink loops are suppressed before the review-object budget is allocated.
             // IV.30.1G.4 — Partial Contour Recovery / Pippin Marks What He Knows.
             // Living Contour used to fail the entire draft when fragmented artwork
@@ -3782,29 +3885,47 @@
                 return candidate;
             };
 
-            const pathSuggestions = budgetedChains.map((entry) => {
+            const pathSuggestions = budgetedChains.flatMap((entry) => {
                 const path = simplifyChainToTarget(entry);
                 const points = path.map((point) => ({
                     x: roundContourCoordinate(point[0]),
                     y: roundContourCoordinate(point[1])
                 }));
-                const confidence = entry.closed
-                    ? 94
-                    : Math.max(76, Math.min(91, Math.round(78 + Math.min(13, entry.length * 1.6))));
-                return {
-                    type: 'wall', confidence, selected: true,
-                    contour: true, fineContour: true, fullBoundary: entry.closed,
-                    partialContour: entry.partial,
-                    partialContourRecovery: entry.partial ? 'certified-open-chain' : 'closed-chain',
-                    unresolvedBoundaryEnds: entry.partial ? [points[0], points[points.length - 1]] : [],
-                    recoveryEvidence: entry.partial
-                        ? ['ordered-boundary-chain', 'minimum-safe-length', 'unresolved-ends-preserved']
-                        : ['closed-boundary-chain'],
-                    evidenceModel: entry.partial ? 'living-contour-partial-v5' : 'living-contour-closed-v5',
-                    adaptiveBudget: true, polyline: true, points,
-                    x1: points[0].x, y1: points[0].y,
-                    x2: points[points.length - 1].x, y2: points[points.length - 1].y
-                };
+                const protectedPath = splitContourPathAtProtectedThresholds(points);
+                const runs = protectedPath.runs.length > 0 ? protectedPath.runs : (protectedPath.gaps.length === 0 ? [points] : []);
+                return runs.map((runPoints) => {
+                    const gapProtected = protectedPath.gaps.length > 0;
+                    const partialContour = entry.partial || gapProtected;
+                    const endpointClassifications = partialContour
+                        ? [classifyContourEndpoint(runPoints[0]), classifyContourEndpoint(runPoints[runPoints.length - 1])]
+                        : [];
+                    const confidence = entry.closed && !gapProtected
+                        ? 94
+                        : Math.max(74, Math.min(91, Math.round(77 + Math.min(13, entry.length * 1.6))));
+                    return {
+                        type: 'wall', confidence, selected: true,
+                        contour: true, fineContour: true, fullBoundary: entry.closed && !gapProtected,
+                        partialContour,
+                        partialContourRecovery: gapProtected
+                            ? 'protected-threshold-split'
+                            : (entry.partial ? 'certified-open-chain' : 'closed-chain'),
+                        unresolvedBoundaryEnds: partialContour ? [runPoints[0], runPoints[runPoints.length - 1]] : [],
+                        gapClassifications: endpointClassifications,
+                        protectedContourGaps: protectedPath.gaps,
+                        thresholdGapProtection: gapProtected,
+                        recoveryEvidence: gapProtected
+                            ? ['ordered-boundary-chain', 'g2-threshold-reused', 'doorway-gap-preserved', 'unresolved-ends-preserved']
+                            : (entry.partial
+                                ? ['ordered-boundary-chain', 'minimum-safe-length', 'unresolved-ends-preserved']
+                                : ['closed-boundary-chain']),
+                        evidenceModel: gapProtected
+                            ? 'living-contour-gap-classification-v5b'
+                            : (entry.partial ? 'living-contour-partial-v5' : 'living-contour-closed-v5'),
+                        adaptiveBudget: true, polyline: true, points: runPoints,
+                        x1: runPoints[0].x, y1: runPoints[0].y,
+                        x2: runPoints[runPoints.length - 1].x, y2: runPoints[runPoints.length - 1].y
+                    };
+                });
             }).filter((item) => item.points.length >= 2 && item.points.length <= maximumPathVertices);
 
             // Defensive compatibility fallback: IV.30.1C intentionally no longer
@@ -3837,9 +3958,12 @@
             // standalone Living Contour reader. Never turn that uncertainty into an
             // empty Hybrid draft: keep a standard contour pass as a review-first
             // fallback and preserve its unresolved ends exactly as certified.
-            const connectedContours = livingContourCandidates({ connectPlayableFloor: true });
+            const thresholdCandidates = structural.filter((item) => item?.type === 'door' && item?.doorwayReasoning);
+            // Historical Connected Dungeon / G.4A regression contract:
+            // const connectedContours = livingContourCandidates({ connectPlayableFloor: true });
+            const connectedContours = livingContourCandidates({ connectPlayableFloor: true, thresholdCandidates });
             const standaloneContours = connectedContours.length === 0
-                ? livingContourCandidates()
+                ? livingContourCandidates({ thresholdCandidates })
                 : [];
             const contours = connectedContours.length > 0 ? connectedContours : standaloneContours;
             const hybridContourSource = connectedContours.length > 0 ? 'connected-floor' : 'standalone-fallback';
@@ -3986,7 +4110,7 @@
             // If that leaves Hybrid empty, fall back once to the standalone Living
             // Contour evidence rather than telling the Keeper that nothing is known.
             if (combined.length === 0 && hybridContourSource === 'connected-floor') {
-                const fallbackContours = livingContourCandidates();
+                const fallbackContours = livingContourCandidates({ thresholdCandidates });
                 const fallbackOrganic = fallbackContours
                     .filter((item) => Array.isArray(item.points) && item.points.length > 1)
                     .map((item) => ({
