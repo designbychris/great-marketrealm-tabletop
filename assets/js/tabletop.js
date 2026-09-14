@@ -2566,9 +2566,12 @@
             const hybridPrefix = suggestion.hybridJudgement
                 ? (suggestion.hybridRegion === 'organic' ? 'Hybrid · organic' : 'Hybrid · structural')
                 : '';
+            const thresholdReason = suggestion.doorwayReasoning && Array.isArray(suggestion.thresholdEvidence)
+                ? ` · ${suggestion.thresholdEvidence.join(' + ')}`
+                : '';
             text.textContent = pathVertices > 2
                 ? `${hybridPrefix ? `${hybridPrefix} · ` : ''}Living wall path · ${pathVertices - 1} connected spans · ${confidence}%`
-                : `${hybridPrefix ? `${hybridPrefix} · ` : ''}${suggestion.type === 'door' ? 'Possible door' : 'Room / wall boundary'} · (${suggestion.x1},${suggestion.y1}) → (${suggestion.x2},${suggestion.y2}) · ${confidence}%`;
+                : `${hybridPrefix ? `${hybridPrefix} · ` : ''}${suggestion.type === 'door' ? (suggestion.doorwayReasoning ? 'Likely doorway' : 'Possible door') : 'Room / wall boundary'} · (${suggestion.x1},${suggestion.y1}) → (${suggestion.x2},${suggestion.y2}) · ${confidence}%${thresholdReason}`;
             label.append(checkbox, text);
             fragment.append(label);
         });
@@ -3050,7 +3053,129 @@
                 };
             });
 
-            return architecturalWalls;
+            // IV.30.1G.2 — Doorway & Threshold Reasoning.
+            // A bright interruption in ink is not automatically a door. A threshold
+            // candidate must sit between two supported wall runs, contain a genuinely
+            // quieter/lighter opening, and have plausible traversable floor on both
+            // sides. The Assistant records why it believes the gap matters; the Keeper
+            // still decides whether the draft becomes an authoritative VTT door.
+            const structuralByKey = new Map(architecturalWalls.map((wall) => [cartographySuggestionKey(wall), wall]));
+            const structuralEdge = (x1, y1, x2, y2) => structuralByKey.get(cartographySuggestionKey({ x1, y1, x2, y2, type: 'wall' })) || null;
+            const canvasPointForGrid = (gx, gy) => ({
+                x: toCanvasX(grid.offsetX) + (gx * gridCanvas),
+                y: toCanvasY(grid.offsetY) + (gy * gridCanvas)
+            });
+            const floorSample = (gx, gy) => {
+                const point = canvasPointForGrid(gx, gy);
+                const radius = Math.max(2, gridCanvas * .18);
+                const stats = luminanceRegionStats(point.x - radius, point.y - radius, point.x + radius, point.y + radius);
+                const density = densityAt(point.x, point.y);
+                const toneFloor = stats.mean >= Math.max(mapTone.dark + 16, mapTone.middle - 42);
+                const quietEnough = density <= .24 && stats.deviation <= 72;
+                return {
+                    plausible: toneFloor && quietEnough,
+                    mean: stats.mean,
+                    deviation: stats.deviation,
+                    density
+                };
+            };
+            const openingSample = (x1, y1, x2, y2) => {
+                const start = canvasPointForGrid(x1, y1);
+                const end = canvasPointForGrid(x2, y2);
+                const midpointX = (start.x + end.x) / 2;
+                const midpointY = (start.y + end.y) / 2;
+                const horizontal = y1 === y2;
+                const radiusAlong = Math.max(2, gridCanvas * .24);
+                const radiusAcross = Math.max(1.5, traceRadius * .72);
+                const stats = horizontal
+                    ? luminanceRegionStats(midpointX - radiusAlong, midpointY - radiusAcross, midpointX + radiusAlong, midpointY + radiusAcross)
+                    : luminanceRegionStats(midpointX - radiusAcross, midpointY - radiusAlong, midpointX + radiusAcross, midpointY + radiusAlong);
+                const density = densityAt(midpointX, midpointY);
+                return { mean: stats.mean, deviation: stats.deviation, density, midpointX, midpointY };
+            };
+            const supportingWallTone = (wall) => {
+                const a = canvasPointForGrid(wall.x1, wall.y1);
+                const b = canvasPointForGrid(wall.x2, wall.y2);
+                const midpointX = (a.x + b.x) / 2;
+                const midpointY = (a.y + b.y) / 2;
+                const radius = Math.max(1.5, traceRadius * .72);
+                return luminanceRegionStats(midpointX - radius, midpointY - radius, midpointX + radius, midpointY + radius).mean;
+            };
+            const doorwayCandidates = [];
+            const considerThreshold = (x1, y1, x2, y2, before, after, sideA, sideB) => {
+                if (!before || !after || structuralEdge(x1, y1, x2, y2)) return;
+                const opening = openingSample(x1, y1, x2, y2);
+                const floorA = floorSample(sideA.x, sideA.y);
+                const floorB = floorSample(sideB.x, sideB.y);
+                const averageWallTone = (supportingWallTone(before) + supportingWallTone(after)) / 2;
+                const openingContrast = opening.mean - averageWallTone;
+                const continuityStrength = Math.min(Number(before.confidence || 0), Number(after.confidence || 0));
+                const topologyStrength = [before, after].reduce((score, wall) => score
+                    + Number((wall.topologySupport?.continuationCount || 0) > 0)
+                    + Number((wall.topologySupport?.cornerCount || 0) > 0)
+                    + Number((wall.topologySupport?.junctionCount || 0) > 0), 0);
+                const clearOpening = opening.density <= .16 && openingContrast >= 12;
+                const crossThresholdFloor = floorA.plausible && floorB.plausible;
+                if (!clearOpening || !crossThresholdFloor || continuityStrength < 52) return;
+
+                const evidence = ['wall-continuity', 'clear-opening', 'floor-both-sides', 'one-grid-threshold'];
+                if (topologyStrength > 0) evidence.push('architectural-support');
+                const confidence = Math.max(58, Math.min(96, Math.round(
+                    54
+                    + ((continuityStrength - 52) * .34)
+                    + Math.min(12, openingContrast * .35)
+                    + (topologyStrength * 2.5)
+                    + (Math.min(floorA.mean, floorB.mean) >= mapTone.middle ? 4 : 0)
+                )));
+                doorwayCandidates.push({
+                    x1, y1, x2, y2,
+                    type: 'door',
+                    confidence,
+                    selected: true,
+                    structural: true,
+                    adaptiveEvidence: true,
+                    doorwayReasoning: true,
+                    thresholdEvidence: evidence,
+                    thresholdSupport: {
+                        continuityStrength,
+                        openingContrast,
+                        openingDensity: opening.density,
+                        floorA,
+                        floorB,
+                        topologyStrength,
+                        widthGridUnits: 1
+                    },
+                    evidenceModel: 'local-contrast-topology-threshold-v3'
+                });
+            };
+
+            // A conservative first threshold model: only one-grid orthogonal gaps
+            // bracketed by structural walls are considered. Wider arches and diagonal
+            // thresholds remain manual until later evidence proves them safe.
+            for (let y = 0; y <= rows; y += 1) {
+                for (let x = 1; x < columns - 1; x += 1) {
+                    considerThreshold(
+                        x, y, x + 1, y,
+                        structuralEdge(x - 1, y, x, y),
+                        structuralEdge(x + 1, y, x + 2, y),
+                        { x: x + .5, y: y - .34 },
+                        { x: x + .5, y: y + .34 }
+                    );
+                }
+            }
+            for (let x = 0; x <= columns; x += 1) {
+                for (let y = 1; y < rows - 1; y += 1) {
+                    considerThreshold(
+                        x, y, x, y + 1,
+                        structuralEdge(x, y - 1, x, y),
+                        structuralEdge(x, y + 1, x, y + 2),
+                        { x: x - .34, y: y + .5 },
+                        { x: x + .34, y: y + .5 }
+                    );
+                }
+            }
+
+            return architecturalWalls.concat(doorwayCandidates);
         };
 
         // IV.30.1B — The Living Contour.
