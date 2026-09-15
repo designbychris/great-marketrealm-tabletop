@@ -4513,6 +4513,8 @@
                         addPerimeterEdge(column, row, 'left');
                     }
                 }
+                const playableRegionClosureEvidenceModel = 'living-contour-playable-region-closure-v8';
+                const reconstructedSurfaceEvidenceModel = 'living-contour-reconstructed-surface-propagation-v9';
                 return Array.from(inferredEdges.values()).map((edge) => ({
                     type: 'wall', confidence: Math.max(80, Math.min(89, Math.round(80 + edge.localInk * 14))), selected: true,
                     contour: true, fineContour: true, fullBoundary: false, partialContour: true,
@@ -4521,9 +4523,11 @@
                     semanticBoundaryClassification: 'structural-wall', semanticBoundaryRole: 'playable-region-perimeter',
                     reconstructedSurfacePropagation: true, contourRecertification: true,
                     recoveryEvidence: ['certified-playable-region', 'reconstructed-playable-surface', 'illustrated-interior-surface', 'propagated-recovery-evidence', 'local-region-closure', 'playable-to-non-playable-transition', 'corroborating-wall-body-ink', 'portal-threshold-veto'],
+                    // Keep both historical provenance literals explicit: the regression suite
+                    // certifies these evidence-model names as compatibility contracts.
                     evidenceModel: edge.propagatedRecovery
-                        ? 'living-contour-reconstructed-surface-propagation-v9'
-                        : 'living-contour-playable-region-closure-v8', polyline: true,
+                        ? reconstructedSurfaceEvidenceModel
+                        : playableRegionClosureEvidenceModel, polyline: true,
                     points: [edge.a, edge.b], x1: edge.a.x, y1: edge.a.y, x2: edge.b.x, y2: edge.b.y
                 }));
             };
