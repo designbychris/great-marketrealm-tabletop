@@ -1210,6 +1210,7 @@ $sceneImage = ($scene !== null && ! $sceneIsGenerated)
                                             <option value="structural">Structural tracing</option>
                                             <option value="contour">Living Contour · caves</option>
                                             <option value="hybrid">Judgement · hybrid map</option>
+                                            <option value="audit">Evidence Audit · diagnostics</option>
                                         </select>
                                     </label>
                                     <button type="button" data-cartography-assistant-analyse>Analyse Map</button>

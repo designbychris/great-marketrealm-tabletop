@@ -1079,3 +1079,14 @@ Regression-only correction for the story-beat endpoint registration assertion; n
 - [ ] Narrative synthesis remains a later IV.37 phase.
 - [ ] Server certification.
 - [ ] Browser certification.
+
+
+## Phase IV.30.1G.5M — Contour Evidence Audit & Candidate Emission Diagnostics ✅
+- [x] Add a Keeper-only Evidence Audit detail mode without changing normal Living Contour or Hybrid judgement.
+- [x] Count raw chains, recoverable chains, semantic rejections, certified bridges, inferred perimeter edges and emitted review objects.
+- [x] Preserve diagnostic reason codes for semantic rejection and perimeter budget/deduplication.
+- [x] Render diagnostic candidate/rejected/emitted evidence as non-authoritative overlay marks.
+- [x] Keep diagnostic geometry impossible to persist as vision barriers.
+- [x] Preserve the existing review-first cartography workflow and G.5L provenance contracts.
+- [ ] Server certification.
+- [ ] Dungeon from Hell Evidence Audit certification.

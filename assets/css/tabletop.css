@@ -1986,6 +1986,19 @@
     opacity: .22;
 }
 
+/* IV.30.1G.5M — diagnostic-only contour evidence. These marks are never authoritative. */
+.gmrt-cartography-evidence-audit {
+    fill: none;
+    stroke-width: 2;
+    stroke-dasharray: 2 5;
+    vector-effect: non-scaling-stroke;
+    opacity: .72;
+}
+.gmrt-cartography-evidence-audit.is-candidate { stroke: rgba(255, 196, 88, .95); }
+.gmrt-cartography-evidence-audit.is-rejected { stroke: rgba(255, 104, 104, .92); }
+.gmrt-cartography-evidence-audit.is-emitted { stroke: rgba(132, 235, 170, .95); }
+.gmrt-cartography-evidence-audit.is-budgeted-out { stroke: rgba(180, 150, 255, .92); }
+
 
 /* Phase IV.31 — The Keeper's Lantern Rack */
 .gmrt-lantern-rack{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;margin:.7rem 0;padding:.65rem .75rem;border:1px solid rgba(244,234,214,.18);border-radius:8px;background:rgba(28,20,10,.68)}

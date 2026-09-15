@@ -2453,6 +2453,7 @@
     let selectedVisionBarrier = null;
     let visionPreview = null;
     let cartographySuggestions = [];
+    let cartographyEvidenceAudit = null; // IV.30.1G.5M — diagnostic only; never persisted.
 
     if (visionLayer) {
         try {
@@ -2501,6 +2502,26 @@
         cartographySuggestionLayer.replaceChildren();
         const fragment = document.createDocumentFragment();
 
+        // IV.30.1G.5M — Contour Evidence Audit & Candidate Emission Diagnostics.
+        // Audit geometry is deliberately non-authoritative: it is rendered only while
+        // the Keeper selects the Evidence Audit detail mode and can never be applied.
+        if (cartographyDetail?.value === 'audit' && cartographyEvidenceAudit?.records) {
+            cartographyEvidenceAudit.records.slice(0, 240).forEach((record) => {
+                if (!Array.isArray(record.points) || record.points.length < 2) return;
+                const shape = document.createElementNS('http://www.w3.org/2000/svg', record.points.length > 2 ? 'polyline' : 'line');
+                const projected = record.points.map((point) => barrierPoint(point.x, point.y));
+                if (projected.length > 2) {
+                    shape.setAttribute('points', projected.map((point) => `${point.x},${point.y}`).join(' '));
+                    shape.setAttribute('fill', 'none');
+                } else {
+                    shape.setAttribute('x1', String(projected[0].x)); shape.setAttribute('y1', String(projected[0].y));
+                    shape.setAttribute('x2', String(projected[1].x)); shape.setAttribute('y2', String(projected[1].y));
+                }
+                shape.classList.add('gmrt-cartography-evidence-audit', `is-${record.state || 'observed'}`);
+                fragment.append(shape);
+            });
+        }
+
         cartographySuggestions.forEach((suggestion) => {
             const points = Array.isArray(suggestion.points) && suggestion.points.length > 1
                 ? suggestion.points
@@ -2544,8 +2565,13 @@
         if (cartographyApply) cartographyApply.disabled = selected === 0;
         if (cartographyClear) cartographyClear.disabled = total === 0;
         if (cartographyAssistantStatus && total > 0) {
-            const doors = cartographySuggestions.filter((item) => item.type === 'door').length;
-            cartographyAssistantStatus.textContent = `${total} draft suggestions · ${selected} selected · ${doors} possible doors. Polyline wall paths count as one review object each. Nothing is saved until Apply Selected.`;
+            if (cartographyDetail?.value === 'audit' && cartographyEvidenceAudit) {
+                const audit = cartographyEvidenceAudit;
+                cartographyAssistantStatus.textContent = `Evidence Audit · ${audit.rawChains} raw chains · ${audit.recoverableChains} recoverable · ${audit.semanticRejected} semantic rejects · ${audit.inferredPerimeters} inferred perimeter edges · ${audit.emitted} emitted. Diagnostic marks are never saved.`;
+            } else {
+                const doors = cartographySuggestions.filter((item) => item.type === 'door').length;
+                cartographyAssistantStatus.textContent = `${total} draft suggestions · ${selected} selected · ${doors} possible doors. Polyline wall paths count as one review object each. Nothing is saved until Apply Selected.`;
+            }
         }
     };
 
@@ -2593,6 +2619,7 @@
 
     const clearCartographyDraft = (message = 'Draft cleared. No cartography suggestions were saved.') => {
         cartographySuggestions = [];
+        cartographyEvidenceAudit = null;
         if (cartographyReview) cartographyReview.replaceChildren();
         if (cartographySuggestionLayer) cartographySuggestionLayer.replaceChildren();
         updateCartographyDraftControls();
@@ -4539,6 +4566,20 @@
             };
             const inferredPlayablePerimeterSuggestions = playableRegionClosureAndPerimeterInference();
 
+            // IV.30.1G.5M — keep an explainable trail through the contour pipeline.
+            // These records are observational only: no threshold, score, budget or
+            // suggestion-selection decision reads them back into the analyser.
+            const contourEvidenceAuditRecords = options.evidenceAudit === true
+                ? recoverableChains.map((entry) => ({
+                    stage: 'semantic-classification',
+                    state: semanticRoleIsAutomaticWall(entry.semanticBoundary?.role) ? 'candidate' : 'rejected',
+                    reason: semanticRoleIsAutomaticWall(entry.semanticBoundary?.role)
+                        ? 'automatic-wall-role'
+                        : `semantic-role-${entry.semanticBoundary?.role || 'uncertain'}`,
+                    points: entry.chain.map((point) => ({ x: roundContourCoordinate(point[0]), y: roundContourCoordinate(point[1]) }))
+                }))
+                : [];
+
             if (recoverableChains.length === 0 && inferredPlayablePerimeterSuggestions.length === 0) {
                 return preOcclusionRecoveryContours;
             }
@@ -4673,6 +4714,30 @@
             void fallbackValues;
             if (pathSuggestions.length > maximumReviewSuggestions) return preOcclusionRecoveryContours;
 
+            const publishContourEvidenceAudit = (emittedSuggestions) => {
+                if (options.evidenceAudit !== true) return;
+                const emittedKeys = new Set(emittedSuggestions.map(cartographySuggestionKey));
+                inferredPlayablePerimeterSuggestions.forEach((item) => {
+                    contourEvidenceAuditRecords.push({
+                        stage: 'perimeter-inference',
+                        state: emittedKeys.has(cartographySuggestionKey(item)) ? 'emitted' : 'budgeted-out',
+                        reason: emittedKeys.has(cartographySuggestionKey(item)) ? 'certified-and-emitted' : 'supplemental-budget-or-deduplication',
+                        points: item.points
+                    });
+                });
+                cartographyEvidenceAudit = {
+                    evidenceModel: 'living-contour-evidence-audit-v10',
+                    rawChains: contourChains.length,
+                    recoverableChains: recoverableChains.length,
+                    semanticRejected: recoverableChains.filter((entry) => !semanticRoleIsAutomaticWall(entry.semanticBoundary?.role)).length,
+                    certifiedBridges: certifiedEvidenceBridges.length,
+                    inferredPerimeters: inferredPlayablePerimeterSuggestions.length,
+                    preOcclusionCertified: preOcclusionRecoveryContours.length,
+                    emitted: emittedSuggestions.length,
+                    records: contourEvidenceAuditRecords
+                };
+            };
+
             // Monotonic evidence contract: preserve every pre-G.5J certified object first,
             // then spend only the remaining review budget on genuinely new reconstruction
             // evidence. G.5J can therefore improve a draft but can never make Living
@@ -4685,8 +4750,11 @@
                     const key = cartographySuggestionKey(item);
                     if (!merged.has(key)) merged.set(key, item);
                 });
-                return Array.from(merged.values());
+                const mergedSuggestions = Array.from(merged.values());
+                publishContourEvidenceAudit(mergedSuggestions);
+                return mergedSuggestions;
             }
+            publishContourEvidenceAudit(pathSuggestions);
             return pathSuggestions;
         };
 
@@ -5087,6 +5155,20 @@
             renderCartographyReview();
             if (cartographySuggestions.length === 0 && cartographyAssistantStatus) {
                 cartographyAssistantStatus.textContent = 'No safe hybrid wall sections could be prepared. Check grid calibration, or review Structural tracing and Living Contour separately.';
+            }
+            return;
+        }
+        if (detail === 'audit') {
+            const existing = new Set(visionBarriers.map(cartographySuggestionKey));
+            cartographyEvidenceAudit = null;
+            cartographySuggestions = livingContourCandidates({ evidenceAudit: true })
+                .filter((item) => !existing.has(cartographySuggestionKey(item)))
+                .sort((a, b) => b.confidence - a.confidence);
+            renderCartographyReview();
+            if (cartographySuggestions.length === 0 && cartographyAssistantStatus) {
+                cartographyAssistantStatus.textContent = cartographyEvidenceAudit
+                    ? `Evidence Audit · no emitted contour objects · ${cartographyEvidenceAudit.rawChains} raw chains · ${cartographyEvidenceAudit.semanticRejected} semantic rejects · ${cartographyEvidenceAudit.inferredPerimeters} inferred perimeter edges.`
+                    : 'Evidence Audit could not prepare diagnostic contour evidence.';
             }
             return;
         }
