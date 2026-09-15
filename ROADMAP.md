@@ -1162,3 +1162,7 @@ Regression-only correction for the story-beat endpoint registration assertion; n
 - [x] Preserve G.5S exterior-seed rejection, G.5R admission vetoes, G.5P contour authority, the 200-object ceiling, and review-first persistence.
 - [ ] Server certification.
 - [ ] Dungeon from Hell Evidence Audit certification: queued, visited, and adjacent-sample counters must become non-zero.
+
+### IV.30.1G.5T.1 — Evidence Audit Publication After Review-Budget Fallback ✅
+- Preserve the normal 200-object monotonic fallback while allowing the top-level Evidence Audit pass to publish G.5T traversal telemetry.
+- Keep recursive `skipOcclusionRecovery` baseline passes silent so they cannot overwrite the live diagnostic audit.

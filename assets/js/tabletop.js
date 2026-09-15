@@ -5056,7 +5056,19 @@
             const simplificationTolerance = Math.max(contourStep * 1.1, .12);
             const fallbackValues = buildSimplifiedSuggestions(simplificationTolerance);
             void fallbackValues;
-            if (pathSuggestions.length > maximumReviewSuggestions) return preOcclusionRecoveryContours;
+            // IV.30.1G.5T.1 — Evidence Audit Publication After Review-Budget Fallback.
+            // G.5T can discover enough new frontier evidence to exceed the 200-object
+            // review boundary. Preserve the exact monotonic fallback for normal scans,
+            // but keep the top-level Evidence Audit pass alive long enough to publish
+            // its traversal telemetry. The recursive skipOcclusionRecovery baseline is
+            // still forbidden from publishing diagnostics below.
+            if (pathSuggestions.length > maximumReviewSuggestions) {
+                if (options.evidenceAudit === true && options.skipOcclusionRecovery !== true) {
+                    pathSuggestions = preOcclusionRecoveryContours;
+                } else {
+                    return preOcclusionRecoveryContours;
+                }
+            }
 
             const publishContourEvidenceAudit = (emittedSuggestions) => {
                 if (options.evidenceAudit !== true || options.skipOcclusionRecovery === true) return;
