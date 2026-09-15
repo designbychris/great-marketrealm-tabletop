@@ -2567,7 +2567,7 @@
         if (cartographyAssistantStatus && total > 0) {
             if (cartographyDetail?.value === 'audit' && cartographyEvidenceAudit) {
                 const audit = cartographyEvidenceAudit;
-                cartographyAssistantStatus.textContent = `Evidence Audit · ${audit.rawChains} raw chains · ${audit.recoverableChains} recoverable · ${audit.semanticRejected} semantic rejects · ${audit.inferredPerimeters} inferred perimeter edges · ${audit.emitted} emitted. Diagnostic marks are never saved.`;
+                cartographyAssistantStatus.textContent = `Evidence Audit · ${audit.rawChains} raw chains · ${audit.recoverableChains} recoverable · ${audit.semanticRejected} semantic rejects · ${audit.inferredPerimeters} inferred perimeter edges → ${audit.promotedPerimeterChains || 0} promoted chains (${audit.promotedPerimeterEdges || 0} edges) · ${audit.emitted} emitted. Diagnostic marks are never saved.`;
             } else {
                 const doors = cartographySuggestions.filter((item) => item.type === 'door').length;
                 cartographyAssistantStatus.textContent = `${total} draft suggestions · ${selected} selected · ${doors} possible doors. Polyline wall paths count as one review object each. Nothing is saved until Apply Selected.`;
@@ -4533,7 +4533,11 @@
                 };
                 for (let row = 1; row < contourRows - 1; row += 1) {
                     for (let column = 1; column < contourColumns - 1; column += 1) {
-                        if (!closure[row][column] || !inferred[row][column]) continue;
+                        // IV.30.1G.5N — the G.5L propagation flag is itself permission
+                        // to reconsider the cell perimeter. Previously this hand-off only
+                        // visited G.5I's `inferred` cells, so reconstructed G.5J/G.5K
+                        // surface could be recorded but never actually reach addPerimeterEdge.
+                        if (!closure[row][column] || (!inferred[row][column] && !propagatedRecoveredSurface[row][column])) continue;
                         addPerimeterEdge(column, row, 'top');
                         addPerimeterEdge(column, row, 'right');
                         addPerimeterEdge(column, row, 'bottom');
@@ -4695,10 +4699,69 @@
                     x1: from.x, y1: from.y, x2: to.x, y2: to.y
                 };
             });
-            const perimeterInferenceBudget = Math.min(24, inferredPlayablePerimeterSuggestions.length);
+            // IV.30.1G.5N — Inferred Perimeter Promotion & Emission Continuity.
+            // G.5M proved that hundreds of certified one-cell perimeter edges were being
+            // generated and then only the first 24 were allowed through the supplemental
+            // object budget. Promote connected edge runs into reviewable polylines first:
+            // the safety budget remains an *object* budget, not an arbitrary edge guillotine.
+            const promoteInferredPerimeterChains = (edges) => {
+                const pointKey = (point) => `${point.x},${point.y}`;
+                const adjacency = new Map();
+                edges.forEach((edge, index) => {
+                    edge.points.forEach((point) => {
+                        const key = pointKey(point);
+                        if (!adjacency.has(key)) adjacency.set(key, []);
+                        adjacency.get(key).push(index);
+                    });
+                });
+                const unused = new Set(edges.map((_, index) => index));
+                const promoted = [];
+                const takeRun = (startIndex, startPoint) => {
+                    const first = edges[startIndex];
+                    const a = first.points[0], b = first.points[1];
+                    const points = [startPoint, pointKey(startPoint) === pointKey(a) ? b : a];
+                    const members = [first];
+                    unused.delete(startIndex);
+                    let guard = 0;
+                    while (guard++ < edges.length) {
+                        const end = points[points.length - 1];
+                        const candidates = (adjacency.get(pointKey(end)) || []).filter((index) => unused.has(index));
+                        if (candidates.length !== 1) break;
+                        const nextIndex = candidates[0];
+                        const next = edges[nextIndex];
+                        const nextPoint = pointKey(next.points[0]) === pointKey(end) ? next.points[1] : next.points[0];
+                        points.push(nextPoint); members.push(next); unused.delete(nextIndex);
+                        if (pointKey(nextPoint) === pointKey(points[0])) break;
+                    }
+                    return { points, members };
+                };
+                while (unused.size > 0) {
+                    const componentSeed = unused.values().next().value;
+                    const seed = edges[componentSeed];
+                    const endpoints = seed.points.filter((point) => (adjacency.get(pointKey(point)) || []).filter((index) => unused.has(index)).length === 1);
+                    const run = takeRun(componentSeed, endpoints[0] || seed.points[0]);
+                    const strongest = run.members.reduce((best, item) => item.confidence > best.confidence ? item : best, run.members[0]);
+                    const propagated = run.members.some((item) => item.evidenceModel === 'living-contour-reconstructed-surface-propagation-v9');
+                    promoted.push({
+                        ...strongest,
+                        confidence: Math.max(...run.members.map((item) => item.confidence)),
+                        inferredPerimeterPromotion: true,
+                        inferredPerimeterEdgeCount: run.members.length,
+                        emissionContinuity: 'connected-perimeter-chain',
+                        evidenceModel: propagated ? 'living-contour-inferred-perimeter-promotion-v11' : strongest.evidenceModel,
+                        recoveryEvidence: Array.from(new Set(run.members.flatMap((item) => item.recoveryEvidence || []).concat(['connected-edge-promotion', 'object-budget-after-grouping']))),
+                        polyline: true, points: run.points,
+                        x1: run.points[0].x, y1: run.points[0].y,
+                        x2: run.points[run.points.length - 1].x, y2: run.points[run.points.length - 1].y
+                    });
+                }
+                return promoted.filter((item) => item.points.length >= 2 && item.points.length <= maximumPathVertices);
+            };
+            const promotedInferredPerimeterSuggestions = promoteInferredPerimeterChains(inferredPlayablePerimeterSuggestions);
+            const perimeterInferenceBudget = Math.min(48, promotedInferredPerimeterSuggestions.length);
             const bridgeInferenceBudget = Math.min(12, evidenceBridgeSuggestions.length);
             const supplementalSuggestions = evidenceBridgeSuggestions.slice(0, bridgeInferenceBudget)
-                .concat(inferredPlayablePerimeterSuggestions.slice(0, perimeterInferenceBudget));
+                .concat(promotedInferredPerimeterSuggestions.slice(0, perimeterInferenceBudget));
             pathSuggestions = pathSuggestions
                 .slice(0, Math.max(0, maximumReviewSuggestions - supplementalSuggestions.length))
                 .concat(supplementalSuggestions);
@@ -4717,11 +4780,27 @@
             const publishContourEvidenceAudit = (emittedSuggestions) => {
                 if (options.evidenceAudit !== true) return;
                 const emittedKeys = new Set(emittedSuggestions.map(cartographySuggestionKey));
+                const promotedMemberKeys = new Set();
+                promotedInferredPerimeterSuggestions.forEach((item) => {
+                    const emitted = emittedKeys.has(cartographySuggestionKey(item));
+                    contourEvidenceAuditRecords.push({
+                        stage: 'perimeter-promotion',
+                        state: emitted ? 'emitted' : 'budgeted-out',
+                        reason: emitted ? 'connected-chain-promoted-and-emitted' : 'promoted-chain-review-budget-or-deduplication',
+                        points: item.points
+                    });
+                    // Record member edges as promoted rather than falsely describing them
+                    // as lost merely because their final review key is now a polyline key.
+                    for (let index = 0; index < Number(item.inferredPerimeterEdgeCount || 0); index += 1) {
+                        // Count is sufficient for the audit summary; geometry remains on the promoted chain.
+                        promotedMemberKeys.add(`${cartographySuggestionKey(item)}:${index}`);
+                    }
+                });
                 inferredPlayablePerimeterSuggestions.forEach((item) => {
                     contourEvidenceAuditRecords.push({
                         stage: 'perimeter-inference',
-                        state: emittedKeys.has(cartographySuggestionKey(item)) ? 'emitted' : 'budgeted-out',
-                        reason: emittedKeys.has(cartographySuggestionKey(item)) ? 'certified-and-emitted' : 'supplemental-budget-or-deduplication',
+                        state: 'promoted',
+                        reason: 'eligible-for-connected-edge-promotion',
                         points: item.points
                     });
                 });
@@ -4732,6 +4811,8 @@
                     semanticRejected: recoverableChains.filter((entry) => !semanticRoleIsAutomaticWall(entry.semanticBoundary?.role)).length,
                     certifiedBridges: certifiedEvidenceBridges.length,
                     inferredPerimeters: inferredPlayablePerimeterSuggestions.length,
+                    promotedPerimeterChains: promotedInferredPerimeterSuggestions.length,
+                    promotedPerimeterEdges: promotedInferredPerimeterSuggestions.reduce((sum, item) => sum + Number(item.inferredPerimeterEdgeCount || 0), 0),
                     preOcclusionCertified: preOcclusionRecoveryContours.length,
                     emitted: emittedSuggestions.length,
                     records: contourEvidenceAuditRecords

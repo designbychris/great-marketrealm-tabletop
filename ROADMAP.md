@@ -1090,3 +1090,13 @@ Regression-only correction for the story-beat endpoint registration assertion; n
 - [x] Preserve the existing review-first cartography workflow and G.5L provenance contracts.
 - [ ] Server certification.
 - [ ] Dungeon from Hell Evidence Audit certification.
+
+## Phase IV.30.1G.5N — Inferred Perimeter Promotion & Emission Continuity ✅
+- [x] Repair the G.5L hand-off so propagated G.5J/G.5K playable surface actually reaches perimeter reconsideration.
+- [x] Group connected inferred perimeter edges into coherent review polylines before applying the supplemental object budget.
+- [x] Preserve portal, wall-body, local-support and maximum-path safety vetoes.
+- [x] Keep G.5I/G.5L provenance while marking genuinely propagated promoted chains with the G.5N evidence model.
+- [x] Extend Evidence Audit with promoted-chain and promoted-edge counts.
+- [x] Preserve review-first behaviour; inferred perimeter promotion remains draft-only until Keeper approval.
+- [ ] Server certification.
+- [ ] Dungeon from Hell Living Contour / Hybrid / Evidence Audit certification.
