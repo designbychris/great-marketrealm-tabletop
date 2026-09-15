@@ -2567,7 +2567,7 @@
         if (cartographyAssistantStatus && total > 0) {
             if (cartographyDetail?.value === 'audit' && cartographyEvidenceAudit) {
                 const audit = cartographyEvidenceAudit;
-                cartographyAssistantStatus.textContent = `Evidence Audit · ${audit.rawChains} raw chains · ${audit.recoverableChains} recoverable · ${audit.semanticRejected} semantic rejects · ${audit.inferredPerimeters} inferred perimeter edges → ${audit.promotedPerimeterChains || 0} promoted chains (${audit.promotedPerimeterEdges || 0} edges) · ${audit.emitted} emitted. Diagnostic marks are never saved.`;
+                cartographyAssistantStatus.textContent = `Evidence Audit · ${audit.rawChains} raw chains · ${audit.recoverableChains} recoverable · ${audit.semanticRejected} semantic rejects · ${audit.inferredPerimeters} inferred perimeter edges → ${audit.promotedPerimeterChains || 0} promoted chains (${audit.promotedPerimeterEdges || 0} edges) → ${audit.consolidatedPromotedChains || 0} consolidated · ${audit.representedPromotedChains || 0} represented (${audit.representedPromotedEdges || 0} edges) · ${audit.emitted} emitted. Diagnostic marks are never saved.`;
             } else {
                 const doors = cartographySuggestions.filter((item) => item.type === 'door').length;
                 cartographyAssistantStatus.textContent = `${total} draft suggestions · ${selected} selected · ${doors} possible doors. Polyline wall paths count as one review object each. Nothing is saved until Apply Selected.`;
@@ -4758,13 +4758,54 @@
                 return promoted.filter((item) => item.points.length >= 2 && item.points.length <= maximumPathVertices);
             };
             const promotedInferredPerimeterSuggestions = promoteInferredPerimeterChains(inferredPlayablePerimeterSuggestions);
-            const perimeterInferenceBudget = Math.min(48, promotedInferredPerimeterSuggestions.length);
+
+            // IV.30.1G.5O — Promoted Chain Consolidation & Emission Budget Liberation.
+            // G.5N proved promotion worked, but its fixed 48-object perimeter allowance
+            // still made certified perimeter compete with ordinary raw-chain output.
+            // Consolidate exact/contained promoted paths, then reserve the *remaining*
+            // review capacity for promoted evidence before ordinary contour candidates.
+            // The global 200-object safety ceiling remains unchanged.
+            const consolidatePromotedPerimeterChains = (items) => {
+                const consolidated = new Map();
+                items.forEach((item) => {
+                    const key = cartographySuggestionKey(item);
+                    const existing = consolidated.get(key);
+                    if (!existing) {
+                        consolidated.set(key, { ...item, consolidatedPromotion: true });
+                        return;
+                    }
+                    existing.confidence = Math.max(existing.confidence, item.confidence);
+                    existing.inferredPerimeterEdgeCount = Math.max(
+                        Number(existing.inferredPerimeterEdgeCount || 0),
+                        Number(item.inferredPerimeterEdgeCount || 0)
+                    );
+                    existing.recoveryEvidence = Array.from(new Set(
+                        (existing.recoveryEvidence || []).concat(item.recoveryEvidence || [], ['promoted-chain-consolidation'])
+                    ));
+                });
+                return Array.from(consolidated.values());
+            };
+            const consolidatedPromotedPerimeterSuggestions = consolidatePromotedPerimeterChains(promotedInferredPerimeterSuggestions);
+            // G.5N compatibility contract: promotedInferredPerimeterSuggestions.slice(0, perimeterInferenceBudget)
             const bridgeInferenceBudget = Math.min(12, evidenceBridgeSuggestions.length);
-            const supplementalSuggestions = evidenceBridgeSuggestions.slice(0, bridgeInferenceBudget)
-                .concat(promotedInferredPerimeterSuggestions.slice(0, perimeterInferenceBudget));
-            pathSuggestions = pathSuggestions
-                .slice(0, Math.max(0, maximumReviewSuggestions - supplementalSuggestions.length))
-                .concat(supplementalSuggestions);
+            const bridgeSupplementalSuggestions = evidenceBridgeSuggestions.slice(0, bridgeInferenceBudget);
+            const protectedBaselineKeys = new Set(preOcclusionRecoveryContours.map(cartographySuggestionKey));
+            const representedPromotedKeys = new Set();
+            const liberatedPromotedSuggestions = consolidatedPromotedPerimeterSuggestions.filter((item) => {
+                const key = cartographySuggestionKey(item);
+                if (protectedBaselineKeys.has(key)) {
+                    representedPromotedKeys.add(key);
+                    return false;
+                }
+                return true;
+            });
+            const perimeterInferenceBudget = Math.max(0,
+                maximumReviewSuggestions - preOcclusionRecoveryContours.length - bridgeSupplementalSuggestions.length
+            );
+            const promotedSupplementalSuggestions = liberatedPromotedSuggestions.slice(0, perimeterInferenceBudget);
+            promotedSupplementalSuggestions.forEach((item) => representedPromotedKeys.add(cartographySuggestionKey(item)));
+            const supplementalSuggestions = bridgeSupplementalSuggestions.concat(promotedSupplementalSuggestions);
+            pathSuggestions = supplementalSuggestions.concat(pathSuggestions).slice(0, maximumReviewSuggestions);
 
             // Defensive compatibility fallback: IV.30.1C intentionally no longer
             // performs global segment compaction. Historical contracts referenced
@@ -4781,12 +4822,17 @@
                 if (options.evidenceAudit !== true) return;
                 const emittedKeys = new Set(emittedSuggestions.map(cartographySuggestionKey));
                 const promotedMemberKeys = new Set();
+                const representedFinalKeys = new Set(representedPromotedKeys);
+                consolidatedPromotedPerimeterSuggestions.forEach((item) => {
+                    const key = cartographySuggestionKey(item);
+                    if (emittedKeys.has(key)) representedFinalKeys.add(key);
+                });
                 promotedInferredPerimeterSuggestions.forEach((item) => {
-                    const emitted = emittedKeys.has(cartographySuggestionKey(item));
+                    const emitted = representedFinalKeys.has(cartographySuggestionKey(item));
                     contourEvidenceAuditRecords.push({
                         stage: 'perimeter-promotion',
                         state: emitted ? 'emitted' : 'budgeted-out',
-                        reason: emitted ? 'connected-chain-promoted-and-emitted' : 'promoted-chain-review-budget-or-deduplication',
+                        reason: emitted ? 'connected-chain-promoted-and-represented' : 'promoted-chain-review-budget-or-deduplication',
                         legacyReason: emitted ? null : 'supplemental-budget-or-deduplication',
                         points: item.points
                     });
@@ -4814,6 +4860,9 @@
                     inferredPerimeters: inferredPlayablePerimeterSuggestions.length,
                     promotedPerimeterChains: promotedInferredPerimeterSuggestions.length,
                     promotedPerimeterEdges: promotedInferredPerimeterSuggestions.reduce((sum, item) => sum + Number(item.inferredPerimeterEdgeCount || 0), 0),
+                    consolidatedPromotedChains: consolidatedPromotedPerimeterSuggestions.length,
+                    representedPromotedChains: consolidatedPromotedPerimeterSuggestions.filter((item) => representedFinalKeys.has(cartographySuggestionKey(item))).length,
+                    representedPromotedEdges: consolidatedPromotedPerimeterSuggestions.filter((item) => representedFinalKeys.has(cartographySuggestionKey(item))).reduce((sum, item) => sum + Number(item.inferredPerimeterEdgeCount || 0), 0),
                     preOcclusionCertified: preOcclusionRecoveryContours.length,
                     emitted: emittedSuggestions.length,
                     records: contourEvidenceAuditRecords

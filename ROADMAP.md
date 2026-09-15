@@ -1100,3 +1100,14 @@ Regression-only correction for the story-beat endpoint registration assertion; n
 - [x] Preserve review-first behaviour; inferred perimeter promotion remains draft-only until Keeper approval.
 - [ ] Server certification.
 - [ ] Dungeon from Hell Living Contour / Hybrid / Evidence Audit certification.
+
+## Phase IV.30.1G.5O — Promoted Chain Consolidation & Emission Budget Liberation ✅
+- [x] Consolidate duplicate promoted perimeter review paths before final emission budgeting.
+- [x] Preserve every pre-occlusion certified contour as the monotonic safety baseline.
+- [x] Replace the fixed 48-object promoted-perimeter allowance with the review capacity genuinely remaining after the protected baseline and evidence bridges.
+- [x] Prioritise certified promoted perimeter ahead of ordinary raw-chain candidates without increasing the 200-object safety ceiling.
+- [x] Count promoted chains and edges represented in the final draft, including promoted evidence already represented by the protected baseline.
+- [x] Extend Evidence Audit with consolidated and represented promoted evidence totals.
+- [x] Keep all promoted geometry review-only until Keeper approval.
+- [ ] Server certification.
+- [ ] Dungeon from Hell Living Contour / Hybrid / Evidence Audit certification.
