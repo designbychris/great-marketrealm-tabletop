@@ -10,7 +10,7 @@ final class EvidenceAuditPublicationAfterReviewBudgetFallbackRegressionTest exte
 {
     public function test_top_level_evidence_audit_survives_review_budget_fallback_and_recursive_baseline_stays_silent(): void
     {
-        $root = dirname(__DIR__, 5);
+        $root = dirname(__DIR__, 4);
         $javascript = file_get_contents($root . '/assets/js/tabletop.js');
 
         self::assertIsString($javascript);
