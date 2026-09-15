@@ -4051,6 +4051,86 @@
                 return { ...entry, semanticBoundary, playableAdjacency: adjacency };
             };
 
+            // IV.30.1G.5G — Portal Pairing & Boundary-Side Reasoning.
+            // A short break is not a doorway merely because its pixels are missing. Pair
+            // the two boundary ends, compare their approach tangents, then ask what kind
+            // of space exists across and to either side of the break. A floor-continuous
+            // jamb pair is a certified portal and remains open; a tiny aligned break with
+            // asymmetric playable/non-playable sides is certified boundary continuation.
+            // Everything else remains unresolved rather than being guessed into a wall.
+            const portalPairingAndBoundarySides = (entry) => {
+                const unresolved = {
+                    classification: 'unresolved-boundary-break', confidence: 0, portal: false,
+                    boundaryContinuation: false, evidence: ['insufficient-pairing-evidence']
+                };
+                if (!entry?.partial || !Array.isArray(entry.chain) || entry.chain.length < 3) return unresolved;
+                const chain = entry.chain;
+                const first = chain[0];
+                const second = chain[1];
+                const beforeLast = chain[chain.length - 2];
+                const last = chain[chain.length - 1];
+                const gapX = Number(last[0]) - Number(first[0]);
+                const gapY = Number(last[1]) - Number(first[1]);
+                const gapDistance = Math.hypot(gapX, gapY);
+                if (gapDistance < .12 || gapDistance > 1.55) return { ...unresolved, evidence: ['ends-not-portal-scale'] };
+                const unit = (x, y) => {
+                    const magnitude = Math.hypot(x, y);
+                    return magnitude > .000001 ? [x / magnitude, y / magnitude] : [0, 0];
+                };
+                // Tangents point away from each unresolved end into its known chain.
+                const tangentA = unit(Number(second[0]) - Number(first[0]), Number(second[1]) - Number(first[1]));
+                const tangentB = unit(Number(beforeLast[0]) - Number(last[0]), Number(beforeLast[1]) - Number(last[1]));
+                const tangentAgreement = Math.abs((tangentA[0] * tangentB[0]) + (tangentA[1] * tangentB[1]));
+                const gapUnit = unit(gapX, gapY);
+                const approachA = Math.abs((tangentA[0] * gapUnit[0]) + (tangentA[1] * gapUnit[1]));
+                const approachB = Math.abs((tangentB[0] * gapUnit[0]) + (tangentB[1] * gapUnit[1]));
+                const pairedJambGeometry = tangentAgreement >= .58 && Math.max(approachA, approachB) >= .42;
+                const playableAtGrid = (x, y) => isPlayableFloor(
+                    Math.round(Number(x) * contourSubdivisions),
+                    Math.round(Number(y) * contourSubdivisions)
+                );
+                let acrossPlayable = 0;
+                const acrossChecks = 9;
+                for (let index = 1; index < acrossChecks; index += 1) {
+                    const ratio = index / acrossChecks;
+                    if (playableAtGrid(Number(first[0]) + gapX * ratio, Number(first[1]) + gapY * ratio)) acrossPlayable += 1;
+                }
+                const acrossPlayableRatio = acrossPlayable / (acrossChecks - 1);
+                const midpointX = (Number(first[0]) + Number(last[0])) / 2;
+                const midpointY = (Number(first[1]) + Number(last[1])) / 2;
+                const sideOffset = Math.max(.30, contourStep * 1.9);
+                const normalX = -gapUnit[1] * sideOffset;
+                const normalY = gapUnit[0] * sideOffset;
+                const sideAPlayable = playableAtGrid(midpointX + normalX, midpointY + normalY);
+                const sideBPlayable = playableAtGrid(midpointX - normalX, midpointY - normalY);
+                const boundarySideSeparation = sideAPlayable !== sideBPlayable;
+                const thresholdEvidence = Boolean(entry.playableAdjacency?.thresholdConnectivity) || acrossPlayableRatio >= .72;
+                if (pairedJambGeometry && thresholdEvidence) {
+                    return {
+                        classification: 'certified-portal-pair', confidence: 94, portal: true, boundaryContinuation: false,
+                        gapDistance, acrossPlayableRatio, sideAPlayable, sideBPlayable,
+                        evidence: ['paired-boundary-ends', 'jamb-compatible-tangents', 'playable-through-gap', 'portal-remains-open']
+                    };
+                }
+                if (gapDistance <= .72 && pairedJambGeometry && boundarySideSeparation && acrossPlayableRatio < .55
+                    && entry.semanticBoundary?.role === 'structural-wall') {
+                    return {
+                        classification: 'certified-boundary-continuation', confidence: 89, portal: false, boundaryContinuation: true,
+                        gapDistance, acrossPlayableRatio, sideAPlayable, sideBPlayable,
+                        evidence: ['paired-boundary-ends', 'aligned-boundary-approach', 'opposed-boundary-sides', 'safe-short-gap-recovery']
+                    };
+                }
+                return {
+                    classification: 'unresolved-boundary-break', confidence: 61, portal: false, boundaryContinuation: false,
+                    gapDistance, acrossPlayableRatio, sideAPlayable, sideBPlayable,
+                    evidence: ['ambiguous-end-pair', 'do-not-invent-portal-or-wall']
+                };
+            };
+            const applyPortalPairingAndBoundarySides = (entry) => ({
+                ...entry,
+                portalPairing: portalPairingAndBoundarySides(entry)
+            });
+
             const splitContourPathAtProtectedThresholds = (points) => {
                 if (!Array.isArray(points) || points.length < 2) return { runs: [], gaps: [] };
                 const runs = [];
@@ -4106,6 +4186,7 @@
                         + Math.min(12, Math.max(0, entry.chain.length - 2) * .45)
                 }))
                 .map(applyPlayableSpaceAdjacency)
+                .map(applyPortalPairingAndBoundarySides)
                 .sort((a, b) => (b.recoveryScore - a.recoveryScore) || (b.length - a.length));
 
             if (recoverableChains.length === 0) return [];
@@ -4170,7 +4251,12 @@
                         unresolvedBoundaryEnds: partialContour ? [runPoints[0], runPoints[runPoints.length - 1]] : [],
                         gapClassifications: endpointClassifications,
                         protectedContourGaps: protectedPath.gaps,
-                        thresholdGapProtection: gapProtected || Boolean(entry.playableAdjacency?.thresholdConnectivity),
+                        thresholdGapProtection: gapProtected || Boolean(entry.playableAdjacency?.thresholdConnectivity) || Boolean(entry.portalPairing?.portal),
+                        portalPairingClassification: entry.portalPairing?.classification || 'unresolved-boundary-break',
+                        portalPairingConfidence: Number(entry.portalPairing?.confidence || 0),
+                        portalPairingEvidence: Array.isArray(entry.portalPairing?.evidence) ? entry.portalPairing.evidence : [],
+                        certifiedPortal: Boolean(entry.portalPairing?.portal),
+                        certifiedBoundaryContinuation: Boolean(entry.portalPairing?.boundaryContinuation),
                         playableSpaceAdjacency: entry.playableAdjacency?.classification || 'unresolved-adjacency',
                         playableSpaceAdjacencyConfidence: Number(entry.playableAdjacency?.confidence || 0),
                         playableSpaceAdjacencyEvidence: Array.isArray(entry.playableAdjacency?.evidence) ? entry.playableAdjacency.evidence : [],
