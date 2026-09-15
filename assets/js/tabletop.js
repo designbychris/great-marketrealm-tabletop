@@ -4502,7 +4502,7 @@
                     const localInk = Math.max(wallBodyDarkness, darkness[row][column]);
                     if (localInk < .20) return;
                     const key = edgeKey(a, b);
-                    if (!inferredEdges.has(key)) inferredEdges.set(key, { a, b, localInk });
+                    if (!inferredEdges.has(key)) inferredEdges.set(key, { a, b, localInk, propagatedRecovery });
                 };
                 for (let row = 1; row < contourRows - 1; row += 1) {
                     for (let column = 1; column < contourColumns - 1; column += 1) {
@@ -4521,7 +4521,9 @@
                     semanticBoundaryClassification: 'structural-wall', semanticBoundaryRole: 'playable-region-perimeter',
                     reconstructedSurfacePropagation: true, contourRecertification: true,
                     recoveryEvidence: ['certified-playable-region', 'reconstructed-playable-surface', 'illustrated-interior-surface', 'propagated-recovery-evidence', 'local-region-closure', 'playable-to-non-playable-transition', 'corroborating-wall-body-ink', 'portal-threshold-veto'],
-                    evidenceModel: 'living-contour-reconstructed-surface-propagation-v9', polyline: true,
+                    evidenceModel: edge.propagatedRecovery
+                        ? 'living-contour-reconstructed-surface-propagation-v9'
+                        : 'living-contour-playable-region-closure-v8', polyline: true,
                     points: [edge.a, edge.b], x1: edge.a.x, y1: edge.a.y, x2: edge.b.x, y2: edge.b.y
                 }));
             };
