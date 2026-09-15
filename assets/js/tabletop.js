@@ -4424,6 +4424,20 @@
                     Array.from({ length: contourColumns }, (_, column) => isPlayableFloor(column, row))
                 );
                 const inferred = Array.from({ length: contourRows }, () => Array(contourColumns).fill(false));
+
+                // IV.30.1G.5L — Reconstructed Surface Propagation & Contour Re-certification.
+                // G.5J/G.5K already know about playable surface hidden by illustration,
+                // but G.5I historically emitted new perimeter only for cells recovered by
+                // its own closure pass. Carry the provenance of those earlier recovered
+                // cells into the closure graph so their *outer* playable/non-playable edge
+                // can be reconsidered. This is still additive and remains subject to the
+                // same portal, wall-body and local-continuity vetoes as G.5I.
+                const propagatedRecoveredSurface = Array.from({ length: contourRows }, (_, row) =>
+                    Array.from({ length: contourColumns }, (_, column) => Boolean(
+                        isPlayableFloor(column, row)
+                        && (reconstructedPlayableSurface[row][column] || illustratedInteriorPlayableSurface[row][column])
+                    ))
+                );
                 const neighbourOffsets = [[-1,-1],[0,-1],[1,-1],[-1,0],[1,0],[-1,1],[0,1],[1,1]];
 
                 // Two deliberately small closure passes recover floor hidden by a hatch,
@@ -4467,11 +4481,21 @@
                     else { a={x:left,y:top}; b={x:left,y:bottom}; outsideColumn -= 1; }
                     if (outsideColumn < 0 || outsideRow < 0 || outsideColumn >= contourColumns || outsideRow >= contourRows) return;
                     if (closure[outsideRow][outsideColumn]) return;
-                    // At least one side of the transition must owe its membership to the
-                    // closure inference; otherwise the ordinary Living Contour reader
-                    // already had this evidence and remains authoritative.
+                    // G.5I-owned closure and G.5L-propagated G.5J/G.5K surface may both
+                    // request local re-certification. Ordinary untouched floor remains the
+                    // responsibility of the existing Living Contour reader.
                     const closureRecovered = inferred[row][column];
-                    if (!closureRecovered) return;
+                    const propagatedRecovery = propagatedRecoveredSurface[row][column];
+                    if (!closureRecovered && !propagatedRecovery) return;
+
+                    // A propagated cell must genuinely belong to the playable region, not
+                    // merely be an isolated illustrated fleck. Require orthogonal support
+                    // from the closure mask before its outside edge may be reconsidered.
+                    if (propagatedRecovery) {
+                        const orthogonalSupport = [[-1,0],[1,0],[0,-1],[0,1]]
+                            .filter(([dx,dy]) => closure[row + dy][column + dx]).length;
+                        if (orthogonalSupport < 2) return;
+                    }
                     const threshold = contourThresholdMatch(a, b);
                     if (threshold) return;
                     const wallBodyDarkness = darkness[outsideRow][outsideColumn];
@@ -4495,8 +4519,9 @@
                     partialContourRecovery: 'playable-region-perimeter-inference',
                     playableRegionClosure: true, inferredPerimeter: true, certifiedPortal: false, thresholdGapProtection: false,
                     semanticBoundaryClassification: 'structural-wall', semanticBoundaryRole: 'playable-region-perimeter',
-                    recoveryEvidence: ['certified-playable-region', 'reconstructed-playable-surface', 'local-region-closure', 'playable-to-non-playable-transition', 'corroborating-wall-body-ink', 'portal-threshold-veto'],
-                    evidenceModel: 'living-contour-playable-region-closure-v8', polyline: true,
+                    reconstructedSurfacePropagation: true, contourRecertification: true,
+                    recoveryEvidence: ['certified-playable-region', 'reconstructed-playable-surface', 'illustrated-interior-surface', 'propagated-recovery-evidence', 'local-region-closure', 'playable-to-non-playable-transition', 'corroborating-wall-body-ink', 'portal-threshold-veto'],
+                    evidenceModel: 'living-contour-reconstructed-surface-propagation-v9', polyline: true,
                     points: [edge.a, edge.b], x1: edge.a.x, y1: edge.a.y, x2: edge.b.x, y2: edge.b.y
                 }));
             };
