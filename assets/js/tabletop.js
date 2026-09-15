@@ -2567,7 +2567,7 @@
         if (cartographyAssistantStatus && total > 0) {
             if (cartographyDetail?.value === 'audit' && cartographyEvidenceAudit) {
                 const audit = cartographyEvidenceAudit;
-                cartographyAssistantStatus.textContent = `Evidence Audit · ${audit.rawChains} raw chains · ${audit.recoverableChains} recoverable · ${audit.semanticRejected} semantic rejects · ${audit.inferredPerimeters} inferred perimeter edges → ${audit.promotedPerimeterChains || 0} promoted chains (${audit.promotedPerimeterEdges || 0} edges) → ${audit.consolidatedPromotedChains || 0} consolidated · ${audit.authoritativePreserved || 0}/${audit.authoritativeContours || 0} authoritative preserved · ${audit.recoveredIllustratedFloorCells || 0} illustrated floor cells recovered · ${audit.reconstructedIllustratedSurfaces || 0} interior surfaces reconstructed · ${audit.illustratedSurfacePerimeterEdges || 0} surface perimeter edges contributed · ${audit.representedPromotedChains || 0} promoted represented (${audit.representedPromotedEdges || 0} edges) · ${audit.emitted} emitted. Diagnostic marks are never saved.`;
+                cartographyAssistantStatus.textContent = `Evidence Audit · ${audit.rawChains} raw chains · ${audit.recoverableChains} recoverable · ${audit.semanticRejected} semantic rejects · ${audit.inferredPerimeters} inferred perimeter edges → ${audit.promotedPerimeterChains || 0} promoted chains (${audit.promotedPerimeterEdges || 0} edges) → ${audit.consolidatedPromotedChains || 0} consolidated · ${audit.authoritativePreserved || 0}/${audit.authoritativeContours || 0} authoritative preserved · ${audit.illustratedFloorSeeds || 0} floor seeds · ${audit.illustratedFrontierCandidates || 0} frontier candidates · ${audit.illustratedFrontierAdmitted || 0} frontier admitted · ${audit.illustratedFrontierStructuralRejects || 0} structural rejects · ${audit.illustratedFrontierExteriorRejects || 0} exterior rejects · ${audit.recoveredIllustratedFloorCells || 0} illustrated floor cells recovered · ${audit.reconstructedIllustratedSurfaces || 0} interior surfaces reconstructed · ${audit.illustratedSurfacePerimeterEdges || 0} surface perimeter edges contributed · ${audit.representedPromotedChains || 0} promoted represented (${audit.representedPromotedEdges || 0} edges) · ${audit.emitted} emitted. Diagnostic marks are never saved.`;
             } else {
                 const doors = cartographySuggestions.filter((item) => item.type === 'door').length;
                 cartographyAssistantStatus.textContent = `${total} draft suggestions · ${selected} selected · ${doors} possible doors. Polyline wall paths count as one review object each. Nothing is saved until Apply Selected.`;
@@ -3622,71 +3622,100 @@
             }
 
             // IV.30.1G.5Q — Illustrated Floor Continuity & Interior Surface Flooding.
-            // G.5K/J recover compact illustrated islands and short occlusions, but large
-            // decorated chambers can still fragment when stones, rubble or creature ink
-            // spans more than one local lookahead. Treat certified playable floor as seed
-            // surface and allow a bounded, iterative flood through *illustrated* cells.
-            // Darkness alone is not a boundary: propagation stops at sustained structural
-            // bands and requires continuing floor support on more than one side.
+            // IV.30.1G.5R — Floor Seed Expansion & Illustrated Frontier Admission.
+            // G.5Q proved that the downstream surface machinery was safe, but the torture
+            // map admitted zero cells: a candidate had to look sufficiently floor-like at
+            // the exact first noisy sample. G.5R moves that decision to the *frontier*.
+            // Certified floor is expanded into a one-cell seed halo, then a small window
+            // asks whether noisy ink is continuous with an interior surface. Lightness by
+            // itself is never evidence: exterior-like openness and sustained wall bands
+            // veto admission. Every gate is counted so a zero can be diagnosed directly.
             const illustratedFloorContinuitySurface = Array.from({ length: contourRows }, () => Array(contourColumns).fill(false));
             const illustratedFloorSeed = Array.from({ length: contourRows }, (_, row) =>
                 Array.from({ length: contourColumns }, (_, column) => Boolean(floor[row][column]))
             );
-            const illustratedFloorLookahead = Math.max(3, Math.round(contourSubdivisions * 1.35));
+            const illustratedFloorSeeds = illustratedFloorSeed.reduce((sum, row) => sum + row.filter(Boolean).length, 0);
+            const illustratedFloorLookahead = Math.max(4, Math.round(contourSubdivisions * 1.75));
+            let illustratedFrontierCandidates = 0;
+            let illustratedFrontierAdmitted = 0;
+            let illustratedFrontierStructuralRejects = 0;
+            let illustratedFrontierExteriorRejects = 0;
             const illustratedFloorFloodPass = () => {
                 if (options.skipOcclusionRecovery === true) return 0;
                 let recovered = 0;
-                const maximumPasses = Math.max(2, Math.round(contourSubdivisions * .85));
-                const visiblePlayable = (column, row, dx, dy) => {
-                    for (let distance = 1; distance <= illustratedFloorLookahead; distance += 1) {
-                        const x = column + dx * distance;
-                        const y = row + dy * distance;
-                        if (x <= 0 || y <= 0 || x >= contourColumns - 1 || y >= contourRows - 1) return false;
-                        if (floor[y][x]) return true;
-                        // Several consecutive near-solid samples are structural evidence,
-                        // not decoration laid over a floor surface.
-                        if (darkness[y][x] >= .82) {
-                            const nx = x + dx, ny = y + dy;
-                            if (nx >= 0 && ny >= 0 && nx < contourColumns && ny < contourRows && darkness[ny][nx] >= .76) return false;
-                        }
+                const maximumPasses = Math.max(3, Math.round(contourSubdivisions * 1.15));
+                const orthogonal = [[-1,0],[1,0],[0,-1],[0,1]];
+                const inBounds = (x,y) => x > 0 && y > 0 && x < contourColumns - 1 && y < contourRows - 1;
+                const isPlayable = (x,y) => inBounds(x,y) && Boolean(floor[y][x]);
+                const neighbourhood = (column,row,radius=2) => {
+                    let playable=0, quiet=0, dense=0, samples=0;
+                    for (let dy=-radius;dy<=radius;dy+=1) for (let dx=-radius;dx<=radius;dx+=1) {
+                        if (dx===0 && dy===0) continue;
+                        const x=column+dx,y=row+dy;
+                        if (!inBounds(x,y)) continue;
+                        samples+=1;
+                        if (floor[y][x]) playable+=1;
+                        if (darkness[y][x] <= .34) quiet+=1;
+                        if (darkness[y][x] >= .78) dense+=1;
                     }
-                    return false;
+                    return {playable,quiet,dense,samples};
                 };
-                for (let pass = 0; pass < maximumPasses; pass += 1) {
-                    const additions = [];
-                    for (let row = 1; row < contourRows - 1; row += 1) {
-                        for (let column = 1; column < contourColumns - 1; column += 1) {
-                            if (floor[row][column]) continue;
-                            const ink = darkness[row][column];
-                            if (ink < .16 || ink > .74) continue;
-                            const orthogonal = [[-1,0],[1,0],[0,-1],[0,1]];
-                            const adjacentPlayable = orthogonal.filter(([dx,dy]) => floor[row+dy][column+dx]).length;
-                            const adjacentRecovered = orthogonal.filter(([dx,dy]) => illustratedFloorContinuitySurface[row+dy][column+dx]).length;
-                            if (adjacentPlayable < 1 || (pass > 0 && adjacentRecovered < 1 && adjacentPlayable < 2)) continue;
-
-                            const north = visiblePlayable(column,row,0,-1);
-                            const south = visiblePlayable(column,row,0,1);
-                            const west = visiblePlayable(column,row,-1,0);
-                            const east = visiblePlayable(column,row,1,0);
-                            const directionalSupport = Number(north)+Number(south)+Number(west)+Number(east);
-                            const opposedFloor = (north && south) || (west && east);
-                            if (directionalSupport < 2 || (!opposedFloor && adjacentPlayable < 2)) continue;
-
-                            const left = darkness[row][column-1], right = darkness[row][column+1];
-                            const up = darkness[row-1][column], down = darkness[row+1][column];
-                            const horizontalStructuralBand = left >= .76 && ink >= .66 && right >= .76;
-                            const verticalStructuralBand = up >= .76 && ink >= .66 && down >= .76;
-                            if (horizontalStructuralBand || verticalStructuralBand) continue;
-                            additions.push([column,row]);
-                        }
+                const lookAhead = (column,row,dx,dy) => {
+                    let denseRun=0;
+                    for (let distance=1;distance<=illustratedFloorLookahead;distance+=1) {
+                        const x=column+dx*distance,y=row+dy*distance;
+                        if (!inBounds(x,y)) return {playable:false,barrier:false};
+                        if (floor[y][x]) return {playable:true,barrier:false};
+                        denseRun = darkness[y][x] >= .80 ? denseRun+1 : 0;
+                        if (denseRun >= 2) return {playable:false,barrier:true};
                     }
-                    additions.forEach(([column,row]) => {
+                    return {playable:false,barrier:false};
+                };
+                for (let pass=0;pass<maximumPasses;pass+=1) {
+                    const additions=[];
+                    for (let row=1;row<contourRows-1;row+=1) for (let column=1;column<contourColumns-1;column+=1) {
+                        if (floor[row][column]) continue;
+                        const adjacentPlayable=orthogonal.filter(([dx,dy])=>isPlayable(column+dx,row+dy)).length;
+                        const adjacentRecovered=orthogonal.filter(([dx,dy])=>illustratedFloorContinuitySurface[row+dy][column+dx]).length;
+                        // A frontier is defined topologically, not by the candidate's ink.
+                        if (adjacentPlayable===0 && adjacentRecovered===0) continue;
+                        illustratedFrontierCandidates+=1;
+
+                        const ink=darkness[row][column];
+                        const left=darkness[row][column-1],right=darkness[row][column+1];
+                        const up=darkness[row-1][column],down=darkness[row+1][column];
+                        const horizontalStructuralBand=left>=.76 && ink>=.62 && right>=.76;
+                        const verticalStructuralBand=up>=.76 && ink>=.62 && down>=.76;
+                        const n=lookAhead(column,row,0,-1), s=lookAhead(column,row,0,1);
+                        const w=lookAhead(column,row,-1,0), e=lookAhead(column,row,1,0);
+                        const directionalSupport=Number(n.playable)+Number(s.playable)+Number(w.playable)+Number(e.playable);
+                        const opposedSupport=(n.playable&&s.playable)||(w.playable&&e.playable);
+                        if (horizontalStructuralBand || verticalStructuralBand || ((n.barrier&&s.barrier)||(w.barrier&&e.barrier))) {
+                            illustratedFrontierStructuralRejects+=1; continue;
+                        }
+
+                        const local=neighbourhood(column,row,2);
+                        // Exterior parchment is usually quiet and open but has little actual
+                        // playable support. Require either opposed floor evidence or a useful
+                        // local playable density before crossing such an open frontier.
+                        const exteriorLike = local.playable <= 1 && local.quiet >= Math.max(10, Math.round(local.samples*.62)) && !opposedSupport;
+                        if (exteriorLike) { illustratedFrontierExteriorRejects+=1; continue; }
+
+                        // Admit decoration across a broader ink range. Dense single samples
+                        // are legal (rocks/creatures); only sustained bands were vetoed above.
+                        const localInteriorSupport = local.playable >= 2 || adjacentPlayable >= 2 || opposedSupport || directionalSupport >= 2;
+                        const inkIsPlausibleDecoration = ink >= .08 && ink <= .88;
+                        if (!localInteriorSupport || !inkIsPlausibleDecoration) continue;
+                        additions.push([column,row]);
+                    }
+                    if (additions.length===0) break;
+                    additions.forEach(([column,row])=>{
                         if (floor[row][column]) return;
-                        floor[row][column] = true;
-                        illustratedFloorContinuitySurface[row][column] = true;
-                        recovered += 1;
+                        floor[row][column]=true;
+                        illustratedFloorContinuitySurface[row][column]=true;
+                        illustratedFrontierAdmitted+=1;
+                        recovered+=1;
                     });
-                    if (additions.length === 0) break;
                 }
                 return recovered;
             };
@@ -5004,6 +5033,11 @@
                     consolidatedPromotedChains: consolidatedPromotedPerimeterSuggestions.length,
                     authoritativeContours: authoritativeContourSuggestions.length,
                     authoritativePreserved,
+                    illustratedFloorSeeds,
+                    illustratedFrontierCandidates,
+                    illustratedFrontierAdmitted,
+                    illustratedFrontierStructuralRejects,
+                    illustratedFrontierExteriorRejects,
                     recoveredIllustratedFloorCells,
                     reconstructedIllustratedSurfaces,
                     illustratedSurfacePerimeterEdges,

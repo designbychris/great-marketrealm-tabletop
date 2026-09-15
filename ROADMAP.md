@@ -1134,3 +1134,13 @@ Regression-only correction for the story-beat endpoint registration assertion; n
 - [x] Preserve the 200-object safety ceiling and review-first persistence contract unchanged.
 - [ ] Server certification.
 - [ ] Dungeon from Hell Living Contour / Hybrid / Evidence Audit certification.
+
+## Phase IV.30.1G.5R — Floor Seed Expansion & Illustrated Frontier Admission ✅
+- [x] Expand certified playable-floor seeds into a topology-led illustrated frontier rather than requiring the first noisy cell to classify itself as floor.
+- [x] Admit plausible decorative ink using neighbourhood playable density, directional look-ahead and opposed-floor support.
+- [x] Preserve sustained structural wall bands as hard flood barriers and reject quiet open parchment without sufficient interior support.
+- [x] Keep G.5Q reconstructed surfaces additive and subordinate to G.5P authoritative contour arbitration.
+- [x] Extend Evidence Audit with floor-seed, frontier-candidate, admitted, structural-reject and exterior-reject counters.
+- [x] Preserve the 200-object safety ceiling and review-first persistence contract unchanged.
+- [ ] Server certification.
+- [ ] Dungeon from Hell Living Contour / Hybrid / Evidence Audit certification.
