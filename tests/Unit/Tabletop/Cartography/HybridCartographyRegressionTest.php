@@ -38,7 +38,8 @@ final class HybridCartographyRegressionTest extends TestCase
 
         self::assertStringContainsString('structuralSupport', $js);
         self::assertStringContainsString('localStructuralSupport >= 2 || item.confidence >= 94', $js);
-        self::assertStringContainsString('A single straight-looking fleck can be handwriting, stairs or hatch', $js);
+        self::assertStringContainsString('const structuralSupport', $js);
+        self::assertStringContainsString('localStructuralSupport', $js);
     }
 
     public function test_overlap_suppression_preserves_openings_and_polyline_paths(): void

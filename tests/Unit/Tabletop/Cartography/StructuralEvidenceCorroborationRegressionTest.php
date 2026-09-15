@@ -34,7 +34,10 @@ final class StructuralEvidenceCorroborationRegressionTest extends TestCase
     public function test_semantic_suppression_is_not_resurrected_by_uncorroborated_structural_reader(): void
     {
         $script = (string) file_get_contents($this->root('assets/js/tabletop.js'));
-        self::assertStringContainsString('const contours = livingContourCandidates({ connectPlayableFloor: true });', $script);
+        self::assertStringContainsString('const connectedContours = livingContourCandidates({', $script);
+        self::assertStringContainsString('connectPlayableFloor: true,', $script);
+        self::assertStringContainsString('thresholdCandidates', $script);
+        self::assertStringContainsString('const fallbackContours = livingContourCandidates({ thresholdCandidates });', $script);
         self::assertStringContainsString('const contourSegments = [];', $script);
         self::assertStringContainsString('confidence alone must never resurrect the grid', $script);
     }
