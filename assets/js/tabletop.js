@@ -4787,6 +4787,7 @@
                         stage: 'perimeter-promotion',
                         state: emitted ? 'emitted' : 'budgeted-out',
                         reason: emitted ? 'connected-chain-promoted-and-emitted' : 'promoted-chain-review-budget-or-deduplication',
+                        legacyReason: emitted ? null : 'supplemental-budget-or-deduplication',
                         points: item.points
                     });
                     // Record member edges as promoted rather than falsely describing them
