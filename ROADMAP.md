@@ -1153,3 +1153,12 @@ Regression-only correction for the story-beat endpoint registration assertion; n
 - [x] Preserve G.5R structural/exterior admission vetoes, G.5P contour authority, the 200-object ceiling, and review-first persistence.
 - [ ] Server certification.
 - [ ] Dungeon from Hell Evidence Audit certification: frontier candidates must become non-zero before downstream tuning.
+
+## Phase IV.30.1G.5T — Trusted Seed Traversal & Frontier Walker Activation ✅
+- [x] Prevent the monotonic pre-occlusion baseline recursion from publishing/overwriting the live Evidence Audit.
+- [x] Traverse outward explicitly from trusted/recovered playable seeds rather than relying on a whole-mesh neighbour scan.
+- [x] Deduplicate adjacent samples per pass while preserving classification-neutral frontier discovery.
+- [x] Extend Evidence Audit with traversal-seeds-queued and traversal-seeds-visited counters.
+- [x] Preserve G.5S exterior-seed rejection, G.5R admission vetoes, G.5P contour authority, the 200-object ceiling, and review-first persistence.
+- [ ] Server certification.
+- [ ] Dungeon from Hell Evidence Audit certification: queued, visited, and adjacent-sample counters must become non-zero.

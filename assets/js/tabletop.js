@@ -2567,7 +2567,7 @@
         if (cartographyAssistantStatus && total > 0) {
             if (cartographyDetail?.value === 'audit' && cartographyEvidenceAudit) {
                 const audit = cartographyEvidenceAudit;
-                cartographyAssistantStatus.textContent = `Evidence Audit · ${audit.rawChains} raw chains · ${audit.recoverableChains} recoverable · ${audit.semanticRejected} semantic rejects · ${audit.inferredPerimeters} inferred perimeter edges → ${audit.promotedPerimeterChains || 0} promoted chains (${audit.promotedPerimeterEdges || 0} edges) → ${audit.consolidatedPromotedChains || 0} consolidated · ${audit.authoritativePreserved || 0}/${audit.authoritativeContours || 0} authoritative preserved · ${audit.illustratedFloorSeeds || 0} floor seeds · ${audit.illustratedAdjacentSamplesExamined || 0} adjacent samples examined · ${audit.illustratedAlreadyPlayableNeighbours || 0} already-playable neighbours · ${audit.illustratedFrontierCandidates || 0} frontier candidates · ${audit.illustratedFrontierAdmitted || 0} frontier admitted · ${audit.illustratedFrontierStructuralRejects || 0} structural rejects · ${audit.illustratedFrontierExteriorRejects || 0} exterior rejects · ${audit.recoveredIllustratedFloorCells || 0} illustrated floor cells recovered · ${audit.reconstructedIllustratedSurfaces || 0} interior surfaces reconstructed · ${audit.illustratedSurfacePerimeterEdges || 0} surface perimeter edges contributed · ${audit.representedPromotedChains || 0} promoted represented (${audit.representedPromotedEdges || 0} edges) · ${audit.emitted} emitted. Diagnostic marks are never saved.`;
+                cartographyAssistantStatus.textContent = `Evidence Audit · ${audit.rawChains} raw chains · ${audit.recoverableChains} recoverable · ${audit.semanticRejected} semantic rejects · ${audit.inferredPerimeters} inferred perimeter edges → ${audit.promotedPerimeterChains || 0} promoted chains (${audit.promotedPerimeterEdges || 0} edges) → ${audit.consolidatedPromotedChains || 0} consolidated · ${audit.authoritativePreserved || 0}/${audit.authoritativeContours || 0} authoritative preserved · ${audit.illustratedFloorSeeds || 0} floor seeds · ${audit.illustratedTraversalSeedsQueued || 0} traversal seeds queued · ${audit.illustratedTraversalSeedsVisited || 0} traversal seeds visited · ${audit.illustratedAdjacentSamplesExamined || 0} adjacent samples examined · ${audit.illustratedAlreadyPlayableNeighbours || 0} already-playable neighbours · ${audit.illustratedFrontierCandidates || 0} frontier candidates · ${audit.illustratedFrontierAdmitted || 0} frontier admitted · ${audit.illustratedFrontierStructuralRejects || 0} structural rejects · ${audit.illustratedFrontierExteriorRejects || 0} exterior rejects · ${audit.recoveredIllustratedFloorCells || 0} illustrated floor cells recovered · ${audit.reconstructedIllustratedSurfaces || 0} interior surfaces reconstructed · ${audit.illustratedSurfacePerimeterEdges || 0} surface perimeter edges contributed · ${audit.representedPromotedChains || 0} promoted represented (${audit.representedPromotedEdges || 0} edges) · ${audit.emitted} emitted. Diagnostic marks are never saved.`;
             } else {
                 const doors = cartographySuggestions.filter((item) => item.type === 'door').length;
                 cartographyAssistantStatus.textContent = `${total} draft suggestions · ${selected} selected · ${doors} possible doors. Polyline wall paths count as one review object each. Nothing is saved until Apply Selected.`;
@@ -3384,7 +3384,7 @@
             // the complete earlier semantic/topological pipeline.
             const preOcclusionRecoveryContours = options.skipOcclusionRecovery === true
                 ? []
-                : livingContourCandidates({ ...options, skipOcclusionRecovery: true });
+                : livingContourCandidates({ ...options, skipOcclusionRecovery: true, evidenceAudit: false });
 
             const gridCanvasX = Math.max(4, toCanvasX(grid.size));
             const gridCanvasY = Math.max(4, toCanvasY(grid.size));
@@ -3624,6 +3624,7 @@
             // IV.30.1G.5Q — Illustrated Floor Continuity & Interior Surface Flooding.
             // IV.30.1G.5R — Floor Seed Expansion & Illustrated Frontier Admission.
             // IV.30.1G.5S — Frontier Discovery & Classification-Neutral Adjacency.
+            // IV.30.1G.5T — Trusted Seed Traversal & Frontier Walker Activation.
             // G.5Q proved that the downstream surface machinery was safe, but the torture
             // map admitted zero cells: a candidate had to look sufficiently floor-like at
             // the exact first noisy sample. G.5R moves that decision to the *frontier*.
@@ -3682,6 +3683,8 @@
                 && !illustratedExteriorSeedComponents.has(illustratedSeedComponent[row][column]);
             const illustratedFloorSeeds = illustratedFloorSeed.reduce((sum, row, y) => sum + row.filter((value, x) => value && isTrustedIllustratedSeed(x,y)).length, 0);
             const illustratedFloorLookahead = Math.max(4, Math.round(contourSubdivisions * 1.75));
+            let illustratedTraversalSeedsQueued = 0;
+            let illustratedTraversalSeedsVisited = 0;
             let illustratedAdjacentSamplesExamined = 0;
             let illustratedAlreadyPlayableNeighbours = 0;
             let illustratedFrontierCandidates = 0;
@@ -3721,15 +3724,29 @@
                 };
                 for (let pass=0;pass<maximumPasses;pass+=1) {
                     const additions=[];
+                    // G.5T: walk outward FROM the trusted/recovered seed set instead of
+                    // rescanning the whole mesh and hoping a neighbour query reaches it.
+                    // The queue/visit counters also prove that the certified seed mask is
+                    // actually consumed by this stage. Diagnostic baseline recursion has
+                    // evidenceAudit disabled so it cannot overwrite the live audit.
+                    const traversalSeeds=[];
                     for (let row=1;row<contourRows-1;row+=1) for (let column=1;column<contourColumns-1;column+=1) {
-                        // G.5S discovery is classification-neutral. First establish whether
-                        // this sample touches trusted/recovered playable surface; only then
-                        // inspect its darkness, wall-band role or exterior character.
-                        const adjacentPlayable=orthogonal.filter(([dx,dy])=>isPlayable(column+dx,row+dy)).length;
-                        if (adjacentPlayable===0) continue;
-                        illustratedAdjacentSamplesExamined+=1;
-                        if (isPlayable(column,row)) { illustratedAlreadyPlayableNeighbours+=1; continue; }
-                        illustratedFrontierCandidates+=1;
+                        if (isPlayable(column,row)) traversalSeeds.push([column,row]);
+                    }
+                    illustratedTraversalSeedsQueued+=traversalSeeds.length;
+                    const examinedThisPass=new Set();
+                    for (const [seedColumn,seedRow] of traversalSeeds) {
+                        illustratedTraversalSeedsVisited+=1;
+                        for (const [dx,dy] of orthogonal) {
+                            const column=seedColumn+dx,row=seedRow+dy;
+                            if (!inBounds(column,row)) continue;
+                            const sampleKey=`${column},${row}`;
+                            if (examinedThisPass.has(sampleKey)) continue;
+                            examinedThisPass.add(sampleKey);
+                            illustratedAdjacentSamplesExamined+=1;
+                            if (isPlayable(column,row)) { illustratedAlreadyPlayableNeighbours+=1; continue; }
+                            illustratedFrontierCandidates+=1;
+
 
                         const ink=darkness[row][column];
                         const left=darkness[row][column-1],right=darkness[row][column+1];
@@ -3755,8 +3772,9 @@
                         // are legal (rocks/creatures); only sustained bands were vetoed above.
                         const localInteriorSupport = local.playable >= 2 || adjacentPlayable >= 2 || opposedSupport || directionalSupport >= 2;
                         const inkIsPlausibleDecoration = ink >= .08 && ink <= .88;
-                        if (!localInteriorSupport || !inkIsPlausibleDecoration) continue;
-                        additions.push([column,row]);
+                            if (!localInteriorSupport || !inkIsPlausibleDecoration) continue;
+                            additions.push([column,row]);
+                        }
                     }
                     if (additions.length===0) break;
                     additions.forEach(([column,row])=>{
@@ -5084,6 +5102,8 @@
                     authoritativeContours: authoritativeContourSuggestions.length,
                     authoritativePreserved,
                     illustratedFloorSeeds,
+                    illustratedTraversalSeedsQueued,
+                    illustratedTraversalSeedsVisited,
                     illustratedAdjacentSamplesExamined,
                     illustratedAlreadyPlayableNeighbours,
                     illustratedFrontierCandidates,
