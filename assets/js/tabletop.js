@@ -3793,17 +3793,24 @@
                 && pointKey(chain[0]) === pointKey(chain[chain.length - 1]);
 
             // IV.30.1G.5A — Semantic Boundary Classification.
-            // A strong contour is not automatically a sight wall. Hills, rubble and
-            // other interior marks can have excellent local contrast while playable
-            // floor continues on both sides. Sample the region relationship across an
-            // ordered boundary before granting it structural authority.
+            // IV.30.1G.5E — Boundary Role & Interior Feature Classification.
+            // Contrast alone cannot tell a cave perimeter from a hill, rubble island,
+            // stair mark or freestanding object. Classify the *role* of the ordered
+            // chain using sidedness, enclosure scale and playable-region context before
+            // it is allowed to become an automatic LOS wall.
             const semanticBoundaryClassification = (chain, closed, length) => {
                 if (!Array.isArray(chain) || chain.length < 2) {
-                    return { role: 'uncertain', confidence: 0, evidence: ['insufficient-boundary-evidence'] };
+                    return { role: 'uncertain', boundaryRole: 'unresolved-evidence', confidence: 0, evidence: ['insufficient-boundary-evidence'] };
                 }
                 let sampled = 0;
                 let playableBothSides = 0;
                 let playableOneSide = 0;
+                let playableNeitherSide = 0;
+                let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+                chain.forEach((point) => {
+                    minX = Math.min(minX, Number(point[0])); maxX = Math.max(maxX, Number(point[0]));
+                    minY = Math.min(minY, Number(point[1])); maxY = Math.max(maxY, Number(point[1]));
+                });
                 const normalOffset = Math.max(1, Math.round(contourSubdivisions * .32));
                 const samplePlayable = (x, y) => isPlayableFloor(Math.round(x), Math.round(y));
                 for (let index = 0; index < chain.length - 1; index += 1) {
@@ -3822,25 +3829,62 @@
                     sampled += 1;
                     if (sideA && sideB) playableBothSides += 1;
                     else if (sideA || sideB) playableOneSide += 1;
+                    else playableNeitherSide += 1;
                 }
                 const bothSidesRatio = sampled > 0 ? playableBothSides / sampled : 0;
                 const oneSideRatio = sampled > 0 ? playableOneSide / sampled : 0;
-                if (closed && length < contourStep * 6 && bothSidesRatio >= .30) {
-                    return { role: 'decoration-noise', confidence: 91, evidence: ['small-enclosed-mark', 'playable-context'] };
+                const neitherSideRatio = sampled > 0 ? playableNeitherSide / sampled : 0;
+                const width = Math.max(0, maxX - minX);
+                const height = Math.max(0, maxY - minY);
+                const enclosureArea = width * height;
+                const enclosureSpan = Math.max(width, height);
+                const compactEnclosure = closed && enclosureSpan <= 2.35 && enclosureArea <= 3.6;
+                const tinyEnclosure = closed && enclosureSpan <= 1.05 && enclosureArea <= .85;
+                const twoSidedPlayable = bothSidesRatio >= .46;
+                const perimeterSeparation = oneSideRatio >= .48;
+
+                if (tinyEnclosure && (bothSidesRatio >= .18 || neitherSideRatio < .72)) {
+                    return {
+                        role: 'decoration-noise', boundaryRole: 'interior-decoration', confidence: 94,
+                        evidence: ['tiny-enclosed-mark', 'interior-playable-context', 'not-region-perimeter']
+                    };
+                }
+                if (compactEnclosure && twoSidedPlayable) {
+                    return {
+                        role: 'interior-feature', boundaryRole: 'interior-feature', confidence: 92,
+                        evidence: ['compact-enclosed-feature', 'playable-floor-both-sides', 'do-not-block-sight']
+                    };
                 }
                 if (closed && bothSidesRatio >= .62) {
-                    return { role: 'terrain', confidence: 88, evidence: ['playable-floor-both-sides', 'closed-interior-boundary'] };
+                    return {
+                        role: 'terrain', boundaryRole: 'terrain-elevation', confidence: 91,
+                        evidence: ['playable-floor-both-sides', 'closed-interior-boundary', 'terrain-not-wall']
+                    };
                 }
-                if (closed && length < 3.2 && bothSidesRatio >= .34) {
-                    return { role: 'obstacle', confidence: 82, evidence: ['compact-interior-boundary', 'mixed-playable-context'] };
+                if (closed && length < 3.2 && bothSidesRatio >= .28) {
+                    return {
+                        role: 'obstacle', boundaryRole: 'interior-obstacle', confidence: 86,
+                        evidence: ['compact-interior-boundary', 'mixed-playable-context', 'review-not-auto-wall']
+                    };
                 }
-                if (oneSideRatio >= .48) {
-                    return { role: 'structural-wall', confidence: 90, evidence: ['playable-floor-one-side', 'wall-band-separation'] };
+                if (perimeterSeparation) {
+                    return {
+                        role: 'structural-wall', boundaryRole: closed ? 'enclosed-region-boundary' : 'playable-region-perimeter', confidence: 92,
+                        evidence: ['playable-floor-one-side', 'wall-band-separation', 'region-boundary-role']
+                    };
                 }
-                return { role: 'uncertain', confidence: 68, evidence: ['ambiguous-region-relationship', 'review-before-wall'] };
+                if (!closed && length >= 2.4 && oneSideRatio >= .30 && bothSidesRatio < .34) {
+                    return {
+                        role: 'structural-wall', boundaryRole: 'partial-region-perimeter', confidence: 78,
+                        evidence: ['long-open-boundary', 'asymmetric-playable-context', 'partial-perimeter-role']
+                    };
+                }
+                return {
+                    role: 'uncertain', boundaryRole: 'unresolved-evidence', confidence: 64,
+                    evidence: ['ambiguous-region-relationship', 'review-before-wall', 'no-interior-promotion']
+                };
             };
-            const semanticRoleIsAutomaticWall = (role) => role === 'structural-wall' || role === 'uncertain';
-
+            const semanticRoleIsAutomaticWall = (role) => role === 'structural-wall';
             // IV.30.1G.4B — Gap & Threshold Classification.
             // Living Contour now consumes the same review-first doorway evidence that
             // Structural tracing already proved in G.2. A contour span which crosses a
@@ -4029,6 +4073,7 @@
                         protectedContourGaps: protectedPath.gaps,
                         thresholdGapProtection: gapProtected,
                         semanticBoundaryClassification: entry.semanticBoundary?.role || 'uncertain',
+                        semanticBoundaryRole: entry.semanticBoundary?.boundaryRole || 'unresolved-evidence',
                         semanticBoundaryConfidence: Number(entry.semanticBoundary?.confidence || 0),
                         semanticBoundaryEvidence: Array.isArray(entry.semanticBoundary?.evidence) ? entry.semanticBoundary.evidence : [],
                         recoveryEvidence: gapProtected
@@ -4285,9 +4330,10 @@
                 const regionDefining = topologyEvidence?.regionMembership === 'connected-playable-boundary';
                 const distributedSupport = topologyEvidence?.playableSideConsistency >= .58
                     || topologyEvidence?.continuity >= .72;
-                const semanticSupport = semanticRole === 'structural-wall'
-                    || (semanticRole === 'uncertain' && semanticConfidence >= 60);
+                const semanticSupport = semanticRole === 'structural-wall';
+                const interiorFeatureRole = ['interior-feature', 'terrain', 'obstacle', 'decoration-noise'].includes(semanticRole);
                 const certified = !compactInterior
+                    && !interiorFeatureRole
                     && pathLength >= 1.2
                     && semanticSupport
                     && (regionDefining || distributedSupport || pathLength >= 3.4);
