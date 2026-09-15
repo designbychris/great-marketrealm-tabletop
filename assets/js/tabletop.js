@@ -3624,6 +3624,7 @@
             // IV.30.1G.5Q — Illustrated Floor Continuity & Interior Surface Flooding.
             // IV.30.1G.5R — Floor Seed Expansion & Illustrated Frontier Admission.
             // IV.30.1G.5S — Frontier Discovery & Classification-Neutral Adjacency.
+            // G.5S discovery is classification-neutral: establish adjacency first, classify the frontier second.
             // IV.30.1G.5T — Trusted Seed Traversal & Frontier Walker Activation.
             // G.5Q proved that the downstream surface machinery was safe, but the torture
             // map admitted zero cells: a candidate had to look sufficiently floor-like at
