@@ -10,7 +10,7 @@ final class PromotedChainConsolidationEmissionBudgetLiberationRegressionTest ext
 {
     public function test_promoted_perimeter_is_consolidated_and_uses_remaining_review_capacity(): void
     {
-        $root = dirname(__DIR__, 5);
+        $root = dirname(__DIR__, 4);
         $script = (string) file_get_contents($root . '/assets/js/tabletop.js');
         $roadmap = (string) file_get_contents($root . '/ROADMAP.md');
 
