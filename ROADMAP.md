@@ -1144,3 +1144,12 @@ Regression-only correction for the story-beat endpoint registration assertion; n
 - [x] Preserve the 200-object safety ceiling and review-first persistence contract unchanged.
 - [ ] Server certification.
 - [ ] Dungeon from Hell Living Contour / Hybrid / Evidence Audit certification.
+
+## Phase IV.30.1G.5S — Frontier Discovery & Classification-Neutral Adjacency ✅
+- [x] Separate trusted illustrated-floor seeds from dominant border-connected exterior parchment before frontier discovery.
+- [x] Define frontier candidates by orthogonal adjacency to trusted/recovered playable surface before consulting pixel classification.
+- [x] Prevent ink, structural, or exterior classification from suppressing candidate discovery; those signals arbitrate only after discovery.
+- [x] Extend Evidence Audit with adjacent-sample and already-playable-neighbour counters so the seed-to-frontier funnel is observable.
+- [x] Preserve G.5R structural/exterior admission vetoes, G.5P contour authority, the 200-object ceiling, and review-first persistence.
+- [ ] Server certification.
+- [ ] Dungeon from Hell Evidence Audit certification: frontier candidates must become non-zero before downstream tuning.

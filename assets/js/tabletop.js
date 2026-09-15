@@ -2567,7 +2567,7 @@
         if (cartographyAssistantStatus && total > 0) {
             if (cartographyDetail?.value === 'audit' && cartographyEvidenceAudit) {
                 const audit = cartographyEvidenceAudit;
-                cartographyAssistantStatus.textContent = `Evidence Audit · ${audit.rawChains} raw chains · ${audit.recoverableChains} recoverable · ${audit.semanticRejected} semantic rejects · ${audit.inferredPerimeters} inferred perimeter edges → ${audit.promotedPerimeterChains || 0} promoted chains (${audit.promotedPerimeterEdges || 0} edges) → ${audit.consolidatedPromotedChains || 0} consolidated · ${audit.authoritativePreserved || 0}/${audit.authoritativeContours || 0} authoritative preserved · ${audit.illustratedFloorSeeds || 0} floor seeds · ${audit.illustratedFrontierCandidates || 0} frontier candidates · ${audit.illustratedFrontierAdmitted || 0} frontier admitted · ${audit.illustratedFrontierStructuralRejects || 0} structural rejects · ${audit.illustratedFrontierExteriorRejects || 0} exterior rejects · ${audit.recoveredIllustratedFloorCells || 0} illustrated floor cells recovered · ${audit.reconstructedIllustratedSurfaces || 0} interior surfaces reconstructed · ${audit.illustratedSurfacePerimeterEdges || 0} surface perimeter edges contributed · ${audit.representedPromotedChains || 0} promoted represented (${audit.representedPromotedEdges || 0} edges) · ${audit.emitted} emitted. Diagnostic marks are never saved.`;
+                cartographyAssistantStatus.textContent = `Evidence Audit · ${audit.rawChains} raw chains · ${audit.recoverableChains} recoverable · ${audit.semanticRejected} semantic rejects · ${audit.inferredPerimeters} inferred perimeter edges → ${audit.promotedPerimeterChains || 0} promoted chains (${audit.promotedPerimeterEdges || 0} edges) → ${audit.consolidatedPromotedChains || 0} consolidated · ${audit.authoritativePreserved || 0}/${audit.authoritativeContours || 0} authoritative preserved · ${audit.illustratedFloorSeeds || 0} floor seeds · ${audit.illustratedAdjacentSamplesExamined || 0} adjacent samples examined · ${audit.illustratedAlreadyPlayableNeighbours || 0} already-playable neighbours · ${audit.illustratedFrontierCandidates || 0} frontier candidates · ${audit.illustratedFrontierAdmitted || 0} frontier admitted · ${audit.illustratedFrontierStructuralRejects || 0} structural rejects · ${audit.illustratedFrontierExteriorRejects || 0} exterior rejects · ${audit.recoveredIllustratedFloorCells || 0} illustrated floor cells recovered · ${audit.reconstructedIllustratedSurfaces || 0} interior surfaces reconstructed · ${audit.illustratedSurfacePerimeterEdges || 0} surface perimeter edges contributed · ${audit.representedPromotedChains || 0} promoted represented (${audit.representedPromotedEdges || 0} edges) · ${audit.emitted} emitted. Diagnostic marks are never saved.`;
             } else {
                 const doors = cartographySuggestions.filter((item) => item.type === 'door').length;
                 cartographyAssistantStatus.textContent = `${total} draft suggestions · ${selected} selected · ${doors} possible doors. Polyline wall paths count as one review object each. Nothing is saved until Apply Selected.`;
@@ -3623,6 +3623,7 @@
 
             // IV.30.1G.5Q — Illustrated Floor Continuity & Interior Surface Flooding.
             // IV.30.1G.5R — Floor Seed Expansion & Illustrated Frontier Admission.
+            // IV.30.1G.5S — Frontier Discovery & Classification-Neutral Adjacency.
             // G.5Q proved that the downstream surface machinery was safe, but the torture
             // map admitted zero cells: a candidate had to look sufficiently floor-like at
             // the exact first noisy sample. G.5R moves that decision to the *frontier*.
@@ -3634,8 +3635,55 @@
             const illustratedFloorSeed = Array.from({ length: contourRows }, (_, row) =>
                 Array.from({ length: contourColumns }, (_, column) => Boolean(floor[row][column]))
             );
-            const illustratedFloorSeeds = illustratedFloorSeed.reduce((sum, row) => sum + row.filter(Boolean).length, 0);
+
+            // G.5S: the raw light-floor classifier also contains the large white parchment
+            // outside the dungeon. A frontier cannot be discovered by treating *every*
+            // light sample as a trusted seed: on this map that made almost the whole fine
+            // mesh "already floor" and left 22,496 seeds with no useful frontier. Label
+            // the seed components before any illustrated flooding and remove only the
+            // dominant, strongly border-connected whitespace components from seed
+            // authority. Candidate discovery is then purely topological: every orthogonal
+            // neighbour of trusted floor is examined before its ink/classification gets a
+            // vote. Classification may reject a frontier; it may never prevent discovery.
+            const illustratedSeedComponent = Array.from({ length: contourRows }, () => Array(contourColumns).fill(-1));
+            const illustratedSeedComponentStats = [];
+            let illustratedSeedComponentId = 0;
+            for (let row = 0; row < contourRows; row += 1) {
+                for (let column = 0; column < contourColumns; column += 1) {
+                    if (!illustratedFloorSeed[row][column] || illustratedSeedComponent[row][column] !== -1) continue;
+                    const queue = [[column,row]];
+                    illustratedSeedComponent[row][column] = illustratedSeedComponentId;
+                    let size = 0, borderSamples = 0;
+                    for (let cursor = 0; cursor < queue.length; cursor += 1) {
+                        const [x,y] = queue[cursor];
+                        size += 1;
+                        if (x === 0 || y === 0 || x === contourColumns - 1 || y === contourRows - 1) borderSamples += 1;
+                        [[-1,0],[1,0],[0,-1],[0,1]].forEach(([dx,dy]) => {
+                            const nx=x+dx, ny=y+dy;
+                            if (nx < 0 || ny < 0 || nx >= contourColumns || ny >= contourRows) return;
+                            if (!illustratedFloorSeed[ny][nx] || illustratedSeedComponent[ny][nx] !== -1) return;
+                            illustratedSeedComponent[ny][nx] = illustratedSeedComponentId;
+                            queue.push([nx,ny]);
+                        });
+                    }
+                    illustratedSeedComponentStats.push({ id: illustratedSeedComponentId, size, borderSamples });
+                    illustratedSeedComponentId += 1;
+                }
+            }
+            const illustratedSeedTotalCells = Math.max(1, contourColumns * contourRows);
+            const illustratedExteriorSeedComponents = new Set(illustratedSeedComponentStats
+                .filter((entry) => entry.borderSamples >= Math.max(8, contourSubdivisions * 2)
+                    && entry.size / illustratedSeedTotalCells >= .08
+                    && entry.borderSamples / Math.max(1, entry.size) >= .012)
+                .map((entry) => entry.id));
+            const isTrustedIllustratedSeed = (column,row) => column >= 0 && row >= 0
+                && column < contourColumns && row < contourRows
+                && illustratedFloorSeed[row][column]
+                && !illustratedExteriorSeedComponents.has(illustratedSeedComponent[row][column]);
+            const illustratedFloorSeeds = illustratedFloorSeed.reduce((sum, row, y) => sum + row.filter((value, x) => value && isTrustedIllustratedSeed(x,y)).length, 0);
             const illustratedFloorLookahead = Math.max(4, Math.round(contourSubdivisions * 1.75));
+            let illustratedAdjacentSamplesExamined = 0;
+            let illustratedAlreadyPlayableNeighbours = 0;
             let illustratedFrontierCandidates = 0;
             let illustratedFrontierAdmitted = 0;
             let illustratedFrontierStructuralRejects = 0;
@@ -3646,7 +3694,7 @@
                 const maximumPasses = Math.max(3, Math.round(contourSubdivisions * 1.15));
                 const orthogonal = [[-1,0],[1,0],[0,-1],[0,1]];
                 const inBounds = (x,y) => x > 0 && y > 0 && x < contourColumns - 1 && y < contourRows - 1;
-                const isPlayable = (x,y) => inBounds(x,y) && Boolean(floor[y][x]);
+                const isPlayable = (x,y) => inBounds(x,y) && (isTrustedIllustratedSeed(x,y) || illustratedFloorContinuitySurface[y][x]);
                 const neighbourhood = (column,row,radius=2) => {
                     let playable=0, quiet=0, dense=0, samples=0;
                     for (let dy=-radius;dy<=radius;dy+=1) for (let dx=-radius;dx<=radius;dx+=1) {
@@ -3654,7 +3702,7 @@
                         const x=column+dx,y=row+dy;
                         if (!inBounds(x,y)) continue;
                         samples+=1;
-                        if (floor[y][x]) playable+=1;
+                        if (isPlayable(x,y)) playable+=1;
                         if (darkness[y][x] <= .34) quiet+=1;
                         if (darkness[y][x] >= .78) dense+=1;
                     }
@@ -3665,7 +3713,7 @@
                     for (let distance=1;distance<=illustratedFloorLookahead;distance+=1) {
                         const x=column+dx*distance,y=row+dy*distance;
                         if (!inBounds(x,y)) return {playable:false,barrier:false};
-                        if (floor[y][x]) return {playable:true,barrier:false};
+                        if (isPlayable(x,y)) return {playable:true,barrier:false};
                         denseRun = darkness[y][x] >= .80 ? denseRun+1 : 0;
                         if (denseRun >= 2) return {playable:false,barrier:true};
                     }
@@ -3674,11 +3722,13 @@
                 for (let pass=0;pass<maximumPasses;pass+=1) {
                     const additions=[];
                     for (let row=1;row<contourRows-1;row+=1) for (let column=1;column<contourColumns-1;column+=1) {
-                        if (floor[row][column]) continue;
+                        // G.5S discovery is classification-neutral. First establish whether
+                        // this sample touches trusted/recovered playable surface; only then
+                        // inspect its darkness, wall-band role or exterior character.
                         const adjacentPlayable=orthogonal.filter(([dx,dy])=>isPlayable(column+dx,row+dy)).length;
-                        const adjacentRecovered=orthogonal.filter(([dx,dy])=>illustratedFloorContinuitySurface[row+dy][column+dx]).length;
-                        // A frontier is defined topologically, not by the candidate's ink.
-                        if (adjacentPlayable===0 && adjacentRecovered===0) continue;
+                        if (adjacentPlayable===0) continue;
+                        illustratedAdjacentSamplesExamined+=1;
+                        if (isPlayable(column,row)) { illustratedAlreadyPlayableNeighbours+=1; continue; }
                         illustratedFrontierCandidates+=1;
 
                         const ink=darkness[row][column];
@@ -3710,7 +3760,7 @@
                     }
                     if (additions.length===0) break;
                     additions.forEach(([column,row])=>{
-                        if (floor[row][column]) return;
+                        if (isTrustedIllustratedSeed(column,row) || illustratedFloorContinuitySurface[row][column]) return;
                         floor[row][column]=true;
                         illustratedFloorContinuitySurface[row][column]=true;
                         illustratedFrontierAdmitted+=1;
@@ -5034,6 +5084,8 @@
                     authoritativeContours: authoritativeContourSuggestions.length,
                     authoritativePreserved,
                     illustratedFloorSeeds,
+                    illustratedAdjacentSamplesExamined,
+                    illustratedAlreadyPlayableNeighbours,
                     illustratedFrontierCandidates,
                     illustratedFrontierAdmitted,
                     illustratedFrontierStructuralRejects,
