@@ -2567,7 +2567,7 @@
         if (cartographyAssistantStatus && total > 0) {
             if (cartographyDetail?.value === 'audit' && cartographyEvidenceAudit) {
                 const audit = cartographyEvidenceAudit;
-                cartographyAssistantStatus.textContent = `Evidence Audit · ${audit.rawChains} raw chains · ${audit.recoverableChains} recoverable · ${audit.semanticRejected} semantic rejects · ${audit.inferredPerimeters} inferred perimeter edges → ${audit.promotedPerimeterChains || 0} promoted chains (${audit.promotedPerimeterEdges || 0} edges) → ${audit.consolidatedPromotedChains || 0} consolidated · ${audit.representedPromotedChains || 0} represented (${audit.representedPromotedEdges || 0} edges) · ${audit.emitted} emitted. Diagnostic marks are never saved.`;
+                cartographyAssistantStatus.textContent = `Evidence Audit · ${audit.rawChains} raw chains · ${audit.recoverableChains} recoverable · ${audit.semanticRejected} semantic rejects · ${audit.inferredPerimeters} inferred perimeter edges → ${audit.promotedPerimeterChains || 0} promoted chains (${audit.promotedPerimeterEdges || 0} edges) → ${audit.consolidatedPromotedChains || 0} consolidated · ${audit.authoritativePreserved || 0}/${audit.authoritativeContours || 0} authoritative preserved · ${audit.representedPromotedChains || 0} promoted represented (${audit.representedPromotedEdges || 0} edges) · ${audit.emitted} emitted. Diagnostic marks are never saved.`;
             } else {
                 const doors = cartographySuggestions.filter((item) => item.type === 'door').length;
                 cartographyAssistantStatus.textContent = `${total} draft suggestions · ${selected} selected · ${doors} possible doors. Polyline wall paths count as one review object each. Nothing is saved until Apply Selected.`;
@@ -4805,7 +4805,51 @@
             const promotedSupplementalSuggestions = liberatedPromotedSuggestions.slice(0, perimeterInferenceBudget);
             promotedSupplementalSuggestions.forEach((item) => representedPromotedKeys.add(cartographySuggestionKey(item)));
             const supplementalSuggestions = bridgeSupplementalSuggestions.concat(promotedSupplementalSuggestions);
-            pathSuggestions = supplementalSuggestions.concat(pathSuggestions).slice(0, maximumReviewSuggestions);
+
+            // IV.30.1G.5P — Contour Authority & Evidence Arbitration.
+            // G.5O proved that promoted evidence can saturate all 200 review objects, but
+            // allowing inferred chains to enter ahead of directly observed contour paths
+            // can evict stronger geometry. Authority is therefore monotonic: preserve the
+            // pre-occlusion safety baseline first, then every direct certified/recoverable
+            // Living Contour path, then graph-certified bridges, and only then spend the
+            // remaining capacity on promoted inferred perimeter. Promotion supplements
+            // observed geometry; it never outranks it merely because it was reconstructed.
+            const authoritativeContourSuggestions = [];
+            const authoritativeContourKeys = new Set();
+            const addAuthoritativeContour = (item) => {
+                const key = cartographySuggestionKey(item);
+                if (authoritativeContourKeys.has(key)) return;
+                authoritativeContourKeys.add(key);
+                authoritativeContourSuggestions.push(item);
+            };
+            preOcclusionRecoveryContours.forEach(addAuthoritativeContour);
+            pathSuggestions.forEach(addAuthoritativeContour);
+
+            const arbitratedSuggestions = authoritativeContourSuggestions.slice(0, maximumReviewSuggestions);
+            const arbitratedKeys = new Set(arbitratedSuggestions.map(cartographySuggestionKey));
+            let authoritativePreserved = arbitratedSuggestions.length;
+            let bridgeRepresented = 0;
+            let promotedRepresentedByArbitration = 0;
+            const appendByAuthority = (items, authority) => {
+                items.forEach((item) => {
+                    const key = cartographySuggestionKey(item);
+                    if (arbitratedKeys.has(key)) {
+                        if (authority === 'promoted') representedPromotedKeys.add(key);
+                        return;
+                    }
+                    if (arbitratedSuggestions.length >= maximumReviewSuggestions) return;
+                    arbitratedKeys.add(key);
+                    arbitratedSuggestions.push(item);
+                    if (authority === 'bridge') bridgeRepresented += 1;
+                    if (authority === 'promoted') {
+                        representedPromotedKeys.add(key);
+                        promotedRepresentedByArbitration += 1;
+                    }
+                });
+            };
+            appendByAuthority(bridgeSupplementalSuggestions, 'bridge');
+            appendByAuthority(promotedSupplementalSuggestions, 'promoted');
+            pathSuggestions = arbitratedSuggestions;
 
             // Defensive compatibility fallback: IV.30.1C intentionally no longer
             // performs global segment compaction. Historical contracts referenced
@@ -4861,6 +4905,10 @@
                     promotedPerimeterChains: promotedInferredPerimeterSuggestions.length,
                     promotedPerimeterEdges: promotedInferredPerimeterSuggestions.reduce((sum, item) => sum + Number(item.inferredPerimeterEdgeCount || 0), 0),
                     consolidatedPromotedChains: consolidatedPromotedPerimeterSuggestions.length,
+                    authoritativeContours: authoritativeContourSuggestions.length,
+                    authoritativePreserved,
+                    bridgeRepresented,
+                    promotedRepresentedByArbitration,
                     representedPromotedChains: consolidatedPromotedPerimeterSuggestions.filter((item) => representedFinalKeys.has(cartographySuggestionKey(item))).length,
                     representedPromotedEdges: consolidatedPromotedPerimeterSuggestions.filter((item) => representedFinalKeys.has(cartographySuggestionKey(item))).reduce((sum, item) => sum + Number(item.inferredPerimeterEdgeCount || 0), 0),
                     preOcclusionCertified: preOcclusionRecoveryContours.length,

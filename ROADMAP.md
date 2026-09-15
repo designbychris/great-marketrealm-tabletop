@@ -1111,3 +1111,14 @@ Regression-only correction for the story-beat endpoint registration assertion; n
 - [x] Keep all promoted geometry review-only until Keeper approval.
 - [ ] Server certification.
 - [ ] Dungeon from Hell Living Contour / Hybrid / Evidence Audit certification.
+
+## Phase IV.30.1G.5P — Contour Authority & Evidence Arbitration ✅
+- [x] Give directly observed certified/recoverable Living Contour geometry authority over reconstructed perimeter evidence.
+- [x] Preserve the pre-occlusion safety baseline before all supplemental evidence.
+- [x] Admit graph-certified bridges only after authoritative contour geometry.
+- [x] Admit promoted inferred perimeter only from review capacity remaining after authoritative geometry and bridges.
+- [x] Deduplicate promoted evidence already represented by a stronger authoritative path.
+- [x] Extend Evidence Audit with authoritative contour totals and authoritative-preserved counts.
+- [x] Keep the 200-object safety ceiling and review-first persistence contract unchanged.
+- [ ] Server certification.
+- [ ] Dungeon from Hell Living Contour / Hybrid / Evidence Audit certification.
