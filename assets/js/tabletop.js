@@ -4131,6 +4131,88 @@
                 portalPairing: portalPairingAndBoundarySides(entry)
             });
 
+            // IV.30.1G.5H — Boundary Graph Reconstruction & Evidence Bridging.
+            // Treat certified structural chains as nodes in a boundary graph. Nearby
+            // unresolved ends may support one another, but proximity alone never grants
+            // permission to draw a wall: the approach tangents must agree, the candidate
+            // bridge must preserve asymmetric boundary sides, and playable floor must not
+            // run through it. Portal/threshold evidence is an explicit veto.
+            const boundaryGraphReconstruction = (entries) => {
+                if (!Array.isArray(entries) || entries.length < 2) return { entries: entries || [], bridges: [] };
+                const unit = (x, y) => {
+                    const magnitude = Math.hypot(x, y);
+                    return magnitude > .000001 ? [x / magnitude, y / magnitude] : [0, 0];
+                };
+                const playableAtGrid = (x, y) => isPlayableFloor(
+                    Math.round(Number(x) * contourSubdivisions),
+                    Math.round(Number(y) * contourSubdivisions)
+                );
+                const endpoints = [];
+                entries.forEach((entry, entryIndex) => {
+                    if (!entry?.partial || entry.semanticBoundary?.role !== 'structural-wall') return;
+                    if (entry.portalPairing?.portal || entry.playableAdjacency?.thresholdConnectivity) return;
+                    const chain = entry.chain;
+                    if (!Array.isArray(chain) || chain.length < 3) return;
+                    endpoints.push({ entryIndex, end: 'start', point: chain[0], neighbour: chain[1] });
+                    endpoints.push({ entryIndex, end: 'finish', point: chain[chain.length - 1], neighbour: chain[chain.length - 2] });
+                });
+                const candidates = [];
+                for (let left = 0; left < endpoints.length; left += 1) {
+                    for (let right = left + 1; right < endpoints.length; right += 1) {
+                        const a = endpoints[left];
+                        const b = endpoints[right];
+                        if (a.entryIndex === b.entryIndex) continue;
+                        const dx = Number(b.point[0]) - Number(a.point[0]);
+                        const dy = Number(b.point[1]) - Number(a.point[1]);
+                        const distance = Math.hypot(dx, dy);
+                        if (distance < .10 || distance > .82) continue;
+                        const bridgeUnit = unit(dx, dy);
+                        const tangentA = unit(Number(a.point[0]) - Number(a.neighbour[0]), Number(a.point[1]) - Number(a.neighbour[1]));
+                        const tangentB = unit(Number(b.point[0]) - Number(b.neighbour[0]), Number(b.point[1]) - Number(b.neighbour[1]));
+                        const approachA = (tangentA[0] * bridgeUnit[0]) + (tangentA[1] * bridgeUnit[1]);
+                        const approachB = -((tangentB[0] * bridgeUnit[0]) + (tangentB[1] * bridgeUnit[1]));
+                        const tangentAgreement = Math.abs((tangentA[0] * tangentB[0]) + (tangentA[1] * tangentB[1]));
+                        if (approachA < .52 || approachB < .52 || tangentAgreement < .62) continue;
+                        let throughPlayable = 0;
+                        const throughChecks = 7;
+                        for (let sample = 1; sample < throughChecks; sample += 1) {
+                            const ratio = sample / throughChecks;
+                            if (playableAtGrid(Number(a.point[0]) + dx * ratio, Number(a.point[1]) + dy * ratio)) throughPlayable += 1;
+                        }
+                        const throughPlayableRatio = throughPlayable / (throughChecks - 1);
+                        const midpointX = (Number(a.point[0]) + Number(b.point[0])) / 2;
+                        const midpointY = (Number(a.point[1]) + Number(b.point[1])) / 2;
+                        const sideOffset = Math.max(.30, contourStep * 1.9);
+                        const normalX = -bridgeUnit[1] * sideOffset;
+                        const normalY = bridgeUnit[0] * sideOffset;
+                        const sideAPlayable = playableAtGrid(midpointX + normalX, midpointY + normalY);
+                        const sideBPlayable = playableAtGrid(midpointX - normalX, midpointY - normalY);
+                        const boundarySideSeparation = sideAPlayable !== sideBPlayable;
+                        if (!boundarySideSeparation || throughPlayableRatio >= .50) continue;
+                        candidates.push({
+                            a, b, distance, tangentAgreement, throughPlayableRatio, sideAPlayable, sideBPlayable,
+                            score: (1 - Math.min(1, distance / .82)) * 40 + tangentAgreement * 35 + (1 - throughPlayableRatio) * 25
+                        });
+                    }
+                }
+                candidates.sort((a, b) => b.score - a.score);
+                const claimedEnds = new Set();
+                const bridges = [];
+                candidates.forEach((candidate) => {
+                    const aKey = `${candidate.a.entryIndex}:${candidate.a.end}`;
+                    const bKey = `${candidate.b.entryIndex}:${candidate.b.end}`;
+                    if (claimedEnds.has(aKey) || claimedEnds.has(bKey)) return;
+                    claimedEnds.add(aKey); claimedEnds.add(bKey);
+                    bridges.push({
+                        classification: 'certified-evidence-bridge', confidence: 90, boundaryContinuation: true,
+                        fromEntry: candidate.a.entryIndex, toEntry: candidate.b.entryIndex,
+                        from: candidate.a.point, to: candidate.b.point, distance: candidate.distance,
+                        evidence: ['boundary-graph-neighbours', 'compatible-end-tangents', 'opposed-boundary-sides', 'non-playable-through-bridge', 'safe-evidence-bridge']
+                    });
+                });
+                return { entries, bridges };
+            };
+
             const splitContourPathAtProtectedThresholds = (points) => {
                 if (!Array.isArray(points) || points.length < 2) return { runs: [], gaps: [] };
                 const runs = [];
@@ -4189,6 +4271,12 @@
                 .map(applyPortalPairingAndBoundarySides)
                 .sort((a, b) => (b.recoveryScore - a.recoveryScore) || (b.length - a.length));
 
+            const boundaryGraph = boundaryGraphReconstruction(recoverableChains);
+            const certifiedEvidenceBridges = boundaryGraph.bridges;
+            recoverableChains.forEach((entry, entryIndex) => {
+                entry.boundaryGraphBridges = certifiedEvidenceBridges.filter((bridge) => bridge.fromEntry === entryIndex || bridge.toEntry === entryIndex);
+            });
+
             if (recoverableChains.length === 0) return [];
 
             // Keep the historical Economy vocabulary as a compatibility contract:
@@ -4220,7 +4308,7 @@
                 return candidate;
             };
 
-            const pathSuggestions = budgetedChains.flatMap((entry) => {
+            let pathSuggestions = budgetedChains.flatMap((entry) => {
                 // Terrain, compact obstacles and decorative marks remain classified
                 // evidence, but they do not become automatic LOS walls. Uncertain
                 // boundaries stay reviewable rather than being silently discarded.
@@ -4257,6 +4345,8 @@
                         portalPairingEvidence: Array.isArray(entry.portalPairing?.evidence) ? entry.portalPairing.evidence : [],
                         certifiedPortal: Boolean(entry.portalPairing?.portal),
                         certifiedBoundaryContinuation: Boolean(entry.portalPairing?.boundaryContinuation),
+                        boundaryGraphBridges: Array.isArray(entry.boundaryGraphBridges) ? entry.boundaryGraphBridges : [],
+                        certifiedEvidenceBridge: Array.isArray(entry.boundaryGraphBridges) && entry.boundaryGraphBridges.length > 0,
                         playableSpaceAdjacency: entry.playableAdjacency?.classification || 'unresolved-adjacency',
                         playableSpaceAdjacencyConfidence: Number(entry.playableAdjacency?.confidence || 0),
                         playableSpaceAdjacencyEvidence: Array.isArray(entry.playableAdjacency?.evidence) ? entry.playableAdjacency.evidence : [],
@@ -4282,6 +4372,25 @@
                     };
                 });
             }).filter((item) => item.points.length >= 2 && item.points.length <= maximumPathVertices);
+
+            // Evidence bridges are deliberately emitted as their own tiny wall polylines.
+            // They never consume a protected portal and never close a region merely for
+            // visual completeness; they exist only where the graph independently certified
+            // a structural continuation between two fragmented chains.
+            const evidenceBridgeSuggestions = certifiedEvidenceBridges.map((bridge) => {
+                const from = { x: roundContourCoordinate(bridge.from[0]), y: roundContourCoordinate(bridge.from[1]) };
+                const to = { x: roundContourCoordinate(bridge.to[0]), y: roundContourCoordinate(bridge.to[1]) };
+                return {
+                    type: 'wall', confidence: bridge.confidence, selected: true, contour: true, fineContour: true,
+                    fullBoundary: false, partialContour: true, partialContourRecovery: 'certified-evidence-bridge',
+                    boundaryGraphBridge: true, certifiedEvidenceBridge: true, certifiedBoundaryContinuation: true,
+                    thresholdGapProtection: false, certifiedPortal: false,
+                    recoveryEvidence: bridge.evidence.concat(['proximity-is-evidence-not-permission']),
+                    evidenceModel: 'living-contour-boundary-graph-v7', polyline: true, points: [from, to],
+                    x1: from.x, y1: from.y, x2: to.x, y2: to.y
+                };
+            });
+            pathSuggestions = pathSuggestions.concat(evidenceBridgeSuggestions).slice(0, maximumReviewSuggestions);
 
             // Defensive compatibility fallback: IV.30.1C intentionally no longer
             // performs global segment compaction. Historical contracts referenced
