@@ -2324,13 +2324,91 @@
                 }, 0);
             };
 
-            // A single straight-looking fleck can be handwriting, stairs or hatch.
-            // Require neighbouring parallel evidence unless the original structural
-            // confidence is exceptionally strong. This is the local judgement step.
+            // IV.30.1G.5B — Structural Evidence Corroboration.
+            // The calibrated grid is a ruler, not artwork. A grid-aligned structural
+            // vote may strengthen real architecture, but it cannot enter Hybrid merely
+            // because a thin dark grid line is persistent. Require either nearby Living
+            // Contour agreement or asymmetric wall-body ink beside the candidate.
+            const contourSegments = [];
+            contours.forEach((item) => {
+                const points = Array.isArray(item.points) ? item.points : [];
+                for (let index = 0; index < points.length - 1; index += 1) {
+                    contourSegments.push({ start: points[index], end: points[index + 1] });
+                }
+            });
+            const pointToSegmentDistanceForEvidence = (point, start, end) => {
+                const dx = end.x - start.x;
+                const dy = end.y - start.y;
+                const lengthSquared = (dx * dx) + (dy * dy);
+                if (lengthSquared <= .000001) return Math.hypot(point.x - start.x, point.y - start.y);
+                const t = Math.max(0, Math.min(1, (((point.x - start.x) * dx) + ((point.y - start.y) * dy)) / lengthSquared));
+                return Math.hypot(point.x - (start.x + (t * dx)), point.y - (start.y + (t * dy)));
+            };
+            const livingContourCorroborates = (item) => {
+                const center = midpoint(item);
+                return contourSegments.some((segment) => pointToSegmentDistanceForEvidence(center, segment.start, segment.end) <= .48);
+            };
+            const artworkDensityAtGridPoint = (gx, gy, radiusCanvas) => {
+                const cx = toCanvasX(grid.offsetX + (gx * grid.size));
+                const cy = toCanvasY(grid.offsetY + (gy * grid.size));
+                const radius = Math.max(1, Math.round(radiusCanvas));
+                let darkHits = 0;
+                let total = 0;
+                for (let y = Math.max(0, Math.round(cy) - radius); y <= Math.min(canvas.height - 1, Math.round(cy) + radius); y += 1) {
+                    for (let x = Math.max(0, Math.round(cx) - radius); x <= Math.min(canvas.width - 1, Math.round(cx) + radius); x += 1) {
+                        total += 1;
+                        if (luminance(x, y) <= 104) darkHits += 1;
+                    }
+                }
+                return darkHits / Math.max(1, total);
+            };
+            const structuralArtworkCorroboration = (item) => {
+                const dx = Number(item.x2) - Number(item.x1);
+                const dy = Number(item.y2) - Number(item.y1);
+                const length = Math.max(.0001, Math.hypot(dx, dy));
+                const normalX = -dy / length;
+                const normalY = dx / length;
+                const center = midpoint(item);
+                const gridCanvas = Math.max(4, toCanvasX(grid.size));
+                const sideOffset = .27;
+                const sampleRadius = Math.max(2, gridCanvas * .09);
+                let sideA = 0;
+                let sideB = 0;
+                [0.25, 0.5, 0.75].forEach((t) => {
+                    const gx = Number(item.x1) + (dx * t);
+                    const gy = Number(item.y1) + (dy * t);
+                    sideA += artworkDensityAtGridPoint(gx + (normalX * sideOffset), gy + (normalY * sideOffset), sampleRadius);
+                    sideB += artworkDensityAtGridPoint(gx - (normalX * sideOffset), gy - (normalY * sideOffset), sampleRadius);
+                });
+                sideA /= 3;
+                sideB /= 3;
+                const wallBodyDensity = Math.max(sideA, sideB);
+                const quietSideDensity = Math.min(sideA, sideB);
+                const livingAgreement = livingContourCorroborates(item);
+                const asymmetricWallBody = wallBodyDensity >= .115 && wallBodyDensity >= quietSideDensity * 1.45;
+                return {
+                    livingAgreement,
+                    asymmetricWallBody,
+                    wallBodyDensity,
+                    quietSideDensity,
+                    corroborated: livingAgreement || asymmetricWallBody
+                };
+            };
+
+            // A single straight-looking fleck can be handwriting, stairs, hatch, or the
+            // imported map's own graph-paper grid. Local parallel support is useful only
+            // after artwork corroboration; confidence alone must never resurrect the grid.
             const strongStructural = structural
                 .map((item) => ({ ...item, localStructuralSupport: structuralSupport(item) }))
-                .filter((item) => item.localStructuralSupport >= 2 || item.confidence >= 94)
-                .map((item) => ({ ...item, hybridJudgement: true, hybridRegion: 'structural' }));
+                .map((item) => ({ ...item, structuralArtworkEvidence: structuralArtworkCorroboration(item) }))
+                .filter((item) => item.structuralArtworkEvidence.corroborated)
+                .filter((item) => item.localStructuralSupport >= 2 || item.confidence >= 94 || item.structuralArtworkEvidence.livingAgreement)
+                .map((item) => ({
+                    ...item,
+                    hybridJudgement: true,
+                    hybridRegion: 'structural',
+                    structuralEvidenceCorroboration: item.structuralArtworkEvidence.livingAgreement ? 'living-contour' : 'wall-body-ink'
+                }));
 
             const pointToSegmentDistance = (point, start, end) => {
                 const dx = end.x - start.x;

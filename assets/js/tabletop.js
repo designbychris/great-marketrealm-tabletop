@@ -1,9 +1,6 @@
 (function () {
     'use strict';
 
-    const i18nStrings = (window.gmrtTabletop && window.gmrtTabletop.strings) || {};
-    const t = (key, fallback) => i18nStrings[key] || fallback;
-
     let activeRefreshTimer = null;
 
     // Phase IV.32.5A — Keeper Drawer lifecycle rail.
@@ -14,177 +11,40 @@
         const root = document.querySelector('.gmrt-chamber');
         if (!root) return;
 
-        const drawers = {
-            session: {
-                drawer: document.querySelector('[data-keeper-session]'),
-                toggle: document.querySelector('[data-keeper-session-toggle]')
-            },
-            tools: {
-                drawer: document.querySelector('[data-keeper-tools]'),
-                toggle: document.querySelector('[data-keeper-tools-toggle]')
-            },
-            atlas: {
-                drawer: document.querySelector('[data-keepers-atlas]'),
-                toggle: document.querySelector('[data-atlas-toggle]')
-            },
-            bestiary: {
-                drawer: document.querySelector('[data-keepers-bestiary]'),
-                toggle: document.querySelector('[data-bestiary-toggle]')
+        const atlasDrawer = document.querySelector('[data-keepers-atlas]');
+        const atlasToggle = document.querySelector('[data-atlas-toggle]');
+        const bestiaryDrawer = document.querySelector('[data-keepers-bestiary]');
+        const bestiaryToggle = document.querySelector('[data-bestiary-toggle]');
+
+        if (kind === 'atlas') {
+            if (!atlasDrawer || !atlasToggle) return;
+            if (open) {
+                if (bestiaryDrawer) bestiaryDrawer.dataset.open = 'false';
+                if (bestiaryToggle) bestiaryToggle.setAttribute('aria-expanded', 'false');
             }
-        };
-
-        const active = drawers[kind];
-        if (!active?.drawer || !active?.toggle) return;
-
-        Object.entries(drawers).forEach(([candidateKind, candidate]) => {
-            if (!candidate.drawer || !candidate.toggle) return;
-            const candidateOpen = open && candidateKind === kind;
-            candidate.drawer.dataset.open = candidateOpen ? 'true' : 'false';
-            candidate.toggle.setAttribute('aria-expanded', candidateOpen ? 'true' : 'false');
-        });
-
-        root.dataset.keeperDrawerOpen = open ? kind : '';
-
-        if (open && kind === 'bestiary') {
-            const search = document.querySelector('[data-bestiary-search]');
-            if (search) window.setTimeout(() => search.focus(), 210);
+            atlasDrawer.dataset.open = open ? 'true' : 'false';
+            root.dataset.keeperDrawerOpen = open ? 'atlas' : '';
+            atlasToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+            return;
         }
-    }
 
-    function sessionRecapStorageKey(recap) {
-        const root = document.querySelector('.gmrt-chamber');
-        const tableId = root?.dataset.tableId || 'table';
-        const recapId = recap?.dataset.sessionRecapId || 'latest';
-        return `gmrt:session-recap:${tableId}:${recapId}:collapsed`;
-    }
-
-    function setSessionRecapExpanded(recap, expanded, remember = true) {
-        if (!recap) return;
-        const toggle = recap.querySelector('[data-session-recap-toggle]');
-        const content = recap.querySelector('[data-session-recap-content]');
-        if (!toggle || !content) return;
-
-        recap.classList.toggle('is-collapsed', !expanded);
-        toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
-        toggle.textContent = expanded ? t('hideRecap', 'Hide Recap') : t('showRecap', 'Show Recap');
-        content.hidden = !expanded;
-
-        if (remember) {
-            try {
-                window.localStorage.setItem(sessionRecapStorageKey(recap), expanded ? '0' : '1');
-            } catch (error) {
-                // Storage can be unavailable in privacy-restricted browsers; the toggle still works.
+        if (kind === 'bestiary') {
+            if (!bestiaryDrawer || !bestiaryToggle) return;
+            if (open) {
+                if (atlasDrawer) atlasDrawer.dataset.open = 'false';
+                if (atlasToggle) atlasToggle.setAttribute('aria-expanded', 'false');
             }
-        }
-    }
-
-    function restoreSessionRecapPreference() {
-        const recap = document.querySelector('[data-session-recap]');
-        if (!recap) return;
-        let collapsed = false;
-        try {
-            collapsed = window.localStorage.getItem(sessionRecapStorageKey(recap)) === '1';
-        } catch (error) {
-            collapsed = false;
-        }
-        setSessionRecapExpanded(recap, !collapsed, false);
-    }
-
-    function sessionClosingStorageKey(tableId) {
-        return `gmrt:session-closing:${tableId || 'table'}`;
-    }
-
-    function rememberSessionClosing(tableId, sessionId) {
-        if (!sessionId) return;
-        try {
-            window.sessionStorage.setItem(sessionClosingStorageKey(tableId), sessionId);
-        } catch (error) {
-            // The farewell remains optional if browser storage is unavailable.
-        }
-    }
-
-    function revealFreshSessionClosing() {
-        const root = document.querySelector('.gmrt-chamber');
-        const closing = document.querySelector('[data-session-closing]');
-        if (!root || !closing) return;
-
-        let rememberedSessionId = '';
-        try {
-            const key = sessionClosingStorageKey(root.dataset.tableId || '');
-            rememberedSessionId = window.sessionStorage.getItem(key) || '';
-            if (rememberedSessionId !== '') {
-                window.sessionStorage.removeItem(key);
+            bestiaryDrawer.dataset.open = open ? 'true' : 'false';
+            root.dataset.keeperDrawerOpen = open ? 'bestiary' : '';
+            bestiaryToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+            if (open) {
+                const search = document.querySelector('[data-bestiary-search]');
+                if (search) window.setTimeout(() => search.focus(), 210);
             }
-        } catch (error) {
-            rememberedSessionId = '';
-        }
-
-        if (rememberedSessionId !== '' && rememberedSessionId === (closing.dataset.sessionClosingId || '')) {
-            closing.hidden = false;
         }
     }
 
     document.addEventListener('click', (event) => {
-        const recapToggle = event.target.closest('[data-session-recap-toggle]');
-        if (recapToggle) {
-            event.preventDefault();
-            const recap = recapToggle.closest('[data-session-recap]');
-            setSessionRecapExpanded(recap, recapToggle.getAttribute('aria-expanded') !== 'true');
-            return;
-        }
-
-        const viewRecap = event.target.closest('[data-session-closing-view-recap]');
-        if (viewRecap) {
-            event.preventDefault();
-            const recap = document.querySelector('[data-session-recap]');
-            if (recap) {
-                setSessionRecapExpanded(recap, true);
-                const heading = recap.querySelector('#gmrt-session-recap-title');
-                recap.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
-                if (heading instanceof HTMLElement) {
-                    heading.setAttribute('tabindex', '-1');
-                    heading.focus({ preventScroll: true });
-                }
-            }
-            return;
-        }
-
-        const dismissClosing = event.target.closest('[data-session-closing-dismiss]');
-        if (dismissClosing) {
-            event.preventDefault();
-            const closing = dismissClosing.closest('[data-session-closing]');
-            if (closing) closing.hidden = true;
-            return;
-        }
-
-        const keeperSessionToggle = event.target.closest('[data-keeper-session-toggle]');
-        if (keeperSessionToggle) {
-            event.preventDefault();
-            const drawer = document.querySelector('[data-keeper-session]');
-            setKeeperDrawerOpen('session', drawer?.dataset.open !== 'true');
-            return;
-        }
-
-        if (event.target.closest('[data-keeper-session-close]')) {
-            event.preventDefault();
-            setKeeperDrawerOpen('session', false);
-            return;
-        }
-
-        const keeperToolsToggle = event.target.closest('[data-keeper-tools-toggle]');
-        if (keeperToolsToggle) {
-            event.preventDefault();
-            const drawer = document.querySelector('[data-keeper-tools]');
-            setKeeperDrawerOpen('tools', drawer?.dataset.open !== 'true');
-            return;
-        }
-
-        if (event.target.closest('[data-keeper-tools-close]')) {
-            event.preventDefault();
-            setKeeperDrawerOpen('tools', false);
-            return;
-        }
-
         const atlasToggle = event.target.closest('[data-atlas-toggle]');
         if (atlasToggle) {
             event.preventDefault();
@@ -216,7 +76,6 @@
     async function replaceChamber(message, sceneId = null) {
         const current = document.querySelector('.gmrt-chamber');
         const liveStatus = document.querySelector('#gmrt-tabletop-status');
-        const keeperDrawerWasOpen = current?.dataset.keeperDrawerOpen || '';
 
         if (!current || !window.gmrtTabletop) {
             return;
@@ -248,7 +107,7 @@
             throw new Error(
                 result.data && result.data.message
                     ? result.data.message
-                    : t('liveRefreshFailed', 'The live Chamber could not be refreshed.')
+                    : 'The live Chamber could not be refreshed.'
             );
         }
 
@@ -259,7 +118,7 @@
         const incoming = parsed.querySelector('.gmrt-chamber');
 
         if (!incoming) {
-            throw new Error(t('refreshedMarkupMissing', 'The refreshed Chamber markup was not found.'));
+            throw new Error('The refreshed Chamber markup was not found.');
         }
 
         if (activeRefreshTimer) {
@@ -269,10 +128,6 @@
 
         current.replaceWith(incoming);
         bootTabletop();
-
-        if (['session', 'tools', 'atlas', 'bestiary'].includes(keeperDrawerWasOpen)) {
-            setKeeperDrawerOpen(keeperDrawerWasOpen, true);
-        }
     }
 
     function bootTabletop() {
@@ -285,8 +140,6 @@
     }
 
     const tableId = root.dataset.tableId || '';
-    restoreSessionRecapPreference();
-    revealFreshSessionClosing();
     const projectedSceneId = root.dataset.sceneId || '';
     const preparationSceneId = root.dataset.preparationSceneId || '';
     let selected = null;
@@ -296,9 +149,6 @@
     let thresholdPlacement = null;
     let bestiaryPlacement = null;
     let keeperLightPlacement = null;
-    let furniturePlacement = null;
-    let trapPlacement = null;
-    let treasurePlacement = null;
     // The fog renderer runs during boot before the Lantern Rack event bindings are
     // installed, so the roster reference must exist before that first render.
     const keeperLightRoster = document.querySelector('[data-keeper-light-roster]');
@@ -340,745 +190,12 @@
         if (!data.success) {
             const message = data.data && data.data.message
                 ? data.data.message
-                : t('requestRejected', 'The Tabletop rejected that request.');
+                : 'The Tabletop rejected that request.';
             throw new Error(message);
         }
 
         return data.data;
     }
-
-    const trapCabinet = document.querySelector('[data-trap-cabinet]');
-    const trapStatus = document.querySelector('[data-trap-status]');
-    const trapRoster = document.querySelector('[data-trap-roster]');
-    const trapNewType = document.querySelector('[data-trap-new-type]');
-    const trapNewLabel = document.querySelector('[data-trap-new-label]');
-    const trapPlace = document.querySelector('[data-trap-place]');
-    const trapPlaceCancel = document.querySelector('[data-trap-place-cancel]');
-
-    function trapSceneId() {
-        return preparationSceneId || projectedSceneId;
-    }
-
-    function finishTrapPlacement(message) {
-        trapPlacement = null;
-        board?.classList.remove('is-trap-placing');
-        if (trapPlaceCancel) trapPlaceCancel.disabled = true;
-        if (trapPlace) trapPlace.classList.remove('is-active');
-        if (trapStatus && message) trapStatus.textContent = message;
-    }
-
-    trapNewType?.addEventListener('change', () => {
-        if (!trapNewLabel) return;
-        const current = trapNewLabel.value.trim();
-        if (current === '' || current === t('pressurePlate', 'Pressure Plate') || current === t('tripwire', 'Tripwire')) {
-            trapNewLabel.value = trapNewType.value === 'tripwire' ? t('tripwire', 'Tripwire') : t('pressurePlate', 'Pressure Plate');
-        }
-    });
-
-    trapPlace?.addEventListener('click', () => {
-        if (treasurePlacement) finishTreasurePlacement('Treasure placement cancelled.');
-        trapPlacement = {
-            mode: 'add',
-            type: String(trapNewType?.value || 'pressure-plate'),
-            label: String(trapNewLabel?.value || '').trim()
-        };
-        board?.classList.add('is-trap-placing');
-        trapPlace.classList.add('is-active');
-        if (trapPlaceCancel) trapPlaceCancel.disabled = false;
-        if (trapStatus) trapStatus.textContent = t('trapSelected', 'Trap selected — click the battlemap to place it.');
-    });
-
-    trapPlaceCancel?.addEventListener('click', () => {
-        finishTrapPlacement(t('trapCancelled', 'Trap placement cancelled. Pippin has lifted his feet very carefully.'));
-    });
-
-    trapRoster?.addEventListener('click', async (event) => {
-        const button = event.target.closest?.('[data-trap-manage]');
-        if (!button || button.disabled) return;
-        const row = button.closest('[data-trap-row]');
-        const trapId = String(row?.dataset.trapId || '');
-        const action = String(button.dataset.trapManage || '');
-        if (!trapId || !action) return;
-
-        if (action === 'move') {
-            trapPlacement = {mode: 'move', trapId};
-            board?.classList.add('is-trap-placing');
-            if (trapPlaceCancel) trapPlaceCancel.disabled = false;
-            if (trapStatus) trapStatus.textContent = t('trapMoveSelected', 'Move selected — click the battlemap for the trap’s new position.');
-            return;
-        }
-
-        if (action === 'remove' && !window.confirm(t('removeTrapConfirm', 'Remove this trap from the Scene?'))) return;
-
-        button.disabled = true;
-        try {
-            const values = {
-                scene_id: trapSceneId(),
-                trap_id: trapId,
-                trap_action: action
-            };
-            if (action === 'update') {
-                values.label = String(row.querySelector('[data-trap-label]')?.value || '').trim();
-                values.trap_type = String(row.querySelector('[data-trap-type]')?.value || 'pressure-plate');
-            }
-            const data = await request('gmrt_forge_trap_action', values);
-            if (trapStatus) trapStatus.textContent = data.message || t('trapUpdated', 'Trap updated.');
-            await replaceChamber(data.message || t('trapUpdated', 'Trap updated.'), trapSceneId() || null);
-        } catch (error) {
-            button.disabled = false;
-            if (trapStatus) trapStatus.textContent = error?.message || t('trapFailed', 'Pippin could not tend that trap.');
-        }
-    });
-
-    // Trap placement owns the battlefield gesture in the same way as furniture
-    // and Keeper lights. It is server-authored; the map marker is just presentation.
-    board?.addEventListener('pointerdown', async (event) => {
-        if (!trapPlacement || event.button !== 0) return;
-        event.preventDefault();
-        event.stopImmediatePropagation();
-        const point = coordinatesFromPointer(event);
-        const placement = trapPlacement;
-        try {
-            const values = {
-                scene_id: trapSceneId(),
-                trap_action: placement.mode === 'move' ? 'move' : 'add',
-                x: point.x,
-                y: point.y
-            };
-            if (placement.mode === 'move') {
-                values.trap_id = placement.trapId;
-            } else {
-                values.trap_type = placement.type;
-                values.label = placement.label;
-            }
-            const data = await request('gmrt_forge_trap_action', values);
-            finishTrapPlacement(data.message || t('trapPositionUpdated', 'Trap position updated.'));
-            await replaceChamber(data.message || t('trapPositionUpdated', 'Trap position updated.'), trapSceneId() || null);
-        } catch (error) {
-            if (trapStatus) trapStatus.textContent = (error?.message || t('trapPlacementFailed', 'The trap could not be placed.')) + ' ' + t('placementRemainsArmed', 'Placement remains armed; click again or cancel.');
-        }
-    }, true);
-
-
-    const storyBeatRoster = document.querySelector('[data-story-beat-roster]');
-    const storyBeatStatus = document.querySelector('[data-story-beat-status]');
-
-    function storySceneId() {
-        return preparationSceneId || projectedSceneId;
-    }
-
-    storyBeatRoster?.addEventListener('click', async (event) => {
-        const button = event.target.closest?.('[data-story-beat-action]');
-        if (!button || button.disabled) return;
-
-        const row = button.closest('[data-story-beat-row]');
-        const beatIndex = Number.parseInt(String(row?.dataset.storyBeatIndex || ''), 10);
-        const action = String(button.dataset.storyBeatAction || '');
-
-        if (!Number.isInteger(beatIndex) || beatIndex < 0 || !action) return;
-
-        button.disabled = true;
-        try {
-            const data = await request('gmrt_forge_story_beat_action', {
-                scene_id: storySceneId(),
-                beat_index: beatIndex,
-                story_action: action
-            });
-
-            if (storyBeatStatus) {
-                storyBeatStatus.textContent = data.message || t('adventureNotesUpdated', 'Adventure notes updated.');
-            }
-
-            await replaceChamber(
-                data.message || t('adventureNotesUpdated', 'Adventure notes updated.'),
-                storySceneId() || null
-            );
-        } catch (error) {
-            button.disabled = false;
-            if (storyBeatStatus) {
-                storyBeatStatus.textContent = error?.message || t('adventureNotesFailed', 'Pippin could not turn that page.');
-            }
-        }
-    });
-
-    const treasureLedger = document.querySelector('[data-treasure-ledger]');
-    const treasureStatus = document.querySelector('[data-treasure-status]');
-    const treasureRoster = document.querySelector('[data-treasure-roster]');
-    const treasureNewType = document.querySelector('[data-treasure-new-type]');
-    const treasureNewLabel = document.querySelector('[data-treasure-new-label]');
-    const treasureNewContents = document.querySelector('[data-treasure-new-contents]');
-    const treasurePlace = document.querySelector('[data-treasure-place]');
-    const treasurePlaceCancel = document.querySelector('[data-treasure-place-cancel]');
-
-    function treasureSceneId() {
-        return preparationSceneId || projectedSceneId;
-    }
-
-    function treasureDefaults(type) {
-        switch (String(type || 'coin-cache')) {
-            case 'trade-goods':
-                return ['Trade Goods', 'A useful bundle of trade goods and saleable provisions.'];
-            case 'adventurer-cache':
-                return ["Adventurer's Cache", 'A small cache of adventuring supplies worth carrying onward.'];
-            case 'curio-stash':
-                return ['Curio Stash', 'A peculiar curio and a few saleable trinkets.'];
-            case 'lair-hoard':
-                return ['Boss Hoard', 'A substantial hoard of mixed coin, valuables, and one conspicuously important prize for the Keeper to define.'];
-            default:
-                return ['Coin Cache', 'A modest cache of mixed coin and trade tokens.'];
-        }
-    }
-
-    function finishTreasurePlacement(message) {
-        treasurePlacement = null;
-        board?.classList.remove('is-treasure-placing');
-        if (treasurePlaceCancel) treasurePlaceCancel.disabled = true;
-        if (treasurePlace) treasurePlace.classList.remove('is-active');
-        if (treasureStatus && message) treasureStatus.textContent = message;
-    }
-
-    treasureNewType?.addEventListener('change', () => {
-        const [label, contents] = treasureDefaults(treasureNewType.value);
-        if (treasureNewLabel) treasureNewLabel.value = label;
-        if (treasureNewContents) treasureNewContents.value = contents;
-    });
-
-    treasurePlace?.addEventListener('click', () => {
-        if (trapPlacement) finishTrapPlacement('Trap placement cancelled.');
-        treasurePlacement = {
-            mode: 'add',
-            type: String(treasureNewType?.value || 'coin-cache'),
-            label: String(treasureNewLabel?.value || '').trim(),
-            contents: String(treasureNewContents?.value || '').trim()
-        };
-        board?.classList.add('is-treasure-placing');
-        treasurePlace.classList.add('is-active');
-        if (treasurePlaceCancel) treasurePlaceCancel.disabled = false;
-        if (treasureStatus) treasureStatus.textContent = t('treasureSelected', 'Treasure selected — click the battlemap to place it.');
-    });
-
-    treasurePlaceCancel?.addEventListener('click', () => {
-        finishTreasurePlacement(t('treasureCancelled', 'Treasure placement cancelled. Pippin has stopped drawing little X marks.'));
-    });
-
-    treasureRoster?.addEventListener('click', async (event) => {
-        const button = event.target.closest?.('[data-treasure-manage]');
-        if (!button || button.disabled) return;
-        const row = button.closest('[data-treasure-row]');
-        const treasureId = String(row?.dataset.treasureId || '');
-        const action = String(button.dataset.treasureManage || '');
-        if (!treasureId || !action) return;
-
-        if (action === 'move') {
-            treasurePlacement = {mode: 'move', treasureId};
-            board?.classList.add('is-treasure-placing');
-            if (treasurePlaceCancel) treasurePlaceCancel.disabled = false;
-            if (treasureStatus) treasureStatus.textContent = t('treasureMoveSelected', 'Move selected — click the battlemap for the treasure’s new position.');
-            return;
-        }
-
-        if (action === 'remove' && !window.confirm(t('removeTreasureConfirm', 'Remove this treasure from the Scene?'))) return;
-
-        button.disabled = true;
-        try {
-            const values = {
-                scene_id: treasureSceneId(),
-                treasure_id: treasureId,
-                treasure_action: action
-            };
-            if (action === 'update') {
-                values.label = String(row.querySelector('[data-treasure-label]')?.value || '').trim();
-                values.treasure_type = String(row.querySelector('[data-treasure-type]')?.value || 'coin-cache');
-                values.contents = String(row.querySelector('[data-treasure-contents]')?.value || '').trim();
-            }
-            const data = await request('gmrt_forge_treasure_action', values);
-            if (treasureStatus) treasureStatus.textContent = data.message || t('treasureUpdated', 'Treasure updated.');
-            await replaceChamber(data.message || t('treasureUpdated', 'Treasure updated.'), treasureSceneId() || null);
-        } catch (error) {
-            button.disabled = false;
-            if (treasureStatus) treasureStatus.textContent = error?.message || t('treasureFailed', 'Pippin could not amend that treasure record.');
-        }
-    });
-
-    board?.addEventListener('pointerdown', async (event) => {
-        if (!treasurePlacement || event.button !== 0) return;
-        event.preventDefault();
-        event.stopImmediatePropagation();
-        const point = coordinatesFromPointer(event);
-        const placement = treasurePlacement;
-        try {
-            const values = {
-                scene_id: treasureSceneId(),
-                treasure_action: placement.mode === 'move' ? 'move' : 'add',
-                x: point.x,
-                y: point.y
-            };
-            if (placement.mode === 'move') {
-                values.treasure_id = placement.treasureId;
-            } else {
-                values.treasure_type = placement.type;
-                values.label = placement.label;
-                values.contents = placement.contents;
-            }
-            const data = await request('gmrt_forge_treasure_action', values);
-            finishTreasurePlacement(data.message || t('treasurePositionUpdated', 'Treasure position updated.'));
-            await replaceChamber(data.message || t('treasurePositionUpdated', 'Treasure position updated.'), treasureSceneId() || null);
-        } catch (error) {
-            if (treasureStatus) treasureStatus.textContent = (error?.message || t('treasurePlacementFailed', 'The treasure could not be placed.')) + ' ' + t('placementRemainsArmed', 'Placement remains armed; click again or cancel.');
-        }
-    }, true);
-
-    const furniturePalette = document.querySelector('[data-furniture-palette]');
-    const furnitureStatus = document.querySelector('[data-furniture-status]');
-    const furnitureCancel = document.querySelector('[data-furniture-cancel]');
-    const furnitureSnap = document.querySelector('[data-furniture-snap]');
-    const furnitureButtons = Array.from(document.querySelectorAll('[data-furniture-kind]'));
-    const furnitureSelection = document.querySelector('[data-furniture-selection]');
-    const furnitureRotateButtons = Array.from(document.querySelectorAll('[data-scene-object-rotate]'));
-    const furnitureScaleButtons = Array.from(document.querySelectorAll('[data-scene-object-scale]'));
-    const furnitureDuplicate = document.querySelector('[data-scene-object-duplicate]');
-    const furnitureInteract = document.querySelector('[data-scene-object-interact]');
-    const furnitureMimic = document.querySelector('[data-scene-object-mimic]');
-    const furnitureArmMimic = document.querySelector('[data-scene-object-arm-mimic]');
-    const furnitureRevealMimic = document.querySelector('[data-scene-object-reveal-mimic]');
-    const furnitureDisarmMimic = document.querySelector('[data-scene-object-disarm-mimic]');
-    const mimicDialog = document.querySelector('[data-mimic-dialog]');
-    const mimicCreature = document.querySelector('[data-mimic-creature]');
-    const mimicConfirm = document.querySelector('[data-mimic-confirm]');
-    const mimicArm = document.querySelector('[data-mimic-arm]');
-    const mimicCancel = document.querySelector('[data-mimic-cancel]');
-    const furnitureRemove = document.querySelector('[data-scene-object-remove]');
-    const sceneObjectLayer = document.querySelector('[data-scene-object-layer]');
-    const sceneObjectAuthoringUrl = window.location.toString();
-    let selectedSceneObjectId = '';
-    let sceneObjectDrag = null;
-    let sceneObjectBusy = false;
-    let tokenDragInProgress = false;
-
-    function sceneObjectElement(objectId) {
-        if (!objectId) return null;
-        return document.querySelector('[data-scene-object-id="' + CSS.escape(objectId) + '"]');
-    }
-
-    function setSceneObjectEditorEnabled(enabled) {
-        [...furnitureRotateButtons, ...furnitureScaleButtons].forEach((button) => {
-            button.disabled = !enabled;
-        });
-        if (furnitureDuplicate) furnitureDuplicate.disabled = !enabled;
-        if (furnitureInteract) {
-            const object = enabled ? sceneObjectElement(selectedSceneObjectId) : null;
-            const interaction = object?.dataset.sceneObjectInteraction || 'none';
-            furnitureInteract.disabled = !enabled || interaction === 'none';
-            furnitureInteract.textContent = interaction === 'open_close'
-                ? (object?.dataset.sceneObjectOpen === 'true' ? t('close', 'Close') : t('open', 'Open'))
-                : t('interact', 'Interact');
-        }
-        if (furnitureMimic || furnitureArmMimic || furnitureRevealMimic || furnitureDisarmMimic) {
-            const object = enabled ? sceneObjectElement(selectedSceneObjectId) : null;
-            const capable = object?.dataset.mimicCapable === 'true';
-            const armed = object?.dataset.mimicArmed === 'true';
-            if (furnitureMimic) furnitureMimic.disabled = !enabled || !capable || armed;
-            if (furnitureArmMimic) furnitureArmMimic.disabled = !enabled || !capable || armed;
-            if (furnitureRevealMimic) {
-                furnitureRevealMimic.disabled = !enabled || !armed;
-                furnitureRevealMimic.title = armed && object?.dataset.mimicName
-                    ? `Reveal ${object.dataset.mimicName}`
-                    : '';
-            }
-            if (furnitureDisarmMimic) furnitureDisarmMimic.disabled = !enabled || !armed;
-        }
-        if (furnitureRemove) furnitureRemove.disabled = !enabled;
-    }
-
-    function selectSceneObject(object) {
-        document.querySelectorAll('[data-scene-object-id]').forEach((candidate) => {
-            const selected = candidate === object;
-            candidate.classList.toggle('is-selected', selected);
-            if (candidate.getAttribute('role') === 'button') {
-                candidate.setAttribute('aria-pressed', selected ? 'true' : 'false');
-            }
-        });
-
-        selectedSceneObjectId = object?.dataset.sceneObjectId || '';
-        setSceneObjectEditorEnabled(Boolean(selectedSceneObjectId));
-
-        if (furnitureSelection) {
-            furnitureSelection.textContent = object
-                ? (object.dataset.sceneObjectLabel || t('furniture', 'Furniture')) + ' selected'
-                : t('noFurnitureSelected', 'No furniture selected');
-        }
-    }
-
-    function syncSceneObjectLayer(incomingDocument) {
-        const currentLayer = document.querySelector('[data-scene-object-layer]');
-        const incomingLayer = incomingDocument?.querySelector('[data-scene-object-layer]');
-        if (!currentLayer || !incomingLayer) return;
-        currentLayer.replaceChildren(...incomingLayer.childNodes);
-
-        if (selectedSceneObjectId) {
-            const restored = sceneObjectElement(selectedSceneObjectId);
-            selectSceneObject(restored);
-        }
-    }
-
-    async function refreshSceneObjectLayer() {
-        const data = await request('gmrt_tabletop_fragment', {});
-        const html = typeof data.html === 'string' ? data.html : '';
-        if (!html) return;
-        syncSceneObjectLayer(new DOMParser().parseFromString(html, 'text/html'));
-    }
-
-    async function submitSceneObjectAction(action, values = {}) {
-        if (!furniturePalette || sceneObjectBusy) return false;
-        sceneObjectBusy = true;
-
-        const body = new URLSearchParams();
-        body.set('gmrt_scene_object_action', action);
-        body.set('gmrt_scene_object_nonce', furniturePalette.dataset.sceneObjectNonce || '');
-        body.set('gmrt_scene_object_scene_id', projectedSceneId);
-        Object.entries(values).forEach(([key, value]) => body.set(key, String(value)));
-
-        try {
-            const response = await fetch(sceneObjectAuthoringUrl, {
-                method: 'POST',
-                credentials: 'same-origin',
-                headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'},
-                body
-            });
-            if (!response.ok) throw new Error(t('furnitureRearrangeFailed', 'Pippin could not rearrange that furnishing.'));
-            const html = await response.text();
-            syncSceneObjectLayer(new DOMParser().parseFromString(html, 'text/html'));
-            return true;
-        } catch (error) {
-            if (furnitureStatus) {
-                furnitureStatus.textContent = error.message || t('furnitureRearrangeFailed', 'Pippin could not rearrange that furnishing.');
-            }
-            return false;
-        } finally {
-            sceneObjectBusy = false;
-        }
-    }
-
-    function furniturePoint(point) {
-        if (!furnitureSnap?.checked || !furniturePalette) return point;
-
-        const width = Math.max(1, Number(furniturePalette.dataset.sceneWidth || 1));
-        const height = Math.max(1, Number(furniturePalette.dataset.sceneHeight || 1));
-        const grid = Math.max(1, Number(furniturePalette.dataset.gridSize || 1));
-        const offsetX = Number(furniturePalette.dataset.gridOffsetX || 0);
-        const offsetY = Number(furniturePalette.dataset.gridOffsetY || 0);
-
-        const snapAxis = (value, extent, offset) => {
-            const source = value * extent;
-            const index = Math.round(((source - offset) / grid) - 0.5);
-            const snapped = offset + ((index + 0.5) * grid);
-            return Math.max(0, Math.min(1, snapped / extent));
-        };
-
-        return {
-            x: snapAxis(point.x, width, offsetX),
-            y: snapAxis(point.y, height, offsetY)
-        };
-    }
-
-    furnitureSnap?.addEventListener('change', () => {
-        if (furnitureStatus) {
-            furnitureStatus.textContent = furnitureSnap.checked
-                ? t('snapEnabled', 'Snap to Grid enabled. Pippin has restored order.')
-                : t('snapDisabled', 'Snap to Grid disabled. Pippin is trying not to look.');
-        }
-    });
-
-    function finishFurniturePlacement(message) {
-        furniturePlacement = null;
-        board?.classList.remove('is-furniture-placing');
-        furnitureButtons.forEach((button) => {
-            button.classList.remove('is-selected');
-            button.setAttribute('aria-pressed', 'false');
-        });
-        if (furnitureCancel) furnitureCancel.disabled = true;
-        if (furnitureStatus && message) furnitureStatus.textContent = message;
-    }
-
-    furnitureButtons.forEach((button) => {
-        button.addEventListener('click', () => {
-            selectSceneObject(null);
-            furniturePlacement = {
-                kind: String(button.dataset.furnitureKind || ''),
-                label: String(button.dataset.furnitureLabel || t('furniture', 'Furniture'))
-            };
-            furnitureButtons.forEach((choice) => {
-                const active = choice === button;
-                choice.classList.toggle('is-selected', active);
-                choice.setAttribute('aria-pressed', active ? 'true' : 'false');
-            });
-            board?.classList.add('is-furniture-placing');
-            if (furnitureCancel) furnitureCancel.disabled = false;
-            if (furnitureStatus) {
-                furnitureStatus.textContent = furniturePlacement.label + ' selected — click the map to place it.';
-            }
-        });
-    });
-
-    furnitureCancel?.addEventListener('click', () => {
-        finishFurniturePlacement(t('furniturePlacementCancelled', 'Placement cancelled. Pippin has put the tape measure away.'));
-    });
-
-    // Furniture placement owns the next battlefield pointer in capture phase.
-    // This mirrors the certified Lantern Rack interaction: authoring must win before
-    // Lens panning, Fog, tokens, vision or cartography can consume the gesture.
-    board?.addEventListener('pointerdown', async (event) => {
-        if (!furniturePlacement || !furniturePalette) return;
-        if (event.button !== 0) return;
-
-        event.preventDefault();
-        event.stopImmediatePropagation();
-
-        const point = furniturePoint(coordinatesFromPointer(event));
-        const placedLabel = furniturePlacement.label;
-        const placed = await submitSceneObjectAction('place', {
-            gmrt_scene_object_kind: furniturePlacement.kind,
-            x: point.x,
-            y: point.y
-        });
-        if (placed) {
-            finishFurniturePlacement(placedLabel + ' placed. Pippin has marked it on the map.');
-        }
-    }, true);
-
-    // IV.35.3B — existing furnishings become Keeper-selectable without making the
-    // whole object layer intercept battlefield input. Only the object itself owns
-    // the pointer, so empty-map token/Lens interactions remain unchanged.
-    sceneObjectLayer?.addEventListener('pointerdown', (event) => {
-        if (!furniturePalette || furniturePlacement || event.button !== 0) return;
-        const object = event.target instanceof Element
-            ? event.target.closest('[data-scene-object-id]')
-            : null;
-        if (!object) return;
-
-        event.preventDefault();
-        event.stopPropagation();
-        selectSceneObject(object);
-        sceneObjectDrag = {
-            id: object.dataset.sceneObjectId || '',
-            pointerId: event.pointerId,
-            object,
-            startX: event.clientX,
-            startY: event.clientY,
-            moved: false,
-            threshold: 3
-        };
-        object.setPointerCapture?.(event.pointerId);
-    });
-
-    window.addEventListener('pointermove', (event) => {
-        if (!sceneObjectDrag) return;
-        const dx = event.clientX - sceneObjectDrag.startX;
-        const dy = event.clientY - sceneObjectDrag.startY;
-        if (!sceneObjectDrag.moved && Math.hypot(dx, dy) < sceneObjectDrag.threshold) return;
-
-        sceneObjectDrag.moved = true;
-        sceneObjectDrag.object.classList.add('is-dragging');
-        board?.classList.add('is-furniture-moving');
-        if (furnitureStatus) {
-            furnitureStatus.textContent = 'Moving ' + (sceneObjectDrag.object.dataset.sceneObjectLabel || 'furniture') + ' — release to place it.';
-        }
-
-        event.preventDefault();
-        const point = furniturePoint(coordinatesFromPointer(event));
-        sceneObjectDrag.object.dataset.sceneObjectX = String(point.x);
-        sceneObjectDrag.object.dataset.sceneObjectY = String(point.y);
-        sceneObjectDrag.object.style.setProperty('--gmrt-object-x', String(point.x * 100) + '%');
-        sceneObjectDrag.object.style.setProperty('--gmrt-object-y', String(point.y * 100) + '%');
-    }, {passive: false});
-
-    window.addEventListener('pointerup', async (event) => {
-        if (!sceneObjectDrag || event.pointerId !== sceneObjectDrag.pointerId) return;
-        const drag = sceneObjectDrag;
-        sceneObjectDrag = null;
-        drag.object.classList.remove('is-dragging');
-        board?.classList.remove('is-furniture-moving');
-        drag.object.releasePointerCapture?.(event.pointerId);
-
-        if (!drag.moved) {
-            if (furnitureStatus) {
-                furnitureStatus.textContent = (drag.object.dataset.sceneObjectLabel || t('furniture', 'Furniture')) + ' selected.';
-            }
-            return;
-        }
-
-        const moved = await submitSceneObjectAction('move', {
-            gmrt_scene_object_id: drag.id,
-            x: drag.object.dataset.sceneObjectX || '0.5',
-            y: drag.object.dataset.sceneObjectY || '0.5'
-        });
-        if (moved && furnitureStatus) {
-            furnitureStatus.textContent = t('furnitureMoved', 'Furniture moved. Pippin has amended the floor plan.');
-        }
-    });
-
-    window.addEventListener('pointercancel', (event) => {
-        if (!sceneObjectDrag || event.pointerId !== sceneObjectDrag.pointerId) return;
-        sceneObjectDrag.object.classList.remove('is-dragging');
-        sceneObjectDrag = null;
-        board?.classList.remove('is-furniture-moving');
-        if (furnitureStatus) furnitureStatus.textContent = t('furnitureMoveCancelled', 'Furniture move cancelled.');
-    });
-
-    sceneObjectLayer?.addEventListener('keydown', (event) => {
-        if (!furniturePalette) return;
-        const object = event.target instanceof Element
-            ? event.target.closest('[data-scene-object-id]')
-            : null;
-        if (!object || !['Enter', ' '].includes(event.key)) return;
-        event.preventDefault();
-        selectSceneObject(object);
-    });
-
-    furnitureRotateButtons.forEach((button) => {
-        button.addEventListener('click', async () => {
-            const object = sceneObjectElement(selectedSceneObjectId);
-            if (!object) return;
-            const rotation = Number(object.dataset.sceneObjectRotation || 0)
-                + Number(button.dataset.sceneObjectRotate || 0);
-            const changed = await submitSceneObjectAction('rotate', {
-                gmrt_scene_object_id: selectedSceneObjectId,
-                rotation
-            });
-            if (changed && furnitureStatus) furnitureStatus.textContent = t('furnitureRotated', 'Furniture rotated. Pippin has rotated the paper too.');
-        });
-    });
-
-    furnitureScaleButtons.forEach((button) => {
-        button.addEventListener('click', async () => {
-            const object = sceneObjectElement(selectedSceneObjectId);
-            if (!object) return;
-            const scale = Math.max(0.5, Math.min(
-                2.5,
-                Number(object.dataset.sceneObjectScale || 1) + Number(button.dataset.sceneObjectScale || 0)
-            ));
-            const changed = await submitSceneObjectAction('scale', {
-                gmrt_scene_object_id: selectedSceneObjectId,
-                scale
-            });
-            if (changed && furnitureStatus) furnitureStatus.textContent = t('furnitureResized', 'Furniture resized. Pippin disputes the new dimensions.');
-        });
-    });
-
-    furnitureInteract?.addEventListener('click', async () => {
-        const object = sceneObjectElement(selectedSceneObjectId);
-        if (!object || (object.dataset.sceneObjectInteraction || 'none') === 'none') return;
-        const changed = await submitSceneObjectAction('interact', {
-            gmrt_scene_object_id: selectedSceneObjectId
-        });
-        if (changed && furnitureStatus) {
-            const restored = sceneObjectElement(selectedSceneObjectId);
-            const isOpen = restored?.dataset.sceneObjectOpen === 'true';
-            furnitureStatus.textContent = isOpen
-                ? t('chestOpened', 'Chest opened. Pippin has taken three prudent steps backwards.')
-                : t('chestClosed', 'Chest closed. Pippin is pretending this solves the problem.');
-        }
-    });
-
-    const openMimicChooser = () => {
-        const object = sceneObjectElement(selectedSceneObjectId);
-        if (!object || object.dataset.mimicCapable !== 'true' || object.dataset.mimicArmed === 'true') return;
-        if (mimicCreature) mimicCreature.value = '';
-        mimicDialog?.showModal();
-    };
-    furnitureMimic?.addEventListener('click', openMimicChooser);
-    furnitureArmMimic?.addEventListener('click', openMimicChooser);
-    mimicCancel?.addEventListener('click', () => mimicDialog?.close());
-    mimicArm?.addEventListener('click', async () => {
-        const creatureId = String(mimicCreature?.value || '');
-        if (!creatureId) {
-            if (furnitureStatus) furnitureStatus.textContent = t('chooseMimic', 'Choose a Mimic from the Bestiary first.');
-            return;
-        }
-        mimicDialog?.close();
-        const changed = await submitSceneObjectAction('arm_mimic', {
-            gmrt_scene_object_id: selectedSceneObjectId,
-            gmrt_mimic_creature_id: creatureId
-        });
-        if (changed && furnitureStatus) {
-            const restored = sceneObjectElement(selectedSceneObjectId);
-            const mimicName = restored?.dataset.mimicName || 'a Mimic';
-            furnitureStatus.textContent = `${restored?.dataset.sceneObjectLabel || t('furniture', 'Furniture')} is armed as ${mimicName}. It still looks completely innocent.`;
-        }
-    });
-    mimicConfirm?.addEventListener('click', async () => {
-        const creatureId = String(mimicCreature?.value || '');
-        if (!creatureId) {
-            if (furnitureStatus) furnitureStatus.textContent = t('chooseCreature', 'Choose a creature from the Bestiary first.');
-            return;
-        }
-        mimicDialog?.close();
-        const changed = await submitSceneObjectAction('convert_mimic', {
-            gmrt_scene_object_id: selectedSceneObjectId,
-            gmrt_mimic_creature_id: creatureId
-        });
-        if (changed) {
-            const message = t('mimicRevealed', 'The furniture was a Mimic. Pippin would like the record to show that he objected.');
-            if (furnitureStatus) furnitureStatus.textContent = message;
-            await replaceChamber(message, null);
-        }
-    });
-
-    furnitureRevealMimic?.addEventListener('click', async () => {
-        const object = sceneObjectElement(selectedSceneObjectId);
-        if (!object || object.dataset.mimicArmed !== 'true') return;
-        if (!window.confirm(`Reveal ${object.dataset.mimicName || 'this Mimic'} now?`)) return;
-
-        const message = `${object.dataset.sceneObjectLabel || t('furniture', 'Furniture')} reveals itself!`;
-        const changed = await submitSceneObjectAction('reveal_mimic', {
-            gmrt_scene_object_id: selectedSceneObjectId
-        });
-        if (changed) {
-            if (furnitureStatus) furnitureStatus.textContent = message;
-            await replaceChamber(message, null);
-        }
-    });
-
-    furnitureDisarmMimic?.addEventListener('click', async () => {
-        const object = sceneObjectElement(selectedSceneObjectId);
-        if (!object || object.dataset.mimicArmed !== 'true') return;
-        if (!window.confirm(t('disarmMimicConfirm', 'Disarm this disguised Mimic? The furnishing will remain.'))) return;
-
-        const changed = await submitSceneObjectAction('disarm_mimic', {
-            gmrt_scene_object_id: selectedSceneObjectId
-        });
-        if (changed && furnitureStatus) {
-            furnitureStatus.textContent = t('mimicDisarmed', 'Mimic disguise disarmed. Pippin remains unconvinced.');
-        }
-    });
-
-    furnitureDuplicate?.addEventListener('click', async () => {
-        if (!selectedSceneObjectId) return;
-        const changed = await submitSceneObjectAction('duplicate', {
-            gmrt_scene_object_id: selectedSceneObjectId
-        });
-        if (changed && furnitureStatus) furnitureStatus.textContent = t('furnitureDuplicated', 'Furniture duplicated. Pippin is counting again.');
-    });
-
-    furnitureRemove?.addEventListener('click', async () => {
-        if (!selectedSceneObjectId) return;
-        if (!window.confirm(t('removeFurnitureConfirm', 'Remove this furnishing from the Scene?'))) return;
-        const objectId = selectedSceneObjectId;
-        const changed = await submitSceneObjectAction('delete', {
-            gmrt_scene_object_id: objectId
-        });
-        if (changed) {
-            selectSceneObject(null);
-            if (furnitureStatus) furnitureStatus.textContent = t('furnitureRemoved', 'Furniture removed. Pippin has reclaimed the floor space.');
-        }
-    });
-
-    window.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && selectedSceneObjectId) {
-            selectSceneObject(null);
-            if (furnitureStatus) furnitureStatus.textContent = t('furnitureSelectionCleared', 'Furniture selection cleared.');
-        }
-    });
 
     async function replaceLifecycle(message) {
         const liveStatus = document.querySelector('#gmrt-tabletop-status');
@@ -1134,8 +251,8 @@
     if (prepareTestTableButton) {
         prepareTestTableButton.addEventListener('click', async () => {
             prepareTestTableButton.disabled = true;
-            prepareTestTableButton.textContent = t('preparing', 'Preparing…');
-            say(t('trainingGroundsPreparing', 'Sage is preparing the Training Grounds…'));
+            prepareTestTableButton.textContent = 'Preparing…';
+            say('Sage is preparing the Training Grounds…');
 
             try {
                 const data = await request('gmrt_prepare_test_table', {});
@@ -1143,9 +260,9 @@
                 url.searchParams.set('table', data.table_id);
                 window.location.assign(url.toString());
             } catch (error) {
-                say(error.message || t('testTableFailed', 'The test Table could not be prepared.'));
+                say(error.message || 'The test Table could not be prepared.');
                 prepareTestTableButton.disabled = false;
-                prepareTestTableButton.textContent = t('prepareTestTable', 'Prepare Test Table');
+                prepareTestTableButton.textContent = 'Prepare Test Table';
             }
         });
     }
@@ -1171,13 +288,13 @@
             const atlasSource = String(form.get('atlas_source') || '');
             const [sourceTableId = '', sourceSceneId = ''] = atlasSource.split('::', 2);
             if (firstMap === 'atlas' && (!sourceTableId || !sourceSceneId)) {
-                if (status) status.textContent = t('chooseAtlasMap', 'Choose the saved Atlas map Pippin should place first.');
+                if (status) status.textContent = 'Choose the saved Atlas map Pippin should place first.';
                 return;
             }
             if (button) button.disabled = true;
             if (status) status.textContent = firstMap === 'forge'
-                ? t('forgePreparing', 'Pippin is clearing a workbench beside the Forge…')
-                : t('tablePreparing', 'Pippin is finding a suitable patch of table…');
+                ? 'Pippin is clearing a workbench beside the Forge…'
+                : 'Pippin is finding a suitable patch of table…';
             try {
                 const data = await request('gmrt_create_tabletop', {
                     name: form.get('name') || '',
@@ -1195,7 +312,7 @@
                 }
                 window.location.assign(url.toString());
             } catch (error) {
-                if (status) status.textContent = error.message || t('tableCreateFailed', 'The Tabletop could not be created.');
+                if (status) status.textContent = error.message || 'The Tabletop could not be created.';
                 if (button) button.disabled = false;
             }
         });
@@ -1215,31 +332,6 @@
         }
     }
 
-    // Phase IV.34.2 — The Table Remembers Tonight: Companion Campaign bridge.
-    document.querySelectorAll('[data-companion-campaign-link]').forEach((form) => {
-        form.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const tableId = form.dataset.tableId || '';
-            const campaignId = String(form.querySelector('[name="campaign_id"]')?.value || '');
-            const button = form.querySelector('button[type="submit"]');
-            const status = form.parentElement?.querySelector('[data-companion-campaign-status]');
-            if (!tableId || !campaignId) return;
-            if (button) button.disabled = true;
-            if (status) status.textContent = t('campaignLinking', 'Pippin is joining the Table Atlas to the Companion Ledger…');
-            try {
-                const data = await request('gmrt_link_companion_campaign', { table_id: tableId, campaign_id: campaignId });
-                const count = Number(data.sessions_synchronised || 0);
-                if (status) status.textContent = count > 0
-                    ? `${data.message || t('campaignLinked', 'Campaign linked.')} ${count} existing Session${count === 1 ? '' : 's'} synchronised.`
-                    : (data.message || t('campaignLinked', 'Campaign linked.'));
-                window.setTimeout(() => window.location.reload(), 650);
-            } catch (error) {
-                if (status) status.textContent = error.message || t('campaignLinkFailed', 'The Companion Campaign could not be linked.');
-                if (button) button.disabled = false;
-            }
-        });
-    });
-
     // Phase IV.33.2 — Campaign Shelf player administration.
     document.querySelectorAll('[data-campaign-invite-form]').forEach((form) => {
         form.addEventListener('submit', async (event) => {
@@ -1251,13 +343,13 @@
             const campaignTableId = form.dataset.tableId || '';
             if (!player || !campaignTableId) return;
             if (button) button.disabled = true;
-            if (status) status.textContent = t('sendingSummons', 'Sending the Summons…');
+            if (status) status.textContent = 'Sending the Summons…';
             try {
                 const data = await request('gmrt_invite_table_player', { table_id: campaignTableId, player });
-                if (status) status.textContent = data.message || t('invitationSent', 'Invitation sent.');
+                if (status) status.textContent = data.message || 'Invitation sent.';
                 window.setTimeout(() => window.location.reload(), 450);
             } catch (error) {
-                if (status) status.textContent = error.message || t('inviteFailed', 'The player could not be invited.');
+                if (status) status.textContent = error.message || 'The player could not be invited.';
                 if (button) button.disabled = false;
             }
         });
@@ -1271,13 +363,13 @@
         const status = button.closest('.gmrt-campaign-card__roster')?.querySelector('[data-campaign-gathering-status]');
         if (!campaignTableId || !userId) return;
         button.disabled = true;
-        if (status) status.textContent = t('closingSeat', 'Closing that seat…');
+        if (status) status.textContent = 'Closing that seat…';
         try {
             const data = await request('gmrt_remove_table_player', { table_id: campaignTableId, user_id: userId });
-            if (status) status.textContent = data.message || t('playerRemoved', 'Player removed.');
+            if (status) status.textContent = data.message || 'Player removed.';
             window.setTimeout(() => window.location.reload(), 450);
         } catch (error) {
-            if (status) status.textContent = error.message || t('removePlayerFailed', 'The player could not be removed.');
+            if (status) status.textContent = error.message || 'The player could not be removed.';
             button.disabled = false;
         }
     });
@@ -1292,10 +384,10 @@
         if (!campaignTableId) return;
         if (!window.confirm(`Remove “${tableName}” permanently? This cannot be undone.`)) return;
         button.disabled = true;
-        if (status) status.textContent = t('tableRemoving', 'Pippin is erasing this road from the atlas…');
+        if (status) status.textContent = 'Pippin is erasing this road from the atlas…';
         try {
             const data = await request('gmrt_remove_tabletop', { table_id: campaignTableId });
-            if (status) status.textContent = data.message || t('tableRemoved', 'Tabletop removed.');
+            if (status) status.textContent = data.message || 'Tabletop removed.';
 
             const card = button.closest('.gmrt-campaign-card');
             const shelf = card?.closest('.gmrt-campaign-lobby__shelf');
@@ -1306,53 +398,14 @@
             if (shelf && !shelf.querySelector('.gmrt-campaign-card')) {
                 const empty = document.createElement('p');
                 empty.className = 'gmrt-campaign-lobby__empty';
-                empty.textContent = t('noSavedRoads', 'Pippin has no saved roads for you yet. A Keeper can set a new Table, or an Adventurer can return after receiving a Summons.');
+                empty.textContent = 'Pippin has no saved roads for you yet. A Keeper can set a new Table, or an Adventurer can return after receiving a Summons.';
                 shelf.replaceWith(empty);
             }
         } catch (error) {
-            if (status) status.textContent = error.message || t('tableRemoveFailed', 'The Tabletop could not be removed.');
+            if (status) status.textContent = error.message || 'The Tabletop could not be removed.';
             button.disabled = false;
         }
     });
-
-    // Phase IV.34.1 — The Keeper Calls the Session.
-    const startSessionForm = document.querySelector('[data-start-table-session]');
-    if (startSessionForm) {
-        startSessionForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const button = startSessionForm.querySelector('button[type="submit"]');
-            const sessionStatus = startSessionForm.closest('[data-table-session]')?.querySelector('[data-table-session-status]');
-            const title = String(startSessionForm.querySelector('[name="title"]')?.value || '').trim();
-            if (button) button.disabled = true;
-            if (sessionStatus) sessionStatus.textContent = t('sessionCalling', 'The Keeper is calling the Session…');
-            try {
-                await request('gmrt_start_table_session', { title });
-                await replaceChamber(t('sessionBegan', 'The Session has begun — the Table remembers tonight.'), null);
-            } catch (error) {
-                if (sessionStatus) sessionStatus.textContent = error.message || t('sessionStartFailed', 'The Session could not be started.');
-                if (button) button.disabled = false;
-            }
-        });
-    }
-
-    const endSessionButton = document.querySelector('[data-end-table-session]');
-    if (endSessionButton) {
-        endSessionButton.addEventListener('click', async () => {
-            const sessionStatus = endSessionButton.closest('[data-table-session]')?.querySelector('[data-table-session-status]');
-            if (!window.confirm(t('endSessionConfirm', 'End the current Session? The campaign itself will remain active and can be resumed in a new Session later.'))) return;
-            endSessionButton.disabled = true;
-            if (sessionStatus) sessionStatus.textContent = t('sessionClosing', 'Closing the Session ledger…');
-            try {
-                const endingSessionId = root.dataset.sessionId || '';
-                await request('gmrt_end_table_session', {});
-                rememberSessionClosing(tableId, endingSessionId);
-                await replaceChamber(t('sessionEnded', 'Until next time — this Session has concluded.'), null);
-            } catch (error) {
-                if (sessionStatus) sessionStatus.textContent = error.message || t('sessionEndFailed', 'The Session could not be ended.');
-                endSessionButton.disabled = false;
-            }
-        });
-    }
 
     const gatheringStatus = document.querySelector('[data-gathering-status]');
     let keeperSecretD20Result = null;
@@ -1420,7 +473,7 @@
                 : '';
             const characterName = companionCharacter && companionCharacter.name
                 ? String(companionCharacter.name)
-                : t('selectedCharacter', 'Selected character');
+                : 'Selected character';
 
             roleBadge.className = 'gmrt-party__role gmrt-party__seat' + (characterImage ? ' has-character' : '');
             if (role === 'dungeon-master') {
@@ -1557,11 +610,11 @@
 
         try {
             const data = await request('gmrt_invite_table_player', { player });
-            gatheringSay(data.message || t('invitationSent', 'Invitation sent.'));
+            gatheringSay(data.message || 'Invitation sent.');
             if (input) input.value = '';
             await refresh();
         } catch (error) {
-            gatheringSay(error.message || t('inviteFailed', 'The player could not be invited.'));
+            gatheringSay(error.message || 'The player could not be invited.');
             if (button) button.disabled = false;
         }
     });
@@ -1595,10 +648,10 @@
         gatheringSay('Removing the player from the Table…');
         try {
             const data = await request('gmrt_remove_table_player', { user_id: userId });
-            gatheringSay(data.message || t('playerRemoved', 'Player removed.'));
+            gatheringSay(data.message || 'Player removed.');
             await refresh();
         } catch (error) {
-            gatheringSay(error.message || t('removePlayerFailed', 'The player could not be removed.'));
+            gatheringSay(error.message || 'The player could not be removed.');
             button.disabled = false;
         }
     });
@@ -1907,8 +960,6 @@
             || visionDrafting
             || thresholdPlacement
             || bestiaryPlacement
-            || keeperLightPlacement
-            || furniturePlacement
             || isLensInteractiveTarget(event.target)
         ) {
             return;
@@ -2025,18 +1076,6 @@
                 const marker = document.createElement('i');
                 marker.className = 'gmrt-keeper-light-marker is-' + lightKind;
                 marker.setAttribute('aria-hidden', 'true');
-
-                if (source.lit !== false) {
-                    marker.classList.add('is-dancing');
-                    const particleCount = lightKind === 'brazier' ? 3 : (lightKind === 'torch' ? 2 : 1);
-                    for (let particleIndex = 0; particleIndex < particleCount; particleIndex += 1) {
-                        const particle = document.createElement('span');
-                        particle.className = 'gmrt-light-emitter-particle';
-                        particle.style.setProperty('--gmrt-emitter-particle-index', String(particleIndex));
-                        marker.appendChild(particle);
-                    }
-                }
-
                 glow.dataset.lightKind = lightKind;
                 glow.appendChild(marker);
                 glow.setAttribute('aria-label', String(source.label || 'Keeper light source') + (source.lit === false ? ', doused' : ', lit'));
@@ -2226,60 +1265,6 @@
         const maxColumn = Math.ceil((width - offsetX) / size);
         const minRow = Math.floor((0 - offsetY) / size);
         const maxRow = Math.ceil((height - offsetY) / size);
-
-        // IV.35.4C.2C — the visible light pool itself is now painted from
-        // server-approved cells. FogCellMapper has already resolved walls,
-        // closed doors and other Vision Barriers before these cells arrive.
-        if (lightLayer) {
-            lightLayer.querySelectorAll('.gmrt-authoritative-light-cell').forEach((cell) => cell.remove());
-            const authoritativeLight = fogProjection.light_cells && typeof fogProjection.light_cells === 'object'
-                ? fogProjection.light_cells
-                : {};
-            Object.entries(authoritativeLight).forEach(([key, light]) => {
-                const match = /^(-?\d+):(-?\d+)$/.exec(String(key));
-                if (!match || !light || typeof light !== 'object') return;
-
-                const intensity = Math.max(0, Math.min(1, Number(light.intensity || 0)));
-                if (intensity <= 0.001) return;
-
-                const column = Number(match[1]);
-                const row = Number(match[2]);
-                const cell = document.createElement('span');
-                cell.className = 'gmrt-authoritative-light-cell is-' + (String(light.tone || 'warm') === 'cool' ? 'cool' : 'warm');
-                cell.style.left = `${offsetX + (column * size)}px`;
-                cell.style.top = `${offsetY + (row * size)}px`;
-                cell.style.width = `${size + 1}px`;
-                cell.style.height = `${size + 1}px`;
-                cell.style.setProperty('--gmrt-authoritative-light', String(intensity));
-                lightLayer.appendChild(cell);
-            });
-        }
-
-        // IV.35.4C.2 — render the server-authoritative surviving light
-        // transmission as pixel-cell shadowing. This is presentation only:
-        // the server has already decided whether illumination survives.
-        if (lightLayer) {
-            lightLayer.querySelectorAll('.gmrt-light-attenuation-cell').forEach((cell) => cell.remove());
-            const attenuation = fogProjection.light_attenuation && typeof fogProjection.light_attenuation === 'object'
-                ? fogProjection.light_attenuation
-                : {};
-            Object.entries(attenuation).forEach(([key, amount]) => {
-                const match = /^(-?\d+):(-?\d+)$/.exec(String(key));
-                const opacity = Math.max(0, Math.min(1, Number(amount || 0)));
-                if (!match || opacity <= 0.001) return;
-
-                const column = Number(match[1]);
-                const row = Number(match[2]);
-                const shadow = document.createElement('span');
-                shadow.className = 'gmrt-light-attenuation-cell';
-                shadow.style.left = `${offsetX + (column * size)}px`;
-                shadow.style.top = `${offsetY + (row * size)}px`;
-                shadow.style.width = `${size + 1}px`;
-                shadow.style.height = `${size + 1}px`;
-                shadow.style.setProperty('--gmrt-light-attenuation', String(opacity));
-                lightLayer.appendChild(shadow);
-            });
-        }
 
         const fragment = document.createDocumentFragment();
 
@@ -2566,23 +1551,9 @@
             const hybridPrefix = suggestion.hybridJudgement
                 ? (suggestion.hybridRegion === 'organic' ? 'Hybrid · organic' : 'Hybrid · structural')
                 : '';
-            const thresholdReason = suggestion.doorwayReasoning && Array.isArray(suggestion.thresholdEvidence)
-                ? ` · ${suggestion.thresholdEvidence.join(' + ')}`
-                : '';
-            const noiseReason = !suggestion.doorwayReasoning && Array.isArray(suggestion.noiseEvidence) && suggestion.noiseEvidence.length > 0
-                ? ` · screened: ${suggestion.noiseEvidence.join(' + ')}`
-                : '';
-            const contourLabel = suggestion.partialContour ? 'Partial living wall path' : 'Living wall path';
-            const protectedGapCount = Array.isArray(suggestion.protectedContourGaps) ? suggestion.protectedContourGaps.length : 0;
-            const gapTypes = Array.isArray(suggestion.gapClassifications)
-                ? Array.from(new Set(suggestion.gapClassifications.map((gap) => gap?.classification).filter(Boolean)))
-                : [];
-            const contourSuffix = suggestion.partialContour
-                ? ` · unresolved ends kept open${protectedGapCount > 0 ? ` · ${protectedGapCount} doorway/passage gap${protectedGapCount === 1 ? '' : 's'} protected` : ''}${gapTypes.length > 0 ? ` · ends: ${gapTypes.join(' / ')}` : ''}`
-                : '';
             text.textContent = pathVertices > 2
-                ? `${hybridPrefix ? `${hybridPrefix} · ` : ''}${contourLabel} · ${pathVertices - 1} connected spans · ${confidence}%${contourSuffix}`
-                : `${hybridPrefix ? `${hybridPrefix} · ` : ''}${suggestion.type === 'door' ? (suggestion.doorwayReasoning ? 'Likely doorway' : 'Possible door') : 'Room / wall boundary'} · (${suggestion.x1},${suggestion.y1}) → (${suggestion.x2},${suggestion.y2}) · ${confidence}%${thresholdReason}${noiseReason}`;
+                ? `${hybridPrefix ? `${hybridPrefix} · ` : ''}Living wall path · ${pathVertices - 1} connected spans · ${confidence}%`
+                : `${hybridPrefix ? `${hybridPrefix} · ` : ''}${suggestion.type === 'door' ? 'Possible door' : 'Room / wall boundary'} · (${suggestion.x1},${suggestion.y1}) → (${suggestion.x2},${suggestion.y2}) · ${confidence}%`;
             label.append(checkbox, text);
             fragment.append(label);
         });
@@ -2670,90 +1641,6 @@
             return sum / Math.max(1, count);
         };
 
-        // IV.30.1G — Adaptive Evidence Model.
-        // Imported maps do not agree on what "dark" means: parchment scans, pale
-        // stone, charcoal caves and digital maps all place their wall ink at very
-        // different absolute luminance values. Build summed-area tables once so the
-        // specialist readers can judge a sample against its *local* neighbourhood in
-        // constant time instead of relying on one global darkness threshold.
-        const luminanceIntegralWidth = canvas.width + 1;
-        const luminanceIntegral = new Float64Array((canvas.width + 1) * (canvas.height + 1));
-        const luminanceSquaredIntegral = new Float64Array((canvas.width + 1) * (canvas.height + 1));
-        const luminanceHistogram = new Uint32Array(256);
-        for (let y = 0; y < canvas.height; y += 1) {
-            let rowSum = 0;
-            let rowSquaredSum = 0;
-            for (let x = 0; x < canvas.width; x += 1) {
-                const value = luminance(x, y);
-                rowSum += value;
-                rowSquaredSum += value * value;
-                const index = ((y + 1) * luminanceIntegralWidth) + (x + 1);
-                luminanceIntegral[index] = luminanceIntegral[index - luminanceIntegralWidth] + rowSum;
-                luminanceSquaredIntegral[index] = luminanceSquaredIntegral[index - luminanceIntegralWidth] + rowSquaredSum;
-                luminanceHistogram[Math.max(0, Math.min(255, Math.round(value)))] += 1;
-            }
-        }
-        const luminancePercentile = (fraction) => {
-            const target = Math.max(1, Math.round(canvas.width * canvas.height * fraction));
-            let seen = 0;
-            for (let value = 0; value < luminanceHistogram.length; value += 1) {
-                seen += luminanceHistogram[value];
-                if (seen >= target) return value;
-            }
-            return 255;
-        };
-        const mapTone = {
-            dark: luminancePercentile(.18),
-            middle: luminancePercentile(.50),
-            light: luminancePercentile(.82)
-        };
-        const luminanceRegionStats = (x1, y1, x2, y2) => {
-            const left = Math.max(0, Math.min(canvas.width - 1, Math.floor(Math.min(x1, x2))));
-            const top = Math.max(0, Math.min(canvas.height - 1, Math.floor(Math.min(y1, y2))));
-            const right = Math.min(canvas.width, Math.max(left + 1, Math.ceil(Math.max(x1, x2))));
-            const bottom = Math.min(canvas.height, Math.max(top + 1, Math.ceil(Math.max(y1, y2))));
-            const sumAt = (table, x, y) => table[(y * luminanceIntegralWidth) + x];
-            const area = Math.max(1, (right - left) * (bottom - top));
-            const sum = sumAt(luminanceIntegral, right, bottom)
-                - sumAt(luminanceIntegral, left, bottom)
-                - sumAt(luminanceIntegral, right, top)
-                + sumAt(luminanceIntegral, left, top);
-            const squared = sumAt(luminanceSquaredIntegral, right, bottom)
-                - sumAt(luminanceSquaredIntegral, left, bottom)
-                - sumAt(luminanceSquaredIntegral, right, top)
-                + sumAt(luminanceSquaredIntegral, left, top);
-            const mean = sum / area;
-            const variance = Math.max(0, (squared / area) - (mean * mean));
-            return { mean, deviation: Math.sqrt(variance), area };
-        };
-        const adaptiveInkEvidence = (x1, y1, x2, y2, neighbourhoodRadius) => {
-            const sample = luminanceRegionStats(x1, y1, x2, y2);
-            const centerX = (x1 + x2) / 2;
-            const centerY = (y1 + y2) / 2;
-            const neighbourhood = luminanceRegionStats(
-                centerX - neighbourhoodRadius,
-                centerY - neighbourhoodRadius,
-                centerX + neighbourhoodRadius,
-                centerY + neighbourhoodRadius
-            );
-            const localContrast = neighbourhood.mean - sample.mean;
-            // Busy hatch/stone needs more separation than quiet floor before a mark is
-            // trusted. Pale walls can therefore qualify through relative contrast,
-            // while globally dark floors are not automatically promoted to wall ink.
-            const requiredContrast = Math.max(9, Math.min(32, 8 + (neighbourhood.deviation * .38)));
-            const relativeInk = localContrast >= requiredContrast;
-            const tonalGuard = sample.mean <= Math.max(mapTone.middle - 4, mapTone.dark + 52);
-            return {
-                sampleMean: sample.mean,
-                localMean: neighbourhood.mean,
-                localDeviation: neighbourhood.deviation,
-                localContrast,
-                requiredContrast,
-                relativeInk: relativeInk && tonalGuard,
-                strong: localContrast >= requiredContrast * 1.45 && tonalGuard
-            };
-        };
-
         const grid = visionGrid();
         const columns = Math.max(0, Math.floor((displayWidth - grid.offsetX) / grid.size));
         const rows = Math.max(0, Math.floor((displayHeight - grid.offsetY) / grid.size));
@@ -2801,36 +1688,28 @@
         }
 
         const structuralCartographyCandidates = () => {
-            // Keep the historic absolute threshold only as a conservative fallback for
-            // genuinely dark ink. IV.30.1G makes local contrast the primary evidence.
             const darkThreshold = 92;
-            const gridCanvas = Math.max(4, toCanvasX(grid.size));
             const sampleStep = Math.max(1, Math.round(Math.min(canvas.width, canvas.height) / 900));
             const dark = new Uint8Array(canvas.width * canvas.height);
-            const adaptiveNeighbourhood = Math.max(6, gridCanvas * .42);
             for (let y = 0; y < canvas.height; y += sampleStep) {
                 for (let x = 0; x < canvas.width; x += sampleStep) {
-                    const right = Math.min(canvas.width, x + sampleStep);
-                    const bottom = Math.min(canvas.height, y + sampleStep);
-                    const evidence = adaptiveInkEvidence(x, y, right, bottom, adaptiveNeighbourhood);
                     let darkSamples = 0;
                     let totalSamples = 0;
-                    for (let yy = y; yy < bottom; yy += 1) {
-                        for (let xx = x; xx < right; xx += 1) {
+                    for (let yy = y; yy < Math.min(canvas.height, y + sampleStep); yy += 1) {
+                        for (let xx = x; xx < Math.min(canvas.width, x + sampleStep); xx += 1) {
                             totalSamples += 1;
                             if (luminance(xx, yy) <= darkThreshold) darkSamples += 1;
                         }
                     }
-                    const absoluteDarkInk = darkSamples / Math.max(1, totalSamples) >= .45
-                        && evidence.localContrast >= 4;
-                    if (evidence.relativeInk || absoluteDarkInk) {
-                        for (let yy = y; yy < bottom; yy += 1) {
-                            for (let xx = x; xx < right; xx += 1) dark[(yy * canvas.width) + xx] = 1;
+                    if (darkSamples / Math.max(1, totalSamples) >= .45) {
+                        for (let yy = y; yy < Math.min(canvas.height, y + sampleStep); yy += 1) {
+                            for (let xx = x; xx < Math.min(canvas.width, x + sampleStep); xx += 1) dark[(yy * canvas.width) + xx] = 1;
                         }
                     }
                 }
             }
 
+            const gridCanvas = Math.max(4, toCanvasX(grid.size));
             const traceStep = Math.max(2, gridCanvas / 5);
             const traceRadius = Math.max(2, gridCanvas * .11);
             const minimumRun = Math.max(2, Math.round(gridCanvas * .28));
@@ -2845,11 +1724,7 @@
                 const dx = Math.abs(gx2 - gx1);
                 const dy = Math.abs(gy2 - gy1);
                 if (dx > 1 || dy > 1) return;
-                const suggestion = {
-                    x1: gx1, y1: gy1, x2: gx2, y2: gy2,
-                    type: 'wall', confidence, selected: true, structural: true,
-                    adaptiveEvidence: true, evidenceModel: 'local-contrast-v1'
-                };
+                const suggestion = { x1: gx1, y1: gy1, x2: gx2, y2: gy2, type: 'wall', confidence, selected: true, structural: true };
                 const key = cartographySuggestionKey(suggestion);
                 const previous = wallVotes.get(key);
                 if (!previous || previous.confidence < confidence) wallVotes.set(key, suggestion);
@@ -2867,106 +1742,6 @@
                 return hits / Math.max(1, total);
             };
 
-            // IV.30.1G.3 — Noise, Furniture & Annotation Rejection.
-            // Text, stair marks, furniture outlines, rubble and hatch clusters can all
-            // contain locally dark strokes. Build a deliberately coarse component map
-            // over the adaptive ink mask so short compact marks and isotropic clutter
-            // can be demoted before doorway reasoning mistakes them for architecture.
-            const noiseStep = Math.max(2, Math.round(gridCanvas * .08));
-            const noiseColumns = Math.max(1, Math.ceil(canvas.width / noiseStep));
-            const noiseRows = Math.max(1, Math.ceil(canvas.height / noiseStep));
-            const noiseOccupied = new Uint8Array(noiseColumns * noiseRows);
-            const noiseLabels = new Int32Array(noiseColumns * noiseRows);
-            const noiseComponents = new Map();
-            const noiseCellIndex = (column, row) => (row * noiseColumns) + column;
-            for (let row = 0; row < noiseRows; row += 1) {
-                for (let column = 0; column < noiseColumns; column += 1) {
-                    const left = column * noiseStep;
-                    const top = row * noiseStep;
-                    const right = Math.min(canvas.width, left + noiseStep);
-                    const bottom = Math.min(canvas.height, top + noiseStep);
-                    let ink = 0;
-                    let total = 0;
-                    for (let yy = top; yy < bottom; yy += 1) {
-                        for (let xx = left; xx < right; xx += 1) {
-                            total += 1;
-                            ink += dark[(yy * canvas.width) + xx];
-                        }
-                    }
-                    if (ink / Math.max(1, total) >= .20) noiseOccupied[noiseCellIndex(column, row)] = 1;
-                }
-            }
-            let nextNoiseLabel = 1;
-            const noiseNeighbours = [[1, 0], [-1, 0], [0, 1], [0, -1]];
-            for (let row = 0; row < noiseRows; row += 1) {
-                for (let column = 0; column < noiseColumns; column += 1) {
-                    const startIndex = noiseCellIndex(column, row);
-                    if (!noiseOccupied[startIndex] || noiseLabels[startIndex] !== 0) continue;
-                    const label = nextNoiseLabel++;
-                    const queue = [[column, row]];
-                    noiseLabels[startIndex] = label;
-                    let cells = 0;
-                    let minX = column;
-                    let maxX = column;
-                    let minY = row;
-                    let maxY = row;
-                    while (queue.length > 0) {
-                        const [cx, cy] = queue.pop();
-                        cells += 1;
-                        minX = Math.min(minX, cx); maxX = Math.max(maxX, cx);
-                        minY = Math.min(minY, cy); maxY = Math.max(maxY, cy);
-                        noiseNeighbours.forEach(([dx, dy]) => {
-                            const nx = cx + dx;
-                            const ny = cy + dy;
-                            if (nx < 0 || ny < 0 || nx >= noiseColumns || ny >= noiseRows) return;
-                            const index = noiseCellIndex(nx, ny);
-                            if (!noiseOccupied[index] || noiseLabels[index] !== 0) return;
-                            noiseLabels[index] = label;
-                            queue.push([nx, ny]);
-                        });
-                    }
-                    const widthCells = (maxX - minX) + 1;
-                    const heightCells = (maxY - minY) + 1;
-                    const widthGridUnits = (widthCells * noiseStep) / gridCanvas;
-                    const heightGridUnits = (heightCells * noiseStep) / gridCanvas;
-                    const longestGridSpan = Math.max(widthGridUnits, heightGridUnits);
-                    const shortestGridSpan = Math.max(.01, Math.min(widthGridUnits, heightGridUnits));
-                    noiseComponents.set(label, {
-                        label, cells, minX, maxX, minY, maxY,
-                        widthGridUnits,
-                        heightGridUnits,
-                        longestGridSpan,
-                        elongation: longestGridSpan / shortestGridSpan,
-                        fillRatio: cells / Math.max(1, widthCells * heightCells)
-                    });
-                }
-            }
-            const noiseComponentAt = (x, y) => {
-                const column = Math.max(0, Math.min(noiseColumns - 1, Math.floor(x / noiseStep)));
-                const row = Math.max(0, Math.min(noiseRows - 1, Math.floor(y / noiseStep)));
-                const label = noiseLabels[noiseCellIndex(column, row)];
-                return label > 0 ? (noiseComponents.get(label) || null) : null;
-            };
-            const localClutterProfile = (x, y) => {
-                const radius = Math.max(traceRadius * .8, gridCanvas * .18);
-                const samples = [
-                    densityAt(x - radius, y), densityAt(x + radius, y),
-                    densityAt(x, y - radius), densityAt(x, y + radius),
-                    densityAt(x - radius * .7, y - radius * .7), densityAt(x + radius * .7, y - radius * .7),
-                    densityAt(x - radius * .7, y + radius * .7), densityAt(x + radius * .7, y + radius * .7)
-                ];
-                const mean = samples.reduce((sum, value) => sum + value, 0) / samples.length;
-                const minimum = Math.min(...samples);
-                const maximum = Math.max(...samples);
-                return {
-                    mean,
-                    minimum,
-                    maximum,
-                    isotropic: minimum >= .11 && mean >= .20,
-                    busy: mean >= .24 && (maximum - minimum) <= .24
-                };
-            };
-
             const traces = [];
             const structuralScore = (x, y, normalX, normalY) => {
                 const center = densityAt(x, y);
@@ -2975,25 +1750,12 @@
                 const sideB = densityAt(x - (normalX * sideOffset), y - (normalY * sideOffset));
                 const quietSide = Math.min(sideA, sideB);
                 const loudSide = Math.max(sideA, sideB);
-                const sampleRadius = Math.max(1.5, traceRadius * .72);
-                const adaptiveEvidence = adaptiveInkEvidence(
-                    x - sampleRadius, y - sampleRadius,
-                    x + sampleRadius, y + sampleRadius,
-                    Math.max(adaptiveNeighbourhood, gridCanvas * .34)
-                );
-                const densityStructure = center >= .18 && quietSide <= .16 && center >= loudSide * 1.25;
-                const adaptiveStructure = adaptiveEvidence.strong
-                    && center >= .12
-                    && quietSide <= .22
-                    && center >= loudSide * 1.08;
                 return {
                     center,
                     quietSide,
                     loudSide,
-                    adaptiveEvidence,
-                    structural: densityStructure || adaptiveStructure,
+                    structural: center >= .18 && quietSide <= .16 && center >= loudSide * 1.25,
                     continuity: center >= .10 && quietSide <= .20 && center >= loudSide * 1.05
-                        || (adaptiveEvidence.relativeInk && center >= .08 && quietSide <= .24)
                 };
             };
 
@@ -3071,275 +1833,7 @@
                 }
             });
 
-            // IV.30.1G.1 — Corners, Junctions & Wall Bodies.
-            // A single dark stroke is weak evidence. A stroke that participates in a
-            // recognisable architectural structure is much stronger: corners, T/X
-            // junctions, collinear continuation and a thick wall-body profile all add
-            // confidence. This is deliberately a scoring layer over the adaptive
-            // reader rather than a hard requirement, so damaged scans and incomplete
-            // walls are not erased merely because one neighbour is missing.
-            const rawStructuralWalls = Array.from(wallVotes.values());
-            const vertexKey = (x, y) => `${x}:${y}`;
-            const vertexWalls = new Map();
-            const addVertexWall = (key, index) => {
-                const attached = vertexWalls.get(key) || [];
-                attached.push(index);
-                vertexWalls.set(key, attached);
-            };
-            rawStructuralWalls.forEach((wall, index) => {
-                addVertexWall(vertexKey(wall.x1, wall.y1), index);
-                addVertexWall(vertexKey(wall.x2, wall.y2), index);
-            });
-            const directionFor = (wall) => {
-                const dx = Math.sign(wall.x2 - wall.x1);
-                const dy = Math.sign(wall.y2 - wall.y1);
-                return { dx, dy };
-            };
-            const collinearDirections = (a, b) => (a.dx === b.dx && a.dy === b.dy)
-                || (a.dx === -b.dx && a.dy === -b.dy);
-            const endpointArchitecture = (wall, wallIndex, x, y) => {
-                const direction = directionFor(wall);
-                const neighbours = (vertexWalls.get(vertexKey(x, y)) || [])
-                    .filter((index) => index !== wallIndex)
-                    .map((index) => rawStructuralWalls[index]);
-                const continuation = neighbours.some((other) => collinearDirections(direction, directionFor(other)));
-                const turns = neighbours.filter((other) => ! collinearDirections(direction, directionFor(other))).length;
-                return {
-                    degree: neighbours.length + 1,
-                    continuation,
-                    corner: turns >= 1 && neighbours.length === 1,
-                    junction: neighbours.length >= 2
-                };
-            };
-            const wallBodyProfile = (wall) => {
-                const direction = directionFor(wall);
-                const length = Math.hypot(direction.dx, direction.dy) || 1;
-                const normalX = -direction.dy / length;
-                const normalY = direction.dx / length;
-                const midpointX = toCanvasX(grid.offsetX) + (((wall.x1 + wall.x2) / 2) * gridCanvas);
-                const midpointY = toCanvasY(grid.offsetY) + (((wall.y1 + wall.y2) / 2) * gridCanvas);
-                const innerOffset = Math.max(1.5, traceRadius * .72);
-                const outerOffset = Math.max(innerOffset + 1, gridCanvas * .23);
-                const center = densityAt(midpointX, midpointY);
-                const innerA = densityAt(midpointX + (normalX * innerOffset), midpointY + (normalY * innerOffset));
-                const innerB = densityAt(midpointX - (normalX * innerOffset), midpointY - (normalY * innerOffset));
-                const outerA = densityAt(midpointX + (normalX * outerOffset), midpointY + (normalY * outerOffset));
-                const outerB = densityAt(midpointX - (normalX * outerOffset), midpointY - (normalY * outerOffset));
-                const innerSupport = Math.max(innerA, innerB);
-                const quietExterior = Math.min(outerA, outerB);
-                const supported = center >= .13 && innerSupport >= .08 && quietExterior <= .22;
-                return { supported, center, innerSupport, quietExterior };
-            };
-            const architecturalWalls = rawStructuralWalls.map((wall, wallIndex) => {
-                const start = endpointArchitecture(wall, wallIndex, wall.x1, wall.y1);
-                const end = endpointArchitecture(wall, wallIndex, wall.x2, wall.y2);
-                const body = wallBodyProfile(wall);
-                const cornerCount = Number(start.corner) + Number(end.corner);
-                const junctionCount = Number(start.junction) + Number(end.junction);
-                const continuationCount = Number(start.continuation) + Number(end.continuation);
-                const isolated = start.degree === 1 && end.degree === 1 && ! body.supported;
-                const architectureBoost = (cornerCount * 4)
-                    + (junctionCount * 7)
-                    + (continuationCount * 3)
-                    + (body.supported ? 5 : 0)
-                    - (isolated ? 8 : 0);
-                const evidence = [];
-                if (cornerCount > 0) evidence.push('corner');
-                if (junctionCount > 0) evidence.push('junction');
-                if (continuationCount > 0) evidence.push('continuation');
-                if (body.supported) evidence.push('wall-body');
-                if (isolated) evidence.push('isolated-stroke');
-                return {
-                    ...wall,
-                    confidence: Math.max(42, Math.min(99, Math.round(wall.confidence + architectureBoost))),
-                    architecturalEvidence: evidence,
-                    topologySupport: {
-                        cornerCount,
-                        junctionCount,
-                        continuationCount,
-                        isolated
-                    },
-                    wallBodyEvidence: body,
-                    evidenceModel: 'local-contrast-topology-v2'
-                };
-            });
-
-            // Apply the noise screen after topology has had a chance to defend a
-            // genuine corner/junction, but before threshold reasoning. Strong connected
-            // architecture survives busy art; isolated compact marks are the primary
-            // rejection target. Nothing is discarded on texture evidence alone.
-            const noiseScreenedWalls = architecturalWalls.map((wall) => {
-                const midpointX = toCanvasX(grid.offsetX) + (((wall.x1 + wall.x2) / 2) * gridCanvas);
-                const midpointY = toCanvasY(grid.offsetY) + (((wall.y1 + wall.y2) / 2) * gridCanvas);
-                const component = noiseComponentAt(midpointX, midpointY);
-                const clutter = localClutterProfile(midpointX, midpointY);
-                const isolated = Boolean(wall.topologySupport?.isolated);
-                const compactMark = Boolean(component)
-                    && component.longestGridSpan <= .95
-                    && component.elongation <= 2.15
-                    && component.fillRatio >= .30;
-                const furnitureOutline = Boolean(component)
-                    && component.longestGridSpan >= .70
-                    && component.longestGridSpan <= 2.8
-                    && component.elongation <= 1.7
-                    && component.fillRatio >= .16
-                    && component.fillRatio <= .62;
-                const textureCluster = clutter.isotropic || clutter.busy;
-                const evidence = [];
-                let penalty = 0;
-                if (compactMark) { evidence.push('compact-annotation'); penalty += 12; }
-                if (furnitureOutline && isolated) { evidence.push('furniture-like-outline'); penalty += 9; }
-                if (textureCluster) { evidence.push('busy-texture'); penalty += 8; }
-                if (!isolated && (wall.topologySupport?.cornerCount || wall.topologySupport?.junctionCount || wall.topologySupport?.continuationCount)) {
-                    penalty = Math.max(0, penalty - 7);
-                    evidence.push('topology-defends-wall');
-                }
-                const rejected = isolated && compactMark && textureCluster && (wall.confidence - penalty) < 64;
-                return {
-                    ...wall,
-                    confidence: Math.max(36, Math.min(99, Math.round(wall.confidence - penalty))),
-                    noiseEvidence: evidence,
-                    noisePenalty: penalty,
-                    noiseRejection: {
-                        rejected,
-                        compactMark,
-                        furnitureOutline,
-                        textureCluster,
-                        component: component ? {
-                            longestGridSpan: component.longestGridSpan,
-                            elongation: component.elongation,
-                            fillRatio: component.fillRatio,
-                            cells: component.cells
-                        } : null,
-                        clutter
-                    },
-                    evidenceModel: 'local-contrast-topology-noise-v4'
-                };
-            }).filter((wall) => !wall.noiseRejection.rejected);
-
-            // IV.30.1G.2 — Doorway & Threshold Reasoning.
-            // A bright interruption in ink is not automatically a door. A threshold
-            // candidate must sit between two supported wall runs, contain a genuinely
-            // quieter/lighter opening, and have plausible traversable floor on both
-            // sides. The Assistant records why it believes the gap matters; the Keeper
-            // still decides whether the draft becomes an authoritative VTT door.
-            const structuralByKey = new Map(noiseScreenedWalls.map((wall) => [cartographySuggestionKey(wall), wall]));
-            const structuralEdge = (x1, y1, x2, y2) => structuralByKey.get(cartographySuggestionKey({ x1, y1, x2, y2, type: 'wall' })) || null;
-            const canvasPointForGrid = (gx, gy) => ({
-                x: toCanvasX(grid.offsetX) + (gx * gridCanvas),
-                y: toCanvasY(grid.offsetY) + (gy * gridCanvas)
-            });
-            const floorSample = (gx, gy) => {
-                const point = canvasPointForGrid(gx, gy);
-                const radius = Math.max(2, gridCanvas * .18);
-                const stats = luminanceRegionStats(point.x - radius, point.y - radius, point.x + radius, point.y + radius);
-                const density = densityAt(point.x, point.y);
-                const toneFloor = stats.mean >= Math.max(mapTone.dark + 16, mapTone.middle - 42);
-                const quietEnough = density <= .24 && stats.deviation <= 72;
-                return {
-                    plausible: toneFloor && quietEnough,
-                    mean: stats.mean,
-                    deviation: stats.deviation,
-                    density
-                };
-            };
-            const openingSample = (x1, y1, x2, y2) => {
-                const start = canvasPointForGrid(x1, y1);
-                const end = canvasPointForGrid(x2, y2);
-                const midpointX = (start.x + end.x) / 2;
-                const midpointY = (start.y + end.y) / 2;
-                const horizontal = y1 === y2;
-                const radiusAlong = Math.max(2, gridCanvas * .24);
-                const radiusAcross = Math.max(1.5, traceRadius * .72);
-                const stats = horizontal
-                    ? luminanceRegionStats(midpointX - radiusAlong, midpointY - radiusAcross, midpointX + radiusAlong, midpointY + radiusAcross)
-                    : luminanceRegionStats(midpointX - radiusAcross, midpointY - radiusAlong, midpointX + radiusAcross, midpointY + radiusAlong);
-                const density = densityAt(midpointX, midpointY);
-                return { mean: stats.mean, deviation: stats.deviation, density, midpointX, midpointY };
-            };
-            const supportingWallTone = (wall) => {
-                const a = canvasPointForGrid(wall.x1, wall.y1);
-                const b = canvasPointForGrid(wall.x2, wall.y2);
-                const midpointX = (a.x + b.x) / 2;
-                const midpointY = (a.y + b.y) / 2;
-                const radius = Math.max(1.5, traceRadius * .72);
-                return luminanceRegionStats(midpointX - radius, midpointY - radius, midpointX + radius, midpointY + radius).mean;
-            };
-            const doorwayCandidates = [];
-            const considerThreshold = (x1, y1, x2, y2, before, after, sideA, sideB) => {
-                if (!before || !after || structuralEdge(x1, y1, x2, y2)) return;
-                const opening = openingSample(x1, y1, x2, y2);
-                const floorA = floorSample(sideA.x, sideA.y);
-                const floorB = floorSample(sideB.x, sideB.y);
-                const averageWallTone = (supportingWallTone(before) + supportingWallTone(after)) / 2;
-                const openingContrast = opening.mean - averageWallTone;
-                const continuityStrength = Math.min(Number(before.confidence || 0), Number(after.confidence || 0));
-                const topologyStrength = [before, after].reduce((score, wall) => score
-                    + Number((wall.topologySupport?.continuationCount || 0) > 0)
-                    + Number((wall.topologySupport?.cornerCount || 0) > 0)
-                    + Number((wall.topologySupport?.junctionCount || 0) > 0), 0);
-                const clearOpening = opening.density <= .16 && openingContrast >= 12;
-                const crossThresholdFloor = floorA.plausible && floorB.plausible;
-                if (!clearOpening || !crossThresholdFloor || continuityStrength < 52) return;
-
-                const evidence = ['wall-continuity', 'clear-opening', 'floor-both-sides', 'one-grid-threshold'];
-                if (topologyStrength > 0) evidence.push('architectural-support');
-                const confidence = Math.max(58, Math.min(96, Math.round(
-                    54
-                    + ((continuityStrength - 52) * .34)
-                    + Math.min(12, openingContrast * .35)
-                    + (topologyStrength * 2.5)
-                    + (Math.min(floorA.mean, floorB.mean) >= mapTone.middle ? 4 : 0)
-                )));
-                doorwayCandidates.push({
-                    x1, y1, x2, y2,
-                    type: 'door',
-                    confidence,
-                    selected: true,
-                    structural: true,
-                    adaptiveEvidence: true,
-                    doorwayReasoning: true,
-                    thresholdEvidence: evidence,
-                    thresholdSupport: {
-                        continuityStrength,
-                        openingContrast,
-                        openingDensity: opening.density,
-                        floorA,
-                        floorB,
-                        topologyStrength,
-                        widthGridUnits: 1
-                    },
-                    evidenceModel: 'local-contrast-topology-threshold-v3'
-                });
-            };
-
-            // A conservative first threshold model: only one-grid orthogonal gaps
-            // bracketed by structural walls are considered. Wider arches and diagonal
-            // thresholds remain manual until later evidence proves them safe.
-            for (let y = 0; y <= rows; y += 1) {
-                for (let x = 1; x < columns - 1; x += 1) {
-                    considerThreshold(
-                        x, y, x + 1, y,
-                        structuralEdge(x - 1, y, x, y),
-                        structuralEdge(x + 1, y, x + 2, y),
-                        { x: x + .5, y: y - .34 },
-                        { x: x + .5, y: y + .34 }
-                    );
-                }
-            }
-            for (let x = 0; x <= columns; x += 1) {
-                for (let y = 1; y < rows - 1; y += 1) {
-                    considerThreshold(
-                        x, y, x, y + 1,
-                        structuralEdge(x, y - 1, x, y),
-                        structuralEdge(x, y + 1, x, y + 2),
-                        { x: x - .34, y: y + .5 },
-                        { x: x + .34, y: y + .5 }
-                    );
-                }
-            }
-
-            return noiseScreenedWalls.concat(doorwayCandidates);
+            return Array.from(wallVotes.values());
         };
 
         // IV.30.1B — The Living Contour.
@@ -3461,67 +1955,6 @@
                 }
             }
 
-            // IV.30.1G.5 — Boundary-Side & Wall-Band Reasoning.
-            // White space outside a cave is visually similar to playable floor. On
-            // hatched maps that used to let Living Contour trace the far/exterior side
-            // of the wall band whenever that edge was darker or cleaner. Label the
-            // current floor components and conservatively recognise only a dominant,
-            // heavily border-connected component as exterior whitespace. A legitimate
-            // dungeon entrance may touch an edge; touching an edge alone is never enough.
-            const floorComponent = Array.from({ length: contourRows }, () => Array(contourColumns).fill(-1));
-            const floorComponentStats = [];
-            let floorComponentId = 0;
-            for (let row = 0; row < contourRows; row += 1) {
-                for (let column = 0; column < contourColumns; column += 1) {
-                    if (!floor[row][column] || floorComponent[row][column] !== -1) continue;
-                    const queue = [[column, row]];
-                    floorComponent[row][column] = floorComponentId;
-                    let size = 0;
-                    let borderSamples = 0;
-                    for (let cursor = 0; cursor < queue.length; cursor += 1) {
-                        const [x, y] = queue[cursor];
-                        size += 1;
-                        if (x === 0 || y === 0 || x === contourColumns - 1 || y === contourRows - 1) borderSamples += 1;
-                        [[-1,0],[1,0],[0,-1],[0,1]].forEach(([dx,dy]) => {
-                            const nx=x+dx, ny=y+dy;
-                            if (nx < 0 || ny < 0 || nx >= contourColumns || ny >= contourRows) return;
-                            if (!floor[ny][nx] || floorComponent[ny][nx] !== -1) return;
-                            floorComponent[ny][nx] = floorComponentId;
-                            queue.push([nx,ny]);
-                        });
-                    }
-                    floorComponentStats.push({ id: floorComponentId, size, borderSamples });
-                    floorComponentId += 1;
-                }
-            }
-            const totalFineCells = Math.max(1, contourColumns * contourRows);
-            const exteriorFloorComponents = new Set(floorComponentStats
-                .filter((entry) => entry.borderSamples >= Math.max(8, contourSubdivisions * 2)
-                    && entry.size / totalFineCells >= .08
-                    && entry.borderSamples / Math.max(1, entry.size) >= .012)
-                .map((entry) => entry.id));
-            const isPlayableFloor = (column, row) => column >= 0 && row >= 0
-                && column < contourColumns && row < contourRows
-                && floor[row][column]
-                && !exteriorFloorComponents.has(floorComponent[row][column]);
-
-            // A floor-facing wall edge should have a meaningful depth of playable floor
-            // behind it. Tiny white pockets between hatch strokes usually fail this test,
-            // which prevents Pippin hopping across the ink band to its opposite edge.
-            const minimumWallBandFloorDepth = Math.max(2, Math.round(contourSubdivisions * .34));
-            const wallBandFloorDepth = (column, row, dx, dy) => {
-                let depth = 0;
-                for (let step = 0; step < minimumWallBandFloorDepth + 2; step += 1) {
-                    const x = column + (dx * step);
-                    const y = row + (dy * step);
-                    if (!isPlayableFloor(x, y)) break;
-                    depth += 1;
-                }
-                return depth;
-            };
-            const wallBandEdgeIsFloorFacing = (column, row, inwardDx, inwardDy) =>
-                wallBandFloorDepth(column, row, inwardDx, inwardDy) >= minimumWallBandFloorDepth;
-
             const suggestions = new Map();
             const roundContourCoordinate = (value) => Math.round(value * contourSubdivisions) / contourSubdivisions;
             const add = (x1, y1, x2, y2, confidence = 84) => {
@@ -3536,19 +1969,19 @@
             const isFloor = (column, row) => column >= 0 && row >= 0 && column < contourColumns && row < contourRows && floor[row][column];
             for (let row = 0; row < contourRows; row += 1) {
                 for (let column = 0; column < contourColumns; column += 1) {
-                    if (!isPlayableFloor(column, row)) continue;
+                    if (!floor[row][column]) continue;
                     const left = column * contourStep;
                     const right = (column + 1) * contourStep;
                     const top = row * contourStep;
                     const bottom = (row + 1) * contourStep;
-                    // The finite analysis envelope is not cave rock. G.5 also refuses
-                    // the exterior-facing side of a wall band and hatch-sized white
-                    // pockets: emitted geometry must have sustained playable floor on
-                    // its inward side. This gives Hybrid a stable side to preserve.
-                    if (row > 0 && !isFloor(column, row - 1) && wallBandEdgeIsFloorFacing(column, row, 0, 1)) add(left, top, right, top, 91);
-                    if (column < contourColumns - 1 && !isFloor(column + 1, row) && wallBandEdgeIsFloorFacing(column, row, -1, 0)) add(right, top, right, bottom, 91);
-                    if (row < contourRows - 1 && !isFloor(column, row + 1) && wallBandEdgeIsFloorFacing(column, row, 0, -1)) add(left, bottom, right, bottom, 91);
-                    if (column > 0 && !isFloor(column - 1, row) && wallBandEdgeIsFloorFacing(column, row, 1, 0)) add(left, top, left, bottom, 91);
+                    // The finite analysis envelope is not cave rock. Only emit a
+                    // contour when both cells exist inside the sampled map and the
+                    // neighbouring cell is classified as solid. This prevents false
+                    // wall paths from hugging the bottom/right (or any outer) edge.
+                    if (row > 0 && !isFloor(column, row - 1)) add(left, top, right, top);
+                    if (column < contourColumns - 1 && !isFloor(column + 1, row)) add(right, top, right, bottom);
+                    if (row < contourRows - 1 && !isFloor(column, row + 1)) add(left, bottom, right, bottom);
+                    if (column > 0 && !isFloor(column - 1, row)) add(left, top, left, bottom);
                 }
             }
 
@@ -3791,138 +2224,21 @@
             };
             const isClosedChain = (chain) => chain.length > 2
                 && pointKey(chain[0]) === pointKey(chain[chain.length - 1]);
-
-            // IV.30.1G.4B — Gap & Threshold Classification.
-            // Living Contour now consumes the same review-first doorway evidence that
-            // Structural tracing already proved in G.2. A contour span which crosses a
-            // certified doorway/passage is split rather than sealed merely to make the
-            // organic boundary look complete. Other unresolved ends are classified for
-            // Keeper review, but uncertainty never grants permission to invent a bridge.
-            const contourThresholdCandidates = Array.isArray(options.thresholdCandidates)
-                ? options.thresholdCandidates.filter((item) => item?.type === 'door' && item?.doorwayReasoning)
-                : structuralCartographyCandidates().filter((item) => item?.type === 'door' && item?.doorwayReasoning);
-            const contourSpanOrientation = (a, b) => {
-                const dx = Math.abs(Number(b.x) - Number(a.x));
-                const dy = Math.abs(Number(b.y) - Number(a.y));
-                if (dy <= .0001 && dx > .0001) return 'horizontal';
-                if (dx <= .0001 && dy > .0001) return 'vertical';
-                return 'organic';
-            };
-            const contourThresholdMatch = (a, b) => {
-                const spanOrientation = contourSpanOrientation(a, b);
-                if (spanOrientation === 'organic') return null;
-                const spanMin = spanOrientation === 'horizontal'
-                    ? Math.min(Number(a.x), Number(b.x))
-                    : Math.min(Number(a.y), Number(b.y));
-                const spanMax = spanOrientation === 'horizontal'
-                    ? Math.max(Number(a.x), Number(b.x))
-                    : Math.max(Number(a.y), Number(b.y));
-                return contourThresholdCandidates.find((threshold) => {
-                    const thresholdA = { x: Number(threshold.x1), y: Number(threshold.y1) };
-                    const thresholdB = { x: Number(threshold.x2), y: Number(threshold.y2) };
-                    if (contourSpanOrientation(thresholdA, thresholdB) !== spanOrientation) return false;
-                    const crossDistance = spanOrientation === 'horizontal'
-                        ? Math.max(Math.abs(Number(a.y) - thresholdA.y), Math.abs(Number(b.y) - thresholdA.y))
-                        : Math.max(Math.abs(Number(a.x) - thresholdA.x), Math.abs(Number(b.x) - thresholdA.x));
-                    if (crossDistance > .42) return false;
-                    const thresholdMin = spanOrientation === 'horizontal'
-                        ? Math.min(thresholdA.x, thresholdB.x)
-                        : Math.min(thresholdA.y, thresholdB.y);
-                    const thresholdMax = spanOrientation === 'horizontal'
-                        ? Math.max(thresholdA.x, thresholdB.x)
-                        : Math.max(thresholdA.y, thresholdB.y);
-                    const overlap = Math.min(spanMax, thresholdMax) - Math.max(spanMin, thresholdMin);
-                    return overlap >= Math.min(.16, Math.max(.08, (spanMax - spanMin) * .28));
-                }) || null;
-            };
-            const classifyContourEndpoint = (point) => {
-                const x = Number(point.x);
-                const y = Number(point.y);
-                const edgeTolerance = Math.max(contourStep * 1.15, .18);
-                if (x <= edgeTolerance || y <= edgeTolerance
-                    || x >= columns - edgeTolerance || y >= rows - edgeTolerance) {
-                    return { classification: 'map-edge', evidence: ['analysis-envelope'] };
-                }
-                const nearbyThreshold = contourThresholdCandidates.find((threshold) => {
-                    const centerX = (Number(threshold.x1) + Number(threshold.x2)) / 2;
-                    const centerY = (Number(threshold.y1) + Number(threshold.y2)) / 2;
-                    return Math.hypot(centerX - x, centerY - y) <= .82;
-                });
-                if (nearbyThreshold) {
-                    return { classification: 'doorway-passage', evidence: ['structural-threshold', 'floor-continuity'] };
-                }
-                const canvasX = originX + (x * gridCanvasX);
-                const canvasY = originY + (y * gridCanvasY);
-                const radius = Math.max(2, Math.min(gridCanvasX, gridCanvasY) * .24);
-                const stats = luminanceRegionStats(canvasX - radius, canvasY - radius, canvasX + radius, canvasY + radius);
-                if (stats.deviation >= 48 && stats.mean <= mapTone.light - 6) {
-                    return { classification: 'noise-gap', evidence: ['locally-busy-ink', 'uncertain-boundary'] };
-                }
-                return { classification: 'uncertain-boundary', evidence: ['insufficient-gap-evidence'] };
-            };
-            const splitContourPathAtProtectedThresholds = (points) => {
-                if (!Array.isArray(points) || points.length < 2) return { runs: [], gaps: [] };
-                const runs = [];
-                const gaps = [];
-                let run = [points[0]];
-                for (let index = 0; index < points.length - 1; index += 1) {
-                    const a = points[index];
-                    const b = points[index + 1];
-                    const threshold = contourThresholdMatch(a, b);
-                    if (threshold) {
-                        if (run.length >= 2) runs.push(run);
-                        gaps.push({
-                            classification: 'doorway-passage',
-                            from: a,
-                            to: b,
-                            confidence: Number(threshold.confidence || 0),
-                            evidence: ['g2-structural-doorway', 'protected-open-gap', 'do-not-auto-bridge']
-                        });
-                        run = [b];
-                        continue;
-                    }
-                    if (run.length === 0) run.push(a);
-                    const previous = run[run.length - 1];
-                    if (!previous || previous.x !== b.x || previous.y !== b.y) run.push(b);
-                }
-                if (run.length >= 2) runs.push(run);
-                return { runs, gaps };
-            };
             // Tiny hatch/ink loops are suppressed before the review-object budget is allocated.
-            // IV.30.1G.4 — Partial Contour Recovery / Pippin Marks What He Knows.
-            // Living Contour used to fail the entire draft when fragmented artwork
-            // produced more safe boundary chains than the review budget allowed. Real
-            // cave maps often contain hatching, door gaps and damaged ink that split an
-            // otherwise useful perimeter. Preserve the strongest defensible open and
-            // closed chains instead of requiring an all-or-nothing complete contour.
-            // Historical Economy regression vocabulary retained for compatibility:
-            // meaningfulChains filtered with entry.length >= contourStep * 2.5 before
-            // IV.30.1G.4 taught the reader to keep safe partial contour sections.
-            const recoverableChains = contourChains
-                .map((chain, sourceIndex) => ({
-                    chain,
-                    sourceIndex,
-                    length: chainLength(chain),
-                    closed: isClosedChain(chain)
-                }))
-                .filter((entry) => entry.length >= contourStep * 1.75)
-                .map((entry) => ({
-                    ...entry,
-                    partial: !entry.closed,
-                    recoveryScore: (entry.closed ? 28 : 0)
-                        + Math.min(72, entry.length * 9)
-                        + Math.min(12, Math.max(0, entry.chain.length - 2) * .45)
-                }))
-                .sort((a, b) => (b.recoveryScore - a.recoveryScore) || (b.length - a.length));
+            const meaningfulChains = contourChains
+                .map((chain) => ({ chain, length: chainLength(chain), closed: isClosedChain(chain) }))
+                .filter((entry) => entry.length >= contourStep * 2.5)
+                .sort((a, b) => b.length - a.length);
 
-            if (recoverableChains.length === 0) return [];
+            if (meaningfulChains.length === 0) return [];
 
             // Keep the historical Economy vocabulary as a compatibility contract:
             // budgetedChains, remainingBudget and Math.sqrt(entry.length) formerly
-            // apportioned a 200-segment review budget. IV.30.1G.4 now spends that same
-            // object budget on the strongest certified contour sections. Nothing is
-            // joined across an unresolved gap merely to make a closed shape.
-            const budgetedChains = recoverableChains.slice(0, maximumReviewSuggestions);
+            // apportioned a 200-segment review budget. In IV.30.1C the same 200-object
+            // ceiling applies to complete paths instead, so every retained contour gets
+            // its own independent vertex budget.
+            if (meaningfulChains.length > maximumReviewSuggestions) return [];
+            const budgetedChains = meaningfulChains;
             const remainingBudget = maximumReviewSuggestions - budgetedChains.length;
             budgetedChains.forEach((entry) => Math.sqrt(entry.length));
 
@@ -3946,50 +2262,19 @@
                 return candidate;
             };
 
-            const pathSuggestions = budgetedChains.flatMap((entry) => {
+            const pathSuggestions = budgetedChains.map((entry) => {
                 const path = simplifyChainToTarget(entry);
                 const points = path.map((point) => ({
                     x: roundContourCoordinate(point[0]),
                     y: roundContourCoordinate(point[1])
                 }));
-                const protectedPath = splitContourPathAtProtectedThresholds(points);
-                const runs = protectedPath.runs.length > 0 ? protectedPath.runs : (protectedPath.gaps.length === 0 ? [points] : []);
-                return runs.map((runPoints) => {
-                    const gapProtected = protectedPath.gaps.length > 0;
-                    const partialContour = entry.partial || gapProtected;
-                    const endpointClassifications = partialContour
-                        ? [classifyContourEndpoint(runPoints[0]), classifyContourEndpoint(runPoints[runPoints.length - 1])]
-                        : [];
-                    const confidence = entry.closed && !gapProtected
-                        ? 94
-                        : Math.max(74, Math.min(91, Math.round(77 + Math.min(13, entry.length * 1.6))));
-                    return {
-                        type: 'wall', confidence, selected: true,
-                        contour: true, fineContour: true, fullBoundary: entry.closed && !gapProtected,
-                        partialContour,
-                        partialContourRecovery: gapProtected
-                            ? 'protected-threshold-split'
-                            : (entry.partial ? 'certified-open-chain' : 'closed-chain'),
-                        unresolvedBoundaryEnds: partialContour ? [runPoints[0], runPoints[runPoints.length - 1]] : [],
-                        gapClassifications: endpointClassifications,
-                        protectedContourGaps: protectedPath.gaps,
-                        thresholdGapProtection: gapProtected,
-                        recoveryEvidence: gapProtected
-                            ? ['ordered-boundary-chain', 'g2-threshold-reused', 'doorway-gap-preserved', 'unresolved-ends-preserved']
-                            : (entry.partial
-                                ? ['ordered-boundary-chain', 'minimum-safe-length', 'unresolved-ends-preserved']
-                                : ['closed-boundary-chain']),
-                        // Historical G.4B evidence spellings retained as regression vocabulary:
-                        // ? 'living-contour-gap-classification-v5b'
-                        // : (entry.partial ? 'living-contour-partial-v5' : 'living-contour-closed-v5')
-                        evidenceModel: gapProtected
-                            ? 'living-contour-wall-band-v6'
-                            : (entry.partial ? 'living-contour-wall-band-partial-v6' : 'living-contour-wall-band-closed-v6'),
-                        adaptiveBudget: true, polyline: true, points: runPoints,
-                        x1: runPoints[0].x, y1: runPoints[0].y,
-                        x2: runPoints[runPoints.length - 1].x, y2: runPoints[runPoints.length - 1].y
-                    };
-                });
+                return {
+                    type: 'wall', confidence: 94, selected: true,
+                    contour: true, fineContour: true, fullBoundary: true,
+                    adaptiveBudget: true, polyline: true, points,
+                    x1: points[0].x, y1: points[0].y,
+                    x2: points[points.length - 1].x, y2: points[points.length - 1].y
+                };
             }).filter((item) => item.points.length >= 2 && item.points.length <= maximumPathVertices);
 
             // Defensive compatibility fallback: IV.30.1C intentionally no longer
@@ -4016,21 +2301,7 @@
             const structural = structuralCartographyCandidates();
             // IV.30.1D regression contract: const contours = livingContourCandidates()
             // Connected Dungeon now opts Hybrid Judgement into floor connectivity explicitly.
-            // IV.30.1G.4A — Hybrid Partial-Contour Preservation.
-            // The connectivity pass is useful on maps with tiny floor seams, but on
-            // heavily-hatched cave maps it can legitimately prove *less* than the
-            // standalone Living Contour reader. Never turn that uncertainty into an
-            // empty Hybrid draft: keep a standard contour pass as a review-first
-            // fallback and preserve its unresolved ends exactly as certified.
-            const thresholdCandidates = structural.filter((item) => item?.type === 'door' && item?.doorwayReasoning);
-            // Historical Connected Dungeon / G.4A regression contract:
-            // const connectedContours = livingContourCandidates({ connectPlayableFloor: true });
-            const connectedContours = livingContourCandidates({ connectPlayableFloor: true, thresholdCandidates });
-            const standaloneContours = connectedContours.length === 0
-                ? livingContourCandidates({ thresholdCandidates })
-                : [];
-            const contours = connectedContours.length > 0 ? connectedContours : standaloneContours;
-            const hybridContourSource = connectedContours.length > 0 ? 'connected-floor' : 'standalone-fallback';
+            const contours = livingContourCandidates({ connectPlayableFloor: true });
 
             const orientation = (item) => {
                 const dx = Math.abs(Number(item.x2) - Number(item.x1));
@@ -4053,13 +2324,91 @@
                 }, 0);
             };
 
-            // A single straight-looking fleck can be handwriting, stairs or hatch.
-            // Require neighbouring parallel evidence unless the original structural
-            // confidence is exceptionally strong. This is the local judgement step.
+            // IV.30.1G.5B — Structural Evidence Corroboration.
+            // The calibrated grid is a ruler, not artwork. A grid-aligned structural
+            // vote may strengthen real architecture, but it cannot enter Hybrid merely
+            // because a thin dark grid line is persistent. Require either nearby Living
+            // Contour agreement or asymmetric wall-body ink beside the candidate.
+            const contourSegments = [];
+            contours.forEach((item) => {
+                const points = Array.isArray(item.points) ? item.points : [];
+                for (let index = 0; index < points.length - 1; index += 1) {
+                    contourSegments.push({ start: points[index], end: points[index + 1] });
+                }
+            });
+            const pointToSegmentDistanceForEvidence = (point, start, end) => {
+                const dx = end.x - start.x;
+                const dy = end.y - start.y;
+                const lengthSquared = (dx * dx) + (dy * dy);
+                if (lengthSquared <= .000001) return Math.hypot(point.x - start.x, point.y - start.y);
+                const t = Math.max(0, Math.min(1, (((point.x - start.x) * dx) + ((point.y - start.y) * dy)) / lengthSquared));
+                return Math.hypot(point.x - (start.x + (t * dx)), point.y - (start.y + (t * dy)));
+            };
+            const livingContourCorroborates = (item) => {
+                const center = midpoint(item);
+                return contourSegments.some((segment) => pointToSegmentDistanceForEvidence(center, segment.start, segment.end) <= .48);
+            };
+            const artworkDensityAtGridPoint = (gx, gy, radiusCanvas) => {
+                const cx = toCanvasX(grid.offsetX + (gx * grid.size));
+                const cy = toCanvasY(grid.offsetY + (gy * grid.size));
+                const radius = Math.max(1, Math.round(radiusCanvas));
+                let darkHits = 0;
+                let total = 0;
+                for (let y = Math.max(0, Math.round(cy) - radius); y <= Math.min(canvas.height - 1, Math.round(cy) + radius); y += 1) {
+                    for (let x = Math.max(0, Math.round(cx) - radius); x <= Math.min(canvas.width - 1, Math.round(cx) + radius); x += 1) {
+                        total += 1;
+                        if (luminance(x, y) <= 104) darkHits += 1;
+                    }
+                }
+                return darkHits / Math.max(1, total);
+            };
+            const structuralArtworkCorroboration = (item) => {
+                const dx = Number(item.x2) - Number(item.x1);
+                const dy = Number(item.y2) - Number(item.y1);
+                const length = Math.max(.0001, Math.hypot(dx, dy));
+                const normalX = -dy / length;
+                const normalY = dx / length;
+                const center = midpoint(item);
+                const gridCanvas = Math.max(4, toCanvasX(grid.size));
+                const sideOffset = .27;
+                const sampleRadius = Math.max(2, gridCanvas * .09);
+                let sideA = 0;
+                let sideB = 0;
+                [0.25, 0.5, 0.75].forEach((t) => {
+                    const gx = Number(item.x1) + (dx * t);
+                    const gy = Number(item.y1) + (dy * t);
+                    sideA += artworkDensityAtGridPoint(gx + (normalX * sideOffset), gy + (normalY * sideOffset), sampleRadius);
+                    sideB += artworkDensityAtGridPoint(gx - (normalX * sideOffset), gy - (normalY * sideOffset), sampleRadius);
+                });
+                sideA /= 3;
+                sideB /= 3;
+                const wallBodyDensity = Math.max(sideA, sideB);
+                const quietSideDensity = Math.min(sideA, sideB);
+                const livingAgreement = livingContourCorroborates(item);
+                const asymmetricWallBody = wallBodyDensity >= .115 && wallBodyDensity >= quietSideDensity * 1.45;
+                return {
+                    livingAgreement,
+                    asymmetricWallBody,
+                    wallBodyDensity,
+                    quietSideDensity,
+                    corroborated: livingAgreement || asymmetricWallBody
+                };
+            };
+
+            // A single straight-looking fleck can be handwriting, stairs, hatch, or the
+            // imported map's own graph-paper grid. Local parallel support is useful only
+            // after artwork corroboration; confidence alone must never resurrect the grid.
             const strongStructural = structural
                 .map((item) => ({ ...item, localStructuralSupport: structuralSupport(item) }))
-                .filter((item) => item.localStructuralSupport >= 2 || item.confidence >= 94)
-                .map((item) => ({ ...item, hybridJudgement: true, hybridRegion: 'structural' }));
+                .map((item) => ({ ...item, structuralArtworkEvidence: structuralArtworkCorroboration(item) }))
+                .filter((item) => item.structuralArtworkEvidence.corroborated)
+                .filter((item) => item.localStructuralSupport >= 2 || item.confidence >= 94 || item.structuralArtworkEvidence.livingAgreement)
+                .map((item) => ({
+                    ...item,
+                    hybridJudgement: true,
+                    hybridRegion: 'structural',
+                    structuralEvidenceCorroboration: item.structuralArtworkEvidence.livingAgreement ? 'living-contour' : 'wall-body-ink'
+                }));
 
             const pointToSegmentDistance = (point, start, end) => {
                 const dx = end.x - start.x;
@@ -4101,19 +2450,8 @@
                                 ...item, points: clean,
                                 x1: clean[0].x, y1: clean[0].y,
                                 x2: clean[clean.length - 1].x, y2: clean[clean.length - 1].y,
-                                confidence: item.partialContour
-                                    ? Math.max(76, Number(item.confidence) || 0)
-                                    : Math.max(88, Number(item.confidence) || 0),
-                                hybridJudgement: true, hybridRegion: 'organic',
-                                hybridContourSource,
-                                hybridPartialPreservation: Boolean(item.partialContour),
-                                partialContour: Boolean(item.partialContour),
-                                unresolvedBoundaryEnds: Array.isArray(item.unresolvedBoundaryEnds)
-                                    ? item.unresolvedBoundaryEnds
-                                    : [],
-                                evidenceModel: item.partialContour
-                                    ? 'hybrid-partial-contour-v5a'
-                                    : (item.evidenceModel || 'hybrid-contour-v5a')
+                                confidence: Math.max(88, Number(item.confidence) || 0),
+                                hybridJudgement: true, hybridRegion: 'organic'
                             });
                         }
                     }
@@ -4139,67 +2477,17 @@
                 if (!previous || Number(previous.confidence) < Number(item.confidence)) unique.set(key, item);
             });
 
-            const organicUsefulness = (item) => {
-                const points = Array.isArray(item.points) ? item.points : [];
-                let pathLength = 0;
-                for (let index = 0; index < points.length - 1; index += 1) {
-                    pathLength += Math.hypot(
-                        Number(points[index + 1].x) - Number(points[index].x),
-                        Number(points[index + 1].y) - Number(points[index].y)
-                    );
-                }
-                // Partial evidence remains valuable, but a long certified path should
-                // outrank a tiny fragment if a pathological map reaches the review cap.
-                return (Number(item.confidence) || 0)
-                    + Math.min(24, pathLength * 1.8)
-                    + (item.partialContour ? 2 : 6);
-            };
-            const organic = Array.from(unique.values())
-                .filter((item) => item.hybridRegion === 'organic')
-                .sort((a, b) => organicUsefulness(b) - organicUsefulness(a));
+            const organic = Array.from(unique.values()).filter((item) => item.hybridRegion === 'organic');
             const built = Array.from(unique.values())
                 .filter((item) => item.hybridRegion === 'structural')
                 .sort((a, b) => (b.localStructuralSupport - a.localStructuralSupport) || (b.confidence - a.confidence));
 
-            // Polyline paths represent much more geometry per review object. G.4A no
-            // longer rejects the entire Hybrid draft when organic fragmentation reaches
-            // the cap: retain the strongest certified paths, then spend any remaining
-            // review objects on constructed linework. Unresolved ends remain open.
-            const retainedOrganic = organic.slice(0, maximumReviewSuggestions);
-            const remaining = maximumReviewSuggestions - retainedOrganic.length;
-            let combined = retainedOrganic.concat(built.slice(0, remaining));
-
-            // A connected-floor pass can produce contours that are all locally covered
-            // by Structural evidence and therefore disappear during overlap trimming.
-            // If that leaves Hybrid empty, fall back once to the standalone Living
-            // Contour evidence rather than telling the Keeper that nothing is known.
-            if (combined.length === 0 && hybridContourSource === 'connected-floor') {
-                const fallbackContours = livingContourCandidates({ thresholdCandidates });
-                const fallbackOrganic = fallbackContours
-                    .filter((item) => Array.isArray(item.points) && item.points.length > 1)
-                    .map((item) => ({
-                        ...item,
-                        confidence: item.partialContour
-                            ? Math.max(74, Number(item.confidence) || 0)
-                            : Math.max(86, Number(item.confidence) || 0),
-                        hybridJudgement: true,
-                        hybridRegion: 'organic',
-                        hybridContourSource: 'standalone-post-trim-fallback',
-                        hybridPartialPreservation: Boolean(item.partialContour),
-                        partialContour: Boolean(item.partialContour),
-                        unresolvedBoundaryEnds: Array.isArray(item.unresolvedBoundaryEnds)
-                            ? item.unresolvedBoundaryEnds
-                            : [],
-                        evidenceModel: item.partialContour
-                            ? 'hybrid-partial-contour-v5a'
-                            : (item.evidenceModel || 'hybrid-contour-v5a')
-                    }))
-                    .sort((a, b) => organicUsefulness(b) - organicUsefulness(a))
-                    .slice(0, maximumReviewSuggestions);
-                combined = fallbackOrganic;
-            }
-
-            return combined;
+            // Polyline paths represent much more geometry per review object, so keep
+            // every safe organic path first and spend the remaining object budget on
+            // the strongest locally-supported constructed linework. No scan-order cut.
+            if (organic.length > maximumReviewSuggestions) return [];
+            const remaining = maximumReviewSuggestions - organic.length;
+            return organic.concat(built.slice(0, remaining));
         };
 
         const scores = candidates.map((item) => item.score).sort((a, b) => a - b);
@@ -4210,7 +2498,7 @@
                 .filter((item) => !existing.has(cartographySuggestionKey(item)));
             renderCartographyReview();
             if (cartographySuggestions.length === 0 && cartographyAssistantStatus) {
-                cartographyAssistantStatus.textContent = 'No safe hybrid wall sections could be prepared. Check grid calibration, or review Structural tracing and Living Contour separately.';
+                cartographyAssistantStatus.textContent = 'No safe hybrid draft could be prepared. Check grid calibration, or review Structural tracing and Living Contour separately.';
             }
             return;
         }
@@ -4221,7 +2509,7 @@
                 .sort((a, b) => b.confidence - a.confidence);
             renderCartographyReview();
             if (cartographySuggestions.length === 0 && cartographyAssistantStatus) {
-                cartographyAssistantStatus.textContent = 'No safe playable floor contour sections could be prepared. Check grid calibration or try Structural tracing.';
+                cartographyAssistantStatus.textContent = 'No complete playable floor contour could be prepared safely. Check grid calibration or try Structural tracing.';
             }
             return;
         }
@@ -4353,7 +2641,7 @@
                     const toggle = document.createElement('button');
                     toggle.type = 'button';
                     toggle.dataset.visionToggle = String(barrier.id);
-                    toggle.textContent = barrier.open ? t('close', 'Close') : t('open', 'Open');
+                    toggle.textContent = barrier.open ? 'Close' : 'Open';
                     item.append(toggle);
                 }
 
@@ -4589,65 +2877,6 @@
     renderVisionLayer();
     renderCartographySuggestions();
 
-    // IV.36.5 — revealed treasure becomes Player-visible through the same Forge revision boundary.
-    document.addEventListener('click', async (event) => {
-        const button = event.target.closest?.('[data-forge-treasure-action]');
-        if (!button || button.disabled) return;
-        const marker = button.closest('[data-forge-treasure-id]');
-        if (!marker) return;
-        button.disabled = true;
-        try {
-            const data = await request('gmrt_forge_treasure_action', {
-                scene_id: treasureSceneId(),
-                treasure_id: String(marker.dataset.forgeTreasureId || ''),
-                treasure_action: String(button.dataset.forgeTreasureAction || '')
-            });
-            say(data.message || 'The treasure ledger changed.');
-            await replaceChamber(data.message || 'The treasure ledger changed.', treasureSceneId() || null);
-        } catch (error) {
-            button.disabled = false;
-            say(error?.message || 'Pippin cannot reconcile that particular pile of valuables.');
-        }
-    });
-
-    // IV.36.4 — Keeper controls share the same persisted state as movement triggers.
-    document.addEventListener('click', async (event) => {
-        const button = event.target.closest?.('[data-forge-trap-action]');
-        if (!button || button.disabled) return;
-        const marker = button.closest('[data-forge-trap-id]');
-        if (!marker) return;
-        button.disabled = true;
-        try {
-            const data = await request('gmrt_forge_trap_action', {
-                scene_id: preparationSceneId || projectedSceneId,
-                trap_id: String(marker.dataset.forgeTrapId || ''),
-                trap_action: String(button.dataset.forgeTrapAction || '')
-            });
-            say(data.message || 'The trap state changed.');
-            await replaceChamber(data.message || 'The trap state changed.', preparationSceneId || projectedSceneId || null);
-        } catch (error) {
-            button.disabled = false;
-            say(error?.message || 'Pippin refuses to touch that mechanism.');
-        }
-    });
-
-    // IV.36.3 — The Dungeon Has Secrets. Keeper reveal is explicit and persistent.
-    document.addEventListener('click', async (event) => {
-        const marker = event.target.closest?.('[data-forge-secret-id]');
-        if (!marker || marker.disabled) return;
-        const secretId=String(marker.dataset.forgeSecretId||'');
-        if(!secretId)return;
-        marker.disabled=true;
-        try {
-            const data=await request('gmrt_reveal_forge_secret',{scene_id:preparationSceneId||projectedSceneId,secret_id:secretId});
-            say(data.message || 'The secret is revealed.');
-            window.location.reload();
-        } catch(error) {
-            marker.disabled=false;
-            say(error?.message || 'That secret refused to be found.');
-        }
-    });
-
     // Phase IV.30.2 — The Cartographer's Dungeon Forge.
     // Geometry comes first: a deterministic seed carves connected floor, then the
     // Forge derives authoritative vision barriers, doors, Keeper lights and Fog.
@@ -4659,30 +2888,6 @@
     const dungeonForgeSceneType = document.querySelector('[data-dungeon-forge-scene-type]');
     const dungeonForgeStyle = document.querySelector('[data-dungeon-forge-style]');
     const dungeonForgeTheme = document.querySelector('[data-dungeon-forge-theme]');
-    const dungeonForgeEntry = document.querySelector('[data-dungeon-forge-entry]');
-    const dungeonForgeLair = document.querySelector('[data-dungeon-forge-lair]');
-    const dungeonForgeLairOccupantWrap = document.querySelector('[data-dungeon-forge-lair-occupant-wrap]');
-    const dungeonForgeLairOccupant = document.querySelector('[data-dungeon-forge-lair-occupant]');
-    const dungeonForgeLairOccupantHidden = document.querySelector('[data-dungeon-forge-lair-occupant-hidden]');
-    const dungeonForgePopulate = document.querySelector('[data-dungeon-forge-populate]');
-    const dungeonForgeSecrets = document.querySelector('[data-dungeon-forge-secrets]');
-    const dungeonForgeTraps = document.querySelector('[data-dungeon-forge-traps]');
-    const dungeonForgeTreasure = document.querySelector('[data-dungeon-forge-treasure]');
-    const dungeonForgeStory = document.querySelector('[data-dungeon-forge-story]');
-    const updateDungeonForgeLairAvailability = () => {
-        if (!dungeonForgeLair) return;
-        const allowed = String(dungeonForgeSceneType?.value || 'dungeon') === 'dungeon'
-            && String(dungeonForgeStyle?.value || 'standard') === 'grand';
-        dungeonForgeLair.disabled = !allowed;
-        if (!allowed) dungeonForgeLair.checked = false;
-        const chosen = allowed && dungeonForgeLair.checked;
-        if (dungeonForgeLairOccupantWrap) dungeonForgeLairOccupantWrap.hidden = !chosen;
-        if (!chosen && dungeonForgeLairOccupant) dungeonForgeLairOccupant.value = '';
-    };
-    dungeonForgeSceneType?.addEventListener('change', updateDungeonForgeLairAvailability);
-    dungeonForgeStyle?.addEventListener('change', updateDungeonForgeLairAvailability);
-    dungeonForgeLair?.addEventListener('change', updateDungeonForgeLairAvailability);
-    updateDungeonForgeLairAvailability();
     const dungeonForgeGenerate = document.querySelector('[data-dungeon-forge-generate]');
     const dungeonForgeReroll = document.querySelector('[data-dungeon-forge-reroll]');
     const dungeonForgeBuild = document.querySelector('[data-dungeon-forge-build]');
@@ -4919,15 +3124,6 @@
         });
         dungeonForgeLayer.appendChild(doorGroup);
 
-        if (plan.entry_anchor) {
-            const anchor=plan.entry_anchor;
-            const marker=forgeSvg('g',{class:`gmrt-forge-entry is-${String(anchor.type || 'entrance')}`});
-            const cx=Number(anchor.x||0)*cols, cy=Number(anchor.y||0)*rows;
-            marker.appendChild(forgeSvg('circle',{cx,cy,r:.36,class:'is-entry-ring'}));
-            marker.appendChild(forgeSvg('circle',{cx,cy,r:.12,class:'is-entry-core'}));
-            dungeonForgeLayer.appendChild(marker);
-        }
-
         if (draft) {
             const lightGroup = forgeSvg('g', { class: 'gmrt-forge-lights' });
             (plan.lights || []).forEach((light) => {
@@ -4979,49 +3175,8 @@
         return { x1:x/cols, y1:y/rows, x2:(x+1)/cols, y2:y/rows };
     };
 
-    // IV.35.8B — Every Dungeon Needs a Door.
-    // A Forge arrival is semantic as well as visual: Entrance reaches the map
-    // boundary, while Portal may stand inside a playable room. Both become the
-    // authoritative Party Arrival Threshold when the draft is built.
-    const forgeEntryMode = (value) => ['entrance','portal'].includes(String(value || '')) ? String(value) : 'none';
-
-    const forgeRoomCentreCell = (room) => ({
-        x: Math.max(room.x, Math.min(room.x + room.w - 1, Math.floor(room.x + room.w / 2))),
-        y: Math.max(room.y, Math.min(room.y + room.h - 1, Math.floor(room.y + room.h / 2)))
-    });
-
-    const forgeDungeonEntrance = (rooms, cols, rows, seed) => {
-        if (!rooms.length) return null;
-        const ranked = rooms.map((room, index) => {
-            const c = forgeRoomCentreCell(room);
-            const distances = [
-                {side:'west', value:c.x}, {side:'east', value:(cols - 1) - c.x},
-                {side:'north', value:c.y}, {side:'south', value:(rows - 1) - c.y}
-            ].sort((a,b)=>a.value-b.value || a.side.localeCompare(b.side));
-            return {room,index,cell:c,side:distances[0].side,distance:distances[0].value};
-        }).sort((a,b)=>a.distance-b.distance || forgeHash(`${seed}|entry|${a.index}`)-forgeHash(`${seed}|entry|${b.index}`));
-        const chosen=ranked[0];
-        const {x,y}=chosen.cell;
-        const boundary = chosen.side==='west' ? {axis:'vertical',line:0,start:y,door:{x1:0,y1:y/rows,x2:0,y2:(y+1)/rows},cell:{x:0,y}}
-            : chosen.side==='east' ? {axis:'vertical',line:cols,start:y,door:{x1:1,y1:y/rows,x2:1,y2:(y+1)/rows},cell:{x:cols-1,y}}
-            : chosen.side==='north' ? {axis:'horizontal',line:0,start:x,door:{x1:x/cols,y1:0,x2:(x+1)/cols,y2:0},cell:{x,y:0}}
-            : {axis:'horizontal',line:rows,start:x,door:{x1:x/cols,y1:1,x2:(x+1)/cols,y2:1},cell:{x,y:rows-1}};
-        return {
-            ...boundary,
-            start: chosen.cell,
-            anchor:{type:'entrance',x:(boundary.cell.x+.5)/cols,y:(boundary.cell.y+.5)/rows,facing:chosen.side}
-        };
-    };
-
-    const forgePortalAnchor = (rooms, cols, rows, seed) => {
-        if (!rooms.length) return null;
-        const room=[...rooms].sort((a,b)=>(b.w*b.h)-(a.w*a.h) || forgeHash(`${seed}|portal|${a.x}:${a.y}`)-forgeHash(`${seed}|portal|${b.x}:${b.y}`))[0];
-        const cell=forgeRoomCentreCell(room);
-        return {type:'portal',x:(cell.x+.5)/cols,y:(cell.y+.5)/rows,facing:'centre'};
-    };
-
     // Legacy IV.30.2 source contract: generateDungeonForgePlan = (seed, style)
-    const generateDungeonForgePlan = (seed, style, theme = 'pantry-stone', preferredAspect = null, entryMode = 'none', includeBossLair = false) => {
+    const generateDungeonForgePlan = (seed, style, theme = 'pantry-stone', preferredAspect = null) => {
         const presets = {
             compact: { cols:24, rooms:6, min:3, max:6 },
             standard: { cols:32, rooms:9, min:4, max:7 },
@@ -5037,17 +3192,6 @@
         const random = forgeRandom(`${seed}|${style}`);
         const integer = (min, max) => min + Math.floor(random() * ((max - min) + 1));
         const rooms = [];
-        const wantsBossLair = style === 'grand' && includeBossLair === true;
-
-        // IV.35.8C — reserve the boss chamber before ordinary packing so the
-        // largest map always has a genuinely large, combat-ready room.
-        if (wantsBossLair) {
-            const lairW = Math.max(10, Math.min(14, Math.floor(cols * .32)));
-            const lairH = Math.max(8, Math.min(11, Math.floor(rows * .34)));
-            const lairX = forgeHash(`${seed}|lair-x`) % 2 === 0 ? 2 : Math.max(2, cols - lairW - 2);
-            const lairY = 2 + (forgeHash(`${seed}|lair-y`) % Math.max(1, rows - lairH - 3));
-            rooms.push({ x:lairX, y:lairY, w:lairW, h:lairH, role:'lair', boss_lair:true });
-        }
 
         for (let attempt = 0; attempt < 500 && rooms.length < preset.rooms; attempt += 1) {
             const w = integer(preset.min, preset.max);
@@ -5104,23 +3248,6 @@
             doors.push(forgeDoorAt(next, a, cols, rows, horizontalFirst ? 'vertical' : 'horizontal'));
         }
 
-        const requestedEntry = forgeEntryMode(entryMode);
-        const dungeonEntrance = requestedEntry === 'entrance'
-            ? forgeDungeonEntrance(rooms, cols, rows, seed)
-            : null;
-        if (dungeonEntrance) {
-            const start=dungeonEntrance.start;
-            const target=dungeonEntrance.cell;
-            if(dungeonEntrance.axis==='vertical'){
-                const step=start.x<=target.x?1:-1;
-                for(let x=start.x;x!==target.x+step;x+=step) carve(x,start.y);
-            } else {
-                const step=start.y<=target.y?1:-1;
-                for(let y=start.y;y!==target.y+step;y+=step) carve(start.x,y);
-            }
-            doors.push(dungeonEntrance.door);
-        }
-
         // Merge contiguous exterior edges into long wall objects so the Forge remains
         // comfortably inside the existing 200-object Cartography safety budget.
         const floorSet = new Set(floor.keys());
@@ -5131,10 +3258,10 @@
         };
         floor.forEach((cell) => {
             const {x,y}=cell;
-            if (!floorSet.has(forgeFloorKey(x,y-1)) && !(dungeonEntrance?.axis==='horizontal' && dungeonEntrance.line===y && dungeonEntrance.start===x)) addEdge(horizontal,y,x);
-            if (!floorSet.has(forgeFloorKey(x,y+1)) && !(dungeonEntrance?.axis==='horizontal' && dungeonEntrance.line===y+1 && dungeonEntrance.start===x)) addEdge(horizontal,y+1,x);
-            if (!floorSet.has(forgeFloorKey(x-1,y)) && !(dungeonEntrance?.axis==='vertical' && dungeonEntrance.line===x && dungeonEntrance.start===y)) addEdge(vertical,x,y);
-            if (!floorSet.has(forgeFloorKey(x+1,y)) && !(dungeonEntrance?.axis==='vertical' && dungeonEntrance.line===x+1 && dungeonEntrance.start===y)) addEdge(vertical,x+1,y);
+            if (!floorSet.has(forgeFloorKey(x,y-1))) addEdge(horizontal,y,x);
+            if (!floorSet.has(forgeFloorKey(x,y+1))) addEdge(horizontal,y+1,x);
+            if (!floorSet.has(forgeFloorKey(x-1,y))) addEdge(vertical,x,y);
+            if (!floorSet.has(forgeFloorKey(x+1,y))) addEdge(vertical,x+1,y);
         });
         const barriers = [];
         const mergeEdges = (map, isHorizontal) => {
@@ -5169,11 +3296,8 @@
         });
 
         return {
-            version:4, scene_type:'dungeon', seed, style, theme, cols, rows,
-            floor:[...floor.values()], rooms, doors, barriers, lights, features:[],
-            entry_anchor: requestedEntry === 'portal'
-                ? forgePortalAnchor(rooms, cols, rows, seed)
-                : (dungeonEntrance?.anchor || null)
+            version:3, scene_type:'dungeon', seed, style, theme, cols, rows,
+            floor:[...floor.values()], rooms, doors, barriers, lights, features:[]
         };
     };
 
@@ -5273,22 +3397,10 @@
         return {version:3,scene_type:'village',seed,style,theme,cols,rows,floor,rooms,doors,barriers,lights,features};
     };
 
-    const generateSceneForgePlan = (sceneType, seed, style, theme = 'pantry-stone', preferredAspect = null, entryMode = 'none', includeBossLair = false) => {
-        const mode=forgeEntryMode(entryMode);
-        if (sceneType === 'forest' || sceneType === 'village') {
-            const plan=sceneType === 'forest'
-                ? generateForestForgePlan(seed, style, theme, preferredAspect)
-                : generateVillageForgePlan(seed, style, theme, preferredAspect);
-            if(mode==='portal') plan.entry_anchor=forgePortalAnchor(plan.rooms,plan.cols,plan.rows,seed);
-            if(mode==='entrance') {
-                const side=forgeHash(`${seed}|outdoor-entry`) % 4;
-                const cells=[{x:.5/plan.cols,y:.5,facing:'west'},{x:(plan.cols-.5)/plan.cols,y:.5,facing:'east'},{x:.5,y:.5/plan.rows,facing:'north'},{x:.5,y:(plan.rows-.5)/plan.rows,facing:'south'}];
-                plan.entry_anchor={type:'entrance',...cells[side]};
-            }
-            plan.version=4;
-            return plan;
-        }
-        return generateDungeonForgePlan(seed, style, theme, preferredAspect, mode, includeBossLair);
+    const generateSceneForgePlan = (sceneType, seed, style, theme = 'pantry-stone', preferredAspect = null) => {
+        if (sceneType === 'forest') return generateForestForgePlan(seed, style, theme, preferredAspect);
+        if (sceneType === 'village') return generateVillageForgePlan(seed, style, theme, preferredAspect);
+        return generateDungeonForgePlan(seed, style, theme, preferredAspect);
     };
 
     const setForgeStatus = (message) => {
@@ -5305,19 +3417,11 @@
         const seed = String(dungeonForgeSeed?.value || '').trim() || 'Peppercorn-01';
         const style = String(dungeonForgeStyle?.value || 'standard');
         const theme = String(dungeonForgeTheme?.value || 'pantry-stone');
-        const entryMode = forgeEntryMode(dungeonForgeEntry?.value || 'none');
-        dungeonForgeDraft = generateSceneForgePlan(sceneType, seed, style, theme, null, entryMode, Boolean(dungeonForgeLair?.checked));
-        dungeonForgeDraft.lair_occupant_id = dungeonForgeLair?.checked ? String(dungeonForgeLairOccupant?.value || '') : '';
-        dungeonForgeDraft.lair_occupant_hidden = Boolean(dungeonForgeDraft.lair_occupant_id && dungeonForgeLairOccupantHidden?.checked);
-        dungeonForgeDraft.populate_rooms = String(dungeonForgeDraft.scene_type || 'dungeon') === 'dungeon' && Boolean(dungeonForgePopulate?.checked);
-        dungeonForgeDraft.include_secrets = String(dungeonForgeDraft.scene_type || 'dungeon') === 'dungeon' && Boolean(dungeonForgeSecrets?.checked);
-        dungeonForgeDraft.include_traps = String(dungeonForgeDraft.scene_type || 'dungeon') === 'dungeon' && Boolean(dungeonForgeTraps?.checked);
-        dungeonForgeDraft.include_treasure = String(dungeonForgeDraft.scene_type || 'dungeon') === 'dungeon' && Boolean(dungeonForgeTreasure?.checked);
-        dungeonForgeDraft.include_story = String(dungeonForgeDraft.scene_type || 'dungeon') === 'dungeon' && Boolean(dungeonForgeStory?.checked);
+        dungeonForgeDraft = generateSceneForgePlan(sceneType, seed, style, theme);
         renderDungeonForgePlan(dungeonForgeDraft, true);
         if (dungeonForgeBuild) dungeonForgeBuild.disabled = false;
         if (dungeonForgeClear) dungeonForgeClear.disabled = false;
-        setForgeStatus(`${String(dungeonForgeDraft.scene_type || 'dungeon')} · ${dungeonForgeDraft.rooms.length} major places · ${dungeonForgeDraft.barriers.length} vision objects · ${dungeonForgeDraft.doors.length} doors · ${dungeonForgeDraft.lights.length} suggested lights${dungeonForgeDraft.entry_anchor ? ` · ${dungeonForgeDraft.entry_anchor.type} arrival` : ''} · preview only.`);
+        setForgeStatus(`${String(dungeonForgeDraft.scene_type || 'dungeon')} · ${dungeonForgeDraft.rooms.length} major places · ${dungeonForgeDraft.barriers.length} vision objects · ${dungeonForgeDraft.doors.length} doors · ${dungeonForgeDraft.lights.length} suggested lights · preview only.`);
     };
 
     dungeonForgeGenerate?.addEventListener('click', () => {
@@ -5360,7 +3464,7 @@
             });
             builtDungeonForgePlan = data.forge || dungeonForgeDraft;
             dungeonForgeDraft = null;
-            setForgeStatus(data.message || 'Dungeon forged. Walls, doors, furniture, lights, grid and Fog are now authoritative.');
+            setForgeStatus(data.message || 'Dungeon forged. Walls, doors, lights, grid and Fog are now authoritative.');
             await replaceChamber(data.message || 'Dungeon forged.', preparationSceneId || null);
         } catch (error) {
             dungeonForgeBuild.disabled = false;
@@ -5899,16 +4003,6 @@
     const atlasForgeSeed = document.querySelector('[data-atlas-forge-seed]');
     const atlasForgeSceneType = document.querySelector('[data-atlas-forge-scene-type]');
     const atlasForgeStyle = document.querySelector('[data-atlas-forge-style]');
-    const atlasForgeEntry = document.querySelector('[data-atlas-forge-entry]');
-    const atlasForgeLair = document.querySelector('[data-atlas-forge-lair]');
-    const atlasForgeLairOccupantWrap = document.querySelector('[data-atlas-forge-lair-occupant-wrap]');
-    const atlasForgeLairOccupant = document.querySelector('[data-atlas-forge-lair-occupant]');
-    const atlasForgeLairOccupantHidden = document.querySelector('[data-atlas-forge-lair-occupant-hidden]');
-    const atlasForgePopulate = document.querySelector('[data-atlas-forge-populate]');
-    const atlasForgeSecrets = document.querySelector('[data-atlas-forge-secrets]');
-    const atlasForgeTraps = document.querySelector('[data-atlas-forge-traps]');
-    const atlasForgeTreasure = document.querySelector('[data-atlas-forge-treasure]');
-    const atlasForgeStory = document.querySelector('[data-atlas-forge-story]');
     const atlasForgeTheme = document.querySelector('[data-atlas-forge-theme]');
     const atlasForgeReroll = document.querySelector('[data-atlas-forge-reroll]');
     const atlasForgeCreate = document.querySelector('[data-atlas-forge-create]');
@@ -5929,20 +4023,6 @@
         }
     };
     atlasForgeSceneType?.addEventListener('change', () => updatePippinFieldNote(String(atlasForgeSceneType.value || 'dungeon')));
-    const updateAtlasForgeLairAvailability = () => {
-        if (!atlasForgeLair) return;
-        const allowed = String(atlasForgeSceneType?.value || 'dungeon') === 'dungeon'
-            && String(atlasForgeStyle?.value || 'standard') === 'grand';
-        atlasForgeLair.disabled = !allowed;
-        if (!allowed) atlasForgeLair.checked = false;
-        const chosen = allowed && atlasForgeLair.checked;
-        if (atlasForgeLairOccupantWrap) atlasForgeLairOccupantWrap.hidden = !chosen;
-        if (!chosen && atlasForgeLairOccupant) atlasForgeLairOccupant.value = '';
-    };
-    atlasForgeSceneType?.addEventListener('change', updateAtlasForgeLairAvailability);
-    atlasForgeStyle?.addEventListener('change', updateAtlasForgeLairAvailability);
-    atlasForgeLair?.addEventListener('change', updateAtlasForgeLairAvailability);
-    updateAtlasForgeLairAvailability();
     const setAtlasOpen = (open) => setKeeperDrawerOpen('atlas', open);
 
     atlasForgeReroll?.addEventListener('click', () => {
@@ -5957,7 +4037,6 @@
         const sceneType = String(atlasForgeSceneType?.value || 'dungeon');
         const seed = String(atlasForgeSeed?.value || '').trim() || 'Peppercorn-01';
         const style = String(atlasForgeStyle?.value || 'standard');
-        const entryMode = forgeEntryMode(atlasForgeEntry?.value || 'none');
         const theme = String(atlasForgeTheme?.value || 'pantry-stone');
         if (!sceneName) {
             const message = 'Give Pippin a name for the new Scene first.';
@@ -5970,14 +4049,7 @@
         let plan;
         try {
             const aspectByStyle = { compact:.78, standard:.7, grand:.65 };
-            plan = generateSceneForgePlan(sceneType, seed, style, theme, aspectByStyle[style] || .7, entryMode, Boolean(atlasForgeLair?.checked));
-            plan.lair_occupant_id = atlasForgeLair?.checked ? String(atlasForgeLairOccupant?.value || '') : '';
-            plan.lair_occupant_hidden = Boolean(plan.lair_occupant_id && atlasForgeLairOccupantHidden?.checked);
-            plan.populate_rooms = String(plan.scene_type || 'dungeon') === 'dungeon' && Boolean(atlasForgePopulate?.checked);
-            plan.include_secrets = String(plan.scene_type || 'dungeon') === 'dungeon' && Boolean(atlasForgeSecrets?.checked);
-            plan.include_traps = String(plan.scene_type || 'dungeon') === 'dungeon' && Boolean(atlasForgeTraps?.checked);
-            plan.include_treasure = String(plan.scene_type || 'dungeon') === 'dungeon' && Boolean(atlasForgeTreasure?.checked);
-            plan.include_story = String(plan.scene_type || 'dungeon') === 'dungeon' && Boolean(atlasForgeStory?.checked);
+            plan = generateSceneForgePlan(sceneType, seed, style, theme, aspectByStyle[style] || .7);
         } catch (error) {
             const message = error?.message || 'Pippin could not prepare that Scene plan.';
             if (atlasForgeStatus) atlasForgeStatus.textContent = message;
@@ -6019,7 +4091,7 @@
             if (!sceneId) return;
             button.disabled = true;
             const previousLabel = button.textContent;
-            button.textContent = t('preparing', 'Preparing…');
+            button.textContent = 'Preparing…';
             if (atlasStatus) atlasStatus.textContent = 'Drawing the curtain around the chosen Scene…';
             try {
                 await replaceChamber('Behind the Curtain — private Scene preparation.', sceneId);
@@ -6101,7 +4173,10 @@
             board.classList.add('is-threshold-placing');
             showThresholdPlacementNotice(type);
 
-            setAtlasOpen(false);
+            const atlasDrawer = document.querySelector('[data-keepers-atlas]');
+            const atlasToggle = document.querySelector('[data-atlas-toggle]');
+            if (atlasDrawer) atlasDrawer.dataset.open = 'false';
+            if (atlasToggle) atlasToggle.setAttribute('aria-expanded', 'false');
 
             say(type === 'party'
                 ? 'Party Arrival armed — click the map to place the Threshold.'
@@ -6177,74 +4252,6 @@
             say('Threshold repositioning armed — click the map to choose its new position. Shift-click the marker to remove it instead.');
         });
     });
-
-
-    // IV.35.8D — Pippin Draws the Way Home.
-    // Scene routes are Keeper-controlled. The destination Party Arrival
-    // Threshold remains the single authoritative arrival anchor.
-    const sceneTransition = document.querySelector('[data-scene-transition]');
-    const sceneTransitionDestination = document.querySelector('[data-scene-transition-destination]');
-    const sceneTransitionSave = document.querySelector('[data-scene-transition-save]');
-    const sceneTransitionTravel = document.querySelector('[data-scene-transition-travel]');
-    const sceneTransitionRemove = document.querySelector('[data-scene-transition-remove]');
-    const sceneTransitionStatus = document.querySelector('[data-scene-transition-status]');
-
-    const setSceneTransitionState = (transition) => {
-        const destination = String(transition?.destination_scene_id || '');
-        if (sceneTransitionDestination) sceneTransitionDestination.value = destination;
-        if (sceneTransitionTravel) sceneTransitionTravel.disabled = destination === '';
-        if (sceneTransitionRemove) sceneTransitionRemove.disabled = destination === '';
-    };
-
-    if (sceneTransition) {
-        const sourceSceneId = String(sceneTransition.dataset.sourceSceneId || '');
-        request('gmrt_atlas_transition_status', { source_scene_id: sourceSceneId })
-            .then((data) => setSceneTransitionState(data.transition || null))
-            .catch(() => setSceneTransitionState(null));
-
-        sceneTransitionSave?.addEventListener('click', async () => {
-            const destinationSceneId = String(sceneTransitionDestination?.value || '');
-            if (!destinationSceneId) {
-                if (sceneTransitionStatus) sceneTransitionStatus.textContent = 'Choose another Scene first.';
-                return;
-            }
-            try {
-                const data = await request('gmrt_atlas_link_transition', {
-                    source_scene_id: sourceSceneId,
-                    destination_scene_id: destinationSceneId
-                });
-                setSceneTransitionState(data.transition || null);
-                if (sceneTransitionStatus) sceneTransitionStatus.textContent = data.message || 'Route drawn.';
-            } catch (error) {
-                if (sceneTransitionStatus) sceneTransitionStatus.textContent = error.message || 'The route could not be drawn.';
-            }
-        });
-
-        sceneTransitionTravel?.addEventListener('click', async () => {
-            if (!window.confirm('Take the Table through this route and open its destination Scene?')) return;
-            sceneTransitionTravel.disabled = true;
-            try {
-                const data = await request('gmrt_atlas_travel_transition', { source_scene_id: sourceSceneId });
-                const message = data.message || 'The party crosses the threshold.';
-                if (sceneTransitionStatus) sceneTransitionStatus.textContent = message;
-                say(message);
-                await replaceChamber(message, null);
-            } catch (error) {
-                if (sceneTransitionStatus) sceneTransitionStatus.textContent = error.message || 'The party could not travel.';
-                sceneTransitionTravel.disabled = false;
-            }
-        });
-
-        sceneTransitionRemove?.addEventListener('click', async () => {
-            try {
-                const data = await request('gmrt_atlas_remove_transition', { source_scene_id: sourceSceneId });
-                setSceneTransitionState(null);
-                if (sceneTransitionStatus) sceneTransitionStatus.textContent = data.message || 'Route erased.';
-            } catch (error) {
-                if (sceneTransitionStatus) sceneTransitionStatus.textContent = error.message || 'The route could not be erased.';
-            }
-        });
-    }
 
     document.querySelectorAll('[data-atlas-open-map]').forEach((button) => {
         button.addEventListener('click', async () => {
@@ -6634,10 +4641,7 @@
             targetLine.classList.remove(
                 'is-visible',
                 'is-long-range',
-                'is-out-of-range',
-                'has-object-cover',
-                'is-full-object-cover',
-                'is-object-vision-blocked'
+                'is-out-of-range'
             );
         }
 
@@ -6719,80 +4723,6 @@
         );
     }
 
-    function segmentsIntersect(a, b, c, d) {
-        const cross = (p, q, r) => (q.x - p.x) * (r.y - p.y) - (q.y - p.y) * (r.x - p.x);
-        const abC = cross(a, b, c);
-        const abD = cross(a, b, d);
-        const cdA = cross(c, d, a);
-        const cdB = cross(c, d, b);
-        return ((abC > 0 && abD < 0) || (abC < 0 && abD > 0))
-            && ((cdA > 0 && cdB < 0) || (cdA < 0 && cdB > 0));
-    }
-
-    function lineIntersectsPolygon(start, end, polygon) {
-        for (let index = 0; index < polygon.length; index += 1) {
-            if (segmentsIntersect(
-                start,
-                end,
-                polygon[index],
-                polygon[(index + 1) % polygon.length]
-            )) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    function sceneObjectCoverBetween(attacker, target) {
-        const attackerRect = attacker.getBoundingClientRect();
-        const targetRect = target.getBoundingClientRect();
-        const start = {
-            x: attackerRect.left + attackerRect.width / 2,
-            y: attackerRect.top + attackerRect.height / 2
-        };
-        const end = {
-            x: targetRect.left + targetRect.width / 2,
-            y: targetRect.top + targetRect.height / 2
-        };
-        const battlemap = board.querySelector('[data-battlemap-image]');
-        const mapRect = (battlemap || board).getBoundingClientRect();
-        const coverRank = {none: 0, half: 1, three_quarters: 2, full: 3};
-        let result = {cover: 'none', blocksVision: false};
-
-        document.querySelectorAll('[data-scene-object-id][data-object-cover]').forEach((object) => {
-            const cover = String(object.dataset.objectCover || 'none');
-            if (!coverRank[cover]) return;
-            const objectX = Number(object.dataset.sceneObjectX || 0.5);
-            const objectY = Number(object.dataset.sceneObjectY || 0.5);
-            const rotation = Number(object.dataset.sceneObjectRotation || 0);
-            const polygon = rectangleCorners(
-                mapRect.left + objectX * mapRect.width,
-                mapRect.top + objectY * mapRect.height,
-                Math.max(1, object.offsetWidth),
-                Math.max(1, object.offsetHeight),
-                rotation
-            );
-            if (!lineIntersectsPolygon(start, end, polygon)) return;
-            if ((coverRank[cover] || 0) > (coverRank[result.cover] || 0)) {
-                result = {
-                    cover,
-                    blocksVision: object.dataset.blocksVision === 'true'
-                };
-            } else if (object.dataset.blocksVision === 'true') {
-                result.blocksVision = true;
-            }
-        });
-
-        return result;
-    }
-
-    function coverLabel(cover) {
-        if (cover === 'half') return 'HALF COVER';
-        if (cover === 'three_quarters') return '3/4 COVER';
-        if (cover === 'full') return 'FULL COVER';
-        return '';
-    }
-
     async function updateTargeting() {
         if (
             !attackTarget
@@ -6843,24 +4773,6 @@
                 label += ' · ' + rollMode.toUpperCase();
             }
 
-            const attackerId = deedsPanel?.dataset.currentToken || '';
-            const attacker = attackerId !== ''
-                ? document.querySelector('[data-token-id="' + CSS.escape(attackerId) + '"]')
-                : null;
-            const target = document.querySelector(
-                '[data-token-id="' + CSS.escape(String(attackTarget.value)) + '"]'
-            );
-            const objectCover = attacker && target
-                ? sceneObjectCoverBetween(attacker, target)
-                : {cover: 'none', blocksVision: false};
-            const tacticalCoverLabel = coverLabel(objectCover.cover);
-            if (tacticalCoverLabel) {
-                label += ' · ' + tacticalCoverLabel;
-            }
-            if (objectCover.blocksVision) {
-                label += ' · OBSCURED';
-            }
-
             if (rangeStatus) {
                 rangeStatus.textContent = label;
                 rangeStatus.className =
@@ -6873,11 +4785,6 @@
                 attackTarget.value,
                 range.range_status || ''
             );
-            if (targetLine) {
-                targetLine.classList.toggle('has-object-cover', objectCover.cover !== 'none');
-                targetLine.classList.toggle('is-full-object-cover', objectCover.cover === 'full');
-                targetLine.classList.toggle('is-object-vision-blocked', objectCover.blocksVision);
-            }
 
             const button = attackButton();
             if (button) {
@@ -7064,148 +4971,8 @@
         };
     }
 
-    function tokenPoint(token) {
-        const x = parseFloat(token.style.getPropertyValue('--gmrt-token-x')) / 100;
-        const y = parseFloat(token.style.getPropertyValue('--gmrt-token-y')) / 100;
-        return {
-            x: Number.isFinite(x) ? x : 0.5,
-            y: Number.isFinite(y) ? y : 0.5
-        };
-    }
-
-    function rectangleCorners(cx, cy, width, height, rotationDegrees = 0) {
-        const halfWidth = Math.max(0, width) / 2;
-        const halfHeight = Math.max(0, height) / 2;
-        const radians = rotationDegrees * Math.PI / 180;
-        const cosine = Math.cos(radians);
-        const sine = Math.sin(radians);
-
-        return [
-            [-halfWidth, -halfHeight],
-            [halfWidth, -halfHeight],
-            [halfWidth, halfHeight],
-            [-halfWidth, halfHeight]
-        ].map(([x, y]) => ({
-            x: cx + x * cosine - y * sine,
-            y: cy + x * sine + y * cosine
-        }));
-    }
-
-    function polygonsOverlap(first, second) {
-        const polygons = [first, second];
-        const epsilon = 0.35;
-
-        for (const polygon of polygons) {
-            for (let index = 0; index < polygon.length; index += 1) {
-                const current = polygon[index];
-                const next = polygon[(index + 1) % polygon.length];
-                const axis = {
-                    x: -(next.y - current.y),
-                    y: next.x - current.x
-                };
-                const length = Math.hypot(axis.x, axis.y) || 1;
-                axis.x /= length;
-                axis.y /= length;
-
-                const project = (points) => points.reduce((range, point) => {
-                    const value = point.x * axis.x + point.y * axis.y;
-                    return {
-                        min: Math.min(range.min, value),
-                        max: Math.max(range.max, value)
-                    };
-                }, {min: Infinity, max: -Infinity});
-
-                const a = project(first);
-                const b = project(second);
-                if (a.max <= b.min + epsilon || b.max <= a.min + epsilon) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-    function tokenCollidesWithFurniture(token, point) {
-        const battlemap = board.querySelector('[data-battlemap-image]');
-        const rect = (battlemap || board).getBoundingClientRect();
-        const tokenWidth = Math.max(1, token.offsetWidth);
-        const tokenHeight = Math.max(1, token.offsetHeight);
-        const tokenPolygon = rectangleCorners(
-            rect.left + point.x * rect.width,
-            rect.top + point.y * rect.height,
-            tokenWidth,
-            tokenHeight
-        );
-
-        return Array.from(document.querySelectorAll('[data-scene-object-id][data-blocks-movement="true"]'))
-            .some((object) => {
-                const objectX = Number(object.dataset.sceneObjectX || 0.5);
-                const objectY = Number(object.dataset.sceneObjectY || 0.5);
-                const objectWidth = Math.max(1, object.offsetWidth);
-                const objectHeight = Math.max(1, object.offsetHeight);
-                const rotation = Number(object.dataset.sceneObjectRotation || 0);
-                const objectPolygon = rectangleCorners(
-                    rect.left + objectX * rect.width,
-                    rect.top + objectY * rect.height,
-                    objectWidth,
-                    objectHeight,
-                    rotation
-                );
-                return polygonsOverlap(tokenPolygon, objectPolygon);
-            });
-    }
-
-    function movementPathBlocked(token, from, to) {
-        const battlemap = board.querySelector('[data-battlemap-image]');
-        const rect = (battlemap || board).getBoundingClientRect();
-        const distancePixels = Math.hypot(
-            (to.x - from.x) * rect.width,
-            (to.y - from.y) * rect.height
-        );
-        const stride = Math.max(4, Math.min(token.offsetWidth, token.offsetHeight) / 3);
-        const steps = Math.max(1, Math.ceil(distancePixels / stride));
-
-        let escapedInitialOverlap = !tokenCollidesWithFurniture(token, from);
-
-        for (let step = 1; step <= steps; step += 1) {
-            const progress = step / steps;
-            const point = {
-                x: from.x + (to.x - from.x) * progress,
-                y: from.y + (to.y - from.y) * progress
-            };
-            const collides = tokenCollidesWithFurniture(token, point);
-
-            // A Keeper may move furniture onto an existing token. Never trap that
-            // token forever: allow it to leave the pre-existing overlap, then begin
-            // enforcing collision normally as soon as it reaches clear floor.
-            if (!escapedInitialOverlap) {
-                if (!collides) escapedInitialOverlap = true;
-                continue;
-            }
-
-            if (collides) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     async function moveSelected(x, y) {
         if (!selected || !tableId) {
-            return;
-        }
-
-        const destination = {
-            x: Math.max(0, Math.min(1, Number(x))),
-            y: Math.max(0, Math.min(1, Number(y)))
-        };
-        const origin = tokenPoint(selected);
-        if (movementPathBlocked(selected, origin, destination)) {
-            selected.classList.add('is-movement-blocked');
-            window.setTimeout(() => selected?.classList.remove('is-movement-blocked'), 260);
-            say('That route is blocked by the furnishings. Pippin refuses to draw the token inside the furniture.');
             return;
         }
 
@@ -7215,8 +4982,8 @@
         try {
             const data = await request('gmrt_move_token', {
                 token_id: tokenId,
-                x: destination.x,
-                y: destination.y,
+                x: x,
+                y: y,
                 revision: revision
             });
 
@@ -7224,7 +4991,7 @@
             selected.style.setProperty('--gmrt-token-x', (token.x * 100) + '%');
             selected.style.setProperty('--gmrt-token-y', (token.y * 100) + '%');
             selected.dataset.tokenRevision = String(token.revision);
-            if(data.trap){say(`CLICK! ${data.trap.label || 'A trap'} has been sprung. ${data.trap.effect || ''}`.trim());}else{say((token.label || 'Token') + ' moved.');}
+            say((token.label || 'Token') + ' moved.');
             await updateTargeting();
             await refresh();
         } catch (error) {
@@ -7324,10 +5091,6 @@
     }
 
     async function refresh() {
-        if (tokenDragInProgress || sceneObjectDrag) {
-            return;
-        }
-
         if (!tableId) {
             return;
         }
@@ -7352,23 +5115,6 @@
                 }
                 await replaceChamber(
                     'Passage Between Places — the Table carries you to a new Scene.',
-                    null
-                );
-                return;
-            }
-
-            const currentSessionId = String(root.dataset.sessionId || '');
-            const currentSessionStatus = String(root.dataset.sessionStatus || '');
-            const incomingSessionId = String(state.session?.id || '');
-            const incomingSessionStatus = String(state.session?.status || '');
-            if (
-                currentSessionId !== incomingSessionId
-                || currentSessionStatus !== incomingSessionStatus
-            ) {
-                await replaceChamber(
-                    incomingSessionId
-                        ? 'The Keeper has called the Session.'
-                        : 'The current Session has concluded.',
                     null
                 );
                 return;
@@ -7457,21 +5203,6 @@
                 say('The Table stirred — the turn has changed.');
             }
 
-            const incomingForgeRevision = String(state.forge_revision || '');
-            const currentForgeRevision = String(root.dataset.forgeRevision || '');
-            if (incomingForgeRevision && currentForgeRevision && incomingForgeRevision !== currentForgeRevision) {
-                await replaceChamber(
-                    root.dataset.viewerRole === 'player'
-                        ? 'Something in the dungeon has changed.'
-                        : 'The Keeper has amended the dungeon.',
-                    null
-                );
-                return;
-            }
-            if (incomingForgeRevision) {
-                root.dataset.forgeRevision = incomingForgeRevision;
-            }
-
             if (state.sync_revision) {
                 root.dataset.syncRevision = String(state.sync_revision);
             }
@@ -7481,7 +5212,6 @@
             renderFootsteps(state.footsteps || []);
             renderFog(state.fog || {});
             renderVisionLayer(state.vision_layer || []);
-            await refreshSceneObjectLayer();
 
             const combatantStates =
                 state.combatant_states || {};
@@ -7559,13 +5289,7 @@
                     String(Math.max(1, Number(token.height_units || 1)))
                 );
                 node.dataset.tokenRevision = String(token.revision || 1);
-                node.dataset.tokenSource = String(token.source_reference || '');
-                node.classList.toggle(
-                    'is-hidden-token',
-                    String(token.visibility || '') === 'hidden'
-                );
                 node.style.setProperty('--gmrt-fellowship-colour', String(token.table_colour_hex || '#d8ad4f'));
-                bindTokenInteractions(node);
 
                 const combatantState =
                     combatantStates[String(token.id)]
@@ -7581,9 +5305,7 @@
         }
     }
 
-    function bindTokenInteractions(token) {
-        if (!token || token.dataset.tokenInteractionsBound === '1') return;
-        token.dataset.tokenInteractionsBound = '1';
+    document.querySelectorAll('.gmrt-token').forEach((token) => {
         token.setAttribute('aria-pressed', 'false');
 
         const tokenDrag = {
@@ -7592,9 +5314,7 @@
             pointerId: null,
             startX: 0,
             startY: 0,
-            threshold: 3,
-            lastValidPoint: null,
-            blocked: false
+            threshold: 3
         };
 
         token.addEventListener('pointerdown', (event) => {
@@ -7604,12 +5324,9 @@
             select(token);
             tokenDrag.active = true;
             tokenDrag.moved = false;
-            tokenDragInProgress = true;
             tokenDrag.pointerId = event.pointerId;
             tokenDrag.startX = event.clientX;
             tokenDrag.startY = event.clientY;
-            tokenDrag.lastValidPoint = tokenPoint(token);
-            tokenDrag.blocked = false;
             token.setPointerCapture(event.pointerId);
         });
 
@@ -7637,17 +5354,6 @@
             event.stopPropagation();
 
             const point = coordinatesFromPointer(event);
-            const from = tokenDrag.lastValidPoint || tokenPoint(token);
-            if (movementPathBlocked(token, from, point)) {
-                tokenDrag.blocked = true;
-                token.classList.add('is-movement-blocked');
-                say('Blocked by furniture. Pippin says the map is quite clear on this point.');
-                return;
-            }
-
-            tokenDrag.blocked = false;
-            token.classList.remove('is-movement-blocked');
-            tokenDrag.lastValidPoint = point;
             token.style.setProperty(
                 '--gmrt-token-x',
                 (point.x * 100) + '%'
@@ -7658,7 +5364,7 @@
             );
         });
 
-        const finishTokenDrag = async (event) => {
+        const finishTokenDrag = (event) => {
             if (
                 !tokenDrag.active
                 || event.pointerId !== tokenDrag.pointerId
@@ -7683,14 +5389,9 @@
             if (moved) {
                 event.preventDefault();
                 event.stopPropagation();
-                const point = tokenDrag.lastValidPoint || tokenPoint(token);
-                token.classList.remove('is-movement-blocked');
-                await moveSelected(point.x, point.y);
-                tokenDrag.lastValidPoint = null;
-                tokenDrag.blocked = false;
+                const point = coordinatesFromPointer(event);
+                moveSelected(point.x, point.y);
             }
-
-            tokenDragInProgress = false;
         };
 
         token.addEventListener('pointerup', finishTokenDrag);
@@ -7726,10 +5427,6 @@
                 Math.max(0, Math.min(1, y))
             );
         });
-    }
-
-    document.querySelectorAll('.gmrt-token').forEach((token) => {
-        bindTokenInteractions(token);
     });
 
     board.addEventListener('click', async (event) => {
