@@ -4277,7 +4277,99 @@
                 entry.boundaryGraphBridges = certifiedEvidenceBridges.filter((bridge) => bridge.fromEntry === entryIndex || bridge.toEntry === entryIndex);
             });
 
-            if (recoverableChains.length === 0) return [];
+            // IV.30.1G.5I — Playable Region Closure & Perimeter Inference.
+            // The Dungeon from Hell proved that some genuine perimeter ink never becomes
+            // a trustworthy contour chain at all. Reverse the question for those gaps:
+            // begin with already-certified playable floor, heal only locally surrounded
+            // floor samples lost beneath illustration/ink, then inspect the resulting
+            // playable-to-non-playable transition for corroborating structural ink.
+            // This is not a white-area outline pass. Exterior whitespace is excluded,
+            // portals/thresholds are vetoes, and a recovered edge needs both local region
+            // closure support and nearby wall-body darkness before it may become a wall.
+            const playableRegionClosureAndPerimeterInference = () => {
+                const closure = Array.from({ length: contourRows }, (_, row) =>
+                    Array.from({ length: contourColumns }, (_, column) => isPlayableFloor(column, row))
+                );
+                const inferred = Array.from({ length: contourRows }, () => Array(contourColumns).fill(false));
+                const neighbourOffsets = [[-1,-1],[0,-1],[1,-1],[-1,0],[1,0],[-1,1],[0,1],[1,1]];
+
+                // Two deliberately small closure passes recover floor hidden by a hatch,
+                // creature line or stone edge without flooding across a real wall band.
+                for (let pass = 0; pass < 2; pass += 1) {
+                    const additions = [];
+                    for (let row = 1; row < contourRows - 1; row += 1) {
+                        for (let column = 1; column < contourColumns - 1; column += 1) {
+                            if (closure[row][column]) continue;
+                            // Never absorb known exterior white space into a dungeon region.
+                            const rawComponent = floor[row][column] ? floorComponent[row][column] : -1;
+                            if (rawComponent >= 0 && exteriorFloorComponents.has(rawComponent)) continue;
+                            let surroundingPlayable = 0;
+                            let orthogonalPlayable = 0;
+                            neighbourOffsets.forEach(([dx, dy]) => {
+                                if (closure[row + dy][column + dx]) surroundingPlayable += 1;
+                            });
+                            [[-1,0],[1,0],[0,-1],[0,1]].forEach(([dx,dy]) => {
+                                if (closure[row + dy][column + dx]) orthogonalPlayable += 1;
+                            });
+                            if (surroundingPlayable < 4 || orthogonalPlayable < 2) continue;
+                            if (darkness[row][column] > .58) continue;
+                            additions.push([column, row]);
+                        }
+                    }
+                    additions.forEach(([column, row]) => { closure[row][column] = true; inferred[row][column] = true; });
+                    if (additions.length === 0) break;
+                }
+
+                const edgeKey = (a, b) => `${a.x},${a.y}:${b.x},${b.y}`;
+                const inferredEdges = new Map();
+                const addPerimeterEdge = (column, row, side) => {
+                    const left = column * contourStep;
+                    const right = (column + 1) * contourStep;
+                    const top = row * contourStep;
+                    const bottom = (row + 1) * contourStep;
+                    let a, b, outsideColumn = column, outsideRow = row;
+                    if (side === 'top') { a={x:left,y:top}; b={x:right,y:top}; outsideRow -= 1; }
+                    else if (side === 'right') { a={x:right,y:top}; b={x:right,y:bottom}; outsideColumn += 1; }
+                    else if (side === 'bottom') { a={x:left,y:bottom}; b={x:right,y:bottom}; outsideRow += 1; }
+                    else { a={x:left,y:top}; b={x:left,y:bottom}; outsideColumn -= 1; }
+                    if (outsideColumn < 0 || outsideRow < 0 || outsideColumn >= contourColumns || outsideRow >= contourRows) return;
+                    if (closure[outsideRow][outsideColumn]) return;
+                    // At least one side of the transition must owe its membership to the
+                    // closure inference; otherwise the ordinary Living Contour reader
+                    // already had this evidence and remains authoritative.
+                    const closureRecovered = inferred[row][column];
+                    if (!closureRecovered) return;
+                    const threshold = contourThresholdMatch(a, b);
+                    if (threshold) return;
+                    const wallBodyDarkness = darkness[outsideRow][outsideColumn];
+                    const localInk = Math.max(wallBodyDarkness, darkness[row][column]);
+                    if (localInk < .20) return;
+                    const key = edgeKey(a, b);
+                    if (!inferredEdges.has(key)) inferredEdges.set(key, { a, b, localInk });
+                };
+                for (let row = 1; row < contourRows - 1; row += 1) {
+                    for (let column = 1; column < contourColumns - 1; column += 1) {
+                        if (!closure[row][column] || !inferred[row][column]) continue;
+                        addPerimeterEdge(column, row, 'top');
+                        addPerimeterEdge(column, row, 'right');
+                        addPerimeterEdge(column, row, 'bottom');
+                        addPerimeterEdge(column, row, 'left');
+                    }
+                }
+                return Array.from(inferredEdges.values()).map((edge) => ({
+                    type: 'wall', confidence: Math.max(80, Math.min(89, Math.round(80 + edge.localInk * 14))), selected: true,
+                    contour: true, fineContour: true, fullBoundary: false, partialContour: true,
+                    partialContourRecovery: 'playable-region-perimeter-inference',
+                    playableRegionClosure: true, inferredPerimeter: true, certifiedPortal: false, thresholdGapProtection: false,
+                    semanticBoundaryClassification: 'structural-wall', semanticBoundaryRole: 'playable-region-perimeter',
+                    recoveryEvidence: ['certified-playable-region', 'local-region-closure', 'playable-to-non-playable-transition', 'corroborating-wall-body-ink', 'portal-threshold-veto'],
+                    evidenceModel: 'living-contour-playable-region-closure-v8', polyline: true,
+                    points: [edge.a, edge.b], x1: edge.a.x, y1: edge.a.y, x2: edge.b.x, y2: edge.b.y
+                }));
+            };
+            const inferredPlayablePerimeterSuggestions = playableRegionClosureAndPerimeterInference();
+
+            if (recoverableChains.length === 0 && inferredPlayablePerimeterSuggestions.length === 0) return [];
 
             // Keep the historical Economy vocabulary as a compatibility contract:
             // budgetedChains, remainingBudget and Math.sqrt(entry.length) formerly
@@ -4390,7 +4482,13 @@
                     x1: from.x, y1: from.y, x2: to.x, y2: to.y
                 };
             });
-            pathSuggestions = pathSuggestions.concat(evidenceBridgeSuggestions).slice(0, maximumReviewSuggestions);
+            const perimeterInferenceBudget = Math.min(24, inferredPlayablePerimeterSuggestions.length);
+            const bridgeInferenceBudget = Math.min(12, evidenceBridgeSuggestions.length);
+            const supplementalSuggestions = evidenceBridgeSuggestions.slice(0, bridgeInferenceBudget)
+                .concat(inferredPlayablePerimeterSuggestions.slice(0, perimeterInferenceBudget));
+            pathSuggestions = pathSuggestions
+                .slice(0, Math.max(0, maximumReviewSuggestions - supplementalSuggestions.length))
+                .concat(supplementalSuggestions);
 
             // Defensive compatibility fallback: IV.30.1C intentionally no longer
             // performs global segment compaction. Historical contracts referenced
