@@ -3471,6 +3471,65 @@
                 }
             }
 
+            // IV.30.1G.5K — Interior Occupancy & Illustrated Floor Reasoning.
+            // Illustration inside a room is not automatically solid structure. Infer only
+            // compact, enclosed occupancy islands that are surrounded by already-visible
+            // playable floor. This is deliberately additive: inferred cells can support
+            // G.5J occlusion recovery, but can never revoke an existing floor cell or
+            // certified G.5A–J contour. Sustained wall-like ink remains a hard veto.
+            const illustratedInteriorPlayableSurface = Array.from({ length: contourRows }, () => Array(contourColumns).fill(false));
+            const maximumInteriorLookahead = Math.max(2, Math.round(contourSubdivisions * .72));
+            const interiorOccupancyPass = () => {
+                const additions = new Map();
+                const visibleFloorInDirection = (column, row, dx, dy) => {
+                    for (let distance = 1; distance <= maximumInteriorLookahead; distance += 1) {
+                        const x = column + (dx * distance);
+                        const y = row + (dy * distance);
+                        if (x < 0 || y < 0 || x >= contourColumns || y >= contourRows) return false;
+                        if (floor[y][x]) return true;
+                        if (darkness[y][x] >= .78 && distance >= 2) return false;
+                    }
+                    return false;
+                };
+                for (let row = 1; row < contourRows - 1; row += 1) {
+                    for (let column = 1; column < contourColumns - 1; column += 1) {
+                        if (floor[row][column]) continue;
+                        // Near-white gaps are already handled by the ordinary floor mask.
+                        // G.5K is for illustrated occupancy: enough ink to hide floor, but
+                        // not a dense structural wall core.
+                        const ink = darkness[row][column];
+                        if (ink < .20 || ink > .70) continue;
+                        const north = visibleFloorInDirection(column, row, 0, -1);
+                        const south = visibleFloorInDirection(column, row, 0, 1);
+                        const west = visibleFloorInDirection(column, row, -1, 0);
+                        const east = visibleFloorInDirection(column, row, 1, 0);
+                        const directionalSupport = Number(north) + Number(south) + Number(west) + Number(east);
+                        const opposedEnclosure = (north && south) || (west && east);
+                        if (directionalSupport < 3 || !opposedEnclosure) continue;
+
+                        // A real wall tends to form a sustained dark band through adjacent
+                        // samples. Interior art is usually locally busy but not a continuous
+                        // barrier. Require at least two quiet/playable neighbours and veto
+                        // a strong opposing wall band.
+                        const neighbours = [[-1,0],[1,0],[0,-1],[0,1]].map(([dx,dy]) => ({
+                            floor: floor[row + dy][column + dx],
+                            darkness: darkness[row + dy][column + dx]
+                        }));
+                        const localFloorSupport = neighbours.filter((sample) => sample.floor || sample.darkness <= .30).length;
+                        const horizontalWallBand = neighbours[0].darkness >= .72 && neighbours[1].darkness >= .72;
+                        const verticalWallBand = neighbours[2].darkness >= .72 && neighbours[3].darkness >= .72;
+                        if (localFloorSupport < 2 || horizontalWallBand || verticalWallBand) continue;
+                        additions.set(`${column},${row}`, [column, row]);
+                    }
+                }
+                additions.forEach(([column, row]) => {
+                    floor[row][column] = true;
+                    illustratedInteriorPlayableSurface[row][column] = true;
+                });
+                return additions.size;
+            };
+            const inferredIllustratedInteriorCells = options.skipOcclusionRecovery === true ? 0 : interiorOccupancyPass();
+
             // IV.30.1G.5J — Playable Surface Reconstruction & Occlusion Recovery.
             // Dense creature art, rubble, mushrooms and annotation can hide an otherwise
             // continuous floor without representing a structural boundary. Reconstruct
