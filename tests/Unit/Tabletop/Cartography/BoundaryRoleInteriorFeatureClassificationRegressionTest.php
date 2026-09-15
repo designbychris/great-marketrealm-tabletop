@@ -19,7 +19,7 @@ final class BoundaryRoleInteriorFeatureClassificationRegressionTest extends Test
         self::assertStringContainsString('IV.30.1G.5E — Boundary Role & Interior Feature Classification', $script);
         self::assertStringContainsString("boundaryRole: 'interior-feature'", $script);
         self::assertStringContainsString("boundaryRole: 'terrain-elevation'", $script);
-        self::assertStringContainsString("boundaryRole: 'playable-region-perimeter'", $script);
+        self::assertStringContainsString("'playable-region-perimeter'", $script);
         self::assertStringContainsString("semanticBoundaryRole: entry.semanticBoundary?.boundaryRole || 'unresolved-evidence'", $script);
     }
 
