@@ -3461,6 +3461,66 @@
                 }
             }
 
+            // IV.30.1G.5J — Playable Surface Reconstruction & Occlusion Recovery.
+            // Dense creature art, rubble, mushrooms and annotation can hide an otherwise
+            // continuous floor without representing a structural boundary. Reconstruct
+            // only short occluded spans whose two visible shores agree: both ends must be
+            // playable, the span must remain locally floor-supported, and a sustained dark
+            // wall band vetoes recovery. This repairs the semantic floor model; it does not
+            // draw a wall or interpolate a pink contour.
+            const reconstructedPlayableSurface = Array.from({ length: contourRows }, () => Array(contourColumns).fill(false));
+            const maximumOcclusionSpan = Math.max(2, Math.round(contourSubdivisions * .85));
+            const occlusionRecoveryPass = () => {
+                const additions = new Map();
+                const considerSpan = (column, row, dx, dy) => {
+                    if (!floor[row][column]) return;
+                    for (let distance = 2; distance <= maximumOcclusionSpan + 1; distance += 1) {
+                        const endColumn = column + dx * distance;
+                        const endRow = row + dy * distance;
+                        if (endColumn <= 0 || endRow <= 0 || endColumn >= contourColumns - 1 || endRow >= contourRows - 1) break;
+                        if (!floor[endRow][endColumn]) continue;
+                        let darkSum = 0;
+                        let veryDark = 0;
+                        let lateralSupport = 0;
+                        const span = [];
+                        for (let step = 1; step < distance; step += 1) {
+                            const x = column + dx * step;
+                            const y = row + dy * step;
+                            if (floor[y][x]) { span.length = 0; break; }
+                            span.push([x, y]);
+                            darkSum += darkness[y][x];
+                            if (darkness[y][x] >= .72) veryDark += 1;
+                            const px = dy; const py = dx;
+                            if (isFinite(darkness[y + py]?.[x + px]) && darkness[y + py][x + px] <= .30) lateralSupport += 1;
+                            if (isFinite(darkness[y - py]?.[x - px]) && darkness[y - py][x - px] <= .30) lateralSupport += 1;
+                        }
+                        if (span.length === 0) break;
+                        const averageDarkness = darkSum / span.length;
+                        const sustainedWallBand = veryDark >= Math.max(2, Math.ceil(span.length * .65));
+                        const supportedOcclusion = lateralSupport >= Math.max(1, Math.floor(span.length * .45));
+                        if (!sustainedWallBand && supportedOcclusion && averageDarkness <= .62) {
+                            span.forEach(([x, y]) => additions.set(`${x},${y}`, [x, y]));
+                        }
+                        break;
+                    }
+                };
+                for (let row = 1; row < contourRows - 1; row += 1) {
+                    for (let column = 1; column < contourColumns - 1; column += 1) {
+                        considerSpan(column, row, 1, 0);
+                        considerSpan(column, row, 0, 1);
+                    }
+                }
+                additions.forEach(([column, row]) => {
+                    floor[row][column] = true;
+                    reconstructedPlayableSurface[row][column] = true;
+                });
+                return additions.size;
+            };
+            const recoveredPlayableSurfaceCells = occlusionRecoveryPass();
+            // Hybrid may make one second conservative pass after its seam-healing stage;
+            // standalone Living Contour remains deliberately single-pass.
+            if (options.connectPlayableFloor === true && recoveredPlayableSurfaceCells > 0) occlusionRecoveryPass();
+
             // IV.30.1G.5 — Boundary-Side & Wall-Band Reasoning.
             // White space outside a cave is visually similar to playable floor. On
             // hatched maps that used to let Living Contour trace the far/exterior side
@@ -4362,7 +4422,7 @@
                     partialContourRecovery: 'playable-region-perimeter-inference',
                     playableRegionClosure: true, inferredPerimeter: true, certifiedPortal: false, thresholdGapProtection: false,
                     semanticBoundaryClassification: 'structural-wall', semanticBoundaryRole: 'playable-region-perimeter',
-                    recoveryEvidence: ['certified-playable-region', 'local-region-closure', 'playable-to-non-playable-transition', 'corroborating-wall-body-ink', 'portal-threshold-veto'],
+                    recoveryEvidence: ['certified-playable-region', 'reconstructed-playable-surface', 'local-region-closure', 'playable-to-non-playable-transition', 'corroborating-wall-body-ink', 'portal-threshold-veto'],
                     evidenceModel: 'living-contour-playable-region-closure-v8', polyline: true,
                     points: [edge.a, edge.b], x1: edge.a.x, y1: edge.a.y, x2: edge.b.x, y2: edge.b.y
                 }));
