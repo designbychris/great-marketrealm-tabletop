@@ -3461,6 +3461,67 @@
                 }
             }
 
+            // IV.30.1G.5 — Boundary-Side & Wall-Band Reasoning.
+            // White space outside a cave is visually similar to playable floor. On
+            // hatched maps that used to let Living Contour trace the far/exterior side
+            // of the wall band whenever that edge was darker or cleaner. Label the
+            // current floor components and conservatively recognise only a dominant,
+            // heavily border-connected component as exterior whitespace. A legitimate
+            // dungeon entrance may touch an edge; touching an edge alone is never enough.
+            const floorComponent = Array.from({ length: contourRows }, () => Array(contourColumns).fill(-1));
+            const floorComponentStats = [];
+            let floorComponentId = 0;
+            for (let row = 0; row < contourRows; row += 1) {
+                for (let column = 0; column < contourColumns; column += 1) {
+                    if (!floor[row][column] || floorComponent[row][column] !== -1) continue;
+                    const queue = [[column, row]];
+                    floorComponent[row][column] = floorComponentId;
+                    let size = 0;
+                    let borderSamples = 0;
+                    for (let cursor = 0; cursor < queue.length; cursor += 1) {
+                        const [x, y] = queue[cursor];
+                        size += 1;
+                        if (x === 0 || y === 0 || x === contourColumns - 1 || y === contourRows - 1) borderSamples += 1;
+                        [[-1,0],[1,0],[0,-1],[0,1]].forEach(([dx,dy]) => {
+                            const nx=x+dx, ny=y+dy;
+                            if (nx < 0 || ny < 0 || nx >= contourColumns || ny >= contourRows) return;
+                            if (!floor[ny][nx] || floorComponent[ny][nx] !== -1) return;
+                            floorComponent[ny][nx] = floorComponentId;
+                            queue.push([nx,ny]);
+                        });
+                    }
+                    floorComponentStats.push({ id: floorComponentId, size, borderSamples });
+                    floorComponentId += 1;
+                }
+            }
+            const totalFineCells = Math.max(1, contourColumns * contourRows);
+            const exteriorFloorComponents = new Set(floorComponentStats
+                .filter((entry) => entry.borderSamples >= Math.max(8, contourSubdivisions * 2)
+                    && entry.size / totalFineCells >= .08
+                    && entry.borderSamples / Math.max(1, entry.size) >= .012)
+                .map((entry) => entry.id));
+            const isPlayableFloor = (column, row) => column >= 0 && row >= 0
+                && column < contourColumns && row < contourRows
+                && floor[row][column]
+                && !exteriorFloorComponents.has(floorComponent[row][column]);
+
+            // A floor-facing wall edge should have a meaningful depth of playable floor
+            // behind it. Tiny white pockets between hatch strokes usually fail this test,
+            // which prevents Pippin hopping across the ink band to its opposite edge.
+            const minimumWallBandFloorDepth = Math.max(2, Math.round(contourSubdivisions * .34));
+            const wallBandFloorDepth = (column, row, dx, dy) => {
+                let depth = 0;
+                for (let step = 0; step < minimumWallBandFloorDepth + 2; step += 1) {
+                    const x = column + (dx * step);
+                    const y = row + (dy * step);
+                    if (!isPlayableFloor(x, y)) break;
+                    depth += 1;
+                }
+                return depth;
+            };
+            const wallBandEdgeIsFloorFacing = (column, row, inwardDx, inwardDy) =>
+                wallBandFloorDepth(column, row, inwardDx, inwardDy) >= minimumWallBandFloorDepth;
+
             const suggestions = new Map();
             const roundContourCoordinate = (value) => Math.round(value * contourSubdivisions) / contourSubdivisions;
             const add = (x1, y1, x2, y2, confidence = 84) => {
@@ -3475,19 +3536,19 @@
             const isFloor = (column, row) => column >= 0 && row >= 0 && column < contourColumns && row < contourRows && floor[row][column];
             for (let row = 0; row < contourRows; row += 1) {
                 for (let column = 0; column < contourColumns; column += 1) {
-                    if (!floor[row][column]) continue;
+                    if (!isPlayableFloor(column, row)) continue;
                     const left = column * contourStep;
                     const right = (column + 1) * contourStep;
                     const top = row * contourStep;
                     const bottom = (row + 1) * contourStep;
-                    // The finite analysis envelope is not cave rock. Only emit a
-                    // contour when both cells exist inside the sampled map and the
-                    // neighbouring cell is classified as solid. This prevents false
-                    // wall paths from hugging the bottom/right (or any outer) edge.
-                    if (row > 0 && !isFloor(column, row - 1)) add(left, top, right, top);
-                    if (column < contourColumns - 1 && !isFloor(column + 1, row)) add(right, top, right, bottom);
-                    if (row < contourRows - 1 && !isFloor(column, row + 1)) add(left, bottom, right, bottom);
-                    if (column > 0 && !isFloor(column - 1, row)) add(left, top, left, bottom);
+                    // The finite analysis envelope is not cave rock. G.5 also refuses
+                    // the exterior-facing side of a wall band and hatch-sized white
+                    // pockets: emitted geometry must have sustained playable floor on
+                    // its inward side. This gives Hybrid a stable side to preserve.
+                    if (row > 0 && !isFloor(column, row - 1) && wallBandEdgeIsFloorFacing(column, row, 0, 1)) add(left, top, right, top, 91);
+                    if (column < contourColumns - 1 && !isFloor(column + 1, row) && wallBandEdgeIsFloorFacing(column, row, -1, 0)) add(right, top, right, bottom, 91);
+                    if (row < contourRows - 1 && !isFloor(column, row + 1) && wallBandEdgeIsFloorFacing(column, row, 0, -1)) add(left, bottom, right, bottom, 91);
+                    if (column > 0 && !isFloor(column - 1, row) && wallBandEdgeIsFloorFacing(column, row, 1, 0)) add(left, top, left, bottom, 91);
                 }
             }
 
@@ -3918,9 +3979,12 @@
                             : (entry.partial
                                 ? ['ordered-boundary-chain', 'minimum-safe-length', 'unresolved-ends-preserved']
                                 : ['closed-boundary-chain']),
+                        // Historical G.4B evidence spellings retained as regression vocabulary:
+                        // ? 'living-contour-gap-classification-v5b'
+                        // : (entry.partial ? 'living-contour-partial-v5' : 'living-contour-closed-v5')
                         evidenceModel: gapProtected
-                            ? 'living-contour-gap-classification-v5b'
-                            : (entry.partial ? 'living-contour-partial-v5' : 'living-contour-closed-v5'),
+                            ? 'living-contour-wall-band-v6'
+                            : (entry.partial ? 'living-contour-wall-band-partial-v6' : 'living-contour-wall-band-closed-v6'),
                         adaptiveBudget: true, polyline: true, points: runPoints,
                         x1: runPoints[0].x, y1: runPoints[0].y,
                         x2: runPoints[runPoints.length - 1].x, y2: runPoints[runPoints.length - 1].y
