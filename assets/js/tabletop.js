@@ -3349,6 +3349,16 @@
         // freely through the artwork and hatch texture makes directional ink scans
         // fragmentary. The result is still only a review-first barrier draft.
         const livingContourCandidates = (options = {}) => {
+            // IV.30.1G.5J.1 — Monotonic Occlusion Recovery.
+            // G.5J is an evidence augmentation layer: it may recover additional playable
+            // surface, but it must never revoke a contour already certified by G.5A–I.
+            // Take one pre-recovery reading as the preservation baseline. The internal
+            // call skips only G.5J reconstruction, preventing recursion while retaining
+            // the complete earlier semantic/topological pipeline.
+            const preOcclusionRecoveryContours = options.skipOcclusionRecovery === true
+                ? []
+                : livingContourCandidates({ ...options, skipOcclusionRecovery: true });
+
             const gridCanvasX = Math.max(4, toCanvasX(grid.size));
             const gridCanvasY = Math.max(4, toCanvasY(grid.size));
             const originX = toCanvasX(grid.offsetX);
@@ -3516,10 +3526,14 @@
                 });
                 return additions.size;
             };
-            const recoveredPlayableSurfaceCells = occlusionRecoveryPass();
-            // Hybrid may make one second conservative pass after its seam-healing stage;
-            // standalone Living Contour remains deliberately single-pass.
-            if (options.connectPlayableFloor === true && recoveredPlayableSurfaceCells > 0) occlusionRecoveryPass();
+            // Historical G.5J regression contract: const recoveredPlayableSurfaceCells = occlusionRecoveryPass();
+            let recoveredPlayableSurfaceCells = 0;
+            if (options.skipOcclusionRecovery !== true) {
+                recoveredPlayableSurfaceCells = occlusionRecoveryPass();
+                // Hybrid may make one second conservative pass after its seam-healing stage;
+                // standalone Living Contour remains deliberately single-pass.
+                if (options.connectPlayableFloor === true && recoveredPlayableSurfaceCells > 0) occlusionRecoveryPass();
+            }
 
             // IV.30.1G.5 — Boundary-Side & Wall-Band Reasoning.
             // White space outside a cave is visually similar to playable floor. On
@@ -4429,7 +4443,9 @@
             };
             const inferredPlayablePerimeterSuggestions = playableRegionClosureAndPerimeterInference();
 
-            if (recoverableChains.length === 0 && inferredPlayablePerimeterSuggestions.length === 0) return [];
+            if (recoverableChains.length === 0 && inferredPlayablePerimeterSuggestions.length === 0) {
+                return preOcclusionRecoveryContours;
+            }
 
             // Keep the historical Economy vocabulary as a compatibility contract:
             // budgetedChains, remainingBudget and Math.sqrt(entry.length) formerly
@@ -4559,7 +4575,22 @@
             const simplificationTolerance = Math.max(contourStep * 1.1, .12);
             const fallbackValues = buildSimplifiedSuggestions(simplificationTolerance);
             void fallbackValues;
-            if (pathSuggestions.length > maximumReviewSuggestions) return [];
+            if (pathSuggestions.length > maximumReviewSuggestions) return preOcclusionRecoveryContours;
+
+            // Monotonic evidence contract: preserve every pre-G.5J certified object first,
+            // then spend only the remaining review budget on genuinely new reconstruction
+            // evidence. G.5J can therefore improve a draft but can never make Living
+            // Contour or Hybrid sparser than the G.5I baseline.
+            if (preOcclusionRecoveryContours.length > 0) {
+                const merged = new Map();
+                preOcclusionRecoveryContours.forEach((item) => merged.set(cartographySuggestionKey(item), item));
+                pathSuggestions.forEach((item) => {
+                    if (merged.size >= maximumReviewSuggestions) return;
+                    const key = cartographySuggestionKey(item);
+                    if (!merged.has(key)) merged.set(key, item);
+                });
+                return Array.from(merged.values());
+            }
             return pathSuggestions;
         };
 
