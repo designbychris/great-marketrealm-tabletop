@@ -4204,11 +4204,69 @@
                 const t = Math.max(0, Math.min(1, (((point.x - start.x) * dx) + ((point.y - start.y) * dy)) / lengthSquared));
                 return Math.hypot(point.x - (start.x + (t * dx)), point.y - (start.y + (t * dy)));
             };
-            const contourSpanCoveredByStructure = (a, b) => {
+            // IV.30.1G.5C — Semantic Continuity & Region Topology.
+            // A wall is not a bag of unrelated pixels. Once Living Contour has proved
+            // an ordered boundary around the same playable region, locally weak spans
+            // inherit cautious support from their neighbours. Door/threshold evidence
+            // remains an explicit break: topology may continue a wall, never seal an
+            // opening that Pippin has already classified as a threshold.
+            const thresholdNearSpan = (a, b) => {
+                const center = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+                return thresholdCandidates.some((door) => pointToSegmentDistance(
+                    center,
+                    { x: Number(door.x1), y: Number(door.y1) },
+                    { x: Number(door.x2), y: Number(door.y2) }
+                ) <= .72);
+            };
+            const contourTopologyEvidence = (item) => {
+                const points = Array.isArray(item.points) ? item.points : [];
+                if (points.length < 2) return { coherent: false, continuity: 0, playableSideConsistency: 0, regionMembership: 'unresolved' };
+                let pathLength = 0;
+                let consistentSamples = 0;
+                let sampledSpans = 0;
+                let previousPolarity = 0;
+                const sideOffset = .24;
+                const gridCanvas = Math.max(4, toCanvasX(grid.size));
+                const sampleRadius = Math.max(2, gridCanvas * .075);
+                for (let index = 0; index < points.length - 1; index += 1) {
+                    const a = points[index];
+                    const b = points[index + 1];
+                    const dx = b.x - a.x;
+                    const dy = b.y - a.y;
+                    const length = Math.hypot(dx, dy);
+                    if (length <= .0001) continue;
+                    pathLength += length;
+                    const nx = -dy / length;
+                    const ny = dx / length;
+                    const gx = (a.x + b.x) / 2;
+                    const gy = (a.y + b.y) / 2;
+                    const sideA = artworkDensityAtGridPoint(gx + (nx * sideOffset), gy + (ny * sideOffset), sampleRadius);
+                    const sideB = artworkDensityAtGridPoint(gx - (nx * sideOffset), gy - (ny * sideOffset), sampleRadius);
+                    const difference = sideA - sideB;
+                    if (Math.abs(difference) < .025) continue;
+                    const polarity = difference > 0 ? 1 : -1;
+                    sampledSpans += 1;
+                    if (previousPolarity === 0 || polarity === previousPolarity) consistentSamples += 1;
+                    previousPolarity = polarity;
+                }
+                const playableSideConsistency = sampledSpans > 0 ? consistentSamples / sampledSpans : 0;
+                const continuity = Math.min(1, pathLength / 3.25);
+                const coherent = pathLength >= 1.35 && continuity >= .42 && (playableSideConsistency >= .58 || points.length >= 5);
+                return {
+                    coherent,
+                    continuity,
+                    playableSideConsistency,
+                    regionMembership: coherent ? 'connected-playable-boundary' : 'local-evidence'
+                };
+            };
+
+            const contourSpanCoveredByStructure = (a, b, topologyEvidence = null) => {
                 const spanDx = Math.abs(b.x - a.x);
                 const spanDy = Math.abs(b.y - a.y);
                 const spanOrientation = spanDx <= .0001 ? 'vertical' : spanDy <= .0001 ? 'horizontal' : 'organic';
                 if (spanOrientation === 'organic') return false;
+                if (thresholdNearSpan(a, b)) return false;
+                if (topologyEvidence?.coherent && topologyEvidence.playableSideConsistency >= .58) return false;
                 const center = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
                 return strongStructural.some((item) => {
                     if (orientation(item) !== spanOrientation) return false;
@@ -4227,6 +4285,7 @@
             contours.forEach((item) => {
                 const points = Array.isArray(item.points) ? item.points : [];
                 if (points.length < 2) return;
+                const topologyEvidence = contourTopologyEvidence(item);
                 let run = [];
                 const flush = () => {
                     if (run.length >= 2) {
@@ -4241,6 +4300,9 @@
                                     : Math.max(88, Number(item.confidence) || 0),
                                 hybridJudgement: true, hybridRegion: 'organic',
                                 hybridContourSource,
+                                semanticRegionTopology: topologyEvidence.regionMembership,
+                                semanticContinuity: topologyEvidence.continuity,
+                                playableSideConsistency: topologyEvidence.playableSideConsistency,
                                 hybridPartialPreservation: Boolean(item.partialContour),
                                 partialContour: Boolean(item.partialContour),
                                 unresolvedBoundaryEnds: Array.isArray(item.unresolvedBoundaryEnds)
@@ -4257,7 +4319,7 @@
                 for (let index = 0; index < points.length - 1; index += 1) {
                     const a = points[index];
                     const b = points[index + 1];
-                    if (contourSpanCoveredByStructure(a, b)) {
+                    if (contourSpanCoveredByStructure(a, b, topologyEvidence)) {
                         flush();
                         continue;
                     }
