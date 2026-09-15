@@ -1122,3 +1122,15 @@ Regression-only correction for the story-beat endpoint registration assertion; n
 - [x] Keep the 200-object safety ceiling and review-first persistence contract unchanged.
 - [ ] Server certification.
 - [ ] Dungeon from Hell Living Contour / Hybrid / Evidence Audit certification.
+
+
+## Phase IV.30.1G.5Q — Illustrated Floor Continuity & Interior Surface Flooding ✅
+- [x] Seed illustrated-floor recovery from already certified playable surface rather than raw whiteness alone.
+- [x] Flood conservatively through decorative ink when wider floor continuity supports the same interior surface.
+- [x] Stop propagation at sustained structural wall bands and dense boundary evidence.
+- [x] Reconstruct connected illustrated interior surfaces and expose their perimeter contribution diagnostically.
+- [x] Feed recovered surface into the existing G.5L/G.5N perimeter re-certification pipeline without outranking G.5P authoritative contours.
+- [x] Extend Evidence Audit with illustrated-floor cells, reconstructed interior surfaces and contributed surface-perimeter edges.
+- [x] Preserve the 200-object safety ceiling and review-first persistence contract unchanged.
+- [ ] Server certification.
+- [ ] Dungeon from Hell Living Contour / Hybrid / Evidence Audit certification.
