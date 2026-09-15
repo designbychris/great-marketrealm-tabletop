@@ -3953,6 +3953,104 @@
                 }
                 return { classification: 'uncertain-boundary', evidence: ['insufficient-gap-evidence'] };
             };
+            // IV.30.1G.5F — Playable-Space Adjacency & Threshold Connectivity.
+            // Ink tells Pippin where a boundary might be; floor topology now tells him
+            // whether that boundary makes sense. Closed chains sample playable floor on
+            // both sides of their envelope so hills/elevation marks embedded inside a
+            // connected floor region cannot masquerade as room walls. Open chains also
+            // test their unresolved ends for a short, floor-continuous passage: that is
+            // inferred threshold evidence and must remain open even when no conventional
+            // door glyph was recognised by Structural tracing.
+            const playableSpaceAdjacency = (chain, closed, semanticBoundary) => {
+                if (!Array.isArray(chain) || chain.length < 2) {
+                    return { classification: 'unresolved-adjacency', confidence: 0, thresholdConnectivity: false, evidence: ['insufficient-chain'] };
+                }
+                let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+                chain.forEach((point) => {
+                    minX = Math.min(minX, Number(point[0])); maxX = Math.max(maxX, Number(point[0]));
+                    minY = Math.min(minY, Number(point[1])); maxY = Math.max(maxY, Number(point[1]));
+                });
+                const playableAtGrid = (x, y) => isPlayableFloor(
+                    Math.round(Number(x) * contourSubdivisions),
+                    Math.round(Number(y) * contourSubdivisions)
+                );
+                const sampleBox = (left, top, right, bottom, step) => {
+                    let playable = 0;
+                    let sampled = 0;
+                    for (let y = top; y <= bottom + .0001; y += step) {
+                        for (let x = left; x <= right + .0001; x += step) {
+                            sampled += 1;
+                            if (playableAtGrid(x, y)) playable += 1;
+                        }
+                    }
+                    return sampled > 0 ? playable / sampled : 0;
+                };
+                const step = Math.max(.22, contourStep * 1.4);
+                const inset = Math.max(.18, contourStep * 1.1);
+                const interiorRatio = closed && (maxX - minX) > inset * 2 && (maxY - minY) > inset * 2
+                    ? sampleBox(minX + inset, minY + inset, maxX - inset, maxY - inset, step)
+                    : 0;
+                const ringOffset = Math.max(.28, contourStep * 1.8);
+                const ringSamples = [
+                    [(minX + maxX) / 2, minY - ringOffset], [(minX + maxX) / 2, maxY + ringOffset],
+                    [minX - ringOffset, (minY + maxY) / 2], [maxX + ringOffset, (minY + maxY) / 2],
+                    [minX - ringOffset, minY - ringOffset], [maxX + ringOffset, minY - ringOffset],
+                    [minX - ringOffset, maxY + ringOffset], [maxX + ringOffset, maxY + ringOffset]
+                ];
+                const exteriorPlayable = ringSamples.filter(([x, y]) => playableAtGrid(x, y)).length / ringSamples.length;
+
+                const first = chain[0];
+                const last = chain[chain.length - 1];
+                const endpointDistance = Math.hypot(Number(last[0]) - Number(first[0]), Number(last[1]) - Number(first[1]));
+                let floorContinuousGap = false;
+                if (!closed && endpointDistance >= .16 && endpointDistance <= 1.45) {
+                    let floorSamples = 0;
+                    const checks = 7;
+                    for (let index = 1; index < checks; index += 1) {
+                        const ratio = index / checks;
+                        const x = Number(first[0]) + ((Number(last[0]) - Number(first[0])) * ratio);
+                        const y = Number(first[1]) + ((Number(last[1]) - Number(first[1])) * ratio);
+                        if (playableAtGrid(x, y)) floorSamples += 1;
+                    }
+                    floorContinuousGap = floorSamples >= checks - 2;
+                }
+
+                const embeddedPlayableIsland = closed
+                    && interiorRatio >= .44
+                    && exteriorPlayable >= .50;
+                if (embeddedPlayableIsland) {
+                    return {
+                        classification: 'interior-playable-island', confidence: 93, thresholdConnectivity: false,
+                        interiorPlayableRatio: interiorRatio, exteriorPlayableRatio: exteriorPlayable,
+                        evidence: ['playable-floor-inside', 'playable-floor-outside', 'isolation-penalty', 'terrain-or-interior-feature']
+                    };
+                }
+                if (floorContinuousGap) {
+                    return {
+                        classification: 'threshold-connected-open-chain', confidence: 91, thresholdConnectivity: true,
+                        interiorPlayableRatio: interiorRatio, exteriorPlayableRatio: exteriorPlayable,
+                        evidence: ['nearby-boundary-ends', 'continuous-playable-floor', 'probable-threshold', 'do-not-auto-bridge']
+                    };
+                }
+                return {
+                    classification: closed ? 'region-envelope' : 'open-boundary', confidence: 76, thresholdConnectivity: false,
+                    interiorPlayableRatio: interiorRatio, exteriorPlayableRatio: exteriorPlayable,
+                    evidence: ['adjacency-consistent']
+                };
+            };
+            const applyPlayableSpaceAdjacency = (entry) => {
+                const adjacency = playableSpaceAdjacency(entry.chain, entry.closed, entry.semanticBoundary);
+                let semanticBoundary = entry.semanticBoundary;
+                if (adjacency.classification === 'interior-playable-island'
+                    && semanticBoundary?.role === 'structural-wall') {
+                    semanticBoundary = {
+                        role: 'terrain', boundaryRole: 'terrain-elevation', confidence: Math.max(91, Number(adjacency.confidence || 0)),
+                        evidence: (semanticBoundary.evidence || []).concat(adjacency.evidence || []).concat(['adjacency-demotion'])
+                    };
+                }
+                return { ...entry, semanticBoundary, playableAdjacency: adjacency };
+            };
+
             const splitContourPathAtProtectedThresholds = (points) => {
                 if (!Array.isArray(points) || points.length < 2) return { runs: [], gaps: [] };
                 const runs = [];
@@ -4007,6 +4105,7 @@
                         + Math.min(72, entry.length * 9)
                         + Math.min(12, Math.max(0, entry.chain.length - 2) * .45)
                 }))
+                .map(applyPlayableSpaceAdjacency)
                 .sort((a, b) => (b.recoveryScore - a.recoveryScore) || (b.length - a.length));
 
             if (recoverableChains.length === 0) return [];
@@ -4071,7 +4170,11 @@
                         unresolvedBoundaryEnds: partialContour ? [runPoints[0], runPoints[runPoints.length - 1]] : [],
                         gapClassifications: endpointClassifications,
                         protectedContourGaps: protectedPath.gaps,
-                        thresholdGapProtection: gapProtected,
+                        thresholdGapProtection: gapProtected || Boolean(entry.playableAdjacency?.thresholdConnectivity),
+                        playableSpaceAdjacency: entry.playableAdjacency?.classification || 'unresolved-adjacency',
+                        playableSpaceAdjacencyConfidence: Number(entry.playableAdjacency?.confidence || 0),
+                        playableSpaceAdjacencyEvidence: Array.isArray(entry.playableAdjacency?.evidence) ? entry.playableAdjacency.evidence : [],
+                        thresholdConnectivity: Boolean(entry.playableAdjacency?.thresholdConnectivity),
                         semanticBoundaryClassification: entry.semanticBoundary?.role || 'uncertain',
                         semanticBoundaryRole: entry.semanticBoundary?.boundaryRole || 'unresolved-evidence',
                         semanticBoundaryConfidence: Number(entry.semanticBoundary?.confidence || 0),
