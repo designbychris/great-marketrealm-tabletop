@@ -15,7 +15,9 @@ final class TrustedSeedTraversalFrontierWalkerActivationRegressionTest extends T
         $roadmap = (string) file_get_contents($root . '/ROADMAP.md');
 
         self::assertStringContainsString('IV.30.1G.5T — Trusted Seed Traversal & Frontier Walker Activation', $script);
-        self::assertStringContainsString('skipOcclusionRecovery: true, evidenceAudit: false', $script);
+        self::assertStringContainsString('livingContourCandidates({ ...options, skipOcclusionRecovery: true })', $script);
+        self::assertStringContainsString('options.evidenceAudit !== true || options.skipOcclusionRecovery === true', $script);
+        self::assertStringContainsString('const adjacentPlayable = orthogonal.reduce', $script);
         self::assertStringContainsString('illustratedTraversalSeedsQueued', $script);
         self::assertStringContainsString('illustratedTraversalSeedsVisited', $script);
         self::assertStringContainsString('const traversalSeeds=[]', $script);

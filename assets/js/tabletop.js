@@ -3384,7 +3384,7 @@
             // the complete earlier semantic/topological pipeline.
             const preOcclusionRecoveryContours = options.skipOcclusionRecovery === true
                 ? []
-                : livingContourCandidates({ ...options, skipOcclusionRecovery: true, evidenceAudit: false });
+                : livingContourCandidates({ ...options, skipOcclusionRecovery: true });
 
             const gridCanvasX = Math.max(4, toCanvasX(grid.size));
             const gridCanvasY = Math.max(4, toCanvasY(grid.size));
@@ -3770,6 +3770,7 @@
 
                         // Admit decoration across a broader ink range. Dense single samples
                         // are legal (rocks/creatures); only sustained bands were vetoed above.
+                        const adjacentPlayable = orthogonal.reduce((count,[dx,dy]) => count + Number(isPlayable(column+dx,row+dy)), 0);
                         const localInteriorSupport = local.playable >= 2 || adjacentPlayable >= 2 || opposedSupport || directionalSupport >= 2;
                         const inkIsPlausibleDecoration = ink >= .08 && ink <= .88;
                             if (!localInteriorSupport || !inkIsPlausibleDecoration) continue;
@@ -5057,7 +5058,7 @@
             if (pathSuggestions.length > maximumReviewSuggestions) return preOcclusionRecoveryContours;
 
             const publishContourEvidenceAudit = (emittedSuggestions) => {
-                if (options.evidenceAudit !== true) return;
+                if (options.evidenceAudit !== true || options.skipOcclusionRecovery === true) return;
                 const emittedKeys = new Set(emittedSuggestions.map(cartographySuggestionKey));
                 const promotedMemberKeys = new Set();
                 const representedFinalKeys = new Set(representedPromotedKeys);
