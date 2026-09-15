@@ -4083,11 +4083,14 @@
             // Historical Connected Dungeon / G.4A regression contract:
             // const connectedContours = livingContourCandidates({ connectPlayableFloor: true });
             const connectedContours = livingContourCandidates({ connectPlayableFloor: true, thresholdCandidates });
-            const standaloneContours = connectedContours.length === 0
-                ? livingContourCandidates({ thresholdCandidates })
-                : [];
-            const contours = connectedContours.length > 0 ? connectedContours : standaloneContours;
-            const hybridContourSource = connectedContours.length > 0 ? 'connected-floor' : 'standalone-fallback';
+            // IV.30.1G.5D — Contour Chain Certification.
+            // Connected-floor reasoning is useful evidence, not an exclusive reader.
+            // The standalone Living pass can retain a long coherent cave perimeter that
+            // the connectivity pass only sees in fragments. Hybrid therefore considers
+            // both sets of Living chains and certifies whole chains before arbitration.
+            const standaloneContours = livingContourCandidates({ thresholdCandidates });
+            const contours = connectedContours.concat(standaloneContours);
+            const hybridContourSource = connectedContours.length > 0 ? 'certified-dual-living-readers' : 'standalone-fallback';
 
             const orientation = (item) => {
                 const dx = Math.abs(Number(item.x2) - Number(item.x1));
@@ -4260,12 +4263,52 @@
                 };
             };
 
-            const contourSpanCoveredByStructure = (a, b, topologyEvidence = null) => {
+            // IV.30.1G.5D — certify the chain, not every fleck inside it.
+            // Long region-defining Living paths may contain weak local ink, especially
+            // across crosshatching or damaged scans. Distributed topology, semantic
+            // wall classification and path scale can certify the whole ordered chain;
+            // tiny interior loops and unresolved fragments never inherit that authority.
+            const contourChainCertification = (item, topologyEvidence) => {
+                const points = Array.isArray(item.points) ? item.points : [];
+                let pathLength = 0;
+                for (let index = 0; index < points.length - 1; index += 1) {
+                    pathLength += Math.hypot(
+                        Number(points[index + 1].x) - Number(points[index].x),
+                        Number(points[index + 1].y) - Number(points[index].y)
+                    );
+                }
+                const semanticRole = item.semanticBoundaryClassification || 'uncertain';
+                const semanticConfidence = Number(item.semanticBoundaryConfidence || 0);
+                const thresholdInterrupted = Boolean(item.thresholdGapProtection)
+                    || (Array.isArray(item.protectedContourGaps) && item.protectedContourGaps.length > 0);
+                const compactInterior = pathLength < 1.15 && points.length <= 5;
+                const regionDefining = topologyEvidence?.regionMembership === 'connected-playable-boundary';
+                const distributedSupport = topologyEvidence?.playableSideConsistency >= .58
+                    || topologyEvidence?.continuity >= .72;
+                const semanticSupport = semanticRole === 'structural-wall'
+                    || (semanticRole === 'uncertain' && semanticConfidence >= 60);
+                const certified = !compactInterior
+                    && pathLength >= 1.2
+                    && semanticSupport
+                    && (regionDefining || distributedSupport || pathLength >= 3.4);
+                return {
+                    certified,
+                    pathLength,
+                    semanticRole,
+                    thresholdInterrupted,
+                    evidence: certified
+                        ? ['ordered-living-chain', 'distributed-boundary-support', 'region-scale-certification']
+                        : ['local-chain-only']
+                };
+            };
+
+            const contourSpanCoveredByStructure = (a, b, topologyEvidence = null, chainCertification = null) => {
                 const spanDx = Math.abs(b.x - a.x);
                 const spanDy = Math.abs(b.y - a.y);
                 const spanOrientation = spanDx <= .0001 ? 'vertical' : spanDy <= .0001 ? 'horizontal' : 'organic';
                 if (spanOrientation === 'organic') return false;
                 if (thresholdNearSpan(a, b)) return false;
+                if (chainCertification?.certified) return false;
                 if (topologyEvidence?.coherent && topologyEvidence.playableSideConsistency >= .58) return false;
                 const center = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
                 return strongStructural.some((item) => {
@@ -4286,6 +4329,9 @@
                 const points = Array.isArray(item.points) ? item.points : [];
                 if (points.length < 2) return;
                 const topologyEvidence = contourTopologyEvidence(item);
+                const chainCertification = contourChainCertification(item, topologyEvidence);
+                // Hybrid is allowed to keep reviewable local evidence, but certified
+                // chains receive whole-chain preservation through weak local spans.
                 let run = [];
                 const flush = () => {
                     if (run.length >= 2) {
@@ -4303,6 +4349,10 @@
                                 semanticRegionTopology: topologyEvidence.regionMembership,
                                 semanticContinuity: topologyEvidence.continuity,
                                 playableSideConsistency: topologyEvidence.playableSideConsistency,
+                                contourChainCertification: chainCertification.certified ? 'certified-region-boundary' : 'local-review-chain',
+                                contourChainLength: chainCertification.pathLength,
+                                contourChainEvidence: chainCertification.evidence,
+                                thresholdInterruptedChain: chainCertification.thresholdInterrupted,
                                 hybridPartialPreservation: Boolean(item.partialContour),
                                 partialContour: Boolean(item.partialContour),
                                 unresolvedBoundaryEnds: Array.isArray(item.unresolvedBoundaryEnds)
@@ -4319,7 +4369,7 @@
                 for (let index = 0; index < points.length - 1; index += 1) {
                     const a = points[index];
                     const b = points[index + 1];
-                    if (contourSpanCoveredByStructure(a, b, topologyEvidence)) {
+                    if (contourSpanCoveredByStructure(a, b, topologyEvidence, chainCertification)) {
                         flush();
                         continue;
                     }
@@ -4370,7 +4420,7 @@
             // by Structural evidence and therefore disappear during overlap trimming.
             // If that leaves Hybrid empty, fall back once to the standalone Living
             // Contour evidence rather than telling the Keeper that nothing is known.
-            if (combined.length === 0 && hybridContourSource === 'connected-floor') {
+            if (combined.length === 0 && hybridContourSource === 'certified-dual-living-readers') {
                 const fallbackContours = livingContourCandidates({ thresholdCandidates });
                 const fallbackOrganic = fallbackContours
                     .filter((item) => Array.isArray(item.points) && item.points.length > 1)

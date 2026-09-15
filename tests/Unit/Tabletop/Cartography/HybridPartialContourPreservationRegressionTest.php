@@ -19,8 +19,8 @@ final class HybridPartialContourPreservationRegressionTest extends TestCase
 
         self::assertStringContainsString('IV.30.1G.4A — Hybrid Partial-Contour Preservation', $script);
         self::assertStringContainsString('const connectedContours = livingContourCandidates({ connectPlayableFloor: true });', $script);
-        self::assertStringContainsString('const standaloneContours = connectedContours.length === 0', $script);
-        self::assertStringContainsString("const hybridContourSource = connectedContours.length > 0 ? 'connected-floor' : 'standalone-fallback';", $script);
+        self::assertStringContainsString('const standaloneContours = livingContourCandidates({ thresholdCandidates });', $script);
+        self::assertStringContainsString("const hybridContourSource = connectedContours.length > 0 ? 'certified-dual-living-readers' : 'standalone-fallback';", $script);
     }
 
     public function test_partial_contour_uncertainty_survives_hybrid_without_auto_bridging(): void
@@ -48,7 +48,7 @@ final class HybridPartialContourPreservationRegressionTest extends TestCase
         $roadmap = (string) file_get_contents($this->root('ROADMAP.md'));
         $phase = (string) file_get_contents($this->root('docs/Roadmap/PHASE-IV.30.1G.4A.md'));
 
-        self::assertStringContainsString("if (combined.length === 0 && hybridContourSource === 'connected-floor')", $script);
+        self::assertStringContainsString("if (combined.length === 0 && hybridContourSource === 'certified-dual-living-readers')", $script);
         self::assertStringContainsString("hybridContourSource: 'standalone-post-trim-fallback'", $script);
         self::assertStringContainsString('[x] **IV.30.1G.4A — Hybrid Partial-Contour Preservation**', $roadmap);
         self::assertStringContainsString('Hybrid may combine what Pippin knows, but it must not erase what Pippin already proved.', $phase);
