@@ -1211,3 +1211,13 @@ Regression-only correction for the story-beat endpoint registration assertion; n
 - Carry reconstructed surface edges through promotion, authority reconciliation, review-budget representation, and Evidence Audit publication.
 - Preserve G.5T.3 Evidence Audit terminal-path ownership and the 200-object review ceiling.
 - Regression-protect the control-flow handoff so contributed surface perimeter cannot silently disappear before G.5W representation.
+
+## Phase IV.30.1G.5X — Authoritative Path Coalescence & Review Capacity Liberation ✅
+- [x] Coalesce only exact-endpoint, non-branching, semantically compatible authoritative wall paths; never bridge a geometric gap merely to save a review object.
+- [x] Preserve every authoritative source segment while allowing multiple compatible source paths to share one polyline review object.
+- [x] Rebuild authoritative review keys after coalescence so G.5W reconstructed-surface equality/extension arbitration operates on the actual coalesced authority.
+- [x] Spend liberated review capacity on novel reconstructed-surface paths before weaker bridge/promoted supplemental evidence, without raising the 200-object ceiling.
+- [x] Report authoritative inputs, coalesced review paths, authority merges, liberated review slots and remaining capacity in Evidence Audit.
+- [x] Preserve G.5W.1 surface-representation handoff, G.5V controlled surface growth, G.5U accounting, structural/exterior vetoes and review-first persistence.
+- [ ] Server certification.
+- [ ] Dungeon from Hell certification: authority preservation must remain complete while review slots are liberated and at least one of the nine novel reconstructed-surface paths becomes represented.

@@ -2567,7 +2567,7 @@
         if (cartographyAssistantStatus && total > 0) {
             if (cartographyDetail?.value === 'audit' && cartographyEvidenceAudit) {
                 const audit = cartographyEvidenceAudit;
-                cartographyAssistantStatus.textContent = `Evidence Audit · ${audit.rawChains} raw chains · ${audit.recoverableChains} recoverable · ${audit.semanticRejected} semantic rejects · ${audit.inferredPerimeters} inferred perimeter edges → ${audit.promotedPerimeterChains || 0} promoted chains (${audit.promotedPerimeterEdges || 0} edges) → ${audit.consolidatedPromotedChains || 0} consolidated · ${audit.authoritativePreserved || 0}/${audit.authoritativeContours || 0} authoritative preserved · ${audit.illustratedFloorSeeds || 0} floor seeds · ${audit.illustratedTraversalSeedsQueued || 0} traversal seeds queued · ${audit.illustratedTraversalSeedsVisited || 0} traversal seeds visited · ${audit.illustratedAdjacentSamplesExamined || 0} adjacent samples examined · ${audit.illustratedAlreadyPlayableNeighbours || 0} already-playable neighbours · ${audit.illustratedFrontierCandidates || 0} frontier candidates · ${audit.illustratedFrontierAdmitted || 0} frontier admitted · ${audit.illustratedFrontierStructuralRejects || 0} structural rejects · ${audit.illustratedFrontierExteriorRejects || 0} exterior rejects · ${audit.illustratedFrontierInteriorSupportRejects || 0} interior-support rejects · ${audit.illustratedFrontierDecorationRejects || 0} decoration rejects · ${audit.illustratedFrontierNeighbourQualified || 0} neighbour-qualified · ${audit.illustratedFrontierDecorationQualified || 0} decoration-qualified · ${audit.illustratedFrontierProvisionalAdmissions || 0} provisional illustrated admissions · ${audit.illustratedFrontierUnaccounted || 0} unaccounted frontier · ${audit.recoveredIllustratedFloorCells || 0} illustrated floor cells recovered · ${audit.reconstructedIllustratedSurfaces || 0} interior surfaces reconstructed · ${audit.illustratedSurfacePerimeterEdges || 0} surface perimeter edges contributed → ${audit.reconstructedSurfacePromotedChains || 0} surface paths promoted · ${audit.reconstructedSurfaceAlreadyRepresented || 0} already represented · ${audit.reconstructedSurfaceAuthorityExtensions || 0} authority extensions · ${audit.reconstructedSurfaceNovelChains || 0} novel surface paths · ${audit.reconstructedSurfaceRepresentedChains || 0} surface paths represented · ${audit.representedPromotedChains || 0} promoted represented (${audit.representedPromotedEdges || 0} edges) · ${audit.emitted} emitted. Diagnostic marks are never saved.`;
+                cartographyAssistantStatus.textContent = `Evidence Audit · ${audit.rawChains} raw chains · ${audit.recoverableChains} recoverable · ${audit.semanticRejected} semantic rejects · ${audit.inferredPerimeters} inferred perimeter edges → ${audit.promotedPerimeterChains || 0} promoted chains (${audit.promotedPerimeterEdges || 0} edges) → ${audit.consolidatedPromotedChains || 0} consolidated · ${audit.authoritativePreserved || 0}/${audit.authoritativeContours || 0} authoritative preserved → ${audit.authoritativeReviewPaths || 0} authoritative review paths · ${audit.authoritativePathMerges || 0} authority merges · ${audit.authoritativeReviewSlotsLiberated || 0} review slots liberated · ${audit.authoritativeRemainingCapacity || 0} capacity remaining · ${audit.illustratedFloorSeeds || 0} floor seeds · ${audit.illustratedTraversalSeedsQueued || 0} traversal seeds queued · ${audit.illustratedTraversalSeedsVisited || 0} traversal seeds visited · ${audit.illustratedAdjacentSamplesExamined || 0} adjacent samples examined · ${audit.illustratedAlreadyPlayableNeighbours || 0} already-playable neighbours · ${audit.illustratedFrontierCandidates || 0} frontier candidates · ${audit.illustratedFrontierAdmitted || 0} frontier admitted · ${audit.illustratedFrontierStructuralRejects || 0} structural rejects · ${audit.illustratedFrontierExteriorRejects || 0} exterior rejects · ${audit.illustratedFrontierInteriorSupportRejects || 0} interior-support rejects · ${audit.illustratedFrontierDecorationRejects || 0} decoration rejects · ${audit.illustratedFrontierNeighbourQualified || 0} neighbour-qualified · ${audit.illustratedFrontierDecorationQualified || 0} decoration-qualified · ${audit.illustratedFrontierProvisionalAdmissions || 0} provisional illustrated admissions · ${audit.illustratedFrontierUnaccounted || 0} unaccounted frontier · ${audit.recoveredIllustratedFloorCells || 0} illustrated floor cells recovered · ${audit.reconstructedIllustratedSurfaces || 0} interior surfaces reconstructed · ${audit.illustratedSurfacePerimeterEdges || 0} surface perimeter edges contributed → ${audit.reconstructedSurfacePromotedChains || 0} surface paths promoted · ${audit.reconstructedSurfaceAlreadyRepresented || 0} already represented · ${audit.reconstructedSurfaceAuthorityExtensions || 0} authority extensions · ${audit.reconstructedSurfaceNovelChains || 0} novel surface paths · ${audit.reconstructedSurfaceRepresentedChains || 0} surface paths represented · ${audit.representedPromotedChains || 0} promoted represented (${audit.representedPromotedEdges || 0} edges) · ${audit.emitted} emitted. Diagnostic marks are never saved.`;
             } else {
                 const doors = cartographySuggestions.filter((item) => item.type === 'door').length;
                 cartographyAssistantStatus.textContent = `${total} draft suggestions · ${selected} selected · ${doors} possible doors. Polyline wall paths count as one review object each. Nothing is saved until Apply Selected.`;
@@ -5097,11 +5097,93 @@
             preOcclusionRecoveryContours.forEach(addAuthoritativeContour);
             pathSuggestions.forEach(addAuthoritativeContour);
 
+            const surfacePointKey = (point) => `${roundContourCoordinate(point.x)},${roundContourCoordinate(point.y)}`;
+
+            // IV.30.1G.5X — Authoritative Path Coalescence & Review Capacity Liberation.
+            // A saturated review list is not permission to discard authority. Instead,
+            // exact-endpoint, semantically compatible, non-branching authoritative paths
+            // may share one review object. Every source segment is retained; only the
+            // number of review objects changes. No gap is bridged by coalescence.
+            const authoritativeSourceSuggestions = authoritativeContourSuggestions.slice();
+            const authoritativeInputCount = authoritativeSourceSuggestions.length;
+            const authoritativeSegmentKey = (a, b) => {
+                const first = surfacePointKey(a), second = surfacePointKey(b);
+                return first < second ? `${first}|${second}` : `${second}|${first}`;
+            };
+            const authoritativeSegmentsFor = (item) => {
+                const points = Array.isArray(item.points) ? item.points : [];
+                const segments = [];
+                for (let index = 0; index < points.length - 1; index += 1) {
+                    segments.push(authoritativeSegmentKey(points[index], points[index + 1]));
+                }
+                return segments;
+            };
+            const authoritativeCompatibilityKey = (item) => [
+                item.type || 'wall',
+                item.certifiedPortal === true ? 'portal' : 'no-portal',
+                item.thresholdGapProtection === true ? 'threshold-protected' : 'no-threshold',
+                item.semanticBoundaryClassification || 'unclassified',
+                item.semanticBoundaryRole || 'unresolved-evidence'
+            ].join('|');
+            let authoritativePathMerges = 0;
+            let authoritativeCoalescenceChanged = true;
+            while (authoritativeCoalescenceChanged) {
+                authoritativeCoalescenceChanged = false;
+                const endpointMembership = new Map();
+                authoritativeContourSuggestions.forEach((item, index) => {
+                    const points = Array.isArray(item.points) ? item.points : [];
+                    if (points.length < 2) return;
+                    [points[0], points[points.length - 1]].forEach((point) => {
+                        const key = surfacePointKey(point);
+                        if (!endpointMembership.has(key)) endpointMembership.set(key, []);
+                        endpointMembership.get(key).push(index);
+                    });
+                });
+                for (const [endpoint, members] of endpointMembership.entries()) {
+                    if (members.length !== 2) continue;
+                    const leftIndex = members[0], rightIndex = members[1];
+                    if (leftIndex === rightIndex) continue;
+                    const left = authoritativeContourSuggestions[leftIndex];
+                    const right = authoritativeContourSuggestions[rightIndex];
+                    if (!left || !right || authoritativeCompatibilityKey(left) !== authoritativeCompatibilityKey(right)) continue;
+                    const leftPoints = Array.isArray(left.points) ? left.points : [];
+                    const rightPoints = Array.isArray(right.points) ? right.points : [];
+                    if (leftPoints.length < 2 || rightPoints.length < 2) continue;
+                    const orientToEnd = (points) => surfacePointKey(points[points.length - 1]) === endpoint ? points : points.slice().reverse();
+                    const orientFromStart = (points) => surfacePointKey(points[0]) === endpoint ? points : points.slice().reverse();
+                    const combined = orientToEnd(leftPoints).concat(orientFromStart(rightPoints).slice(1));
+                    if (combined.length > maximumPathVertices) continue;
+                    const merged = {
+                        ...left,
+                        points: combined,
+                        x1: combined[0].x, y1: combined[0].y,
+                        x2: combined[combined.length - 1].x, y2: combined[combined.length - 1].y,
+                        authoritativePathCoalescence: true,
+                        recoveryEvidence: Array.from(new Set((left.recoveryEvidence || []).concat(right.recoveryEvidence || [], [
+                            'authoritative-path-coalescence', 'exact-endpoint-no-gap', 'source-geometry-preserved'
+                        ])))
+                    };
+                    const keep = Math.min(leftIndex, rightIndex), remove = Math.max(leftIndex, rightIndex);
+                    authoritativeContourSuggestions[keep] = merged;
+                    authoritativeContourSuggestions.splice(remove, 1);
+                    authoritativePathMerges += 1;
+                    authoritativeCoalescenceChanged = true;
+                    break;
+                }
+            }
+            authoritativeContourKeys.clear();
+            authoritativeContourSuggestions.forEach((item) => authoritativeContourKeys.add(cartographySuggestionKey(item)));
+            const coalescedAuthoritativeSegmentKeys = new Set(authoritativeContourSuggestions.flatMap(authoritativeSegmentsFor));
+            const authoritativeSourcesPreserved = authoritativeSourceSuggestions.filter((item) =>
+                authoritativeSegmentsFor(item).every((key) => coalescedAuthoritativeSegmentKeys.has(key))
+            ).length;
+            const authoritativeReviewPaths = authoritativeContourSuggestions.length;
+            const authoritativeReviewSlotsLiberated = Math.max(0, authoritativeInputCount - authoritativeReviewPaths);
+
             // G.5W: a reconstructed surface chain that meets an authoritative endpoint
             // extends that object instead of becoming object 201. This preserves every
             // authoritative review object while allowing genuinely new contiguous surface
             // geometry to become visible under a saturated 200-object budget.
-            const surfacePointKey = (point) => `${roundContourCoordinate(point.x)},${roundContourCoordinate(point.y)}`;
             let reconstructedSurfaceAlreadyRepresented = 0;
             let reconstructedSurfaceAuthorityExtensions = 0;
             const representedReconstructedSurfaceKeys = new Set();
@@ -5151,7 +5233,7 @@
 
             const arbitratedSuggestions = authoritativeContourSuggestions.slice(0, maximumReviewSuggestions);
             const arbitratedKeys = new Set(arbitratedSuggestions.map(cartographySuggestionKey));
-            let authoritativePreserved = arbitratedSuggestions.length;
+            let authoritativePreserved = authoritativeSourcesPreserved;
             let bridgeRepresented = 0;
             let promotedRepresentedByArbitration = 0;
             const appendByAuthority = (items, authority) => {
@@ -5250,8 +5332,12 @@
                     promotedPerimeterChains: promotedInferredPerimeterSuggestions.length,
                     promotedPerimeterEdges: promotedInferredPerimeterSuggestions.reduce((sum, item) => sum + Number(item.inferredPerimeterEdgeCount || 0), 0),
                     consolidatedPromotedChains: consolidatedPromotedPerimeterSuggestions.length,
-                    authoritativeContours: authoritativeContourSuggestions.length,
+                    authoritativeContours: authoritativeInputCount,
                     authoritativePreserved,
+                    authoritativeReviewPaths,
+                    authoritativePathMerges,
+                    authoritativeReviewSlotsLiberated,
+                    authoritativeRemainingCapacity: Math.max(0, maximumReviewSuggestions - arbitratedSuggestions.length),
                     illustratedFloorSeeds,
                     illustratedTraversalSeedsQueued,
                     illustratedTraversalSeedsVisited,
