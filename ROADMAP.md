@@ -1266,3 +1266,12 @@ Regression-only correction for the story-beat endpoint registration assertion; n
 - [x] Preserve doorway/threshold veto semantics, G.5Y recovery authority, topology-safe component reconciliation, G.5X authority coalescence and the 200-object review ceiling.
 - [x] Add a regression contract that prevents recovered-surface completion from executing before `contourThresholdMatch` is initialized.
 
+
+## Phase IV.30.1G.5Z.2 — Completed Perimeter Path Representation Audit ✅
+- [x] Trace G.5Z completed perimeter edges through connected path assembly without changing recovery, promotion or arbitration behaviour.
+- [x] Publish assembled source-edge coverage plus open/closed reconstructed surface path counts.
+- [x] Attribute represented source edges to exact authority representation, zero-cost authority extension and novel review-path admission.
+- [x] Publish represented and uncovered completed-perimeter edge totals so downstream geometry loss cannot hide behind review-object counts.
+- [x] Preserve G.5Y's admission gates, G.5Z.1 local anchor reconciliation, G.5X authoritative coalescence and the 200-object review ceiling.
+- [ ] Server certification.
+- [ ] Dungeon from Hell audit: determine whether the 271 completed perimeter edges are all represented, or identify the exact downstream edge deficit before changing geometry.
