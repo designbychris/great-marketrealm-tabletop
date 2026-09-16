@@ -1323,3 +1323,14 @@ Regression-only correction for the story-beat endpoint registration assertion; n
 - [x] Preserve G.5Y/G.5Z.6 admission and secondary seeding, G.5Z.1 reconciliation, G.5Z.2/G.5Z.3 representation/correspondence accounting, G.5X authority coalescence and the 200-object review ceiling.
 - [ ] Server certification.
 - [ ] Dungeon from Hell audit: account for the observed 608 contributed → 276 assembled handoff and determine whether the 332-edge deficit clusters around branch topology, oversized components or another assembly condition before changing path construction.
+
+
+## Phase IV.30.1G.5Z.8 — Vertex-Cap-Safe Perimeter Segmentation & Continuity Preservation ✅
+- [x] Preserve the existing 256-vertex review-path safety ceiling rather than raising it to fit one unusually large illustrated perimeter.
+- [x] Segment oversized non-branching connected perimeter runs into contiguous review paths with at most 255 source edges / 256 vertices per review object.
+- [x] Preserve exact source geometry across segmentation: neighbouring cap-safe paths share the split vertex and no source perimeter edge is simplified, bridged or discarded merely to satisfy the cap.
+- [x] Preserve source-edge provenance and publish oversized source components, cap-safe path count, segmented edge volume and shared split-vertex count in Evidence Audit.
+- [x] Retain G.5Z.7 contributed/assembled/unassembled accounting so runtime certification can prove the observed 608 → 276 → 332 loss closes to 608 → 608 → 0.
+- [x] Preserve G.5Y/G.5Z.6 admission and secondary seeding, G.5Z.1 reconciliation, G.5Z.2/G.5Z.3 representation/correspondence accounting, G.5X authoritative coalescence and the 200-object review ceiling.
+- [ ] Server certification.
+- [ ] Dungeon from Hell certification: verify the 332-edge oversized component becomes cap-safe contiguous review paths, all 608 perimeter edges assemble, representation remains complete, and split vertices introduce no visual wall gaps.
