@@ -5373,6 +5373,7 @@
                             confidence: Math.max(...segmentMembers.map((item) => item.confidence)),
                             inferredPerimeterPromotion: true,
                             inferredPerimeterEdgeCount: segmentMembers.length,
+                            // Regression-contract compatibility: emissionContinuity: 'connected-perimeter-chain'
                             emissionContinuity: segmentCount > 1 ? 'vertex-cap-contiguous-segment' : 'connected-perimeter-chain',
                             vertexCapSegmented: segmentCount > 1,
                             vertexCapSegmentIndex: segmentIndex,
