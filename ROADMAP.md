@@ -1250,3 +1250,12 @@ Regression-only correction for the story-beat endpoint registration assertion; n
 - [x] Preserve the 200-object review ceiling, G.5Y propagation safeguards, G.5X authoritative coalescence and review-first persistence.
 - [ ] Server certification.
 - [ ] Dungeon from Hell certification: the same recovered-floor population should yield materially more complete perimeter geometry without exterior runaway or authority loss.
+
+
+## Phase IV.30.1G.5Z.1 — Recovered-to-Playable Component Anchor Reconciliation ✅
+- [x] Treat G.5Y-admitted recovered cells as valid local completion anchors even when the later broad floor-component classifier folds their enlarged component into exterior whitespace.
+- [x] Reconcile completion through recovered surface cells and certified non-exterior playable floor only; never attach to arbitrary nearest/exterior floor.
+- [x] Publish surface anchor candidates, exact playable anchors, reconciled anchors and unresolved surfaces before G.5Z completion accounting.
+- [x] Keep G.5Y admission authoritative and preserve structural/exterior/decoration gates, G.5Z boundary extraction, G.5X authority coalescence and the 200-object ceiling.
+- [ ] Server certification.
+- [ ] Dungeon from Hell certification: the three reconstructed surfaces should resolve to non-zero completed components/cells and raw boundary sides without exterior runaway.

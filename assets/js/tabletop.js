@@ -2567,7 +2567,7 @@
         if (cartographyAssistantStatus && total > 0) {
             if (cartographyDetail?.value === 'audit' && cartographyEvidenceAudit) {
                 const audit = cartographyEvidenceAudit;
-                cartographyAssistantStatus.textContent = `Evidence Audit · ${audit.rawChains} raw chains · ${audit.recoverableChains} recoverable · ${audit.semanticRejected} semantic rejects · ${audit.inferredPerimeters} inferred perimeter edges → ${audit.promotedPerimeterChains || 0} promoted chains (${audit.promotedPerimeterEdges || 0} edges) → ${audit.consolidatedPromotedChains || 0} consolidated · ${audit.authoritativePreserved || 0}/${audit.authoritativeContours || 0} authoritative preserved → ${audit.authoritativeReviewPaths || 0} authoritative review paths · ${audit.authoritativePathMerges || 0} authority merges · ${audit.authoritativeReviewSlotsLiberated || 0} review slots liberated · ${audit.authoritativeRemainingCapacity || 0} capacity remaining · ${audit.illustratedFloorSeeds || 0} floor seeds · ${audit.illustratedTraversalSeedsQueued || 0} traversal seeds queued · ${audit.illustratedTraversalSeedsVisited || 0} traversal seeds visited · ${audit.illustratedAdjacentSamplesExamined || 0} adjacent samples examined · ${audit.illustratedAlreadyPlayableNeighbours || 0} already-playable neighbours · ${audit.illustratedFrontierCandidates || 0} frontier candidates · ${audit.illustratedFrontierAdmitted || 0} frontier admitted · ${audit.illustratedFrontierStructuralRejects || 0} structural rejects · ${audit.illustratedFrontierExteriorRejects || 0} exterior rejects · ${audit.illustratedFrontierInteriorSupportRejects || 0} interior-support rejects · ${audit.illustratedFrontierDecorationRejects || 0} decoration rejects · ${audit.illustratedFrontierNeighbourQualified || 0} neighbour-qualified · ${audit.illustratedFrontierDecorationQualified || 0} decoration-qualified · ${audit.illustratedFrontierProvisionalAdmissions || 0} provisional illustrated admissions · ${audit.illustratedFrontierUnaccounted || 0} unaccounted frontier · ${audit.illustratedPropagationWaves || 0} propagation waves · ${audit.illustratedPropagationDeepestWave || 0} deepest wave · ${audit.illustratedPropagatedAdmissions || 0} propagated admissions · ${audit.illustratedQuietFloorAdmissions || 0} quiet-floor admissions · ${audit.illustratedExhaustedFrontierCells || 0} exhausted frontier samples · ${audit.recoveredIllustratedFloorCells || 0} illustrated floor cells recovered · ${audit.reconstructedIllustratedSurfaces || 0} interior surfaces reconstructed · ${audit.illustratedSurfaceCompletedComponents || 0} completed surface components · ${audit.illustratedSurfaceCompletedCells || 0} completed playable cells · ${audit.illustratedSurfaceRawBoundarySides || 0} raw surface boundary sides · ${audit.illustratedSurfacePlayableSeamsSuppressed || 0} playable seams suppressed · ${audit.illustratedSurfaceThresholdRejects || 0} threshold boundary rejects · ${audit.illustratedSurfacePerimeterEdges || 0} surface perimeter edges contributed → ${audit.reconstructedSurfacePromotedChains || 0} surface paths promoted · ${audit.reconstructedSurfaceAlreadyRepresented || 0} already represented · ${audit.reconstructedSurfaceAuthorityExtensions || 0} authority extensions · ${audit.reconstructedSurfaceNovelChains || 0} novel surface paths · ${audit.reconstructedSurfaceRepresentedChains || 0} surface paths represented · ${audit.representedPromotedChains || 0} promoted represented (${audit.representedPromotedEdges || 0} edges) · ${audit.emitted} emitted. Diagnostic marks are never saved.`;
+                cartographyAssistantStatus.textContent = `Evidence Audit · ${audit.rawChains} raw chains · ${audit.recoverableChains} recoverable · ${audit.semanticRejected} semantic rejects · ${audit.inferredPerimeters} inferred perimeter edges → ${audit.promotedPerimeterChains || 0} promoted chains (${audit.promotedPerimeterEdges || 0} edges) → ${audit.consolidatedPromotedChains || 0} consolidated · ${audit.authoritativePreserved || 0}/${audit.authoritativeContours || 0} authoritative preserved → ${audit.authoritativeReviewPaths || 0} authoritative review paths · ${audit.authoritativePathMerges || 0} authority merges · ${audit.authoritativeReviewSlotsLiberated || 0} review slots liberated · ${audit.authoritativeRemainingCapacity || 0} capacity remaining · ${audit.illustratedFloorSeeds || 0} floor seeds · ${audit.illustratedTraversalSeedsQueued || 0} traversal seeds queued · ${audit.illustratedTraversalSeedsVisited || 0} traversal seeds visited · ${audit.illustratedAdjacentSamplesExamined || 0} adjacent samples examined · ${audit.illustratedAlreadyPlayableNeighbours || 0} already-playable neighbours · ${audit.illustratedFrontierCandidates || 0} frontier candidates · ${audit.illustratedFrontierAdmitted || 0} frontier admitted · ${audit.illustratedFrontierStructuralRejects || 0} structural rejects · ${audit.illustratedFrontierExteriorRejects || 0} exterior rejects · ${audit.illustratedFrontierInteriorSupportRejects || 0} interior-support rejects · ${audit.illustratedFrontierDecorationRejects || 0} decoration rejects · ${audit.illustratedFrontierNeighbourQualified || 0} neighbour-qualified · ${audit.illustratedFrontierDecorationQualified || 0} decoration-qualified · ${audit.illustratedFrontierProvisionalAdmissions || 0} provisional illustrated admissions · ${audit.illustratedFrontierUnaccounted || 0} unaccounted frontier · ${audit.illustratedPropagationWaves || 0} propagation waves · ${audit.illustratedPropagationDeepestWave || 0} deepest wave · ${audit.illustratedPropagatedAdmissions || 0} propagated admissions · ${audit.illustratedQuietFloorAdmissions || 0} quiet-floor admissions · ${audit.illustratedExhaustedFrontierCells || 0} exhausted frontier samples · ${audit.recoveredIllustratedFloorCells || 0} illustrated floor cells recovered · ${audit.reconstructedIllustratedSurfaces || 0} interior surfaces reconstructed · ${audit.illustratedSurfaceAnchorCandidates || 0} surface anchor candidates · ${audit.illustratedSurfaceExactPlayableAnchors || 0} exact playable anchors · ${audit.illustratedSurfaceReconciledAnchors || 0} reconciled anchors · ${audit.illustratedSurfaceUnresolvedSurfaces || 0} unresolved surfaces · ${audit.illustratedSurfaceCompletedComponents || 0} completed surface components · ${audit.illustratedSurfaceCompletedCells || 0} completed playable cells · ${audit.illustratedSurfaceRawBoundarySides || 0} raw surface boundary sides · ${audit.illustratedSurfacePlayableSeamsSuppressed || 0} playable seams suppressed · ${audit.illustratedSurfaceThresholdRejects || 0} threshold boundary rejects · ${audit.illustratedSurfacePerimeterEdges || 0} surface perimeter edges contributed → ${audit.reconstructedSurfacePromotedChains || 0} surface paths promoted · ${audit.reconstructedSurfaceAlreadyRepresented || 0} already represented · ${audit.reconstructedSurfaceAuthorityExtensions || 0} authority extensions · ${audit.reconstructedSurfaceNovelChains || 0} novel surface paths · ${audit.reconstructedSurfaceRepresentedChains || 0} surface paths represented · ${audit.representedPromotedChains || 0} promoted represented (${audit.representedPromotedEdges || 0} edges) · ${audit.emitted} emitted. Diagnostic marks are never saved.`;
             } else {
                 const doors = cartographySuggestions.filter((item) => item.type === 'door').length;
                 cartographyAssistantStatus.textContent = `${total} draft suggestions · ${selected} selected · ${doors} possible doors. Polyline wall paths count as one review object each. Nothing is saved until Apply Selected.`;
@@ -3848,6 +3848,10 @@
             let illustratedSurfaceThresholdRejects = 0;
             let illustratedSurfaceCompletedCells = 0;
             let illustratedSurfaceCompletedComponents = 0;
+            let illustratedSurfaceAnchorCandidates = 0;
+            let illustratedSurfaceExactPlayableAnchors = 0;
+            let illustratedSurfaceReconciledAnchors = 0;
+            let illustratedSurfaceUnresolvedSurfaces = 0;
             // IV.30.1G.5W — Reconstructed Surface Authority & Review-Budget Representation.
             // G.5V proved reconstructed illustrated surfaces can discover useful perimeter,
             // but the old diagnostic counter discarded the geometry before arbitration.
@@ -3967,14 +3971,31 @@
                 return [{ x: left, y: bottom }, { x: right, y: bottom }];
             };
             const completedEdgeKey = (a, b) => {
-                const first = `${roundContourCoordinate(a.x)},${roundContourCoordinate(a.y)}`;
-                const second = `${roundContourCoordinate(b.x)},${roundContourCoordinate(b.y)}`;
+                // Keep this helper independent of the later suggestion-rounding closure:
+                // G.5Z.1 boundary completion executes before roundContourCoordinate exists.
+                const roundCompletedCoordinate = (value) => Math.round(value * contourSubdivisions) / contourSubdivisions;
+                const first = `${roundCompletedCoordinate(a.x)},${roundCompletedCoordinate(a.y)}`;
+                const second = `${roundCompletedCoordinate(b.x)},${roundCompletedCoordinate(b.y)}`;
                 return first < second ? `${first}:${second}` : `${second}:${first}`;
             };
+            // IV.30.1G.5Z.1 — Recovered-to-Playable Component Anchor Reconciliation.
+            // G.5Z's first live audit proved that G.5Y can recover 885 cells while the
+            // post-recovery floor-component classifier labels their enlarged component as
+            // exterior. Recovered cells are already admitted by G.5Y's stricter structural,
+            // exterior and decoration gates, so they are valid local anchors even when that
+            // later broad component label disagrees. Completion may walk from such an anchor
+            // through either the recovered surface itself or certified non-exterior floor; it
+            // may never use an unrelated exterior floor cell merely because it is nearby.
+            const isCompletedSurfacePlayable = (column, row) => column >= 0 && row >= 0
+                && column < contourColumns && row < contourRows
+                && (illustratedFloorContinuitySurface[row][column] || isPlayableFloor(column, row));
             for (let seedRow = 1; seedRow < contourRows - 1; seedRow += 1) {
                 for (let seedColumn = 1; seedColumn < contourColumns - 1; seedColumn += 1) {
                     if (!illustratedFloorContinuitySurface[seedRow][seedColumn] || completedSurfaceVisited[seedRow][seedColumn]) continue;
-                    if (!isPlayableFloor(seedColumn, seedRow)) continue;
+                    illustratedSurfaceAnchorCandidates += 1;
+                    if (isPlayableFloor(seedColumn, seedRow)) illustratedSurfaceExactPlayableAnchors += 1;
+                    else if (isCompletedSurfacePlayable(seedColumn, seedRow)) illustratedSurfaceReconciledAnchors += 1;
+                    else { illustratedSurfaceUnresolvedSurfaces += 1; continue; }
                     illustratedSurfaceCompletedComponents += 1;
                     const queue = [[seedColumn, seedRow]];
                     completedSurfaceVisited[seedRow][seedColumn] = true;
@@ -3983,7 +4004,7 @@
                         illustratedSurfaceCompletedCells += 1;
                         [[-1,0],[1,0],[0,-1],[0,1]].forEach(([dx,dy]) => {
                             const nx = x + dx, ny = y + dy;
-                            if (isPlayableFloor(nx, ny)) {
+                            if (isCompletedSurfacePlayable(nx, ny)) {
                                 // This is an interior seam of the completed playable
                                 // surface, never a wall merely because only one side was
                                 // originally recovered by G.5Y.
@@ -5470,6 +5491,10 @@
                     illustratedExhaustedFrontierCells,
                     recoveredIllustratedFloorCells,
                     reconstructedIllustratedSurfaces,
+                    illustratedSurfaceAnchorCandidates,
+                    illustratedSurfaceExactPlayableAnchors,
+                    illustratedSurfaceReconciledAnchors,
+                    illustratedSurfaceUnresolvedSurfaces,
                     illustratedSurfaceCompletedComponents,
                     illustratedSurfaceCompletedCells,
                     illustratedSurfaceRawBoundarySides,
