@@ -1166,3 +1166,8 @@ Regression-only correction for the story-beat endpoint registration assertion; n
 ### IV.30.1G.5T.1 — Evidence Audit Publication After Review-Budget Fallback ✅
 - Preserve the normal 200-object monotonic fallback while allowing the top-level Evidence Audit pass to publish G.5T traversal telemetry.
 - Keep recursive `skipOcclusionRecovery` baseline passes silent so they cannot overwrite the live diagnostic audit.
+
+### IV.30.1G.5T.2 — Evidence Audit Status Ownership ✅
+- Give the top-level Evidence Audit analysis explicit ownership of its completed telemetry object.
+- Capture diagnostic publication through a top-level callback and restore that audit immediately before review rendering.
+- Keep recursive `skipOcclusionRecovery` passes silent and preserve ordinary Living Contour / Hybrid draft summaries.

@@ -5103,7 +5103,12 @@
                         points: item.points
                     });
                 });
-                cartographyEvidenceAudit = {
+                // IV.30.1G.5T.2 — Evidence Audit Status Ownership.
+                // Publish through both the historical shared audit state and an explicit
+                // top-level callback. The callback gives the Analyse Map caller ownership
+                // of the final diagnostic object, so later draft rendering cannot lose the
+                // audit merely because an internal contour pass used fallback/recursion.
+                const publishedEvidenceAudit = {
                     evidenceModel: 'living-contour-evidence-audit-v10',
                     rawChains: contourChains.length,
                     recoverableChains: recoverableChains.length,
@@ -5135,6 +5140,10 @@
                     emitted: emittedSuggestions.length,
                     records: contourEvidenceAuditRecords
                 };
+                cartographyEvidenceAudit = publishedEvidenceAudit;
+                if (typeof options.onEvidenceAudit === 'function') {
+                    options.onEvidenceAudit(publishedEvidenceAudit);
+                }
             };
 
             // Monotonic evidence contract: preserve every pre-G.5J certified object first,
@@ -5560,9 +5569,17 @@
         if (detail === 'audit') {
             const existing = new Set(visionBarriers.map(cartographySuggestionKey));
             cartographyEvidenceAudit = null;
-            cartographySuggestions = livingContourCandidates({ evidenceAudit: true })
+            let completedEvidenceAudit = null;
+            cartographySuggestions = livingContourCandidates({
+                evidenceAudit: true,
+                onEvidenceAudit: (audit) => { completedEvidenceAudit = audit; }
+            })
                 .filter((item) => !existing.has(cartographySuggestionKey(item)))
                 .sort((a, b) => b.confidence - a.confidence);
+            // The top-level Evidence Audit owns the status panel. Re-attach the audit
+            // captured from the completed contour pass immediately before rendering the
+            // review, rather than relying on mutable state from nested analysis passes.
+            if (completedEvidenceAudit) cartographyEvidenceAudit = completedEvidenceAudit;
             renderCartographyReview();
             if (cartographySuggestions.length === 0 && cartographyAssistantStatus) {
                 cartographyAssistantStatus.textContent = cartographyEvidenceAudit
