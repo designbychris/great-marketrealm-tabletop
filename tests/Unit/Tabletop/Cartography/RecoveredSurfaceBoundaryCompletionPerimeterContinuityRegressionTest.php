@@ -16,8 +16,8 @@ final class RecoveredSurfaceBoundaryCompletionPerimeterContinuityRegressionTest 
 
         self::assertStringContainsString('IV.30.1G.5Z — Recovered Surface Boundary Completion & Perimeter Continuity', $script);
         self::assertStringContainsString('if (!illustratedFloorContinuitySurface[seedRow][seedColumn] || completedSurfaceVisited[seedRow][seedColumn]) continue;', $script);
-        self::assertStringContainsString('if (!isPlayableFloor(seedColumn, seedRow)) continue;', $script);
-        self::assertStringContainsString('if (isPlayableFloor(nx, ny)) {', $script);
+        self::assertStringContainsString('illustratedFloorContinuitySurface[row][column] || isPlayableFloor(column, row)', $script);
+        self::assertStringContainsString('if (isCompletedSurfacePlayable(nx, ny)) {', $script);
         self::assertStringContainsString('illustratedSurfacePlayableSeamsSuppressed += 1;', $script);
         self::assertStringContainsString('if (contourThresholdMatch(a,b)) {', $script);
         self::assertStringContainsString("evidenceModel: 'living-contour-recovered-surface-boundary-completion-v13'", $script);
