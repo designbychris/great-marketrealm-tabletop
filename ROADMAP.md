@@ -1275,3 +1275,12 @@ Regression-only correction for the story-beat endpoint registration assertion; n
 - [x] Preserve G.5Y's admission gates, G.5Z.1 local anchor reconciliation, G.5X authoritative coalescence and the 200-object review ceiling.
 - [ ] Server certification.
 - [ ] Dungeon from Hell audit: determine whether the 271 completed perimeter edges are all represented, or identify the exact downstream edge deficit before changing geometry.
+
+## Phase IV.30.1G.5Z.3 — Represented Geometry Visual Correspondence Audit ✅
+- [x] Preserve G.5Z.2 source perimeter identities through final review-object arbitration and compare them against the coordinates actually emitted for review.
+- [x] Publish final review-segment volume plus exact source-edge spatial correspondence instead of relying on object-level representation accounting alone.
+- [x] Split exact correspondence across authority-extension and novel reconstructed-surface routes so either path can be audited independently.
+- [x] Publish displaced/collapsed source-edge counts and open-chain termination counts without changing simplification, geometry or arbitration behaviour.
+- [x] Preserve G.5Y admission gates, G.5Z.1 local anchor reconciliation, G.5X authoritative coalescence, G.5Z.2 edge accounting and the 200-object review ceiling.
+- [ ] Server certification.
+- [ ] Dungeon from Hell audit: determine whether all 271 represented completed-perimeter edges remain at their exact source coordinates in final review geometry, and whether remaining visual gaps correlate with authority extensions or open-chain terminations.

@@ -2567,7 +2567,7 @@
         if (cartographyAssistantStatus && total > 0) {
             if (cartographyDetail?.value === 'audit' && cartographyEvidenceAudit) {
                 const audit = cartographyEvidenceAudit;
-                cartographyAssistantStatus.textContent = `Evidence Audit · ${audit.rawChains} raw chains · ${audit.recoverableChains} recoverable · ${audit.semanticRejected} semantic rejects · ${audit.inferredPerimeters} inferred perimeter edges → ${audit.promotedPerimeterChains || 0} promoted chains (${audit.promotedPerimeterEdges || 0} edges) → ${audit.consolidatedPromotedChains || 0} consolidated · ${audit.authoritativePreserved || 0}/${audit.authoritativeContours || 0} authoritative preserved → ${audit.authoritativeReviewPaths || 0} authoritative review paths · ${audit.authoritativePathMerges || 0} authority merges · ${audit.authoritativeReviewSlotsLiberated || 0} review slots liberated · ${audit.authoritativeRemainingCapacity || 0} capacity remaining · ${audit.illustratedFloorSeeds || 0} floor seeds · ${audit.illustratedTraversalSeedsQueued || 0} traversal seeds queued · ${audit.illustratedTraversalSeedsVisited || 0} traversal seeds visited · ${audit.illustratedAdjacentSamplesExamined || 0} adjacent samples examined · ${audit.illustratedAlreadyPlayableNeighbours || 0} already-playable neighbours · ${audit.illustratedFrontierCandidates || 0} frontier candidates · ${audit.illustratedFrontierAdmitted || 0} frontier admitted · ${audit.illustratedFrontierStructuralRejects || 0} structural rejects · ${audit.illustratedFrontierExteriorRejects || 0} exterior rejects · ${audit.illustratedFrontierInteriorSupportRejects || 0} interior-support rejects · ${audit.illustratedFrontierDecorationRejects || 0} decoration rejects · ${audit.illustratedFrontierNeighbourQualified || 0} neighbour-qualified · ${audit.illustratedFrontierDecorationQualified || 0} decoration-qualified · ${audit.illustratedFrontierProvisionalAdmissions || 0} provisional illustrated admissions · ${audit.illustratedFrontierUnaccounted || 0} unaccounted frontier · ${audit.illustratedPropagationWaves || 0} propagation waves · ${audit.illustratedPropagationDeepestWave || 0} deepest wave · ${audit.illustratedPropagatedAdmissions || 0} propagated admissions · ${audit.illustratedQuietFloorAdmissions || 0} quiet-floor admissions · ${audit.illustratedExhaustedFrontierCells || 0} exhausted frontier samples · ${audit.recoveredIllustratedFloorCells || 0} illustrated floor cells recovered · ${audit.reconstructedIllustratedSurfaces || 0} interior surfaces reconstructed · ${audit.illustratedSurfaceAnchorCandidates || 0} surface anchor candidates · ${audit.illustratedSurfaceExactPlayableAnchors || 0} exact playable anchors · ${audit.illustratedSurfaceReconciledAnchors || 0} reconciled anchors · ${audit.illustratedSurfaceUnresolvedSurfaces || 0} unresolved surfaces · ${audit.illustratedSurfaceCompletedComponents || 0} completed surface components · ${audit.illustratedSurfaceCompletedCells || 0} completed playable cells · ${audit.illustratedSurfaceRawBoundarySides || 0} raw surface boundary sides · ${audit.illustratedSurfacePlayableSeamsSuppressed || 0} playable seams suppressed · ${audit.illustratedSurfaceThresholdRejects || 0} threshold boundary rejects · ${audit.illustratedSurfacePerimeterEdges || 0} surface perimeter edges contributed → ${audit.reconstructedSurfacePromotedChains || 0} surface paths promoted (${audit.reconstructedSurfaceAssembledEdges || 0} assembled edges) · ${audit.reconstructedSurfaceClosedChains || 0} closed / ${audit.reconstructedSurfaceOpenChains || 0} open · ${audit.reconstructedSurfaceAlreadyRepresented || 0} already represented (${audit.reconstructedSurfaceAlreadyRepresentedEdges || 0} edges) · ${audit.reconstructedSurfaceAuthorityExtensions || 0} authority extensions (${audit.reconstructedSurfaceAuthorityExtensionEdges || 0} edges) · ${audit.reconstructedSurfaceNovelChains || 0} novel surface paths · ${audit.reconstructedSurfaceRepresentedChains || 0} surface paths represented (${audit.reconstructedSurfaceRepresentedEdges || 0} edges) · ${audit.reconstructedSurfaceUncoveredEdges || 0} uncovered surface edges · ${audit.representedPromotedChains || 0} promoted represented (${audit.representedPromotedEdges || 0} edges) · ${audit.emitted} emitted. Diagnostic marks are never saved.`;
+                cartographyAssistantStatus.textContent = `Evidence Audit · ${audit.rawChains} raw chains · ${audit.recoverableChains} recoverable · ${audit.semanticRejected} semantic rejects · ${audit.inferredPerimeters} inferred perimeter edges → ${audit.promotedPerimeterChains || 0} promoted chains (${audit.promotedPerimeterEdges || 0} edges) → ${audit.consolidatedPromotedChains || 0} consolidated · ${audit.authoritativePreserved || 0}/${audit.authoritativeContours || 0} authoritative preserved → ${audit.authoritativeReviewPaths || 0} authoritative review paths · ${audit.authoritativePathMerges || 0} authority merges · ${audit.authoritativeReviewSlotsLiberated || 0} review slots liberated · ${audit.authoritativeRemainingCapacity || 0} capacity remaining · ${audit.illustratedFloorSeeds || 0} floor seeds · ${audit.illustratedTraversalSeedsQueued || 0} traversal seeds queued · ${audit.illustratedTraversalSeedsVisited || 0} traversal seeds visited · ${audit.illustratedAdjacentSamplesExamined || 0} adjacent samples examined · ${audit.illustratedAlreadyPlayableNeighbours || 0} already-playable neighbours · ${audit.illustratedFrontierCandidates || 0} frontier candidates · ${audit.illustratedFrontierAdmitted || 0} frontier admitted · ${audit.illustratedFrontierStructuralRejects || 0} structural rejects · ${audit.illustratedFrontierExteriorRejects || 0} exterior rejects · ${audit.illustratedFrontierInteriorSupportRejects || 0} interior-support rejects · ${audit.illustratedFrontierDecorationRejects || 0} decoration rejects · ${audit.illustratedFrontierNeighbourQualified || 0} neighbour-qualified · ${audit.illustratedFrontierDecorationQualified || 0} decoration-qualified · ${audit.illustratedFrontierProvisionalAdmissions || 0} provisional illustrated admissions · ${audit.illustratedFrontierUnaccounted || 0} unaccounted frontier · ${audit.illustratedPropagationWaves || 0} propagation waves · ${audit.illustratedPropagationDeepestWave || 0} deepest wave · ${audit.illustratedPropagatedAdmissions || 0} propagated admissions · ${audit.illustratedQuietFloorAdmissions || 0} quiet-floor admissions · ${audit.illustratedExhaustedFrontierCells || 0} exhausted frontier samples · ${audit.recoveredIllustratedFloorCells || 0} illustrated floor cells recovered · ${audit.reconstructedIllustratedSurfaces || 0} interior surfaces reconstructed · ${audit.illustratedSurfaceAnchorCandidates || 0} surface anchor candidates · ${audit.illustratedSurfaceExactPlayableAnchors || 0} exact playable anchors · ${audit.illustratedSurfaceReconciledAnchors || 0} reconciled anchors · ${audit.illustratedSurfaceUnresolvedSurfaces || 0} unresolved surfaces · ${audit.illustratedSurfaceCompletedComponents || 0} completed surface components · ${audit.illustratedSurfaceCompletedCells || 0} completed playable cells · ${audit.illustratedSurfaceRawBoundarySides || 0} raw surface boundary sides · ${audit.illustratedSurfacePlayableSeamsSuppressed || 0} playable seams suppressed · ${audit.illustratedSurfaceThresholdRejects || 0} threshold boundary rejects · ${audit.illustratedSurfacePerimeterEdges || 0} surface perimeter edges contributed → ${audit.reconstructedSurfacePromotedChains || 0} surface paths promoted (${audit.reconstructedSurfaceAssembledEdges || 0} assembled edges) · ${audit.reconstructedSurfaceClosedChains || 0} closed / ${audit.reconstructedSurfaceOpenChains || 0} open · ${audit.reconstructedSurfaceAlreadyRepresented || 0} already represented (${audit.reconstructedSurfaceAlreadyRepresentedEdges || 0} edges) · ${audit.reconstructedSurfaceAuthorityExtensions || 0} authority extensions (${audit.reconstructedSurfaceAuthorityExtensionEdges || 0} edges) · ${audit.reconstructedSurfaceNovelChains || 0} novel surface paths · ${audit.reconstructedSurfaceRepresentedChains || 0} surface paths represented (${audit.reconstructedSurfaceRepresentedEdges || 0} edges) · ${audit.reconstructedSurfaceUncoveredEdges || 0} uncovered surface edges · ${audit.reconstructedSurfaceRenderedReviewSegments || 0} rendered review segments · ${audit.reconstructedSurfaceExactCorrespondenceEdges || 0} exact-correspondence edges (${audit.reconstructedSurfaceAuthorityCorrespondenceEdges || 0} authority / ${audit.reconstructedSurfaceNovelCorrespondenceEdges || 0} novel) · ${audit.reconstructedSurfaceDisplacedEdges || 0} displaced edges · ${audit.reconstructedSurfaceCollapsedEdges || 0} collapsed edges · ${audit.reconstructedSurfaceOpenChainTerminations || 0} open-chain terminations · ${audit.representedPromotedChains || 0} promoted represented (${audit.representedPromotedEdges || 0} edges) · ${audit.emitted} emitted. Diagnostic marks are never saved.`;
             } else {
                 const doors = cartographySuggestions.filter((item) => item.type === 'door').length;
                 cartographyAssistantStatus.textContent = `${total} draft suggestions · ${selected} selected · ${doors} possible doors. Polyline wall paths count as one review object each. Nothing is saved until Apply Selected.`;
@@ -5185,6 +5185,8 @@
             let reconstructedSurfaceAlreadyRepresentedEdges = 0;
             let reconstructedSurfaceAuthorityExtensionEdges = 0;
             let reconstructedSurfaceNovelRepresentedEdges = 0;
+            const reconstructedSurfaceAuthorityExtensionSegmentKeys = new Set();
+            const reconstructedSurfaceNovelSegmentKeys = new Set();
 
             // IV.30.1G.5O — Promoted Chain Consolidation & Emission Budget Liberation.
             // G.5N proved promotion worked, but its fixed 48-object perimeter allowance
@@ -5273,6 +5275,15 @@
                 }
                 return segments;
             };
+            // IV.30.1G.5Z.3 — Represented Geometry Visual Correspondence Audit.
+            // G.5Z.2 proved every completed perimeter edge is represented by some review
+            // object. Retain exact source-segment identities so final review geometry can
+            // prove spatial correspondence rather than object-level bookkeeping alone.
+            // This audit is observational: it never mutates points or arbitration.
+            const reconstructedSurfaceSourceSegmentKeys = new Set(
+                promotedReconstructedSurfaceSuggestions.flatMap(authoritativeSegmentsFor)
+            );
+
             const authoritativeCompatibilityKey = (item) => [
                 item.type || 'wall',
                 item.certifiedPortal === true ? 'portal' : 'no-portal',
@@ -5380,6 +5391,7 @@
                         };
                         reconstructedSurfaceAuthorityExtensions += 1;
                         reconstructedSurfaceAuthorityExtensionEdges += Number(surface.inferredPerimeterEdgeCount || 0);
+                        authoritativeSegmentsFor(surface).forEach((key) => reconstructedSurfaceAuthorityExtensionSegmentKeys.add(key));
                         representedReconstructedSurfaceKeys.add(surfaceKey);
                         extended = true;
                         break;
@@ -5415,11 +5427,38 @@
                 if (arbitratedKeys.has(cartographySuggestionKey(item))) {
                     representedReconstructedSurfaceKeys.add(cartographySuggestionKey(item));
                     reconstructedSurfaceNovelRepresentedEdges += Number(item.inferredPerimeterEdgeCount || 0);
+                    authoritativeSegmentsFor(item).forEach((key) => reconstructedSurfaceNovelSegmentKeys.add(key));
                 }
             });
+
             appendByAuthority(bridgeSupplementalSuggestions, 'bridge');
             appendByAuthority(promotedSupplementalSuggestions, 'promoted');
             pathSuggestions = arbitratedSuggestions;
+
+            // G.5Z.3 compares the final review coordinates with the completed perimeter.
+            // Exact source-segment survival is the strongest correspondence signal. Any
+            // future simplifier that moves geometry will therefore become visible here.
+            const reconstructedSurfaceFinalSegmentKeys = new Set(arbitratedSuggestions.flatMap(authoritativeSegmentsFor));
+            const reconstructedSurfaceExactCorrespondenceEdges = Array.from(reconstructedSurfaceSourceSegmentKeys)
+                .filter((key) => reconstructedSurfaceFinalSegmentKeys.has(key)).length;
+            const reconstructedSurfaceAuthorityCorrespondenceEdges = Array.from(reconstructedSurfaceAuthorityExtensionSegmentKeys)
+                .filter((key) => reconstructedSurfaceFinalSegmentKeys.has(key)).length;
+            const reconstructedSurfaceNovelCorrespondenceEdges = Array.from(reconstructedSurfaceNovelSegmentKeys)
+                .filter((key) => reconstructedSurfaceFinalSegmentKeys.has(key)).length;
+            const reconstructedSurfaceDisplacedEdges = Math.max(0,
+                reconstructedSurfaceSourceSegmentKeys.size - reconstructedSurfaceExactCorrespondenceEdges
+            );
+            const reconstructedSurfaceCollapsedEdges = promotedReconstructedSurfaceSuggestions.reduce((count, item) => {
+                const points = Array.isArray(item.points) ? item.points : [];
+                for (let index = 0; index < points.length - 1; index += 1) {
+                    if (surfacePointKey(points[index]) === surfacePointKey(points[index + 1])) count += 1;
+                }
+                return count;
+            }, 0);
+            const reconstructedSurfaceRenderedReviewSegments = arbitratedSuggestions.reduce(
+                (sum, item) => sum + Math.max(0, (Array.isArray(item.points) ? item.points.length : 0) - 1), 0
+            );
+
 
             // Defensive compatibility fallback: IV.30.1C intentionally no longer
             // performs global segment compaction. Historical contracts referenced
@@ -5542,6 +5581,13 @@
                     reconstructedSurfaceRepresentedChains: representedReconstructedSurfaceKeys.size,
                     reconstructedSurfaceRepresentedEdges: reconstructedSurfaceAlreadyRepresentedEdges + reconstructedSurfaceAuthorityExtensionEdges + reconstructedSurfaceNovelRepresentedEdges,
                     reconstructedSurfaceUncoveredEdges: Math.max(0, reconstructedSurfaceAssembledEdges - reconstructedSurfaceAlreadyRepresentedEdges - reconstructedSurfaceAuthorityExtensionEdges - reconstructedSurfaceNovelRepresentedEdges),
+                    reconstructedSurfaceRenderedReviewSegments,
+                    reconstructedSurfaceExactCorrespondenceEdges,
+                    reconstructedSurfaceAuthorityCorrespondenceEdges,
+                    reconstructedSurfaceNovelCorrespondenceEdges,
+                    reconstructedSurfaceDisplacedEdges,
+                    reconstructedSurfaceCollapsedEdges,
+                    reconstructedSurfaceOpenChainTerminations: reconstructedSurfaceOpenChains * 2,
                     bridgeRepresented,
                     promotedRepresentedByArbitration,
                     representedPromotedChains: consolidatedPromotedPerimeterSuggestions.filter((item) => representedFinalKeys.has(cartographySuggestionKey(item))).length,
