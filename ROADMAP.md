@@ -1304,3 +1304,12 @@ Regression-only correction for the story-beat endpoint registration assertion; n
 - [x] Preserve G.5Y structural/exterior/decoration admission, G.5Z.1 reconciliation, G.5Z.2/G.5Z.3 representation/correspondence accounting, G.5Z.4 reject topology, G.5X authority coalescence and the 200-object review ceiling.
 - [ ] Server certification.
 - [ ] Dungeon from Hell audit: determine whether substantial coherent floor-like territory exists outside the G.5Y frontier and whether it corresponds to the visibly untraced lower dungeon before introducing any additional seed authority.
+
+## Phase IV.30.1G.5Z.6 — Conservative Interior Island Seeding & Controlled Re-Propagation ✅
+- [x] Promote only G.5Z.5 enclosed multi-cell islands with a local one/two-cell relationship to certified floor into secondary-seed consideration.
+- [x] Reject secondary bridges that cross dense or structural wall-band evidence; no nearest-playable search, arbitrary snapping or unrestricted island admission is permitted.
+- [x] Grant at most one secondary seed per topology-safe component and require every subsequent recovered cell to pass the existing G.5Y flood gates unchanged.
+- [x] Publish secondary narrow-gap candidates, topology-safe seed candidates, admitted secondary seeds and additional illustrated-floor recovery in Evidence Audit.
+- [x] Preserve G.5Y structural/exterior/decoration safeguards, G.5Z.1 reconciliation, G.5Z.2/G.5Z.3 representation/correspondence accounting, G.5Z.4/G.5Z.5 audits, G.5X authority coalescence and the 200-object review ceiling.
+- [ ] Server certification.
+- [ ] Dungeon from Hell certification: prove non-zero secondary recovery without exterior leakage, then inspect whether the lower illustrated dungeon gains sensible contour coverage.
