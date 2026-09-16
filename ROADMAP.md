@@ -1334,3 +1334,13 @@ Regression-only correction for the story-beat endpoint registration assertion; n
 - [x] Preserve G.5Y/G.5Z.6 admission and secondary seeding, G.5Z.1 reconciliation, G.5Z.2/G.5Z.3 representation/correspondence accounting, G.5X authoritative coalescence and the 200-object review ceiling.
 - [ ] Server certification.
 - [ ] Dungeon from Hell certification: verify the 332-edge oversized component becomes cap-safe contiguous review paths, all 608 perimeter edges assemble, representation remains complete, and split vertices introduce no visual wall gaps.
+
+## Phase IV.30.1G.5Z.9 — Unseeded Interior Island Qualification & Reachability Audit ✅
+- [x] Retain G.5Z.5 disconnected-island identities and distinguish G.5Z.6 first-generation seeded islands from the remaining unseeded candidate population.
+- [x] Publish initial unseeded qualification reasons, including absence of a narrow-gap relationship and locally unsafe bridge evidence, without granting new seed authority.
+- [x] Re-audit unseeded candidate islands after G.5Z.6 controlled re-propagation against the expanded certified playable surface.
+- [x] Distinguish islands absorbed by secondary recovery from those still disconnected, and publish newly adjacent, newly narrow-gap, topology-safe and structural-gap-blocked component counts.
+- [x] Keep the audit diagnostic-only: no second-generation seed is created and no floor cell is admitted by G.5Z.9.
+- [x] Preserve G.5Y structural/exterior/decoration gates, G.5Z.6 first-generation seed authority, G.5Z.8 vertex-cap-safe segmentation, G.5X authoritative coalescence and the 200-object review ceiling.
+- [ ] Server certification.
+- [ ] Dungeon from Hell audit: determine whether the expanded 3,833-cell surface makes previously unseeded lower-dungeon islands newly topology-safe before authorizing any second-generation seeding.
