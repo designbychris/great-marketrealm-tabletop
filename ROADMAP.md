@@ -1205,3 +1205,9 @@ Regression-only correction for the story-beat endpoint registration assertion; n
 - [x] Preserve the 200-object safety ceiling, G.5V controlled growth, G.5U accounting, structural/exterior vetoes and review-first persistence.
 - [ ] Server certification.
 - [ ] Dungeon from Hell Evidence Audit / Living Contour certification: reconstructed surface paths should become represented by equality, authority extension, or genuine remaining review capacity.
+
+### Phase IV.30.1G.5W.1 — Surface Representation Pipeline Publication ✅
+- Treat retained reconstructed illustrated-surface perimeter as a first-class reason to continue beyond the historical no-recoverable/no-inferred early return.
+- Carry reconstructed surface edges through promotion, authority reconciliation, review-budget representation, and Evidence Audit publication.
+- Preserve G.5T.3 Evidence Audit terminal-path ownership and the 200-object review ceiling.
+- Regression-protect the control-flow handoff so contributed surface perimeter cannot silently disappear before G.5W representation.

@@ -4837,7 +4837,16 @@
             // diagnostic pass and still need to reach the publisher below, even when
             // the visible review objects ultimately come entirely from the monotonic
             // pre-occlusion baseline.
-            if (recoverableChains.length === 0 && inferredPlayablePerimeterSuggestions.length === 0
+            // IV.30.1G.5W.1 — Surface Representation Pipeline Publication.
+            // Reconstructed illustrated-surface perimeter is now a first-class reason to
+            // continue into authority/review representation. G.5W originally retained
+            // those edges, but a normal Living Contour pass could still take the older
+            // no-recoverable/no-inferred early return before the retained surface geometry
+            // reached promotion/arbitration. Only return when *all three* evidence sources
+            // are empty. Evidence Audit retains its G.5T.3 terminal-path ownership rule.
+            if (recoverableChains.length === 0
+                && inferredPlayablePerimeterSuggestions.length === 0
+                && reconstructedIllustratedSurfaceEdges.length === 0
                 && !(options.evidenceAudit === true && options.skipOcclusionRecovery !== true)) {
                 return preOcclusionRecoveryContours;
             }
