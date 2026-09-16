@@ -1221,3 +1221,21 @@ Regression-only correction for the story-beat endpoint registration assertion; n
 - [x] Preserve G.5W.1 surface-representation handoff, G.5V controlled surface growth, G.5U accounting, structural/exterior vetoes and review-first persistence.
 - [ ] Server certification.
 - [ ] Dungeon from Hell certification: authority preservation must remain complete while review slots are liberated and at least one of the nine novel reconstructed-surface paths becomes represented.
+
+## Phase IV.30.1G.5Y — Recovered Surface Propagation & Multi-Wave Illustrated Flooding ✅
+- [x] Promote each successfully recovered illustrated-floor cell into the next breadth wave instead of exhausting the historical short pass budget.
+- [x] Extend the bounded flood budget while retaining structural-band and exterior-parchment vetoes as absolute safeguards.
+- [x] Admit quiet illustrated floor only when at least two already-playable neighbours and local playable support establish interior continuity; decoration alone does not weaken the exterior gate.
+- [x] Publish propagation waves, deepest wave, propagated admissions, quiet-floor admissions and exhausted-frontier accounting in Evidence Audit.
+- [x] Preserve G.5X authoritative coalescence, the 200-object review ceiling, review-first persistence and reconstructed-surface authority arbitration.
+- [ ] Server certification.
+- [ ] Dungeon from Hell certification: recovered illustrated floor should grow beyond the G.5X 113-cell baseline without exterior parchment runaway.
+
+## Phase IV.30.1G.5Y — Recovered Surface Propagation & Multi-Wave Illustrated Flooding ✅
+- [x] Promote each successfully recovered illustrated-floor cell into subsequent bounded breadth waves rather than exhausting the historical short pass budget.
+- [x] Retain structural-band and exterior-parchment vetoes as absolute safeguards throughout propagation.
+- [x] Admit quiet illustrated floor only after two-neighbour and local playable support establish interior continuity.
+- [x] Publish propagation waves, deepest wave, propagated admissions, quiet-floor admissions and exhausted-frontier accounting in Evidence Audit.
+- [x] Preserve G.5X authoritative coalescence, reconstructed-surface arbitration, the 200-object review ceiling and review-first persistence.
+- [ ] Server certification.
+- [ ] Dungeon from Hell certification: recovered illustrated floor should grow beyond the G.5X 113-cell baseline without exterior parchment runaway.

@@ -2567,7 +2567,7 @@
         if (cartographyAssistantStatus && total > 0) {
             if (cartographyDetail?.value === 'audit' && cartographyEvidenceAudit) {
                 const audit = cartographyEvidenceAudit;
-                cartographyAssistantStatus.textContent = `Evidence Audit · ${audit.rawChains} raw chains · ${audit.recoverableChains} recoverable · ${audit.semanticRejected} semantic rejects · ${audit.inferredPerimeters} inferred perimeter edges → ${audit.promotedPerimeterChains || 0} promoted chains (${audit.promotedPerimeterEdges || 0} edges) → ${audit.consolidatedPromotedChains || 0} consolidated · ${audit.authoritativePreserved || 0}/${audit.authoritativeContours || 0} authoritative preserved → ${audit.authoritativeReviewPaths || 0} authoritative review paths · ${audit.authoritativePathMerges || 0} authority merges · ${audit.authoritativeReviewSlotsLiberated || 0} review slots liberated · ${audit.authoritativeRemainingCapacity || 0} capacity remaining · ${audit.illustratedFloorSeeds || 0} floor seeds · ${audit.illustratedTraversalSeedsQueued || 0} traversal seeds queued · ${audit.illustratedTraversalSeedsVisited || 0} traversal seeds visited · ${audit.illustratedAdjacentSamplesExamined || 0} adjacent samples examined · ${audit.illustratedAlreadyPlayableNeighbours || 0} already-playable neighbours · ${audit.illustratedFrontierCandidates || 0} frontier candidates · ${audit.illustratedFrontierAdmitted || 0} frontier admitted · ${audit.illustratedFrontierStructuralRejects || 0} structural rejects · ${audit.illustratedFrontierExteriorRejects || 0} exterior rejects · ${audit.illustratedFrontierInteriorSupportRejects || 0} interior-support rejects · ${audit.illustratedFrontierDecorationRejects || 0} decoration rejects · ${audit.illustratedFrontierNeighbourQualified || 0} neighbour-qualified · ${audit.illustratedFrontierDecorationQualified || 0} decoration-qualified · ${audit.illustratedFrontierProvisionalAdmissions || 0} provisional illustrated admissions · ${audit.illustratedFrontierUnaccounted || 0} unaccounted frontier · ${audit.recoveredIllustratedFloorCells || 0} illustrated floor cells recovered · ${audit.reconstructedIllustratedSurfaces || 0} interior surfaces reconstructed · ${audit.illustratedSurfacePerimeterEdges || 0} surface perimeter edges contributed → ${audit.reconstructedSurfacePromotedChains || 0} surface paths promoted · ${audit.reconstructedSurfaceAlreadyRepresented || 0} already represented · ${audit.reconstructedSurfaceAuthorityExtensions || 0} authority extensions · ${audit.reconstructedSurfaceNovelChains || 0} novel surface paths · ${audit.reconstructedSurfaceRepresentedChains || 0} surface paths represented · ${audit.representedPromotedChains || 0} promoted represented (${audit.representedPromotedEdges || 0} edges) · ${audit.emitted} emitted. Diagnostic marks are never saved.`;
+                cartographyAssistantStatus.textContent = `Evidence Audit · ${audit.rawChains} raw chains · ${audit.recoverableChains} recoverable · ${audit.semanticRejected} semantic rejects · ${audit.inferredPerimeters} inferred perimeter edges → ${audit.promotedPerimeterChains || 0} promoted chains (${audit.promotedPerimeterEdges || 0} edges) → ${audit.consolidatedPromotedChains || 0} consolidated · ${audit.authoritativePreserved || 0}/${audit.authoritativeContours || 0} authoritative preserved → ${audit.authoritativeReviewPaths || 0} authoritative review paths · ${audit.authoritativePathMerges || 0} authority merges · ${audit.authoritativeReviewSlotsLiberated || 0} review slots liberated · ${audit.authoritativeRemainingCapacity || 0} capacity remaining · ${audit.illustratedFloorSeeds || 0} floor seeds · ${audit.illustratedTraversalSeedsQueued || 0} traversal seeds queued · ${audit.illustratedTraversalSeedsVisited || 0} traversal seeds visited · ${audit.illustratedAdjacentSamplesExamined || 0} adjacent samples examined · ${audit.illustratedAlreadyPlayableNeighbours || 0} already-playable neighbours · ${audit.illustratedFrontierCandidates || 0} frontier candidates · ${audit.illustratedFrontierAdmitted || 0} frontier admitted · ${audit.illustratedFrontierStructuralRejects || 0} structural rejects · ${audit.illustratedFrontierExteriorRejects || 0} exterior rejects · ${audit.illustratedFrontierInteriorSupportRejects || 0} interior-support rejects · ${audit.illustratedFrontierDecorationRejects || 0} decoration rejects · ${audit.illustratedFrontierNeighbourQualified || 0} neighbour-qualified · ${audit.illustratedFrontierDecorationQualified || 0} decoration-qualified · ${audit.illustratedFrontierProvisionalAdmissions || 0} provisional illustrated admissions · ${audit.illustratedFrontierUnaccounted || 0} unaccounted frontier · ${audit.illustratedPropagationWaves || 0} propagation waves · ${audit.illustratedPropagationDeepestWave || 0} deepest wave · ${audit.illustratedPropagatedAdmissions || 0} propagated admissions · ${audit.illustratedQuietFloorAdmissions || 0} quiet-floor admissions · ${audit.illustratedExhaustedFrontierCells || 0} exhausted frontier samples · ${audit.recoveredIllustratedFloorCells || 0} illustrated floor cells recovered · ${audit.reconstructedIllustratedSurfaces || 0} interior surfaces reconstructed · ${audit.illustratedSurfacePerimeterEdges || 0} surface perimeter edges contributed → ${audit.reconstructedSurfacePromotedChains || 0} surface paths promoted · ${audit.reconstructedSurfaceAlreadyRepresented || 0} already represented · ${audit.reconstructedSurfaceAuthorityExtensions || 0} authority extensions · ${audit.reconstructedSurfaceNovelChains || 0} novel surface paths · ${audit.reconstructedSurfaceRepresentedChains || 0} surface paths represented · ${audit.representedPromotedChains || 0} promoted represented (${audit.representedPromotedEdges || 0} edges) · ${audit.emitted} emitted. Diagnostic marks are never saved.`;
             } else {
                 const doors = cartographySuggestions.filter((item) => item.type === 'door').length;
                 cartographyAssistantStatus.textContent = `${total} draft suggestions · ${selected} selected · ${doors} possible doors. Polyline wall paths count as one review object each. Nothing is saved until Apply Selected.`;
@@ -3698,10 +3698,19 @@
             let illustratedFrontierNeighbourQualified = 0;
             let illustratedFrontierDecorationQualified = 0;
             let illustratedFrontierProvisionalAdmissions = 0;
+            // IV.30.1G.5Y — Recovered Surface Propagation & Multi-Wave Illustrated Flooding.
+            // Recovered cells become explicit next-wave traversal authority. Quiet floor may
+            // propagate only after two-neighbour/local playable support; structural bands and
+            // exterior parchment remain absolute vetoes.
+            let illustratedPropagationWaves = 0;
+            let illustratedPropagationDeepestWave = 0;
+            let illustratedPropagatedAdmissions = 0;
+            let illustratedQuietFloorAdmissions = 0;
+            let illustratedExhaustedFrontierCells = 0;
             const illustratedFloorFloodPass = () => {
                 if (options.skipOcclusionRecovery === true) return 0;
                 let recovered = 0;
-                const maximumPasses = Math.max(3, Math.round(contourSubdivisions * 1.15));
+                const maximumPasses = Math.max(10, Math.round(contourSubdivisions * 4.5));
                 const orthogonal = [[-1,0],[1,0],[0,-1],[0,1]];
                 const inBounds = (x,y) => x > 0 && y > 0 && x < contourColumns - 1 && y < contourRows - 1;
                 const isPlayable = (x,y) => inBounds(x,y) && (isTrustedIllustratedSeed(x,y) || illustratedFloorContinuitySurface[y][x]);
@@ -3731,6 +3740,7 @@
                 };
                 for (let pass=0;pass<maximumPasses;pass+=1) {
                     const additions=[];
+                    const recoveredBeforePass = recovered;
                     // G.5T: walk outward FROM the trusted/recovered seed set instead of
                     // rescanning the whole mesh and hoping a neighbour query reaches it.
                     // The queue/visit counters also prove that the certified seed mask is
@@ -3780,6 +3790,7 @@
                         const adjacentPlayable = orthogonal.reduce((count,[dx,dy]) => count + Number(isPlayable(column+dx,row+dy)), 0);
                         const localInteriorSupport = local.playable >= 2 || adjacentPlayable >= 2 || opposedSupport || directionalSupport >= 2;
                         const inkIsPlausibleDecoration = ink >= .08 && ink <= .88;
+                        const quietIllustratedFloor = ink < .08 && adjacentPlayable >= 2 && local.playable >= 2;
                         // G.5U: every discovered frontier must leave through an explicit
                         // admission/rejection gate. Qualification counters describe the
                         // evidence without relaxing any G.5R safety threshold.
@@ -3791,22 +3802,30 @@
                         // interior-support rule can become true. Structural and exterior vetoes
                         // above remain absolute, and growth remains bounded by the existing pass
                         // limit and orthogonal traversal from already-playable cells.
-                        if (!inkIsPlausibleDecoration) { illustratedFrontierDecorationRejects+=1; continue; }
-                        const provisionalDecorationAdmission = !localInteriorSupport && adjacentPlayable >= 1;
+                        if (!inkIsPlausibleDecoration && !quietIllustratedFloor) { illustratedFrontierDecorationRejects+=1; continue; }
+                        const provisionalDecorationAdmission = inkIsPlausibleDecoration && !localInteriorSupport && adjacentPlayable >= 1;
                         if (!localInteriorSupport && !provisionalDecorationAdmission) { illustratedFrontierInteriorSupportRejects+=1; continue; }
                         if (provisionalDecorationAdmission) illustratedFrontierProvisionalAdmissions+=1;
+                        if (quietIllustratedFloor) illustratedQuietFloorAdmissions+=1;
                         additions.push([column,row]);
                         // G.5U historical contract: if (!localInteriorSupport) { illustratedFrontierInteriorSupportRejects+=1; continue; }
                         }
                     }
-                    if (additions.length===0) break;
+                    if (additions.length===0) {
+                        illustratedExhaustedFrontierCells += examinedThisPass.size;
+                        break;
+                    }
+                    illustratedPropagationWaves += 1;
+                    illustratedPropagationDeepestWave = Math.max(illustratedPropagationDeepestWave, pass + 1);
                     additions.forEach(([column,row])=>{
                         if (isTrustedIllustratedSeed(column,row) || illustratedFloorContinuitySurface[row][column]) return;
                         floor[row][column]=true;
                         illustratedFloorContinuitySurface[row][column]=true;
                         illustratedFrontierAdmitted+=1;
                         recovered+=1;
+                        if (pass > 0) illustratedPropagatedAdmissions+=1;
                     });
+                    if (recovered === recoveredBeforePass) break;
                 }
                 return recovered;
             };
@@ -5353,6 +5372,11 @@
                     illustratedFrontierDecorationQualified,
                     illustratedFrontierProvisionalAdmissions,
                     illustratedFrontierUnaccounted: Math.max(0, illustratedFrontierCandidates - illustratedFrontierAdmitted - illustratedFrontierStructuralRejects - illustratedFrontierExteriorRejects - illustratedFrontierInteriorSupportRejects - illustratedFrontierDecorationRejects),
+                    illustratedPropagationWaves,
+                    illustratedPropagationDeepestWave,
+                    illustratedPropagatedAdmissions,
+                    illustratedQuietFloorAdmissions,
+                    illustratedExhaustedFrontierCells,
                     recoveredIllustratedFloorCells,
                     reconstructedIllustratedSurfaces,
                     illustratedSurfacePerimeterEdges,
