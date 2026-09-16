@@ -1176,3 +1176,12 @@ Regression-only correction for the story-beat endpoint registration assertion; n
 - Keep normal Living Contour monotonic early-return behaviour unchanged when an outer pass has no new recoverable contour/perimeter evidence.
 - Prevent the top-level Evidence Audit from taking that same early return before G.5T traversal telemetry reaches the diagnostic publisher.
 - Allow the visible 200-object review to remain entirely baseline-backed while Evidence Audit still reports the outer traversal experiment.
+
+## Phase IV.30.1G.5U — Frontier Admission Accounting & Illustrated Neighbour Qualification ✅
+- [x] Require every illustrated frontier candidate to terminate in an explicit admitted or rejection category.
+- [x] Separate interior-support rejection from implausible-decoration rejection without relaxing G.5R safety thresholds.
+- [x] Report neighbour-qualified and decoration-qualified frontier evidence independently of final admission.
+- [x] Add an explicit unaccounted-frontier invariant to Evidence Audit so silent candidate loss is observable immediately.
+- [x] Preserve structural/exterior vetoes, trusted-seed traversal, contour authority, the 200-object ceiling, and review-first persistence unchanged.
+- [ ] Server certification.
+- [ ] Dungeon from Hell Evidence Audit certification: unaccounted frontier must be zero and the dominant admission gate must be identified before threshold tuning.
