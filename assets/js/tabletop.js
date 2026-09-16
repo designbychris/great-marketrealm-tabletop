@@ -2567,7 +2567,7 @@
         if (cartographyAssistantStatus && total > 0) {
             if (cartographyDetail?.value === 'audit' && cartographyEvidenceAudit) {
                 const audit = cartographyEvidenceAudit;
-                cartographyAssistantStatus.textContent = `Evidence Audit · ${audit.rawChains} raw chains · ${audit.recoverableChains} recoverable · ${audit.semanticRejected} semantic rejects · ${audit.inferredPerimeters} inferred perimeter edges → ${audit.promotedPerimeterChains || 0} promoted chains (${audit.promotedPerimeterEdges || 0} edges) → ${audit.consolidatedPromotedChains || 0} consolidated · ${audit.authoritativePreserved || 0}/${audit.authoritativeContours || 0} authoritative preserved → ${audit.authoritativeReviewPaths || 0} authoritative review paths · ${audit.authoritativePathMerges || 0} authority merges · ${audit.authoritativeReviewSlotsLiberated || 0} review slots liberated · ${audit.authoritativeRemainingCapacity || 0} capacity remaining · ${audit.illustratedFloorSeeds || 0} floor seeds · ${audit.illustratedTraversalSeedsQueued || 0} traversal seeds queued · ${audit.illustratedTraversalSeedsVisited || 0} traversal seeds visited · ${audit.illustratedAdjacentSamplesExamined || 0} adjacent samples examined · ${audit.illustratedAlreadyPlayableNeighbours || 0} already-playable neighbours · ${audit.illustratedFrontierCandidates || 0} frontier candidates · ${audit.illustratedFrontierAdmitted || 0} frontier admitted · ${audit.illustratedFrontierStructuralRejects || 0} structural rejects · ${audit.illustratedFrontierExteriorRejects || 0} exterior rejects · ${audit.illustratedFrontierInteriorSupportRejects || 0} interior-support rejects · ${audit.illustratedFrontierDecorationRejects || 0} decoration rejects · ${audit.illustratedDecorationRejectUnrecoveredCells || 0} unrecovered decoration cells → ${audit.illustratedDecorationRejectComponents || 0} reject components · ${audit.illustratedDecorationRejectAdjacentComponents || 0} adjacent to recovered floor · ${audit.illustratedDecorationRejectMultiSidedComponents || 0} multi-sided support · ${audit.illustratedDecorationRejectInteriorSupportedComponents || 0} interior-supported · ${audit.illustratedDecorationRejectIsolatedComponents || 0} isolated · ${audit.illustratedPotentialPlayableIslandComponents || 0} potential playable islands (${audit.illustratedPotentialPlayableIslandCells || 0} cells) · ${audit.illustratedFrontierNeighbourQualified || 0} neighbour-qualified · ${audit.illustratedFrontierDecorationQualified || 0} decoration-qualified · ${audit.illustratedFrontierProvisionalAdmissions || 0} provisional illustrated admissions · ${audit.illustratedFrontierUnaccounted || 0} unaccounted frontier · ${audit.illustratedPropagationWaves || 0} propagation waves · ${audit.illustratedPropagationDeepestWave || 0} deepest wave · ${audit.illustratedPropagatedAdmissions || 0} propagated admissions · ${audit.illustratedQuietFloorAdmissions || 0} quiet-floor admissions · ${audit.illustratedExhaustedFrontierCells || 0} exhausted frontier samples · ${audit.recoveredIllustratedFloorCells || 0} illustrated floor cells recovered · ${audit.reconstructedIllustratedSurfaces || 0} interior surfaces reconstructed · ${audit.illustratedSurfaceAnchorCandidates || 0} surface anchor candidates · ${audit.illustratedSurfaceExactPlayableAnchors || 0} exact playable anchors · ${audit.illustratedSurfaceReconciledAnchors || 0} reconciled anchors · ${audit.illustratedSurfaceUnresolvedSurfaces || 0} unresolved surfaces · ${audit.illustratedSurfaceCompletedComponents || 0} completed surface components · ${audit.illustratedSurfaceCompletedCells || 0} completed playable cells · ${audit.illustratedSurfaceRawBoundarySides || 0} raw surface boundary sides · ${audit.illustratedSurfacePlayableSeamsSuppressed || 0} playable seams suppressed · ${audit.illustratedSurfaceThresholdRejects || 0} threshold boundary rejects · ${audit.illustratedSurfacePerimeterEdges || 0} surface perimeter edges contributed → ${audit.reconstructedSurfacePromotedChains || 0} surface paths promoted (${audit.reconstructedSurfaceAssembledEdges || 0} assembled edges) · ${audit.reconstructedSurfaceClosedChains || 0} closed / ${audit.reconstructedSurfaceOpenChains || 0} open · ${audit.reconstructedSurfaceAlreadyRepresented || 0} already represented (${audit.reconstructedSurfaceAlreadyRepresentedEdges || 0} edges) · ${audit.reconstructedSurfaceAuthorityExtensions || 0} authority extensions (${audit.reconstructedSurfaceAuthorityExtensionEdges || 0} edges) · ${audit.reconstructedSurfaceNovelChains || 0} novel surface paths · ${audit.reconstructedSurfaceRepresentedChains || 0} surface paths represented (${audit.reconstructedSurfaceRepresentedEdges || 0} edges) · ${audit.reconstructedSurfaceUncoveredEdges || 0} uncovered surface edges · ${audit.reconstructedSurfaceRenderedReviewSegments || 0} rendered review segments · ${audit.reconstructedSurfaceExactCorrespondenceEdges || 0} exact-correspondence edges (${audit.reconstructedSurfaceAuthorityCorrespondenceEdges || 0} authority / ${audit.reconstructedSurfaceNovelCorrespondenceEdges || 0} novel) · ${audit.reconstructedSurfaceDisplacedEdges || 0} displaced edges · ${audit.reconstructedSurfaceCollapsedEdges || 0} collapsed edges · ${audit.reconstructedSurfaceOpenChainTerminations || 0} open-chain terminations · ${audit.representedPromotedChains || 0} promoted represented (${audit.representedPromotedEdges || 0} edges) · ${audit.emitted} emitted. Diagnostic marks are never saved.`;
+                cartographyAssistantStatus.textContent = `Evidence Audit · ${audit.rawChains} raw chains · ${audit.recoverableChains} recoverable · ${audit.semanticRejected} semantic rejects · ${audit.inferredPerimeters} inferred perimeter edges → ${audit.promotedPerimeterChains || 0} promoted chains (${audit.promotedPerimeterEdges || 0} edges) → ${audit.consolidatedPromotedChains || 0} consolidated · ${audit.authoritativePreserved || 0}/${audit.authoritativeContours || 0} authoritative preserved → ${audit.authoritativeReviewPaths || 0} authoritative review paths · ${audit.authoritativePathMerges || 0} authority merges · ${audit.authoritativeReviewSlotsLiberated || 0} review slots liberated · ${audit.authoritativeRemainingCapacity || 0} capacity remaining · ${audit.illustratedFloorSeeds || 0} floor seeds · ${audit.illustratedTraversalSeedsQueued || 0} traversal seeds queued · ${audit.illustratedTraversalSeedsVisited || 0} traversal seeds visited · ${audit.illustratedAdjacentSamplesExamined || 0} adjacent samples examined · ${audit.illustratedAlreadyPlayableNeighbours || 0} already-playable neighbours · ${audit.illustratedFrontierCandidates || 0} frontier candidates · ${audit.illustratedFrontierAdmitted || 0} frontier admitted · ${audit.illustratedFrontierStructuralRejects || 0} structural rejects · ${audit.illustratedFrontierExteriorRejects || 0} exterior rejects · ${audit.illustratedFrontierInteriorSupportRejects || 0} interior-support rejects · ${audit.illustratedFrontierDecorationRejects || 0} decoration rejects · ${audit.illustratedDecorationRejectUnrecoveredCells || 0} unrecovered decoration cells → ${audit.illustratedDecorationRejectComponents || 0} reject components · ${audit.illustratedDecorationRejectAdjacentComponents || 0} adjacent to recovered floor · ${audit.illustratedDecorationRejectMultiSidedComponents || 0} multi-sided support · ${audit.illustratedDecorationRejectInteriorSupportedComponents || 0} interior-supported · ${audit.illustratedDecorationRejectIsolatedComponents || 0} isolated · ${audit.illustratedPotentialPlayableIslandComponents || 0} potential playable islands (${audit.illustratedPotentialPlayableIslandCells || 0} cells) · ${audit.illustratedMeshCells || 0} mesh cells · ${audit.illustratedRecoveredOrCanonicalCells || 0} recovered/canonical cells · ${audit.illustratedFrontierExaminedUniqueCells || 0} unique frontier-examined cells · ${audit.illustratedNeverFrontierCells || 0} never-frontier cells · ${audit.illustratedFloorLikeNeverFrontierCells || 0} floor-like never-frontier cells → ${audit.illustratedNeverFrontierComponents || 0} components · ${audit.illustratedNeverFrontierExteriorComponents || 0} exterior-connected · ${audit.illustratedNeverFrontierInteriorComponents || 0} enclosed/interior · ${audit.illustratedNeverFrontierNarrowGapComponents || 0} narrow-gap adjacent · ${audit.illustratedDisconnectedPlayableIslandComponents || 0} disconnected playable islands (${audit.illustratedDisconnectedPlayableIslandCells || 0} cells) · ${audit.illustratedFrontierNeighbourQualified || 0} neighbour-qualified · ${audit.illustratedFrontierDecorationQualified || 0} decoration-qualified · ${audit.illustratedFrontierProvisionalAdmissions || 0} provisional illustrated admissions · ${audit.illustratedFrontierUnaccounted || 0} unaccounted frontier · ${audit.illustratedPropagationWaves || 0} propagation waves · ${audit.illustratedPropagationDeepestWave || 0} deepest wave · ${audit.illustratedPropagatedAdmissions || 0} propagated admissions · ${audit.illustratedQuietFloorAdmissions || 0} quiet-floor admissions · ${audit.illustratedExhaustedFrontierCells || 0} exhausted frontier samples · ${audit.recoveredIllustratedFloorCells || 0} illustrated floor cells recovered · ${audit.reconstructedIllustratedSurfaces || 0} interior surfaces reconstructed · ${audit.illustratedSurfaceAnchorCandidates || 0} surface anchor candidates · ${audit.illustratedSurfaceExactPlayableAnchors || 0} exact playable anchors · ${audit.illustratedSurfaceReconciledAnchors || 0} reconciled anchors · ${audit.illustratedSurfaceUnresolvedSurfaces || 0} unresolved surfaces · ${audit.illustratedSurfaceCompletedComponents || 0} completed surface components · ${audit.illustratedSurfaceCompletedCells || 0} completed playable cells · ${audit.illustratedSurfaceRawBoundarySides || 0} raw surface boundary sides · ${audit.illustratedSurfacePlayableSeamsSuppressed || 0} playable seams suppressed · ${audit.illustratedSurfaceThresholdRejects || 0} threshold boundary rejects · ${audit.illustratedSurfacePerimeterEdges || 0} surface perimeter edges contributed → ${audit.reconstructedSurfacePromotedChains || 0} surface paths promoted (${audit.reconstructedSurfaceAssembledEdges || 0} assembled edges) · ${audit.reconstructedSurfaceClosedChains || 0} closed / ${audit.reconstructedSurfaceOpenChains || 0} open · ${audit.reconstructedSurfaceAlreadyRepresented || 0} already represented (${audit.reconstructedSurfaceAlreadyRepresentedEdges || 0} edges) · ${audit.reconstructedSurfaceAuthorityExtensions || 0} authority extensions (${audit.reconstructedSurfaceAuthorityExtensionEdges || 0} edges) · ${audit.reconstructedSurfaceNovelChains || 0} novel surface paths · ${audit.reconstructedSurfaceRepresentedChains || 0} surface paths represented (${audit.reconstructedSurfaceRepresentedEdges || 0} edges) · ${audit.reconstructedSurfaceUncoveredEdges || 0} uncovered surface edges · ${audit.reconstructedSurfaceRenderedReviewSegments || 0} rendered review segments · ${audit.reconstructedSurfaceExactCorrespondenceEdges || 0} exact-correspondence edges (${audit.reconstructedSurfaceAuthorityCorrespondenceEdges || 0} authority / ${audit.reconstructedSurfaceNovelCorrespondenceEdges || 0} novel) · ${audit.reconstructedSurfaceDisplacedEdges || 0} displaced edges · ${audit.reconstructedSurfaceCollapsedEdges || 0} collapsed edges · ${audit.reconstructedSurfaceOpenChainTerminations || 0} open-chain terminations · ${audit.representedPromotedChains || 0} promoted represented (${audit.representedPromotedEdges || 0} edges) · ${audit.emitted} emitted. Diagnostic marks are never saved.`;
             } else {
                 const doors = cartographySuggestions.filter((item) => item.type === 'door').length;
                 cartographyAssistantStatus.textContent = `${total} draft suggestions · ${selected} selected · ${doors} possible doors. Polyline wall paths count as one review object each. Nothing is saved until Apply Selected.`;
@@ -3695,6 +3695,11 @@
             let illustratedFrontierExteriorRejects = 0;
             let illustratedFrontierInteriorSupportRejects = 0;
             let illustratedFrontierDecorationRejects = 0;
+            // IV.30.1G.5Z.5 — Unvisited Playable-Likeness & Disconnected Interior Island Audit.
+            // Keep an identity ledger of every sample that actually reached G.5Y frontier
+            // classification. The post-flood audit can then distinguish rejected territory
+            // from floor-like mesh cells propagation never reached at all. Diagnostic only.
+            const illustratedFrontierExaminedCells = new Set();
             // IV.30.1G.5Z.4 — Unrecovered Playable-Island & Decoration-Reject Topology Audit.
             // Preserve the identity of decoration-rejected frontier samples so the final
             // unrecovered topology can be audited after all G.5Y propagation waves. This
@@ -3768,6 +3773,7 @@
                             illustratedAdjacentSamplesExamined+=1;
                             if (isPlayable(column,row)) { illustratedAlreadyPlayableNeighbours+=1; continue; }
                             illustratedFrontierCandidates+=1;
+                            illustratedFrontierExaminedCells.add(sampleKey);
 
 
                         const ink=darkness[row][column];
@@ -3909,6 +3915,77 @@
                 if (componentCells >= 2 && adjacentToRecoveredFloor && contactDirections.size >= 2 && !touchesMeshBorder) {
                     illustratedPotentialPlayableIslandComponents+=1;
                     illustratedPotentialPlayableIslandCells+=componentCells;
+                }
+            }
+
+            // IV.30.1G.5Z.5 — audit floor-like territory that never became a G.5Y frontier.
+            // This phase deliberately grants no new seed/admission authority. A sample is
+            // merely "floor-like" when it is quiet enough to resemble the already-certified
+            // floor while not forming the same strong three-sample structural bands used by
+            // G.5Y. Components touching the fine-mesh border remain exterior evidence.
+            const illustratedMeshCells = Math.max(0, (contourColumns - 2) * (contourRows - 2));
+            let illustratedRecoveredOrCanonicalCells = 0;
+            let illustratedNeverFrontierCells = 0;
+            const illustratedFloorLikeNeverFrontierCells = new Set();
+            for (let row=1;row<contourRows-1;row+=1) for (let column=1;column<contourColumns-1;column+=1) {
+                const key=`${column},${row}`;
+                if (isTrustedIllustratedSeed(column,row) || illustratedFloorContinuitySurface[row][column]) {
+                    illustratedRecoveredOrCanonicalCells+=1;
+                    continue;
+                }
+                if (illustratedFrontierExaminedCells.has(key)) continue;
+                illustratedNeverFrontierCells+=1;
+                const ink=darkness[row][column];
+                const horizontalStructuralBand=darkness[row][column-1]>=.76 && ink>=.62 && darkness[row][column+1]>=.76;
+                const verticalStructuralBand=darkness[row-1][column]>=.76 && ink>=.62 && darkness[row+1][column]>=.76;
+                if (ink <= .34 && !horizontalStructuralBand && !verticalStructuralBand) illustratedFloorLikeNeverFrontierCells.add(key);
+            }
+            const neverFrontierVisited=new Set();
+            let illustratedNeverFrontierComponents=0;
+            let illustratedNeverFrontierExteriorComponents=0;
+            let illustratedNeverFrontierInteriorComponents=0;
+            let illustratedNeverFrontierNarrowGapComponents=0;
+            let illustratedDisconnectedPlayableIslandComponents=0;
+            let illustratedDisconnectedPlayableIslandCells=0;
+            for (const startKey of illustratedFloorLikeNeverFrontierCells) {
+                if (neverFrontierVisited.has(startKey)) continue;
+                illustratedNeverFrontierComponents+=1;
+                const queue=[startKey];
+                neverFrontierVisited.add(startKey);
+                let componentCells=0;
+                let touchesMeshBorder=false;
+                let nearRecoveredAcrossGap=false;
+                for (let cursor=0;cursor<queue.length;cursor+=1) {
+                    const [column,row]=queue[cursor].split(',').map(Number);
+                    componentCells+=1;
+                    if (column <= 1 || row <= 1 || column >= contourColumns-2 || row >= contourRows-2) touchesMeshBorder=true;
+                    for (const [dx,dy] of [[-1,0],[1,0],[0,-1],[0,1]]) {
+                        const nx=column+dx,ny=row+dy;
+                        if (nx <= 0 || ny <= 0 || nx >= contourColumns-1 || ny >= contourRows-1) continue;
+                        const neighbourKey=`${nx},${ny}`;
+                        if (illustratedFloorLikeNeverFrontierCells.has(neighbourKey)) {
+                            if (!neverFrontierVisited.has(neighbourKey)) { neverFrontierVisited.add(neighbourKey); queue.push(neighbourKey); }
+                            continue;
+                        }
+                        // Audit one- and two-cell topological separations only. This is not
+                        // nearest-cell matching and cannot itself connect or admit anything.
+                        for (let distance=1;distance<=2;distance+=1) {
+                            const gx=column+dx*distance,gy=row+dy*distance;
+                            if (gx <= 0 || gy <= 0 || gx >= contourColumns-1 || gy >= contourRows-1) break;
+                            if (isTrustedIllustratedSeed(gx,gy) || illustratedFloorContinuitySurface[gy][gx]) { nearRecoveredAcrossGap=true; break; }
+                        }
+                    }
+                }
+                if (touchesMeshBorder) illustratedNeverFrontierExteriorComponents+=1;
+                else {
+                    illustratedNeverFrontierInteriorComponents+=1;
+                    if (nearRecoveredAcrossGap) illustratedNeverFrontierNarrowGapComponents+=1;
+                    // Require a coherent multi-cell interior region. This is intentionally
+                    // evidence-only; G.5Z.5 never seeds or recovers the component.
+                    if (componentCells >= 2) {
+                        illustratedDisconnectedPlayableIslandComponents+=1;
+                        illustratedDisconnectedPlayableIslandCells+=componentCells;
+                    }
                 }
             }
 
@@ -5631,6 +5708,17 @@
                     illustratedDecorationRejectIsolatedComponents,
                     illustratedPotentialPlayableIslandComponents,
                     illustratedPotentialPlayableIslandCells,
+                    illustratedMeshCells,
+                    illustratedRecoveredOrCanonicalCells,
+                    illustratedFrontierExaminedUniqueCells: illustratedFrontierExaminedCells.size,
+                    illustratedNeverFrontierCells,
+                    illustratedFloorLikeNeverFrontierCells: illustratedFloorLikeNeverFrontierCells.size,
+                    illustratedNeverFrontierComponents,
+                    illustratedNeverFrontierExteriorComponents,
+                    illustratedNeverFrontierInteriorComponents,
+                    illustratedNeverFrontierNarrowGapComponents,
+                    illustratedDisconnectedPlayableIslandComponents,
+                    illustratedDisconnectedPlayableIslandCells,
                     illustratedFrontierNeighbourQualified,
                     illustratedFrontierDecorationQualified,
                     illustratedFrontierProvisionalAdmissions,

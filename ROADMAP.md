@@ -1294,3 +1294,13 @@ Regression-only correction for the story-beat endpoint registration assertion; n
 - [x] Preserve G.5Y structural/exterior/decoration gates, G.5Z.1 reconciliation, G.5Z.2/G.5Z.3 representation accounting, G.5X authority coalescence and the 200-object review ceiling.
 - [ ] Server certification.
 - [ ] Dungeon from Hell audit: determine whether the final decoration-reject population contains coherent interior components corresponding to the visibly untraced lower dungeon before changing admission behaviour.
+
+## Phase IV.30.1G.5Z.5 — Unvisited Playable-Likeness & Disconnected Interior Island Audit ✅
+- [x] Record the unique fine-mesh cells that actually reach G.5Y frontier classification so final rejects can be distinguished from territory propagation never visits.
+- [x] Audit unrecovered/non-canonical, never-frontier cells for conservative quiet-floor likeness without granting seed or admission authority.
+- [x] Group floor-like never-frontier cells into orthogonally connected components and distinguish mesh-border/exterior components from enclosed/interior components.
+- [x] Publish components lying within a one/two-cell topological gap of recovered/trusted floor as narrow-gap evidence without performing nearest-cell attachment or geometric snapping.
+- [x] Publish coherent enclosed floor-like components as diagnostic disconnected playable-island candidates and report their cell volume.
+- [x] Preserve G.5Y structural/exterior/decoration admission, G.5Z.1 reconciliation, G.5Z.2/G.5Z.3 representation/correspondence accounting, G.5Z.4 reject topology, G.5X authority coalescence and the 200-object review ceiling.
+- [ ] Server certification.
+- [ ] Dungeon from Hell audit: determine whether substantial coherent floor-like territory exists outside the G.5Y frontier and whether it corresponds to the visibly untraced lower dungeon before introducing any additional seed authority.
