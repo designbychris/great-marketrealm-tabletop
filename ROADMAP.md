@@ -1313,3 +1313,13 @@ Regression-only correction for the story-beat endpoint registration assertion; n
 - [x] Preserve G.5Y structural/exterior/decoration safeguards, G.5Z.1 reconciliation, G.5Z.2/G.5Z.3 representation/correspondence accounting, G.5Z.4/G.5Z.5 audits, G.5X authority coalescence and the 200-object review ceiling.
 - [ ] Server certification.
 - [ ] Dungeon from Hell certification: prove non-zero secondary recovery without exterior leakage, then inspect whether the lower illustrated dungeon gains sensible contour coverage.
+
+## Phase IV.30.1G.5Z.7 — Surface Perimeter-to-Path Assembly Loss Audit ✅
+- [x] Preserve the identity of every G.5Z completed surface-perimeter edge through the G.5N connected-edge promotion handoff without changing promotion behaviour.
+- [x] Publish contributed, assembled and unassembled perimeter-edge totals separately so post-assembly representation coverage cannot hide pre-assembly loss.
+- [x] Group unassembled perimeter edges into connected components and publish component count plus largest component size.
+- [x] Publish unassembled edges touching branch/junction vertices in the full source perimeter graph as evidence of ambiguous continuation pressure.
+- [x] Publish components whose edge volume can exceed the 256-vertex review-path ceiling as vertex-cap-risk evidence without changing or bypassing that ceiling.
+- [x] Preserve G.5Y/G.5Z.6 admission and secondary seeding, G.5Z.1 reconciliation, G.5Z.2/G.5Z.3 representation/correspondence accounting, G.5X authority coalescence and the 200-object review ceiling.
+- [ ] Server certification.
+- [ ] Dungeon from Hell audit: account for the observed 608 contributed → 276 assembled handoff and determine whether the 332-edge deficit clusters around branch topology, oversized components or another assembly condition before changing path construction.
