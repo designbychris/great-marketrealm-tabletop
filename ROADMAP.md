@@ -1239,3 +1239,14 @@ Regression-only correction for the story-beat endpoint registration assertion; n
 - [x] Preserve G.5X authoritative coalescence, reconstructed-surface arbitration, the 200-object review ceiling and review-first persistence.
 - [ ] Server certification.
 - [ ] Dungeon from Hell certification: recovered illustrated floor should grow beyond the G.5X 113-cell baseline without exterior parchment runaway.
+
+## Phase IV.30.1G.5Z — Recovered Surface Boundary Completion & Perimeter Continuity ✅
+- [x] Keep G.5Y floor admission authoritative; boundary completion never admits a new floor cell.
+- [x] Expand each recovered illustrated surface through the certified non-exterior playable component it touches before perimeter extraction.
+- [x] Suppress playable-to-playable interior seams and retain only the complete playable/non-playable frontier.
+- [x] Preserve protected threshold openings while de-duplicating exact completed boundary sides.
+- [x] Promote completed boundary sides through the existing G.5W/G.5X authority and review-budget arbitration rather than bypassing it.
+- [x] Publish completed surface components/cells, raw boundary sides, suppressed playable seams, threshold rejects and contributed perimeter edges in Evidence Audit.
+- [x] Preserve the 200-object review ceiling, G.5Y propagation safeguards, G.5X authoritative coalescence and review-first persistence.
+- [ ] Server certification.
+- [ ] Dungeon from Hell certification: the same recovered-floor population should yield materially more complete perimeter geometry without exterior runaway or authority loss.

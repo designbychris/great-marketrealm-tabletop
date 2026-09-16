@@ -2567,7 +2567,7 @@
         if (cartographyAssistantStatus && total > 0) {
             if (cartographyDetail?.value === 'audit' && cartographyEvidenceAudit) {
                 const audit = cartographyEvidenceAudit;
-                cartographyAssistantStatus.textContent = `Evidence Audit · ${audit.rawChains} raw chains · ${audit.recoverableChains} recoverable · ${audit.semanticRejected} semantic rejects · ${audit.inferredPerimeters} inferred perimeter edges → ${audit.promotedPerimeterChains || 0} promoted chains (${audit.promotedPerimeterEdges || 0} edges) → ${audit.consolidatedPromotedChains || 0} consolidated · ${audit.authoritativePreserved || 0}/${audit.authoritativeContours || 0} authoritative preserved → ${audit.authoritativeReviewPaths || 0} authoritative review paths · ${audit.authoritativePathMerges || 0} authority merges · ${audit.authoritativeReviewSlotsLiberated || 0} review slots liberated · ${audit.authoritativeRemainingCapacity || 0} capacity remaining · ${audit.illustratedFloorSeeds || 0} floor seeds · ${audit.illustratedTraversalSeedsQueued || 0} traversal seeds queued · ${audit.illustratedTraversalSeedsVisited || 0} traversal seeds visited · ${audit.illustratedAdjacentSamplesExamined || 0} adjacent samples examined · ${audit.illustratedAlreadyPlayableNeighbours || 0} already-playable neighbours · ${audit.illustratedFrontierCandidates || 0} frontier candidates · ${audit.illustratedFrontierAdmitted || 0} frontier admitted · ${audit.illustratedFrontierStructuralRejects || 0} structural rejects · ${audit.illustratedFrontierExteriorRejects || 0} exterior rejects · ${audit.illustratedFrontierInteriorSupportRejects || 0} interior-support rejects · ${audit.illustratedFrontierDecorationRejects || 0} decoration rejects · ${audit.illustratedFrontierNeighbourQualified || 0} neighbour-qualified · ${audit.illustratedFrontierDecorationQualified || 0} decoration-qualified · ${audit.illustratedFrontierProvisionalAdmissions || 0} provisional illustrated admissions · ${audit.illustratedFrontierUnaccounted || 0} unaccounted frontier · ${audit.illustratedPropagationWaves || 0} propagation waves · ${audit.illustratedPropagationDeepestWave || 0} deepest wave · ${audit.illustratedPropagatedAdmissions || 0} propagated admissions · ${audit.illustratedQuietFloorAdmissions || 0} quiet-floor admissions · ${audit.illustratedExhaustedFrontierCells || 0} exhausted frontier samples · ${audit.recoveredIllustratedFloorCells || 0} illustrated floor cells recovered · ${audit.reconstructedIllustratedSurfaces || 0} interior surfaces reconstructed · ${audit.illustratedSurfacePerimeterEdges || 0} surface perimeter edges contributed → ${audit.reconstructedSurfacePromotedChains || 0} surface paths promoted · ${audit.reconstructedSurfaceAlreadyRepresented || 0} already represented · ${audit.reconstructedSurfaceAuthorityExtensions || 0} authority extensions · ${audit.reconstructedSurfaceNovelChains || 0} novel surface paths · ${audit.reconstructedSurfaceRepresentedChains || 0} surface paths represented · ${audit.representedPromotedChains || 0} promoted represented (${audit.representedPromotedEdges || 0} edges) · ${audit.emitted} emitted. Diagnostic marks are never saved.`;
+                cartographyAssistantStatus.textContent = `Evidence Audit · ${audit.rawChains} raw chains · ${audit.recoverableChains} recoverable · ${audit.semanticRejected} semantic rejects · ${audit.inferredPerimeters} inferred perimeter edges → ${audit.promotedPerimeterChains || 0} promoted chains (${audit.promotedPerimeterEdges || 0} edges) → ${audit.consolidatedPromotedChains || 0} consolidated · ${audit.authoritativePreserved || 0}/${audit.authoritativeContours || 0} authoritative preserved → ${audit.authoritativeReviewPaths || 0} authoritative review paths · ${audit.authoritativePathMerges || 0} authority merges · ${audit.authoritativeReviewSlotsLiberated || 0} review slots liberated · ${audit.authoritativeRemainingCapacity || 0} capacity remaining · ${audit.illustratedFloorSeeds || 0} floor seeds · ${audit.illustratedTraversalSeedsQueued || 0} traversal seeds queued · ${audit.illustratedTraversalSeedsVisited || 0} traversal seeds visited · ${audit.illustratedAdjacentSamplesExamined || 0} adjacent samples examined · ${audit.illustratedAlreadyPlayableNeighbours || 0} already-playable neighbours · ${audit.illustratedFrontierCandidates || 0} frontier candidates · ${audit.illustratedFrontierAdmitted || 0} frontier admitted · ${audit.illustratedFrontierStructuralRejects || 0} structural rejects · ${audit.illustratedFrontierExteriorRejects || 0} exterior rejects · ${audit.illustratedFrontierInteriorSupportRejects || 0} interior-support rejects · ${audit.illustratedFrontierDecorationRejects || 0} decoration rejects · ${audit.illustratedFrontierNeighbourQualified || 0} neighbour-qualified · ${audit.illustratedFrontierDecorationQualified || 0} decoration-qualified · ${audit.illustratedFrontierProvisionalAdmissions || 0} provisional illustrated admissions · ${audit.illustratedFrontierUnaccounted || 0} unaccounted frontier · ${audit.illustratedPropagationWaves || 0} propagation waves · ${audit.illustratedPropagationDeepestWave || 0} deepest wave · ${audit.illustratedPropagatedAdmissions || 0} propagated admissions · ${audit.illustratedQuietFloorAdmissions || 0} quiet-floor admissions · ${audit.illustratedExhaustedFrontierCells || 0} exhausted frontier samples · ${audit.recoveredIllustratedFloorCells || 0} illustrated floor cells recovered · ${audit.reconstructedIllustratedSurfaces || 0} interior surfaces reconstructed · ${audit.illustratedSurfaceCompletedComponents || 0} completed surface components · ${audit.illustratedSurfaceCompletedCells || 0} completed playable cells · ${audit.illustratedSurfaceRawBoundarySides || 0} raw surface boundary sides · ${audit.illustratedSurfacePlayableSeamsSuppressed || 0} playable seams suppressed · ${audit.illustratedSurfaceThresholdRejects || 0} threshold boundary rejects · ${audit.illustratedSurfacePerimeterEdges || 0} surface perimeter edges contributed → ${audit.reconstructedSurfacePromotedChains || 0} surface paths promoted · ${audit.reconstructedSurfaceAlreadyRepresented || 0} already represented · ${audit.reconstructedSurfaceAuthorityExtensions || 0} authority extensions · ${audit.reconstructedSurfaceNovelChains || 0} novel surface paths · ${audit.reconstructedSurfaceRepresentedChains || 0} surface paths represented · ${audit.representedPromotedChains || 0} promoted represented (${audit.representedPromotedEdges || 0} edges) · ${audit.emitted} emitted. Diagnostic marks are never saved.`;
             } else {
                 const doors = cartographySuggestions.filter((item) => item.type === 'door').length;
                 cartographyAssistantStatus.textContent = `${total} draft suggestions · ${selected} selected · ${doors} possible doors. Polyline wall paths count as one review object each. Nothing is saved until Apply Selected.`;
@@ -3843,6 +3843,11 @@
             const illustratedSurfaceVisited = Array.from({ length: contourRows }, () => Array(contourColumns).fill(false));
             let reconstructedIllustratedSurfaces = 0;
             let illustratedSurfacePerimeterEdges = 0;
+            let illustratedSurfaceRawBoundarySides = 0;
+            let illustratedSurfacePlayableSeamsSuppressed = 0;
+            let illustratedSurfaceThresholdRejects = 0;
+            let illustratedSurfaceCompletedCells = 0;
+            let illustratedSurfaceCompletedComponents = 0;
             // IV.30.1G.5W — Reconstructed Surface Authority & Review-Budget Representation.
             // G.5V proved reconstructed illustrated surfaces can discover useful perimeter,
             // but the old diagnostic counter discarded the geometry before arbitration.
@@ -3935,6 +3940,86 @@
                 && column < contourColumns && row < contourRows
                 && floor[row][column]
                 && !exteriorFloorComponents.has(floorComponent[row][column]);
+
+
+            // IV.30.1G.5Z — Recovered Surface Boundary Completion & Perimeter Continuity.
+            // G.5Y can recover a large illustrated interior while the earlier G.5W edge
+            // collector sees only the sides owned directly by recovered cells. Complete
+            // each recovered surface through the certified playable component it touches,
+            // then derive the *whole* playable/non-playable frontier. This changes no
+            // floor admission decision: G.5Y remains the sole recovery authority. It only
+            // makes the already-admitted surface boundary complete before promotion.
+            // Exterior floor components remain excluded by isPlayableFloor, protected
+            // thresholds remain open, and exact edge de-duplication prevents a completed
+            // component from spending review capacity twice on the same wall side.
+            reconstructedIllustratedSurfaceEdges.length = 0;
+            illustratedSurfacePerimeterEdges = 0;
+            const completedSurfaceVisited = Array.from({ length: contourRows }, () => Array(contourColumns).fill(false));
+            const completedSurfaceEdgeKeys = new Set();
+            const completedSurfaceEdge = (x, y, dx, dy) => {
+                const left = x * contourStep;
+                const right = (x + 1) * contourStep;
+                const top = y * contourStep;
+                const bottom = (y + 1) * contourStep;
+                if (dx === -1) return [{ x: left, y: top }, { x: left, y: bottom }];
+                if (dx === 1) return [{ x: right, y: top }, { x: right, y: bottom }];
+                if (dy === -1) return [{ x: left, y: top }, { x: right, y: top }];
+                return [{ x: left, y: bottom }, { x: right, y: bottom }];
+            };
+            const completedEdgeKey = (a, b) => {
+                const first = `${roundContourCoordinate(a.x)},${roundContourCoordinate(a.y)}`;
+                const second = `${roundContourCoordinate(b.x)},${roundContourCoordinate(b.y)}`;
+                return first < second ? `${first}:${second}` : `${second}:${first}`;
+            };
+            for (let seedRow = 1; seedRow < contourRows - 1; seedRow += 1) {
+                for (let seedColumn = 1; seedColumn < contourColumns - 1; seedColumn += 1) {
+                    if (!illustratedFloorContinuitySurface[seedRow][seedColumn] || completedSurfaceVisited[seedRow][seedColumn]) continue;
+                    if (!isPlayableFloor(seedColumn, seedRow)) continue;
+                    illustratedSurfaceCompletedComponents += 1;
+                    const queue = [[seedColumn, seedRow]];
+                    completedSurfaceVisited[seedRow][seedColumn] = true;
+                    for (let cursor = 0; cursor < queue.length; cursor += 1) {
+                        const [x, y] = queue[cursor];
+                        illustratedSurfaceCompletedCells += 1;
+                        [[-1,0],[1,0],[0,-1],[0,1]].forEach(([dx,dy]) => {
+                            const nx = x + dx, ny = y + dy;
+                            if (isPlayableFloor(nx, ny)) {
+                                // This is an interior seam of the completed playable
+                                // surface, never a wall merely because only one side was
+                                // originally recovered by G.5Y.
+                                illustratedSurfacePlayableSeamsSuppressed += 1;
+                                if (!completedSurfaceVisited[ny][nx]) {
+                                    completedSurfaceVisited[ny][nx] = true;
+                                    queue.push([nx,ny]);
+                                }
+                                return;
+                            }
+                            illustratedSurfaceRawBoundarySides += 1;
+                            const [a,b] = completedSurfaceEdge(x,y,dx,dy);
+                            if (contourThresholdMatch(a,b)) {
+                                illustratedSurfaceThresholdRejects += 1;
+                                return;
+                            }
+                            const key = completedEdgeKey(a,b);
+                            if (completedSurfaceEdgeKeys.has(key)) return;
+                            completedSurfaceEdgeKeys.add(key);
+                            illustratedSurfacePerimeterEdges += 1;
+                            reconstructedIllustratedSurfaceEdges.push({
+                                type: 'wall', confidence: 87, selected: true, contour: true, fineContour: true,
+                                fullBoundary: false, partialContour: true,
+                                partialContourRecovery: 'recovered-surface-boundary-completion',
+                                reconstructedSurfaceAuthority: true, reconstructedSurfacePropagation: true,
+                                recoveredSurfaceBoundaryCompletion: true, perimeterContinuity: true,
+                                semanticBoundaryClassification: 'structural-wall',
+                                semanticBoundaryRole: 'completed-illustrated-surface-perimeter',
+                                evidenceModel: 'living-contour-recovered-surface-boundary-completion-v13',
+                                recoveryEvidence: ['illustrated-interior-surface', 'g5y-admission-preserved', 'certified-playable-component', 'complete-playable-frontier', 'interior-seam-suppression', 'portal-threshold-veto'],
+                                polyline: true, points: [a,b], x1: a.x, y1: a.y, x2: b.x, y2: b.y
+                            });
+                        });
+                    }
+                }
+            }
 
             // A floor-facing wall edge should have a meaningful depth of playable floor
             // behind it. Tiny white pockets between hatch strokes usually fail this test,
@@ -5385,6 +5470,11 @@
                     illustratedExhaustedFrontierCells,
                     recoveredIllustratedFloorCells,
                     reconstructedIllustratedSurfaces,
+                    illustratedSurfaceCompletedComponents,
+                    illustratedSurfaceCompletedCells,
+                    illustratedSurfaceRawBoundarySides,
+                    illustratedSurfacePlayableSeamsSuppressed,
+                    illustratedSurfaceThresholdRejects,
                     illustratedSurfacePerimeterEdges,
                     reconstructedSurfacePromotedChains: promotedReconstructedSurfaceSuggestions.length,
                     reconstructedSurfaceAlreadyRepresented,
