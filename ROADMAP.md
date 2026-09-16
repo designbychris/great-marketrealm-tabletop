@@ -1194,3 +1194,14 @@ Regression-only correction for the story-beat endpoint registration assertion; n
 - [x] Preserve G.5U frontier accounting so every candidate remains admitted or explicitly rejected.
 - [ ] Server certification.
 - [ ] Dungeon from Hell Evidence Audit certification: frontier admitted and illustrated floor recovered should become non-zero without unaccounted frontier or authority loss.
+
+## Phase IV.30.1G.5W — Reconstructed Surface Authority & Review-Budget Representation ✅
+- [x] Retain reconstructed illustrated-surface perimeter geometry instead of publishing only a diagnostic edge count.
+- [x] Promote connected reconstructed-surface edges into reviewable surface paths before the review-object budget is applied.
+- [x] Treat an exact authoritative match as already represented rather than spending another review object.
+- [x] Extend an authoritative contour at a shared endpoint when the reconstructed surface continues it, preserving the authoritative object at zero additional review-object cost.
+- [x] Offer genuinely novel reconstructed-surface paths the remaining review capacity ahead of weaker bridge/promoted supplemental evidence without evicting authoritative contours.
+- [x] Extend Evidence Audit with surface-path promotion, already-represented, authority-extension, novel-path and represented-path counters.
+- [x] Preserve the 200-object safety ceiling, G.5V controlled growth, G.5U accounting, structural/exterior vetoes and review-first persistence.
+- [ ] Server certification.
+- [ ] Dungeon from Hell Evidence Audit / Living Contour certification: reconstructed surface paths should become represented by equality, authority extension, or genuine remaining review capacity.

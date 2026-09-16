@@ -2567,7 +2567,7 @@
         if (cartographyAssistantStatus && total > 0) {
             if (cartographyDetail?.value === 'audit' && cartographyEvidenceAudit) {
                 const audit = cartographyEvidenceAudit;
-                cartographyAssistantStatus.textContent = `Evidence Audit · ${audit.rawChains} raw chains · ${audit.recoverableChains} recoverable · ${audit.semanticRejected} semantic rejects · ${audit.inferredPerimeters} inferred perimeter edges → ${audit.promotedPerimeterChains || 0} promoted chains (${audit.promotedPerimeterEdges || 0} edges) → ${audit.consolidatedPromotedChains || 0} consolidated · ${audit.authoritativePreserved || 0}/${audit.authoritativeContours || 0} authoritative preserved · ${audit.illustratedFloorSeeds || 0} floor seeds · ${audit.illustratedTraversalSeedsQueued || 0} traversal seeds queued · ${audit.illustratedTraversalSeedsVisited || 0} traversal seeds visited · ${audit.illustratedAdjacentSamplesExamined || 0} adjacent samples examined · ${audit.illustratedAlreadyPlayableNeighbours || 0} already-playable neighbours · ${audit.illustratedFrontierCandidates || 0} frontier candidates · ${audit.illustratedFrontierAdmitted || 0} frontier admitted · ${audit.illustratedFrontierStructuralRejects || 0} structural rejects · ${audit.illustratedFrontierExteriorRejects || 0} exterior rejects · ${audit.illustratedFrontierInteriorSupportRejects || 0} interior-support rejects · ${audit.illustratedFrontierDecorationRejects || 0} decoration rejects · ${audit.illustratedFrontierNeighbourQualified || 0} neighbour-qualified · ${audit.illustratedFrontierDecorationQualified || 0} decoration-qualified · ${audit.illustratedFrontierProvisionalAdmissions || 0} provisional illustrated admissions · ${audit.illustratedFrontierUnaccounted || 0} unaccounted frontier · ${audit.recoveredIllustratedFloorCells || 0} illustrated floor cells recovered · ${audit.reconstructedIllustratedSurfaces || 0} interior surfaces reconstructed · ${audit.illustratedSurfacePerimeterEdges || 0} surface perimeter edges contributed · ${audit.representedPromotedChains || 0} promoted represented (${audit.representedPromotedEdges || 0} edges) · ${audit.emitted} emitted. Diagnostic marks are never saved.`;
+                cartographyAssistantStatus.textContent = `Evidence Audit · ${audit.rawChains} raw chains · ${audit.recoverableChains} recoverable · ${audit.semanticRejected} semantic rejects · ${audit.inferredPerimeters} inferred perimeter edges → ${audit.promotedPerimeterChains || 0} promoted chains (${audit.promotedPerimeterEdges || 0} edges) → ${audit.consolidatedPromotedChains || 0} consolidated · ${audit.authoritativePreserved || 0}/${audit.authoritativeContours || 0} authoritative preserved · ${audit.illustratedFloorSeeds || 0} floor seeds · ${audit.illustratedTraversalSeedsQueued || 0} traversal seeds queued · ${audit.illustratedTraversalSeedsVisited || 0} traversal seeds visited · ${audit.illustratedAdjacentSamplesExamined || 0} adjacent samples examined · ${audit.illustratedAlreadyPlayableNeighbours || 0} already-playable neighbours · ${audit.illustratedFrontierCandidates || 0} frontier candidates · ${audit.illustratedFrontierAdmitted || 0} frontier admitted · ${audit.illustratedFrontierStructuralRejects || 0} structural rejects · ${audit.illustratedFrontierExteriorRejects || 0} exterior rejects · ${audit.illustratedFrontierInteriorSupportRejects || 0} interior-support rejects · ${audit.illustratedFrontierDecorationRejects || 0} decoration rejects · ${audit.illustratedFrontierNeighbourQualified || 0} neighbour-qualified · ${audit.illustratedFrontierDecorationQualified || 0} decoration-qualified · ${audit.illustratedFrontierProvisionalAdmissions || 0} provisional illustrated admissions · ${audit.illustratedFrontierUnaccounted || 0} unaccounted frontier · ${audit.recoveredIllustratedFloorCells || 0} illustrated floor cells recovered · ${audit.reconstructedIllustratedSurfaces || 0} interior surfaces reconstructed · ${audit.illustratedSurfacePerimeterEdges || 0} surface perimeter edges contributed → ${audit.reconstructedSurfacePromotedChains || 0} surface paths promoted · ${audit.reconstructedSurfaceAlreadyRepresented || 0} already represented · ${audit.reconstructedSurfaceAuthorityExtensions || 0} authority extensions · ${audit.reconstructedSurfaceNovelChains || 0} novel surface paths · ${audit.reconstructedSurfaceRepresentedChains || 0} surface paths represented · ${audit.representedPromotedChains || 0} promoted represented (${audit.representedPromotedEdges || 0} edges) · ${audit.emitted} emitted. Diagnostic marks are never saved.`;
             } else {
                 const doors = cartographySuggestions.filter((item) => item.type === 'door').length;
                 cartographyAssistantStatus.textContent = `${total} draft suggestions · ${selected} selected · ${doors} possible doors. Polyline wall paths count as one review object each. Nothing is saved until Apply Selected.`;
@@ -3818,6 +3818,13 @@
             const illustratedSurfaceVisited = Array.from({ length: contourRows }, () => Array(contourColumns).fill(false));
             let reconstructedIllustratedSurfaces = 0;
             let illustratedSurfacePerimeterEdges = 0;
+            // IV.30.1G.5W — Reconstructed Surface Authority & Review-Budget Representation.
+            // G.5V proved reconstructed illustrated surfaces can discover useful perimeter,
+            // but the old diagnostic counter discarded the geometry before arbitration.
+            // Retain those exact cell-boundary edges so they can be promoted into review
+            // polylines and, where possible, extend an already-authoritative contour at
+            // zero additional review-object cost.
+            const reconstructedIllustratedSurfaceEdges = [];
             for (let row = 1; row < contourRows - 1; row += 1) {
                 for (let column = 1; column < contourColumns - 1; column += 1) {
                     if (!illustratedFloorContinuitySurface[row][column] || illustratedSurfaceVisited[row][column]) continue;
@@ -3828,7 +3835,29 @@
                         const [x,y] = queue[cursor];
                         [[-1,0],[1,0],[0,-1],[0,1]].forEach(([dx,dy]) => {
                             const nx=x+dx, ny=y+dy;
-                            if (!floor[ny][nx]) illustratedSurfacePerimeterEdges += 1;
+                            if (!floor[ny][nx]) {
+                                illustratedSurfacePerimeterEdges += 1;
+                                const left = x * contourStep;
+                                const right = (x + 1) * contourStep;
+                                const top = y * contourStep;
+                                const bottom = (y + 1) * contourStep;
+                                let a; let b;
+                                if (dx === -1) { a = { x: left, y: top }; b = { x: left, y: bottom }; }
+                                else if (dx === 1) { a = { x: right, y: top }; b = { x: right, y: bottom }; }
+                                else if (dy === -1) { a = { x: left, y: top }; b = { x: right, y: top }; }
+                                else { a = { x: left, y: bottom }; b = { x: right, y: bottom }; }
+                                reconstructedIllustratedSurfaceEdges.push({
+                                    type: 'wall', confidence: 86, selected: true, contour: true, fineContour: true,
+                                    fullBoundary: false, partialContour: true,
+                                    partialContourRecovery: 'reconstructed-illustrated-surface-perimeter',
+                                    reconstructedSurfaceAuthority: true, reconstructedSurfacePropagation: true,
+                                    semanticBoundaryClassification: 'structural-wall',
+                                    semanticBoundaryRole: 'illustrated-surface-perimeter',
+                                    evidenceModel: 'living-contour-reconstructed-surface-authority-v12',
+                                    recoveryEvidence: ['illustrated-interior-surface', 'controlled-surface-growth', 'surface-perimeter-retained-for-arbitration'],
+                                    polyline: true, points: [a, b], x1: a.x, y1: a.y, x2: b.x, y2: b.y
+                                });
+                            }
                             if (!illustratedFloorContinuitySurface[ny][nx] || illustratedSurfaceVisited[ny][nx]) return;
                             illustratedSurfaceVisited[ny][nx] = true;
                             queue.push([nx,ny]);
@@ -4983,6 +5012,15 @@
                 return promoted.filter((item) => item.points.length >= 2 && item.points.length <= maximumPathVertices);
             };
             const promotedInferredPerimeterSuggestions = promoteInferredPerimeterChains(inferredPlayablePerimeterSuggestions);
+            const promotedReconstructedSurfaceSuggestions = promoteInferredPerimeterChains(reconstructedIllustratedSurfaceEdges)
+                .map((item) => ({
+                    ...item,
+                    reconstructedSurfaceAuthority: true,
+                    evidenceModel: 'living-contour-reconstructed-surface-authority-v12',
+                    recoveryEvidence: Array.from(new Set((item.recoveryEvidence || []).concat([
+                        'reconstructed-surface-authority', 'review-budget-representation'
+                    ])))
+                }));
 
             // IV.30.1G.5O — Promoted Chain Consolidation & Emission Budget Liberation.
             // G.5N proved promotion worked, but its fixed 48-object perimeter allowance
@@ -5050,6 +5088,58 @@
             preOcclusionRecoveryContours.forEach(addAuthoritativeContour);
             pathSuggestions.forEach(addAuthoritativeContour);
 
+            // G.5W: a reconstructed surface chain that meets an authoritative endpoint
+            // extends that object instead of becoming object 201. This preserves every
+            // authoritative review object while allowing genuinely new contiguous surface
+            // geometry to become visible under a saturated 200-object budget.
+            const surfacePointKey = (point) => `${roundContourCoordinate(point.x)},${roundContourCoordinate(point.y)}`;
+            let reconstructedSurfaceAlreadyRepresented = 0;
+            let reconstructedSurfaceAuthorityExtensions = 0;
+            const representedReconstructedSurfaceKeys = new Set();
+            const remainingReconstructedSurfaceSuggestions = [];
+            promotedReconstructedSurfaceSuggestions.forEach((surface) => {
+                const surfaceKey = cartographySuggestionKey(surface);
+                if (authoritativeContourKeys.has(surfaceKey)) {
+                    reconstructedSurfaceAlreadyRepresented += 1;
+                    representedReconstructedSurfaceKeys.add(surfaceKey);
+                    return;
+                }
+                const surfacePoints = Array.isArray(surface.points) ? surface.points : [];
+                let extended = false;
+                if (surfacePoints.length >= 2) {
+                    for (let index = 0; index < authoritativeContourSuggestions.length; index += 1) {
+                        const authority = authoritativeContourSuggestions[index];
+                        const authorityPoints = Array.isArray(authority.points) ? authority.points : [];
+                        if (authorityPoints.length < 2) continue;
+                        let combined = null;
+                        if (surfacePointKey(authorityPoints[authorityPoints.length - 1]) === surfacePointKey(surfacePoints[0]))
+                            combined = authorityPoints.concat(surfacePoints.slice(1));
+                        else if (surfacePointKey(authorityPoints[authorityPoints.length - 1]) === surfacePointKey(surfacePoints[surfacePoints.length - 1]))
+                            combined = authorityPoints.concat(surfacePoints.slice(0, -1).reverse());
+                        else if (surfacePointKey(authorityPoints[0]) === surfacePointKey(surfacePoints[surfacePoints.length - 1]))
+                            combined = surfacePoints.slice(0, -1).concat(authorityPoints);
+                        else if (surfacePointKey(authorityPoints[0]) === surfacePointKey(surfacePoints[0]))
+                            combined = surfacePoints.slice(1).reverse().concat(authorityPoints);
+                        if (!combined || combined.length > maximumPathVertices) continue;
+                        authoritativeContourSuggestions[index] = {
+                            ...authority,
+                            points: combined,
+                            x1: combined[0].x, y1: combined[0].y,
+                            x2: combined[combined.length - 1].x, y2: combined[combined.length - 1].y,
+                            reconstructedSurfaceAuthorityExtension: true,
+                            recoveryEvidence: Array.from(new Set((authority.recoveryEvidence || []).concat([
+                                'reconstructed-surface-authority-extension', 'zero-additional-review-object-cost'
+                            ])))
+                        };
+                        reconstructedSurfaceAuthorityExtensions += 1;
+                        representedReconstructedSurfaceKeys.add(surfaceKey);
+                        extended = true;
+                        break;
+                    }
+                }
+                if (!extended) remainingReconstructedSurfaceSuggestions.push(surface);
+            });
+
             const arbitratedSuggestions = authoritativeContourSuggestions.slice(0, maximumReviewSuggestions);
             const arbitratedKeys = new Set(arbitratedSuggestions.map(cartographySuggestionKey));
             let authoritativePreserved = arbitratedSuggestions.length;
@@ -5072,6 +5162,10 @@
                     }
                 });
             };
+            appendByAuthority(remainingReconstructedSurfaceSuggestions, 'surface');
+            remainingReconstructedSurfaceSuggestions.forEach((item) => {
+                if (arbitratedKeys.has(cartographySuggestionKey(item))) representedReconstructedSurfaceKeys.add(cartographySuggestionKey(item));
+            });
             appendByAuthority(bridgeSupplementalSuggestions, 'bridge');
             appendByAuthority(promotedSupplementalSuggestions, 'promoted');
             pathSuggestions = arbitratedSuggestions;
@@ -5167,6 +5261,11 @@
                     recoveredIllustratedFloorCells,
                     reconstructedIllustratedSurfaces,
                     illustratedSurfacePerimeterEdges,
+                    reconstructedSurfacePromotedChains: promotedReconstructedSurfaceSuggestions.length,
+                    reconstructedSurfaceAlreadyRepresented,
+                    reconstructedSurfaceAuthorityExtensions,
+                    reconstructedSurfaceNovelChains: remainingReconstructedSurfaceSuggestions.length,
+                    reconstructedSurfaceRepresentedChains: representedReconstructedSurfaceKeys.size,
                     bridgeRepresented,
                     promotedRepresentedByArbitration,
                     representedPromotedChains: consolidatedPromotedPerimeterSuggestions.filter((item) => representedFinalKeys.has(cartographySuggestionKey(item))).length,
