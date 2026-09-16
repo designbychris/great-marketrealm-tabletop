@@ -1284,3 +1284,13 @@ Regression-only correction for the story-beat endpoint registration assertion; n
 - [x] Preserve G.5Y admission gates, G.5Z.1 local anchor reconciliation, G.5X authoritative coalescence, G.5Z.2 edge accounting and the 200-object review ceiling.
 - [ ] Server certification.
 - [ ] Dungeon from Hell audit: determine whether all 271 represented completed-perimeter edges remain at their exact source coordinates in final review geometry, and whether remaining visual gaps correlate with authority extensions or open-chain terminations.
+
+## Phase IV.30.1G.5Z.4 — Unrecovered Playable-Island & Decoration-Reject Topology Audit ✅
+- [x] Preserve the identity of G.5Y decoration-rejected frontier samples without changing their admission outcome.
+- [x] Remove early-wave rejects that later become recovered floor so the audit describes only the final unrecovered decoration population.
+- [x] Group final rejects into orthogonally connected components and publish adjacency to recovered/trusted floor, multi-sided playable support, interior support and isolation.
+- [x] Identify topology-qualified potential playable islands as diagnostic evidence only; no rejected cell is admitted by this phase.
+- [x] Publish potential-island component and cell totals in Evidence Audit so any future recovery rule can be justified against measured topology.
+- [x] Preserve G.5Y structural/exterior/decoration gates, G.5Z.1 reconciliation, G.5Z.2/G.5Z.3 representation accounting, G.5X authority coalescence and the 200-object review ceiling.
+- [ ] Server certification.
+- [ ] Dungeon from Hell audit: determine whether the final decoration-reject population contains coherent interior components corresponding to the visibly untraced lower dungeon before changing admission behaviour.
