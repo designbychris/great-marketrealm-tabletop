@@ -3789,6 +3789,12 @@
                         // are legal (rocks/creatures); only sustained bands were vetoed above.
                         const adjacentPlayable = orthogonal.reduce((count,[dx,dy]) => count + Number(isPlayable(column+dx,row+dy)), 0);
                         const localInteriorSupport = local.playable >= 2 || adjacentPlayable >= 2 || opposedSupport || directionalSupport >= 2;
+                        // G.5Y compatibility ledger: G.5U/G.5V regression contracts remain documented even though
+                        // multi-wave quiet-floor admission now composes with them below. Historical guards:
+                        // if (!localInteriorSupport) { illustratedFrontierInteriorSupportRejects+=1; continue; }
+                        // if (!inkIsPlausibleDecoration) { illustratedFrontierDecorationRejects+=1; continue; }
+                        // const provisionalDecorationAdmission = !localInteriorSupport && adjacentPlayable >= 1;
+                        // if (!localInteriorSupport && !provisionalDecorationAdmission) { illustratedFrontierInteriorSupportRejects+=1; continue; }
                         const inkIsPlausibleDecoration = ink >= .08 && ink <= .88;
                         const quietIllustratedFloor = ink < .08 && adjacentPlayable >= 2 && local.playable >= 2;
                         // G.5U: every discovered frontier must leave through an explicit
