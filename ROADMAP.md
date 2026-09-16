@@ -1185,3 +1185,12 @@ Regression-only correction for the story-beat endpoint registration assertion; n
 - [x] Preserve structural/exterior vetoes, trusted-seed traversal, contour authority, the 200-object ceiling, and review-first persistence unchanged.
 - [ ] Server certification.
 - [ ] Dungeon from Hell Evidence Audit certification: unaccounted frontier must be zero and the dominant admission gate must be identified before threshold tuning.
+
+## Phase IV.30.1G.5V — Decoration-Qualified Frontier Admission & Controlled Surface Growth ✅
+- [x] Allow a non-structural, non-exterior, decoration-qualified frontier cell to take the first contiguous step from trusted/recovered playable floor even before the older two-neighbour interior-support rule can be satisfied.
+- [x] Keep structural and exterior vetoes absolute; provisional admission cannot jump gaps and can only grow orthogonally from an already-playable cell.
+- [x] Keep surface growth bounded by the existing illustrated-floor flood pass limit and preserve the 200-object review ceiling and contour-authority arbitration.
+- [x] Report provisional illustrated admissions separately from traditional neighbour-qualified admissions in Evidence Audit.
+- [x] Preserve G.5U frontier accounting so every candidate remains admitted or explicitly rejected.
+- [ ] Server certification.
+- [ ] Dungeon from Hell Evidence Audit certification: frontier admitted and illustrated floor recovered should become non-zero without unaccounted frontier or authority loss.
