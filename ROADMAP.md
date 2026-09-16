@@ -1259,3 +1259,10 @@ Regression-only correction for the story-beat endpoint registration assertion; n
 - [x] Keep G.5Y admission authoritative and preserve structural/exterior/decoration gates, G.5Z boundary extraction, G.5X authority coalescence and the 200-object ceiling.
 - [ ] Server certification.
 - [ ] Dungeon from Hell certification: the three reconstructed surfaces should resolve to non-zero completed components/cells and raw boundary sides without exterior runaway.
+
+## Phase IV.30.1G.5Z.1A — Threshold Classifier Initialization Order Correction ✅
+
+- [x] Initialize the established G.4B contour threshold classifier before G.5Z/G.5Z.1 recovered-surface boundary completion consumes it.
+- [x] Preserve doorway/threshold veto semantics, G.5Y recovery authority, topology-safe component reconciliation, G.5X authority coalescence and the 200-object review ceiling.
+- [x] Add a regression contract that prevents recovered-surface completion from executing before `contourThresholdMatch` is initialized.
+

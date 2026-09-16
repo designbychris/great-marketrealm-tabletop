@@ -3946,6 +3946,54 @@
                 && !exteriorFloorComponents.has(floorComponent[row][column]);
 
 
+            // IV.30.1G.5Z.1A — Threshold Classifier Initialization Order Correction.
+            // G.5Z.1 boundary completion consumes the established G.4B doorway veto, so
+            // initialize that classifier before recovered-surface boundary extraction runs.
+            // This is an ordering correction only: the threshold evidence and matching
+            // semantics remain the same and no new floor or review capacity is admitted.
+            // IV.30.1G.4B — Gap & Threshold Classification.
+            // Living Contour now consumes the same review-first doorway evidence that
+            // Structural tracing already proved in G.2. A contour span which crosses a
+            // certified doorway/passage is split rather than sealed merely to make the
+            // organic boundary look complete. Other unresolved ends are classified for
+            // Keeper review, but uncertainty never grants permission to invent a bridge.
+            const contourThresholdCandidates = Array.isArray(options.thresholdCandidates)
+                ? options.thresholdCandidates.filter((item) => item?.type === 'door' && item?.doorwayReasoning)
+                : structuralCartographyCandidates().filter((item) => item?.type === 'door' && item?.doorwayReasoning);
+            const contourSpanOrientation = (a, b) => {
+                const dx = Math.abs(Number(b.x) - Number(a.x));
+                const dy = Math.abs(Number(b.y) - Number(a.y));
+                if (dy <= .0001 && dx > .0001) return 'horizontal';
+                if (dx <= .0001 && dy > .0001) return 'vertical';
+                return 'organic';
+            };
+            const contourThresholdMatch = (a, b) => {
+                const spanOrientation = contourSpanOrientation(a, b);
+                if (spanOrientation === 'organic') return null;
+                const spanMin = spanOrientation === 'horizontal'
+                    ? Math.min(Number(a.x), Number(b.x))
+                    : Math.min(Number(a.y), Number(b.y));
+                const spanMax = spanOrientation === 'horizontal'
+                    ? Math.max(Number(a.x), Number(b.x))
+                    : Math.max(Number(a.y), Number(b.y));
+                return contourThresholdCandidates.find((threshold) => {
+                    const thresholdA = { x: Number(threshold.x1), y: Number(threshold.y1) };
+                    const thresholdB = { x: Number(threshold.x2), y: Number(threshold.y2) };
+                    if (contourSpanOrientation(thresholdA, thresholdB) !== spanOrientation) return false;
+                    const crossDistance = spanOrientation === 'horizontal'
+                        ? Math.max(Math.abs(Number(a.y) - thresholdA.y), Math.abs(Number(b.y) - thresholdA.y))
+                        : Math.max(Math.abs(Number(a.x) - thresholdA.x), Math.abs(Number(b.x) - thresholdA.x));
+                    if (crossDistance > .42) return false;
+                    const thresholdMin = spanOrientation === 'horizontal'
+                        ? Math.min(thresholdA.x, thresholdB.x)
+                        : Math.min(thresholdA.y, thresholdB.y);
+                    const thresholdMax = spanOrientation === 'horizontal'
+                        ? Math.max(thresholdA.x, thresholdB.x)
+                        : Math.max(thresholdA.y, thresholdB.y);
+                    const overlap = Math.min(spanMax, thresholdMax) - Math.max(spanMin, thresholdMin);
+                    return overlap >= Math.min(.16, Math.max(.08, (spanMax - spanMin) * .28));
+                }) || null;
+            };
             // IV.30.1G.5Z — Recovered Surface Boundary Completion & Perimeter Continuity.
             // G.5Y can recover a large illustrated interior while the earlier G.5W edge
             // collector sees only the sides owned directly by recovered cells. Complete
@@ -4425,49 +4473,6 @@
                 };
             };
             const semanticRoleIsAutomaticWall = (role) => role === 'structural-wall';
-            // IV.30.1G.4B — Gap & Threshold Classification.
-            // Living Contour now consumes the same review-first doorway evidence that
-            // Structural tracing already proved in G.2. A contour span which crosses a
-            // certified doorway/passage is split rather than sealed merely to make the
-            // organic boundary look complete. Other unresolved ends are classified for
-            // Keeper review, but uncertainty never grants permission to invent a bridge.
-            const contourThresholdCandidates = Array.isArray(options.thresholdCandidates)
-                ? options.thresholdCandidates.filter((item) => item?.type === 'door' && item?.doorwayReasoning)
-                : structuralCartographyCandidates().filter((item) => item?.type === 'door' && item?.doorwayReasoning);
-            const contourSpanOrientation = (a, b) => {
-                const dx = Math.abs(Number(b.x) - Number(a.x));
-                const dy = Math.abs(Number(b.y) - Number(a.y));
-                if (dy <= .0001 && dx > .0001) return 'horizontal';
-                if (dx <= .0001 && dy > .0001) return 'vertical';
-                return 'organic';
-            };
-            const contourThresholdMatch = (a, b) => {
-                const spanOrientation = contourSpanOrientation(a, b);
-                if (spanOrientation === 'organic') return null;
-                const spanMin = spanOrientation === 'horizontal'
-                    ? Math.min(Number(a.x), Number(b.x))
-                    : Math.min(Number(a.y), Number(b.y));
-                const spanMax = spanOrientation === 'horizontal'
-                    ? Math.max(Number(a.x), Number(b.x))
-                    : Math.max(Number(a.y), Number(b.y));
-                return contourThresholdCandidates.find((threshold) => {
-                    const thresholdA = { x: Number(threshold.x1), y: Number(threshold.y1) };
-                    const thresholdB = { x: Number(threshold.x2), y: Number(threshold.y2) };
-                    if (contourSpanOrientation(thresholdA, thresholdB) !== spanOrientation) return false;
-                    const crossDistance = spanOrientation === 'horizontal'
-                        ? Math.max(Math.abs(Number(a.y) - thresholdA.y), Math.abs(Number(b.y) - thresholdA.y))
-                        : Math.max(Math.abs(Number(a.x) - thresholdA.x), Math.abs(Number(b.x) - thresholdA.x));
-                    if (crossDistance > .42) return false;
-                    const thresholdMin = spanOrientation === 'horizontal'
-                        ? Math.min(thresholdA.x, thresholdB.x)
-                        : Math.min(thresholdA.y, thresholdB.y);
-                    const thresholdMax = spanOrientation === 'horizontal'
-                        ? Math.max(thresholdA.x, thresholdB.x)
-                        : Math.max(thresholdA.y, thresholdB.y);
-                    const overlap = Math.min(spanMax, thresholdMax) - Math.max(spanMin, thresholdMin);
-                    return overlap >= Math.min(.16, Math.max(.08, (spanMax - spanMin) * .28));
-                }) || null;
-            };
             const classifyContourEndpoint = (point) => {
                 const x = Number(point.x);
                 const y = Number(point.y);
