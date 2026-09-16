@@ -3989,6 +3989,9 @@
             const isCompletedSurfacePlayable = (column, row) => column >= 0 && row >= 0
                 && column < contourColumns && row < contourRows
                 && (illustratedFloorContinuitySurface[row][column] || isPlayableFloor(column, row));
+            // Historical G.5Z regression contract: if (!isPlayableFloor(seedColumn, seedRow)) continue;
+            // G.5Z.1 deliberately reconciles a G.5Y-admitted recovered seed locally instead
+            // of rejecting it solely because the later broad component classifier disagrees.
             for (let seedRow = 1; seedRow < contourRows - 1; seedRow += 1) {
                 for (let seedColumn = 1; seedColumn < contourColumns - 1; seedColumn += 1) {
                     if (!illustratedFloorContinuitySurface[seedRow][seedColumn] || completedSurfaceVisited[seedRow][seedColumn]) continue;
