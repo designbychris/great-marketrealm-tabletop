@@ -1171,3 +1171,8 @@ Regression-only correction for the story-beat endpoint registration assertion; n
 - Give the top-level Evidence Audit analysis explicit ownership of its completed telemetry object.
 - Capture diagnostic publication through a top-level callback and restore that audit immediately before review rendering.
 - Keep recursive `skipOcclusionRecovery` passes silent and preserve ordinary Living Contour / Hybrid draft summaries.
+
+### IV.30.1G.5T.3 — Evidence Audit Terminal-Path Ownership ✅
+- Keep normal Living Contour monotonic early-return behaviour unchanged when an outer pass has no new recoverable contour/perimeter evidence.
+- Prevent the top-level Evidence Audit from taking that same early return before G.5T traversal telemetry reaches the diagnostic publisher.
+- Allow the visible 200-object review to remain entirely baseline-backed while Evidence Audit still reports the outer traversal experiment.

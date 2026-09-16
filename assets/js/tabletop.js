@@ -4780,7 +4780,15 @@
                 }))
                 : [];
 
-            if (recoverableChains.length === 0 && inferredPlayablePerimeterSuggestions.length === 0) {
+            // IV.30.1G.5T.3 — Evidence Audit Terminal-Path Ownership.
+            // A normal contour scan may safely return the preserved baseline when this
+            // outer pass has no new recoverable chains/perimeters. Evidence Audit must
+            // not take that early exit: G.5T's traversal counters belong to the outer
+            // diagnostic pass and still need to reach the publisher below, even when
+            // the visible review objects ultimately come entirely from the monotonic
+            // pre-occlusion baseline.
+            if (recoverableChains.length === 0 && inferredPlayablePerimeterSuggestions.length === 0
+                && !(options.evidenceAudit === true && options.skipOcclusionRecovery !== true)) {
                 return preOcclusionRecoveryContours;
             }
 
