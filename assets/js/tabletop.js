@@ -4473,6 +4473,19 @@
             // thresholds remain open, and exact edge de-duplication prevents a completed
             // component from spending review capacity twice on the same wall side.
             reconstructedIllustratedSurfaceEdges.length = 0;
+
+            // IV.30.1G.5Z.15A — Surface Corroboration Runtime Scope Correction.
+            // structuralEdge belongs to Structural Cartography's private candidate scope.
+            // Build the diagnostic exact-edge lookup inside Living Contour instead of
+            // reaching across that boundary. This changes no recovery/admission rule.
+            const surfaceStructuralByKey = new Map(
+                structuralCartographyCandidates()
+                    .filter((item) => item?.type === 'wall')
+                    .map((wall) => [cartographySuggestionKey(wall), wall])
+            );
+            const surfaceStructuralEdge = (x1, y1, x2, y2) => surfaceStructuralByKey.get(
+                cartographySuggestionKey({ x1, y1, x2, y2, type: 'wall' })
+            ) || null;
             illustratedSurfacePerimeterEdges = 0;
             const completedSurfaceVisited = Array.from({ length: contourRows }, () => Array(contourColumns).fill(false));
             const completedSurfaceEdgeKeys = new Set();
@@ -4550,7 +4563,7 @@
                             const insideInk = Number(darkness[y]?.[x] ?? 0);
                             const outsideInk = Number(darkness[ny]?.[nx] ?? 0);
                             const boundaryInk = Math.max(insideInk, outsideInk);
-                            const exactStructuralBoundary = Boolean(structuralEdge(a.x, a.y, b.x, b.y));
+                            const exactStructuralBoundary = Boolean(surfaceStructuralEdge(a.x, a.y, b.x, b.y));
                             let surfaceBoundaryCorroboration = 'unsupported-frontier';
                             if (exactStructuralBoundary) {
                                 illustratedSurfaceBoundaryStructuralCorroborated += 1;

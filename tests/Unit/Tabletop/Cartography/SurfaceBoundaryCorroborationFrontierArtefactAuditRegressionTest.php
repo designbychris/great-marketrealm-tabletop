@@ -35,4 +35,13 @@ final class SurfaceBoundaryCorroborationFrontierArtefactAuditRegressionTest exte
         self::assertStringContainsString('boundary corroboration ${audit.illustratedSurfaceBoundaryStructuralCorroborated || 0} exact structural', $this->script);
         self::assertStringContainsString('${audit.illustratedSurfaceBoundaryUnsupportedFrontier || 0} unsupported frontier', $this->script);
     }
+    public function test_surface_structural_corroboration_uses_a_living_contour_local_lookup(): void
+    {
+        self::assertStringContainsString('IV.30.1G.5Z.15A — Surface Corroboration Runtime Scope Correction.', $this->script);
+        self::assertStringContainsString('const surfaceStructuralByKey = new Map(', $this->script);
+        self::assertStringContainsString('const surfaceStructuralEdge = (x1, y1, x2, y2)', $this->script);
+        self::assertStringContainsString('Boolean(surfaceStructuralEdge(a.x, a.y, b.x, b.y))', $this->script);
+        self::assertStringNotContainsString('Boolean(structuralEdge(a.x, a.y, b.x, b.y))', $this->script);
+    }
+
 }
