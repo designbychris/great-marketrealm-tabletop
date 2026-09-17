@@ -1385,3 +1385,13 @@ Regression-only correction for the story-beat endpoint registration assertion; n
 - [x] Publish review objects and certified overlays separately in Evidence Audit, including overlay path/edge volume and zero capacity rejection for certified surface geometry.
 - [ ] Server certification.
 - [ ] Dungeon from Hell certification: verify 28 requested / 886-edge reconstructed surface becomes 28 certified overlays / 886 represented / 0 uncovered, while the ordinary review ledger remains at or below 200 and correspondence returns to exact geometry.
+
+## Phase IV.30.1G.5Z.14 — Iterative Recovery to Topology-Safe Convergence ✅
+- [x] Continue iterative reseeding beyond G3 only while a previously-qualified coherent disconnected island becomes locally topology-safe under the unchanged G.5Z.11 one/two-cell relationship.
+- [x] Preserve one seed per coherent island per generation and hand every seed immediately to the unchanged G.5Y flood; no singleton reject gains authority.
+- [x] Preserve the dense/structural bridge veto exactly; do not widen search distance, use nearest-playable matching, snap geometry or weaken structural/exterior/decoration gates.
+- [x] Prefer natural `topology-safe-exhausted` convergence; retain a ten-generation emergency guard solely against pathological looping and report `generation-budget` only when eligible work remains at that guard.
+- [x] Publish a per-generation audit record so G4+ candidate, seed and recovered-cell totals remain visible without hard-coding each future generation into the data contract.
+- [x] Preserve G.5Z.13 certified-overlay/review-budget separation, G.5Z.8 256-vertex cap-safe segmentation, G.5X authoritative coalescence and the 200-object review ceiling.
+- [ ] Server certification.
+- [ ] Dungeon from Hell certification: verify the three post-G3 topology-safe islands are admitted under unchanged safeguards, measure subsequent generations, and confirm convergence naturally exhausts before the emergency guard without perimeter/overlay correspondence loss.
