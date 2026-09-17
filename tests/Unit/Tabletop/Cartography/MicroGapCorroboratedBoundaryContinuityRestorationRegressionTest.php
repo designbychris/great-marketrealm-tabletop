@@ -48,6 +48,6 @@ final class MicroGapCorroboratedBoundaryContinuityRestorationRegressionTest exte
     public function test_existing_review_and_vertex_caps_remain_literal_contracts(): void
     {
         self::assertStringContainsString('const maximumPathVertices = 256;', $this->source);
-        self::assertStringContainsString('const maximumReviewObjects = 200;', $this->source);
+        self::assertStringContainsString('const maximumReviewSuggestions = 200;', $this->source);
     }
 }
