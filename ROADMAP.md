@@ -1435,3 +1435,7 @@ Regression-only correction for the story-beat endpoint registration assertion; n
 - [x] Preserve G.5Z.14 topology-safe convergence, threshold/portal vetoes, G.5Z.13 certified overlays, G.5Z.8 256-vertex segmentation, G.5X authority coalescence and the 200-object review ceiling.
 - [ ] Server certification.
 - [ ] Dungeon from Hell certification: expect the G.5Z.17 population of seven 1–2-edge both-bounded runs (11 original edges) to restore locally, taking 229 contributed edges toward 240 while the long false exterior frontier remains suppressed; verify fragmentation/open terminations improve without correspondence loss.
+
+### IV.30.1G.5Z.19 — Suppressed Boundary Run Span & Interior Evidence Audit
+
+Diagnostic-only forensic pass over the longer (>2-edge) open-paper runs deliberately left suppressed by G.5Z.18. The audit retains exact source-perimeter topology and reports exact run lengths, 5–8 versus 9+ populations, local ink distribution (near-cutoff/deep-quiet plus mean/max), geometric span in contour cells, and two-cell playable interior-depth support. It does not restore any long run, relax the G.5Z.16 open-paper threshold, alter the G.5Z.18 ≤2 micro-gap rule, snap endpoints, perform nearest matching, or manufacture geometry. The 200 review-object ceiling, 256-vertex cap, certified surface-overlay channel, threshold/portal vetoes, and topology-safe recovery convergence remain unchanged.
