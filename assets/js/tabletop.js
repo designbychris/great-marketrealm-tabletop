@@ -4747,9 +4747,10 @@
                         const points = runEdges.flatMap((runEdge) => [runEdge.a, runEdge.b]);
                         const xs = points.map((point) => point.x);
                         const ys = points.map((point) => point.y);
-                        const cellWidth = Math.max(1, canvasWidth / contourColumns);
-                        const cellHeight = Math.max(1, canvasHeight / contourRows);
-                        const spanCells = Math.round(Math.max((Math.max(...xs) - Math.min(...xs)) / cellWidth, (Math.max(...ys) - Math.min(...ys)) / cellHeight));
+                        const spanCells = Math.round(Math.max(
+                            (Math.max(...xs) - Math.min(...xs)) / Math.max(1, contourCellX),
+                            (Math.max(...ys) - Math.min(...ys)) / Math.max(1, contourCellY)
+                        ));
                         illustratedSurfaceLongGapTotalSpanCells += spanCells;
                         illustratedSurfaceLongGapLargestSpanCells = Math.max(illustratedSurfaceLongGapLargestSpanCells, spanCells);
                     }

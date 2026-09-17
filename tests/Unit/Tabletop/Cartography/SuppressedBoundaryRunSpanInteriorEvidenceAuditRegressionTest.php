@@ -25,6 +25,10 @@ final class SuppressedBoundaryRunSpanInteriorEvidenceAuditRegressionTest extends
         self::assertStringContainsString('illustratedSurfaceLongGapDeepQuietEdges', $source);
         self::assertStringContainsString('illustratedSurfaceLongGapInteriorDepthSupportedEdges', $source);
         self::assertStringContainsString('illustratedSurfaceLongGapLargestSpanCells', $source);
+        self::assertStringContainsString('Math.max(1, contourCellX)', $source);
+        self::assertStringContainsString('Math.max(1, contourCellY)', $source);
+        self::assertStringNotContainsString('canvasWidth / contourColumns', $source);
+        self::assertStringNotContainsString('canvasHeight / contourRows', $source);
         self::assertStringContainsString('long-run forensic ${audit.illustratedSurfaceLongGapRuns || 0} runs', $source);
     }
 
