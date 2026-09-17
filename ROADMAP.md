@@ -1354,3 +1354,14 @@ Regression-only correction for the story-beat endpoint registration assertion; n
 - [x] Preserve G.5Y structural/exterior/decoration gates, G.5Z.6 secondary-seed authority, G.5Z.8 vertex-cap-safe segmentation, G.5X authoritative coalescence and the 200-object review ceiling.
 - [ ] Server certification.
 - [ ] Dungeon from Hell audit: explain the 202 enclosed/interior → 89 qualified-island gap and determine whether any residual rejected component population corresponds to the visibly untraced lower-left dungeon before changing qualification behaviour.
+
+## Phase IV.30.1G.5Z.11 — Iterative Topology-Safe Island Reseeding & Bounded Convergence ✅
+- [x] Re-evaluate only previously qualified, coherent G.5Z.5 disconnected islands after first-generation G.5Z.6 recovery; singleton/coherence rejects never gain iterative seed authority.
+- [x] Admit at most one local topology-safe seed per remaining coherent island per generation, using the same one/two-cell relationship and dense/structural bridge veto as G.5Z.6.
+- [x] Hand every admitted iterative seed straight back to the unchanged G.5Y flood so all growth beyond the seed must still pass certified structural, exterior and decoration gates.
+- [x] Bound convergence to three secondary generations total (G.5Z.6 plus at most two iterative generations), with no nearest-playable search, arbitrary snapping or progressively relaxed topology rules.
+- [x] Publish generation-two and generation-three candidate, seed and recovered-cell totals, aggregate iterative recovery, and an explicit convergence reason in Evidence Audit.
+- [x] Distinguish natural topology-safe exhaustion from the generation-budget stop by performing a final diagnostic-only eligibility check after generation three.
+- [x] Preserve G.5Z.10 singleton rejection, G.5Z.8 vertex-cap-safe segmentation, G.5X authoritative coalescence, the 256-vertex path cap and the 200-object review ceiling.
+- [ ] Server certification.
+- [ ] Dungeon from Hell certification: confirm the three G.5Z.10 post-recovery topology-safe islands are admitted conservatively, measure any additional recovery, and verify convergence without structural leakage or downstream perimeter/representation loss.
