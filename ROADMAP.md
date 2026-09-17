@@ -1365,3 +1365,13 @@ Regression-only correction for the story-beat endpoint registration assertion; n
 - [x] Preserve G.5Z.10 singleton rejection, G.5Z.8 vertex-cap-safe segmentation, G.5X authoritative coalescence, the 256-vertex path cap and the 200-object review ceiling.
 - [ ] Server certification.
 - [ ] Dungeon from Hell certification: confirm the three G.5Z.10 post-recovery topology-safe islands are admitted conservatively, measure any additional recovery, and verify convergence without structural leakage or downstream perimeter/representation loss.
+
+## Phase IV.30.1G.5Z.12 — Review Capacity Pressure & Surface Representation Admission Audit ✅
+- [x] Account explicitly for the immutable 200-object review ceiling after G.5X authority coalescence and before reconstructed-surface admission.
+- [x] Publish authoritative occupancy, surface slots available, requested novel surface path/edge volume, and capacity-rejected path/edge volume without changing admission order or budget.
+- [x] Classify capacity-rejected surface paths as closed/open and identify vertex-cap-segmented paths so review pressure can be separated from G.5Z.8 segmentation behaviour.
+- [x] Audit exact-endpoint continuity between rejected and admitted reconstructed-surface paths, and identify only those endpoint-contiguous pairs that could fit within the existing 256-vertex cap as diagnostic merge candidates.
+- [x] Distinguish endpoint-contiguous rejected paths from genuinely independent rejected paths; no coalescence, simplification, bridge, snapping or geometry mutation is performed in this phase.
+- [x] Preserve G.5Z.11 bounded iterative recovery, G.5Z.8 vertex-cap-safe segmentation, G.5X authoritative coalescence, the 256-vertex path cap and the 200-object review ceiling.
+- [ ] Server certification.
+- [ ] Dungeon from Hell audit: explain the observed 185 authority + 15 admitted surface = 200 pressure, account for all 13 rejected paths / 217 uncovered edges, and determine whether exact-endpoint cap-safe representation opportunities exist before changing review behaviour.
