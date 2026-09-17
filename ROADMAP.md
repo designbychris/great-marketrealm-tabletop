@@ -1425,3 +1425,13 @@ Regression-only correction for the story-beat endpoint registration assertion; n
 - [x] Preserve G.5Z.14 topology-safe convergence, G.5Z.16 open-paper suppression, threshold/portal vetoes, G.5Z.13 certified overlays, G.5Z.8 256-vertex segmentation, G.5X authority coalescence and the 200-object review ceiling.
 - [ ] Server certification.
 - [ ] Dungeon from Hell audit: measure how many of the 643 suppressed open-paper edges form short both-bounded same-source gaps versus long/one-sided/unbounded frontier before authorizing any continuity restoration.
+
+## Phase IV.30.1G.5Z.18 — Micro-Gap Corroborated Boundary Continuity Restoration ✅
+- [x] Restore only exact original G.5Z.16-suppressed perimeter members belonging to G.5Z.17 both-bounded, non-branching same-source runs of at most two edges.
+- [x] Keep all 3+ edge suppressed runs withheld even when both-bounded, preventing long open-paper excursions from regaining wall authority merely because they eventually return to retained boundary.
+- [x] Re-admit no invented geometry: restoration reuses the original exact endpoints and source-surface membership; no distance search, nearest matching, snapping, interpolation or replacement edge is permitted.
+- [x] Preserve the G.5Z.16 open-paper suppression population as an auditable gross count while separately publishing eligible runs/edges and actually restored edges before final contributed perimeter totals.
+- [x] Mark restored edge provenance explicitly with `surfaceBoundaryMicroGapRestored` and `g5z18-micro-gap-continuity` evidence without changing persistence authority.
+- [x] Preserve G.5Z.14 topology-safe convergence, threshold/portal vetoes, G.5Z.13 certified overlays, G.5Z.8 256-vertex segmentation, G.5X authority coalescence and the 200-object review ceiling.
+- [ ] Server certification.
+- [ ] Dungeon from Hell certification: expect the G.5Z.17 population of seven 1–2-edge both-bounded runs (11 original edges) to restore locally, taking 229 contributed edges toward 240 while the long false exterior frontier remains suppressed; verify fragmentation/open terminations improve without correspondence loss.
