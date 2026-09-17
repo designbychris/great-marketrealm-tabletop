@@ -1375,3 +1375,13 @@ Regression-only correction for the story-beat endpoint registration assertion; n
 - [x] Preserve G.5Z.11 bounded iterative recovery, G.5Z.8 vertex-cap-safe segmentation, G.5X authoritative coalescence, the 256-vertex path cap and the 200-object review ceiling.
 - [ ] Server certification.
 - [ ] Dungeon from Hell audit: explain the observed 185 authority + 15 admitted surface = 200 pressure, account for all 13 rejected paths / 217 uncovered edges, and determine whether exact-endpoint cap-safe representation opportunities exist before changing review behaviour.
+
+## Phase IV.30.1G.5Z.13 — Certified Surface Overlay Representation & Review-Budget Separation ✅
+- [x] Keep the ordinary review-suggestion ledger bounded by the existing 200-object ceiling; do not raise or dynamically expand the review budget.
+- [x] Represent every novel reconstructed-surface path through a distinct certified-surface overlay channel after floor recovery, component completion, perimeter extraction and cap-safe path assembly have certified its geometry.
+- [x] Keep certified overlays outside review-suggestion capacity accounting while preserving explicit Keeper review/acceptance; overlay status grants no automatic persistence authority.
+- [x] Preserve exact reconstructed-surface source segments in final correspondence accounting so complete overlay representation can restore contributed → assembled → represented → exact edge parity.
+- [x] Preserve G.5X authoritative coalescence, G.5Z.8 256-vertex cap-safe segmentation, G.5Z.11 bounded iterative recovery and the 200-object review ceiling.
+- [x] Publish review objects and certified overlays separately in Evidence Audit, including overlay path/edge volume and zero capacity rejection for certified surface geometry.
+- [ ] Server certification.
+- [ ] Dungeon from Hell certification: verify 28 requested / 886-edge reconstructed surface becomes 28 certified overlays / 886 represented / 0 uncovered, while the ordinary review ledger remains at or below 200 and correspondence returns to exact geometry.
