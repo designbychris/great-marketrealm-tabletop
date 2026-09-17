@@ -1415,3 +1415,13 @@ Regression-only correction for the story-beat endpoint registration assertion; n
 - [x] Preserve portal/threshold vetoes, G.5Z.13 certified overlays, G.5Z.8 256-vertex cap-safe segmentation, G.5X authority coalescence and the 200-object review ceiling.
 - [ ] Server certification.
 - [ ] Dungeon from Hell certification: verify the 643 G.5Z.15 open-paper frontier edges are withheld, the giant exterior/diagonal polygon disappears or materially collapses, and legitimate ink-corroborated dungeon contours remain represented without correspondence loss.
+
+## Phase IV.30.1G.5Z.17 — Local Corroborated Boundary Gap Continuity Audit ✅
+- [x] Preserve G.5Z.16 suppression exactly while retaining diagnostic topology records for every admitted and suppressed completed-surface boundary edge.
+- [x] Group suppressed open-paper edges only by exact shared endpoints within the same completed source surface; perform no distance search, nearest matching, snapping or invented bridge.
+- [x] Classify each suppressed run as bounded by retained/corroborated boundary at both terminals, one terminal, or neither terminal, and report branch-adjacent topology separately.
+- [x] Publish suppressed-run length buckets of 1, 2, 3–4, 5–8 and 9+ edges so tiny local interruptions can be distinguished from long genuine recovery frontier.
+- [x] Identify both-bounded, non-branching, same-source contiguous runs as diagnostic continuity candidates only; no suppressed edge is restored or promoted in this phase.
+- [x] Preserve G.5Z.14 topology-safe convergence, G.5Z.16 open-paper suppression, threshold/portal vetoes, G.5Z.13 certified overlays, G.5Z.8 256-vertex segmentation, G.5X authority coalescence and the 200-object review ceiling.
+- [ ] Server certification.
+- [ ] Dungeon from Hell audit: measure how many of the 643 suppressed open-paper edges form short both-bounded same-source gaps versus long/one-sided/unbounded frontier before authorizing any continuity restoration.
