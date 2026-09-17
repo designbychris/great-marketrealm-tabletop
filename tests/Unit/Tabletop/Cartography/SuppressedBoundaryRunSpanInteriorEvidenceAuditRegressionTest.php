@@ -10,7 +10,7 @@ final class SuppressedBoundaryRunSpanInteriorEvidenceAuditRegressionTest extends
 {
     private function source(): string
     {
-        $source = file_get_contents(dirname(__DIR__, 5) . '/assets/js/tabletop.js');
+        $source = file_get_contents(dirname(__DIR__, 4) . '/assets/js/tabletop.js');
         self::assertIsString($source);
         return $source;
     }
