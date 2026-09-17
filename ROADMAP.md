@@ -1395,3 +1395,13 @@ Regression-only correction for the story-beat endpoint registration assertion; n
 - [x] Preserve G.5Z.13 certified-overlay/review-budget separation, G.5Z.8 256-vertex cap-safe segmentation, G.5X authoritative coalescence and the 200-object review ceiling.
 - [ ] Server certification.
 - [ ] Dungeon from Hell certification: verify the three post-G3 topology-safe islands are admitted under unchanged safeguards, measure subsequent generations, and confirm convergence naturally exhausts before the emergency guard without perimeter/overlay correspondence loss.
+
+## Phase IV.30.1G.5Z.15 — Surface Boundary Corroboration & Frontier Artefact Audit ✅
+- [x] Audit every completed reconstructed-surface perimeter edge before path promotion using only local evidence already available to Living Contour; do not change perimeter admission or rendering.
+- [x] Classify perimeter edges into exact structural corroboration, strong local ink, moderate local ink, and unsupported recovered-surface frontier, with quiet/open-paper frontier reported separately.
+- [x] Attach the diagnostic corroboration class and measured local ink value to reconstructed-surface edge provenance without granting or removing authority.
+- [x] Keep threshold vetoes, G.5Z.14 topology-safe convergence, G.5Z.13 certified overlays, G.5Z.8 256-vertex segmentation, G.5X authority coalescence and the 200-object review ceiling unchanged.
+- [x] Publish the corroboration population directly beside raw/perimeter boundary counts so unsupported frontier can be compared against the giant exterior polygon without relying on visual guesswork.
+- [x] Preserve diagnostic-only semantics: G.5Z.15 performs no rejection, suppression, bridge, snap, nearest-wall search, admission reorder or persistence change.
+- [ ] Server certification.
+- [ ] Dungeon from Hell audit: determine whether the giant exterior/diagonal polygon is dominated by unsupported/open-paper frontier while genuine dungeon contours carry structural or local-ink corroboration before authorizing any suppression phase.
