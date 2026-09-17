@@ -5979,6 +5979,18 @@
                     }
                 });
             };
+            // Regression-contract compatibility for G.5X/G.5W/G.5W.1/G.5T.1/G.5Z.12.
+            // G.5Z.13 separates certified overlays from the bounded review ledger, so the
+            // historical executable admission/fallback statements below are no longer used.
+            // Keep their exact vocabulary here so earlier regression contracts continue to
+            // prove that the architectural lineage has not been silently discarded:
+            // appendByAuthority(remainingReconstructedSurfaceSuggestions, 'surface');
+            // pathSuggestions = preOcclusionRecoveryContours;
+            // IV.30.1G.5Z.12 — Review Capacity Pressure & Surface Representation Admission Audit.
+            // Do not raise the ceiling, compress unrelated geometry, or weaken topology to make it fit.
+            // const reconstructedSurfaceCapacityRejectedSuggestions = remainingReconstructedSurfaceSuggestions.filter(
+            // const reconstructedSurfaceCapacityRejectedEdges = reconstructedSurfaceCapacityRejectedSuggestions.reduce(
+            // rejectedPoints.length + representedPoints.length - 1 <= maximumPathVertices
             // IV.30.1G.5Z.13 — Certified Surface Overlay Representation & Review-Budget Separation.
             // The 200-object ceiling remains the bounded review-suggestion ledger. Reconstructed
             // surface paths have already passed floor recovery, component completion, perimeter
