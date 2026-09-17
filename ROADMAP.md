@@ -1344,3 +1344,13 @@ Regression-only correction for the story-beat endpoint registration assertion; n
 - [x] Preserve G.5Y structural/exterior/decoration gates, G.5Z.6 first-generation seed authority, G.5Z.8 vertex-cap-safe segmentation, G.5X authoritative coalescence and the 200-object review ceiling.
 - [ ] Server certification.
 - [ ] Dungeon from Hell audit: determine whether the expanded 3,833-cell surface makes previously unseeded lower-dungeon islands newly topology-safe before authorizing any second-generation seeding.
+
+## Phase IV.30.1G.5Z.10 — Interior Component Qualification Rejection Audit ✅
+- [x] Account explicitly for the enclosed/interior floor-like components that do not satisfy G.5Z.5 playable-island qualification instead of leaving the interior-to-island gap implicit.
+- [x] Publish rejected component and cell totals, separating coherence/singleton rejection from any other multi-cell rejection so the current qualification rule can be audited rather than guessed.
+- [x] Retain component-cell identity and report whether rejected components were initially near certified floor without granting seed or admission authority.
+- [x] Re-audit rejected components after G.5Z.6 expansion and distinguish naturally absorbed rejects from residual components, including post-recovery adjacency and one/two-cell narrow-gap evidence.
+- [x] Correct diagnostic component-cell provenance so G.5Z.9 and G.5Z.10 report original component volume rather than zero-length bookkeeping records; no contour behaviour is changed.
+- [x] Preserve G.5Y structural/exterior/decoration gates, G.5Z.6 secondary-seed authority, G.5Z.8 vertex-cap-safe segmentation, G.5X authoritative coalescence and the 200-object review ceiling.
+- [ ] Server certification.
+- [ ] Dungeon from Hell audit: explain the 202 enclosed/interior → 89 qualified-island gap and determine whether any residual rejected component population corresponds to the visibly untraced lower-left dungeon before changing qualification behaviour.
