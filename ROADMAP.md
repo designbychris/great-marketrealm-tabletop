@@ -1405,3 +1405,13 @@ Regression-only correction for the story-beat endpoint registration assertion; n
 - [x] Preserve diagnostic-only semantics: G.5Z.15 performs no rejection, suppression, bridge, snap, nearest-wall search, admission reorder or persistence change.
 - [ ] Server certification.
 - [ ] Dungeon from Hell audit: determine whether the giant exterior/diagonal polygon is dominated by unsupported/open-paper frontier while genuine dungeon contours carry structural or local-ink corroboration before authorizing any suppression phase.
+
+## Phase IV.30.1G.5Z.16 — Corroborated Surface Boundary Admission & Open-Paper Frontier Suppression ✅
+- [x] Convert G.5Z.15's positively identified quiet/open-paper frontier population into a narrow perimeter-admission veto before reconstructed-surface path assembly.
+- [x] Suppress only unsupported frontier edges whose local boundary ink is at or below the certified open-paper threshold (`<= .30`); retain strong/moderate corroborated edges and unsupported-but-not-open-paper edges unchanged.
+- [x] Keep completed playable-surface recovery intact: no recovered floor cell is removed and G.5Z.14 remains naturally converged at the unchanged topology-safe rules.
+- [x] Perform no nearest-wall replacement, snapping, arbitrary bridge, length/map-edge heuristic, admission reorder or weakened structural/exterior/decoration test.
+- [x] Publish open-paper suppression explicitly between G.5Z.15 corroboration and contributed perimeter-edge totals so raw → suppressed → admitted geometry is auditable.
+- [x] Preserve portal/threshold vetoes, G.5Z.13 certified overlays, G.5Z.8 256-vertex cap-safe segmentation, G.5X authority coalescence and the 200-object review ceiling.
+- [ ] Server certification.
+- [ ] Dungeon from Hell certification: verify the 643 G.5Z.15 open-paper frontier edges are withheld, the giant exterior/diagonal polygon disappears or materially collapses, and legitimate ink-corroborated dungeon contours remain represented without correspondence loss.
