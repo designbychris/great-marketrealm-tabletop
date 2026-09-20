@@ -1453,3 +1453,9 @@ G.5Z.21 adds a second, separately audited continuity-restoration class without r
 ### IV.30.1G.5Z.22 — Residual Open-Chain Termination & Illustrated Wall Correspondence Audit
 
 Diagnostic-only endpoint inventory of the final promoted reconstructed-surface paths. In Evidence Audit mode, numbered, non-interactive SVG markers identify each remaining open-chain termination; audit records retain the exact point, source path index, adjoining still-suppressed original perimeter run length, local ink/structural corroboration, and exact authoritative endpoint coincidence. Doorway or intentional-opening classification remains unresolved without independent evidence. Restored micro/short-run members are excluded from the remaining-suppression inventory. The markers are not review suggestions, are not selectable or saved, and are removed outside Evidence Audit mode. No wall admission, geometry modification, threshold relaxation, nearest matching, review-ceiling change or vertex-cap change is introduced.
+
+
+### IV.30.1G.5Z.22A — Diagnostic Visibility & Execution Verification
+
+- The Evidence Audit status begins with a versioned termination-record count and individual endpoint summaries so deployed-code visibility is distinguishable from a missing or truncated trailing status section. A missing record array is reported explicitly rather than silently treated as zero.
+- Numbered SVG endpoint markers render after review suggestions to remain visible above wall strokes; they remain audit-only, non-interactive, and cleared with the diagnostic layer. No recovered geometry, review admission, wall semantics, or persistence changes.
