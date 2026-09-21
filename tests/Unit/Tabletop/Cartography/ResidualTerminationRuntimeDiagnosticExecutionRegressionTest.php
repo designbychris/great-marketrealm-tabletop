@@ -14,7 +14,7 @@ final class ResidualTerminationRuntimeDiagnosticExecutionRegressionTest extends 
         self::assertIsString($source);
         self::assertStringContainsString("cartographyAuditRuntimeWitness.dataset.cartographyAuditRuntime = 'G.5Z.22B'", $source);
         self::assertStringContainsString("reportCartographyAuditRuntime('updated JavaScript executing · audit started')", $source);
-        self::assertStringContainsString("audit callback ${completedEvidenceAudit ? 'received' : 'MISSING'}", $source);
+        self::assertStringContainsString('audit callback ${completedEvidenceAudit ? \'received\' : \'MISSING\'}', $source);
         self::assertStringContainsString("querySelectorAll('[data-audit-termination]')", $source);
         self::assertStringContainsString("cartographyAuditRuntimeWitness.style.display = 'none'", $source);
     }
