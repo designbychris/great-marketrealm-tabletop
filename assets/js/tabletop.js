@@ -6653,6 +6653,77 @@
                     links, components, graphClosureCandidates: components.filter((item) => item.closureFeasible).length,
                     admittedEdges: 0, restoredRuns: 0 };
             })();
+            // G.5Z.28: geometry and exterior-separation forensic audit. Graph closure
+            // alone cannot certify an illustrated wall or authorise edge admission.
+            const residualCycleGeometryAudit = (() => {
+                const pointKey = residualTerminationPointKey;
+                const segmentKey = (a, b) => completedEdgeKey(a, b);
+                const retainedSegments = promotedReconstructedSurfaceSuggestions.flatMap((path) => {
+                    const points = path.points || [];
+                    return points.slice(1).map((point, index) => ({ a: points[index], b: point }));
+                });
+                const runSegments = new Map(suppressedRuns.map((run) => [run.id,
+                    run.members.map((index) => stillSuppressed[index])]));
+                const allSegments = retainedSegments.concat([...runSegments.values()].flat());
+                const vertexDegree = new Map();
+                const uniqueEdges = new Set();
+                let duplicateEdges = 0;
+                allSegments.forEach((edge) => {
+                    const key = segmentKey(edge.a, edge.b);
+                    if (uniqueEdges.has(key)) duplicateEdges += 1;
+                    uniqueEdges.add(key);
+                    [edge.a, edge.b].forEach((point) => {
+                        const key = pointKey(point);
+                        vertexDegree.set(key, (vertexDegree.get(key) || 0) + 1);
+                    });
+                });
+                // Axis-aligned grid edges can intersect away from endpoints only when
+                // overlapping or crossing. Check the latter independently of graph degree.
+                const crosses = (first, second) => {
+                    const firstVertical = first.a.x === first.b.x;
+                    const secondVertical = second.a.x === second.b.x;
+                    if (firstVertical === secondVertical) return false;
+                    const vertical = firstVertical ? first : second;
+                    const horizontal = firstVertical ? second : first;
+                    const x = vertical.a.x, y = horizontal.a.y;
+                    return x > Math.min(horizontal.a.x, horizontal.b.x) && x < Math.max(horizontal.a.x, horizontal.b.x)
+                        && y > Math.min(vertical.a.y, vertical.b.y) && y < Math.max(vertical.a.y, vertical.b.y);
+                };
+                let interiorCrossings = 0;
+                for (let i = 0; i < allSegments.length; i += 1) {
+                    for (let j = i + 1; j < allSegments.length; j += 1) {
+                        if (crosses(allSegments[i], allSegments[j])) interiorCrossings += 1;
+                    }
+                }
+                const branchVertices = [...vertexDegree.values()].filter((degree) => degree !== 2).length;
+                const runs = suppressedRuns.map((run) => {
+                    const members = runSegments.get(run.id) || [];
+                    const ink = members.map((edge) => Number(edge.boundaryInk || 0));
+                    const quiet = members.filter((edge) => edge.suppressedOpenPaper === true).length;
+                    const sourceIds = [...new Set(members.map((edge) => edge.surfaceComponentId))];
+                    const pairing = residualRunPairings.find((entry) => entry.runId === run.id);
+                    const endpoints = (pairing?.endpointIds || []).map((id) => residualTerminations.find((entry) => entry.id === id)).filter(Boolean);
+                    const sourceVerified = sourceIds.length === 1 && endpoints.length === 2 && endpoints.every((endpoint) =>
+                        residualPathProvenance[endpoint.pathIndex - 1]?.verifiedComponentId === sourceIds[0]);
+                    return { runId: run.id, edges: members.length, quietEdges: quiet,
+                        maximumInk: ink.length ? Math.max(...ink) : 0, sourceVerified,
+                        exteriorClassification: quiet === members.length ? 'suppressed-open-paper-frontier' : 'mixed-or-unverified-frontier',
+                        geometryClassification: pairing?.classification === 'two-distinct-endpoints' && sourceVerified
+                            ? 'endpoint-and-source-consistent-not-wall-certified' : 'unverified-endpoint-or-source',
+                        diagnosticOnly: true };
+                });
+                const cycleCandidate = residualClosureAudit.graphClosureCandidates > 0;
+                const combinatorialSimple = cycleCandidate && duplicateEdges === 0 && branchVertices === 0 && interiorCrossings === 0;
+                return { diagnosticOnly: true, cycleCandidate, combinatorialSimple,
+                    duplicateEdges, branchVertices, interiorCrossings, runs,
+                    // A topologically simple outline still needs positive illustration
+                    // evidence and exterior separation; quiet paper is not a wall.
+                    classification: !cycleCandidate ? 'no-graph-cycle'
+                        : !combinatorialSimple ? 'geometric-cycle-not-certified'
+                        : 'simple-grid-cycle-only-exterior-boundary-unverified',
+                    geometryCertified: false, exteriorSeparationCertified: false,
+                    admittedEdges: 0, restoredRuns: 0 };
+            })();
             // A bounded visual witness only: no suppressed edge is admitted or saved.
             const residualPairedRunSegments = suppressedRuns.filter((run) =>
                 residualRunPairings[run.id - 1].classification === 'two-distinct-endpoints')
@@ -7070,6 +7141,7 @@
                     residualCoincidentEndpointGroups,
                     residualRunPairings,
                     residualClosureAudit,
+                    residualCycleGeometryAudit,
                     residualUnmatchedEndpointIds,
                     residualPairedRunSegments,
                     bridgeRepresented,
@@ -7537,6 +7609,10 @@
                     `${record.id}:P${record.pathIndex}/${record.endpointRole}@(${record.gridPoint.x},${record.gridPoint.y})/t(${record.tangent.x},${record.tangent.y})/R[${record.suppressedRunIds.join(',') || '-'}]`).join(' · ');
                 const coincident = cartographyEvidenceAudit.residualCoincidentEndpointGroups || [];
                 const closure = cartographyEvidenceAudit.residualClosureAudit;
+                const geometry = cartographyEvidenceAudit.residualCycleGeometryAudit;
+                cartographyAuditRuntimeWitness.dataset.cartographyGeometry = geometry
+                    ? `G.5Z.28 geometry · ${geometry.classification} · graph candidate ${geometry.cycleCandidate} · simple grid cycle ${geometry.combinatorialSimple} · ${geometry.duplicateEdges} duplicate edges · ${geometry.branchVertices} non-degree-two vertices · ${geometry.interiorCrossings} interior crossings · ${geometry.runs.map((run) => `R${run.runId}:${run.edges}e/${run.quietEdges}quiet/maxInk${run.maximumInk.toFixed(3)}/${run.exteriorClassification}/${run.geometryClassification}`).join(' · ')} · geometry certified ${geometry.geometryCertified} · exterior separation certified ${geometry.exteriorSeparationCertified} · ${geometry.admittedEdges} edges admitted · ${geometry.restoredRuns} runs restored`
+                    : 'G.5Z.28 geometry unavailable';
                 cartographyAuditRuntimeWitness.dataset.cartographyClosure = closure
                     ? `G.5Z.27 closure · ${closure.openPathCount} open paths · ${closure.endpointCount} endpoints · ${closure.runCount} suppressed runs · ${closure.components.length} graph components · ${closure.graphClosureCandidates} graph-cycle candidates (NOT geometry-certified) · ${closure.links.map((link) => `R${link.runId}:${link.edges}e/P[${link.pathIndices.join(',')}]/${link.classification}`).join(' · ')} · ${closure.components.map((component) => `C[P${component.pathIndices.join(',P')}]/R[${component.runIds.join(',')}]/${component.classification}`).join(' · ')} · ${closure.admittedEdges} edges admitted · ${closure.restoredRuns} runs restored`
                     : 'G.5Z.27 closure unavailable';
@@ -7548,7 +7624,7 @@
                 const connectivityWitness = `G.5Z.23 connectivity · ${endpointRecords.length} endpoints · ${paired.length} two-endpoint connected runs · ${unmatched.length} no-adjacent-run endpoints [${unmatched.join(',')}] · ${pairings.map((run) => `R${run.runId}:${run.edges}e/E[${run.endpointIds.join(',')}]/${run.classification}`).join(' · ')} · ${endpointDetails}`;
                 cartographyAuditRuntimeWitness.dataset.cartographyConnectivity = connectivityWitness;
             }
-            reportCartographyAuditRuntime(`${cartographyAuditRuntimeWitness.dataset.cartographyClosure || 'G.5Z.27 closure unavailable'} · ${assemblyWitness} · ${cartographyAuditRuntimeWitness.dataset.cartographyProvenance || 'G.5Z.25 provenance unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyCoincidence || 'G.5Z.24 coincidence unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyConnectivity || 'G.5Z.23 connectivity unavailable'} · audit callback ${completedEvidenceAudit ? 'received' : 'MISSING'} · endpoint records ${Array.isArray(endpointRecords) ? endpointRecords.length : 'MISSING'} / expected ${expectedEndpoints ?? 'MISSING'} · SVG markers ${markerCount} · ${Array.isArray(endpointRecords) ? endpointRecords.map((record) => `${record.id}:P${record.pathIndex}/${record.reason}/${record.suppressedRunEdges}e`).join(', ') : 'no endpoint records published'}`);
+            reportCartographyAuditRuntime(`${cartographyAuditRuntimeWitness.dataset.cartographyGeometry || 'G.5Z.28 geometry unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyClosure || 'G.5Z.27 closure unavailable'} · ${assemblyWitness} · ${cartographyAuditRuntimeWitness.dataset.cartographyProvenance || 'G.5Z.25 provenance unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyCoincidence || 'G.5Z.24 coincidence unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyConnectivity || 'G.5Z.23 connectivity unavailable'} · audit callback ${completedEvidenceAudit ? 'received' : 'MISSING'} · endpoint records ${Array.isArray(endpointRecords) ? endpointRecords.length : 'MISSING'} / expected ${expectedEndpoints ?? 'MISSING'} · SVG markers ${markerCount} · ${Array.isArray(endpointRecords) ? endpointRecords.map((record) => `${record.id}:P${record.pathIndex}/${record.reason}/${record.suppressedRunEdges}e`).join(', ') : 'no endpoint records published'}`);
             if (cartographySuggestions.length === 0 && cartographyAssistantStatus) {
                 cartographyAssistantStatus.textContent = cartographyEvidenceAudit
                     ? `Evidence Audit · no emitted contour objects · ${cartographyEvidenceAudit.rawChains} raw chains · ${cartographyEvidenceAudit.semanticRejected} semantic rejects · ${cartographyEvidenceAudit.inferredPerimeters} inferred perimeter edges.`
