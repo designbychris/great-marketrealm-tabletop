@@ -6077,74 +6077,6 @@
             }).length;
             const reconstructedSurfaceOpenChains = Math.max(0, promotedReconstructedSurfaceSuggestions.length - reconstructedSurfaceClosedChains);
 
-            // IV.30.1G.5Z.22 — Residual Open-Chain Termination & Illustrated Wall Correspondence Audit.
-            // Inspect ONLY the final promoted source paths. No endpoint snapping, wall
-            // admission, threshold relaxation, draft mutation or persistence occurs here.
-            const residualTerminationPointKey = (point) => `${point.x},${point.y}`;
-            const residualSuppressedByEndpoint = new Map();
-            const retainedSurfaceEdgeKeys = new Set(reconstructedIllustratedSurfaceEdges.map((edge) => {
-                const points = edge.points || [];
-                return points.length >= 2 ? completedEdgeKey(points[0], points[1]) : '';
-            }));
-            // A restored member is no longer suppressed even though its original
-            // G.5Z.16 topology record remains marked suppressedOpenPaper.
-            const stillSuppressed = illustratedSurfaceBoundaryTopology.filter((edge) =>
-                edge.suppressedOpenPaper && !retainedSurfaceEdgeKeys.has(edge.key));
-            const suppressedAdjacency = new Map();
-            stillSuppressed.forEach((edge, index) => [edge.a, edge.b].forEach((point) => {
-                const key = residualTerminationPointKey(point);
-                if (!suppressedAdjacency.has(key)) suppressedAdjacency.set(key, []);
-                suppressedAdjacency.get(key).push(index);
-                if (!residualSuppressedByEndpoint.has(key)) residualSuppressedByEndpoint.set(key, []);
-                residualSuppressedByEndpoint.get(key).push(edge);
-            }));
-            const suppressedRunSizeByIndex = new Map();
-            stillSuppressed.forEach((edge, index) => {
-                if (suppressedRunSizeByIndex.has(index)) return;
-                const pending = [index], members = new Set();
-                while (pending.length) {
-                    const next = pending.pop();
-                    if (members.has(next)) continue;
-                    members.add(next);
-                    [stillSuppressed[next].a, stillSuppressed[next].b].forEach((point) =>
-                        (suppressedAdjacency.get(residualTerminationPointKey(point)) || []).forEach((candidate) => {
-                            if (!members.has(candidate) && stillSuppressed[candidate].surfaceComponentId === edge.surfaceComponentId) pending.push(candidate);
-                        }));
-                }
-                members.forEach((member) => suppressedRunSizeByIndex.set(member, members.size));
-            });
-            const suppressedRunSizeByEdgeKey = new Map(stillSuppressed.map((edge, index) => [edge.key, suppressedRunSizeByIndex.get(index)]));
-            const authorityEndpointKeys = new Set(authoritativeContourSuggestions.flatMap((path) => {
-                const points = path.points || [];
-                return points.length ? [residualTerminationPointKey(points[0]), residualTerminationPointKey(points[points.length - 1])] : [];
-            }));
-            const residualTerminations = [];
-            promotedReconstructedSurfaceSuggestions.forEach((path, pathIndex) => {
-                const points = Array.isArray(path.points) ? path.points : [];
-                if (points.length < 2 || residualTerminationPointKey(points[0]) === residualTerminationPointKey(points[points.length - 1])) return;
-                [points[0], points[points.length - 1]].forEach((point) => {
-                    const neighbouringSuppressed = residualSuppressedByEndpoint.get(residualTerminationPointKey(point)) || [];
-                    const localInk = neighbouringSuppressed.length
-                        ? Math.max(...neighbouringSuppressed.map((edge) => Number(edge.boundaryInk || 0))) : 0;
-                    const exactStructural = neighbouringSuppressed.some((edge) => edge.exactStructuralBoundary === true);
-                    residualTerminations.push({
-                        id: residualTerminations.length + 1,
-                        point: { x: point.x, y: point.y },
-                        pathIndex: pathIndex + 1,
-                        sourceComponentIds: [...new Set(neighbouringSuppressed.map((edge) => edge.surfaceComponentId))],
-                        suppressedRunEdges: neighbouringSuppressed.length
-                            ? Math.max(...neighbouringSuppressed.map((edge) => suppressedRunSizeByEdgeKey.get(edge.key) || 0)) : 0,
-                        authoritativeEndpoint: authorityEndpointKeys.has(residualTerminationPointKey(point)),
-                        localInk, exactStructural,
-                        reason: exactStructural ? 'exact-structural-neighbour' : neighbouringSuppressed.length
-                            ? (localInk >= .42 ? 'ink-corroborated-neighbour' : 'suppressed-open-paper-neighbour')
-                            : 'no-adjacent-suppressed-edge',
-                        // A passage/door cannot be certified from ink or endpoint geometry alone.
-                        openingClassification: 'unresolved'
-                    });
-                });
-            });
-
             // IV.30.1G.5Z.7 — Surface Perimeter-to-Path Assembly Loss Audit.
             // G.5Z.6 expanded the completed perimeter enough to expose a new handoff:
             // contributed perimeter edges can fail to enter promoted review paths before
@@ -6373,6 +6305,77 @@
             ).length;
             const authoritativeReviewPaths = authoritativeContourSuggestions.length;
             const authoritativeReviewSlotsLiberated = Math.max(0, authoritativeInputCount - authoritativeReviewPaths);
+
+            // IV.30.1G.5Z.22B.1 — inspect authoritative endpoints only after
+            // authority has been initialized and its exact-endpoint coalescence completed.
+            // IV.30.1G.5Z.22 — Residual Open-Chain Termination & Illustrated Wall Correspondence Audit.
+            // Inspect ONLY the final promoted source paths. No endpoint snapping, wall
+            // admission, threshold relaxation, draft mutation or persistence occurs here.
+            const residualTerminationPointKey = (point) => `${point.x},${point.y}`;
+            const residualSuppressedByEndpoint = new Map();
+            const retainedSurfaceEdgeKeys = new Set(reconstructedIllustratedSurfaceEdges.map((edge) => {
+                const points = edge.points || [];
+                return points.length >= 2 ? completedEdgeKey(points[0], points[1]) : '';
+            }));
+            // A restored member is no longer suppressed even though its original
+            // G.5Z.16 topology record remains marked suppressedOpenPaper.
+            const stillSuppressed = illustratedSurfaceBoundaryTopology.filter((edge) =>
+                edge.suppressedOpenPaper && !retainedSurfaceEdgeKeys.has(edge.key));
+            const suppressedAdjacency = new Map();
+            stillSuppressed.forEach((edge, index) => [edge.a, edge.b].forEach((point) => {
+                const key = residualTerminationPointKey(point);
+                if (!suppressedAdjacency.has(key)) suppressedAdjacency.set(key, []);
+                suppressedAdjacency.get(key).push(index);
+                if (!residualSuppressedByEndpoint.has(key)) residualSuppressedByEndpoint.set(key, []);
+                residualSuppressedByEndpoint.get(key).push(edge);
+            }));
+            const suppressedRunSizeByIndex = new Map();
+            stillSuppressed.forEach((edge, index) => {
+                if (suppressedRunSizeByIndex.has(index)) return;
+                const pending = [index], members = new Set();
+                while (pending.length) {
+                    const next = pending.pop();
+                    if (members.has(next)) continue;
+                    members.add(next);
+                    [stillSuppressed[next].a, stillSuppressed[next].b].forEach((point) =>
+                        (suppressedAdjacency.get(residualTerminationPointKey(point)) || []).forEach((candidate) => {
+                            if (!members.has(candidate) && stillSuppressed[candidate].surfaceComponentId === edge.surfaceComponentId) pending.push(candidate);
+                        }));
+                }
+                members.forEach((member) => suppressedRunSizeByIndex.set(member, members.size));
+            });
+            const suppressedRunSizeByEdgeKey = new Map(stillSuppressed.map((edge, index) => [edge.key, suppressedRunSizeByIndex.get(index)]));
+            const authorityEndpointKeys = new Set(authoritativeContourSuggestions.flatMap((path) => {
+                const points = path.points || [];
+                return points.length ? [residualTerminationPointKey(points[0]), residualTerminationPointKey(points[points.length - 1])] : [];
+            }));
+            const residualTerminations = [];
+            promotedReconstructedSurfaceSuggestions.forEach((path, pathIndex) => {
+                const points = Array.isArray(path.points) ? path.points : [];
+                if (points.length < 2 || residualTerminationPointKey(points[0]) === residualTerminationPointKey(points[points.length - 1])) return;
+                [points[0], points[points.length - 1]].forEach((point) => {
+                    const neighbouringSuppressed = residualSuppressedByEndpoint.get(residualTerminationPointKey(point)) || [];
+                    const localInk = neighbouringSuppressed.length
+                        ? Math.max(...neighbouringSuppressed.map((edge) => Number(edge.boundaryInk || 0))) : 0;
+                    const exactStructural = neighbouringSuppressed.some((edge) => edge.exactStructuralBoundary === true);
+                    residualTerminations.push({
+                        id: residualTerminations.length + 1,
+                        point: { x: point.x, y: point.y },
+                        pathIndex: pathIndex + 1,
+                        sourceComponentIds: [...new Set(neighbouringSuppressed.map((edge) => edge.surfaceComponentId))],
+                        suppressedRunEdges: neighbouringSuppressed.length
+                            ? Math.max(...neighbouringSuppressed.map((edge) => suppressedRunSizeByEdgeKey.get(edge.key) || 0)) : 0,
+                        authoritativeEndpoint: authorityEndpointKeys.has(residualTerminationPointKey(point)),
+                        localInk, exactStructural,
+                        reason: exactStructural ? 'exact-structural-neighbour' : neighbouringSuppressed.length
+                            ? (localInk >= .42 ? 'ink-corroborated-neighbour' : 'suppressed-open-paper-neighbour')
+                            : 'no-adjacent-suppressed-edge',
+                        // A passage/door cannot be certified from ink or endpoint geometry alone.
+                        openingClassification: 'unresolved'
+                    });
+                });
+            });
+
 
             // G.5W: a reconstructed surface chain that meets an authoritative endpoint
             // extends that object instead of becoming object 201. This preserves every

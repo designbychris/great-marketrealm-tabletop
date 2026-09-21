@@ -1464,3 +1464,8 @@ Diagnostic-only endpoint inventory of the final promoted reconstructed-surface p
 
 - Add a separate, visible G.5Z.22B runtime witness before the Evidence Audit status. It reports when the deployed JavaScript begins the audit, whether the completed audit callback arrived, endpoint-record count versus expected terminations, and the number of numbered SVG markers actually present after rendering.
 - The witness is independent of the long legacy audit status and clears with the draft. This phase changes no floor recovery, boundary admission, review capacity, saved barriers, or wall geometry.
+
+
+### IV.30.1G.5Z.22B.1 — Authoritative Endpoint Initialization Correction
+
+Move the residual termination diagnostic block after authoritative contour initialization and exact-endpoint coalescence, before reconstructed surface authority extensions. This fixes the JavaScript temporal-dead-zone error without changing surface admission, wall geometry, the 200-object review ceiling, or persistence. Add an execution-order regression test.
