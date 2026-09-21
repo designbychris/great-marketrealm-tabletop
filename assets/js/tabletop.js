@@ -6724,6 +6724,60 @@
                     geometryCertified: false, exteriorSeparationCertified: false,
                     admittedEdges: 0, restoredRuns: 0 };
             })();
+            // IV.30.1G.5Z.29 — forensic-only separation of the recovered-surface
+            // frontier from positively illustrated wall evidence. The original boundary
+            // topology records the inside cell and outward normal BEFORE suppression.
+            // A quiet inside/outside pair proves a surface frontier, NOT a wall.
+            const residualExteriorFrontierAudit = (() => {
+                const runs = suppressedRuns.map((run) => {
+                    const members = run.members.map((index) => stillSuppressed[index]);
+                    const sourceIds = [...new Set(members.map((edge) => edge.surfaceComponentId))];
+                    const exactSourceCells = members.filter((edge) =>
+                        Number.isInteger(edge.insideColumn) && Number.isInteger(edge.insideRow)
+                        && Number.isInteger(edge.outsideDx) && Number.isInteger(edge.outsideDy)
+                        && Math.abs(edge.outsideDx) + Math.abs(edge.outsideDy) === 1);
+                    const insideCells = new Set(exactSourceCells.map((edge) => `${edge.insideColumn},${edge.insideRow}`));
+                    const outsideCells = new Set(exactSourceCells.map((edge) =>
+                        `${edge.insideColumn + edge.outsideDx},${edge.insideRow + edge.outsideDy}`));
+                    const inkSupported = members.filter((edge) => edge.exactStructuralBoundary === true
+                        || edge.surfaceBoundaryCorroboration === 'exact-structural'
+                        || edge.surfaceBoundaryCorroboration === 'strong-local-ink'
+                        || edge.surfaceBoundaryCorroboration === 'moderate-local-ink');
+                    const quietPairs = exactSourceCells.filter((edge) => edge.suppressedOpenPaper === true
+                        && Number(edge.boundaryInk) <= .30);
+                    const endpointPair = residualRunPairings.find((entry) => entry.runId === run.id);
+                    const endpoints = (endpointPair?.endpointIds || []).map((id) =>
+                        residualTerminations.find((entry) => entry.id === id)).filter(Boolean);
+                    const sourceConsistent = sourceIds.length === 1 && endpoints.length === 2
+                        && endpoints.every((entry) =>
+                            residualPathProvenance[entry.pathIndex - 1]?.verifiedComponentId === sourceIds[0]);
+                    const completeProvenance = exactSourceCells.length === members.length;
+                    return { runId: run.id, edges: members.length, sourceComponentCount: sourceIds.length,
+                        sourceConsistent, provenanceRecorded: exactSourceCells.length,
+                        distinctInsideCells: insideCells.size, distinctOutsideCells: outsideCells.size,
+                        quietPairs: quietPairs.length, inkSupportedEdges: inkSupported.length,
+                        classification: !completeProvenance ? 'incomplete-cell-provenance'
+                            : !sourceConsistent ? 'source-or-endpoint-unverified'
+                            : inkSupported.length ? 'mixed-frontier-requires-local-review'
+                            : quietPairs.length === members.length
+                                ? 'recovered-surface-frontier-not-illustrated-wall'
+                                : 'frontier-evidence-unresolved',
+                        diagnosticOnly: true };
+                });
+                const classifiedEdges = runs.reduce((total, run) => total + run.edges, 0);
+                const quietEdges = runs.reduce((total, run) => total + run.quietPairs, 0);
+                const corroboratedEdges = runs.reduce((total, run) => total + run.inkSupportedEdges, 0);
+                return { diagnosticOnly: true, runs, classifiedEdges, quietEdges,
+                    corroboratedEdges, originalSuppressedEdges: stillSuppressed.length,
+                    retainedPerimeterEdges: reconstructedIllustratedSurfaceEdges.length,
+                    // Classification is descriptive only: no synthetic wall, closure,
+                    // floor admission, review object or persistent draft is created.
+                    separationClassification: runs.every((run) =>
+                        run.classification === 'recovered-surface-frontier-not-illustrated-wall')
+                        ? 'quiet-surface-frontier-distinct-from-illustrated-wall-evidence'
+                        : 'mixed-or-incomplete-frontier-evidence',
+                    wallCertification: false, admittedEdges: 0, restoredRuns: 0 };
+            })();
             // A bounded visual witness only: no suppressed edge is admitted or saved.
             const residualPairedRunSegments = suppressedRuns.filter((run) =>
                 residualRunPairings[run.id - 1].classification === 'two-distinct-endpoints')
@@ -7142,6 +7196,7 @@
                     residualRunPairings,
                     residualClosureAudit,
                     residualCycleGeometryAudit,
+                    residualExteriorFrontierAudit,
                     residualUnmatchedEndpointIds,
                     residualPairedRunSegments,
                     bridgeRepresented,
@@ -7610,6 +7665,10 @@
                 const coincident = cartographyEvidenceAudit.residualCoincidentEndpointGroups || [];
                 const closure = cartographyEvidenceAudit.residualClosureAudit;
                 const geometry = cartographyEvidenceAudit.residualCycleGeometryAudit;
+                const frontier = cartographyEvidenceAudit.residualExteriorFrontierAudit;
+                cartographyAuditRuntimeWitness.dataset.cartographyFrontier = frontier
+                    ? `G.5Z.29 frontier · ${frontier.separationClassification} · ${frontier.runs.length} runs · ${frontier.classifiedEdges} classified edges / ${frontier.originalSuppressedEdges} suppressed · ${frontier.quietEdges} quiet pairs · ${frontier.corroboratedEdges} corroborated edges · ${frontier.runs.map((run) => `R${run.runId}:${run.edges}e/${run.provenanceRecorded} provenance/${run.distinctInsideCells} inside cells/${run.distinctOutsideCells} outside cells/${run.quietPairs} quiet/${run.inkSupportedEdges} ink-supported/${run.classification}`).join(' · ')} · wall certified ${frontier.wallCertification} · ${frontier.admittedEdges} edges admitted · ${frontier.restoredRuns} runs restored`
+                    : 'G.5Z.29 frontier unavailable';
                 cartographyAuditRuntimeWitness.dataset.cartographyGeometry = geometry
                     ? `G.5Z.28 geometry · ${geometry.classification} · graph candidate ${geometry.cycleCandidate} · simple grid cycle ${geometry.combinatorialSimple} · ${geometry.duplicateEdges} duplicate edges · ${geometry.branchVertices} non-degree-two vertices · ${geometry.interiorCrossings} interior crossings · ${geometry.runs.map((run) => `R${run.runId}:${run.edges}e/${run.quietEdges}quiet/maxInk${run.maximumInk.toFixed(3)}/${run.exteriorClassification}/${run.geometryClassification}`).join(' · ')} · geometry certified ${geometry.geometryCertified} · exterior separation certified ${geometry.exteriorSeparationCertified} · ${geometry.admittedEdges} edges admitted · ${geometry.restoredRuns} runs restored`
                     : 'G.5Z.28 geometry unavailable';
@@ -7624,7 +7683,7 @@
                 const connectivityWitness = `G.5Z.23 connectivity · ${endpointRecords.length} endpoints · ${paired.length} two-endpoint connected runs · ${unmatched.length} no-adjacent-run endpoints [${unmatched.join(',')}] · ${pairings.map((run) => `R${run.runId}:${run.edges}e/E[${run.endpointIds.join(',')}]/${run.classification}`).join(' · ')} · ${endpointDetails}`;
                 cartographyAuditRuntimeWitness.dataset.cartographyConnectivity = connectivityWitness;
             }
-            reportCartographyAuditRuntime(`${cartographyAuditRuntimeWitness.dataset.cartographyGeometry || 'G.5Z.28 geometry unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyClosure || 'G.5Z.27 closure unavailable'} · ${assemblyWitness} · ${cartographyAuditRuntimeWitness.dataset.cartographyProvenance || 'G.5Z.25 provenance unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyCoincidence || 'G.5Z.24 coincidence unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyConnectivity || 'G.5Z.23 connectivity unavailable'} · audit callback ${completedEvidenceAudit ? 'received' : 'MISSING'} · endpoint records ${Array.isArray(endpointRecords) ? endpointRecords.length : 'MISSING'} / expected ${expectedEndpoints ?? 'MISSING'} · SVG markers ${markerCount} · ${Array.isArray(endpointRecords) ? endpointRecords.map((record) => `${record.id}:P${record.pathIndex}/${record.reason}/${record.suppressedRunEdges}e`).join(', ') : 'no endpoint records published'}`);
+            reportCartographyAuditRuntime(`${cartographyAuditRuntimeWitness.dataset.cartographyFrontier || 'G.5Z.29 frontier unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyGeometry || 'G.5Z.28 geometry unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyClosure || 'G.5Z.27 closure unavailable'} · ${assemblyWitness} · ${cartographyAuditRuntimeWitness.dataset.cartographyProvenance || 'G.5Z.25 provenance unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyCoincidence || 'G.5Z.24 coincidence unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyConnectivity || 'G.5Z.23 connectivity unavailable'} · audit callback ${completedEvidenceAudit ? 'received' : 'MISSING'} · endpoint records ${Array.isArray(endpointRecords) ? endpointRecords.length : 'MISSING'} / expected ${expectedEndpoints ?? 'MISSING'} · SVG markers ${markerCount} · ${Array.isArray(endpointRecords) ? endpointRecords.map((record) => `${record.id}:P${record.pathIndex}/${record.reason}/${record.suppressedRunEdges}e`).join(', ') : 'no endpoint records published'}`);
             if (cartographySuggestions.length === 0 && cartographyAssistantStatus) {
                 cartographyAssistantStatus.textContent = cartographyEvidenceAudit
                     ? `Evidence Audit · no emitted contour objects · ${cartographyEvidenceAudit.rawChains} raw chains · ${cartographyEvidenceAudit.semanticRejected} semantic rejects · ${cartographyEvidenceAudit.inferredPerimeters} inferred perimeter edges.`
