@@ -6067,6 +6067,93 @@
                     ])))
                 }));
 
+            // IV.30.1G.5Z.26 — Source-proven, topology-safe local path assembly.
+            // Only exact coincident endpoints on the same uniquely identified original
+            // surface component qualify. No suppressed perimeter edges are restored.
+            const localAssemblyPointKey = (point) => `${point.x},${point.y}`;
+            const originalComponentBySegment = new Map();
+            illustratedSurfaceBoundaryTopology.forEach((edge) => {
+                const key = completedEdgeKey(edge.a, edge.b);
+                if (!originalComponentBySegment.has(key)) originalComponentBySegment.set(key, new Set());
+                originalComponentBySegment.get(key).add(edge.surfaceComponentId);
+            });
+            const localAssemblyProvenance = (path) => {
+                const points = path.points || [];
+                const ids = new Set();
+                for (let i = 1; i < points.length; i += 1) {
+                    const components = originalComponentBySegment.get(completedEdgeKey(points[i - 1], points[i]));
+                    if (!components || components.size !== 1) return null;
+                    components.forEach((id) => ids.add(id));
+                    if (ids.size !== 1) return null;
+                }
+                return ids.size === 1 ? [...ids][0] : null;
+            };
+            const localAssemblyAudit = { candidates: 0, joined: 0, capRejected: 0,
+                sourceRejected: 0, topologyRejected: 0, edgeCountBefore: promotedReconstructedSurfaceSuggestions
+                    .reduce((sum, path) => sum + (path.points || []).length - 1, 0) };
+            let localAssemblyChanged = true;
+            while (localAssemblyChanged) {
+                localAssemblyChanged = false;
+                const endpoints = new Map();
+                promotedReconstructedSurfaceSuggestions.forEach((path, index) => {
+                    const points = path.points || [];
+                    if (points.length < 2 || localAssemblyPointKey(points[0]) === localAssemblyPointKey(points[points.length - 1])) return;
+                    [points[0], points[points.length - 1]].forEach((point) => {
+                        const key = localAssemblyPointKey(point);
+                        if (!endpoints.has(key)) endpoints.set(key, []);
+                        endpoints.get(key).push(index);
+                    });
+                });
+                for (const [key, members] of endpoints) {
+                    if (members.length !== 2 || members[0] === members[1]) continue;
+                    const [leftIndex, rightIndex] = members;
+                    const left = promotedReconstructedSurfaceSuggestions[leftIndex];
+                    const right = promotedReconstructedSurfaceSuggestions[rightIndex];
+                    localAssemblyAudit.candidates += 1;
+                    const leftSource = localAssemblyProvenance(left);
+                    if (leftSource === null || leftSource !== localAssemblyProvenance(right)
+                        || left.vertexCapSegmented || right.vertexCapSegmented) {
+                        localAssemblyAudit.sourceRejected += 1; continue;
+                    }
+                    const a = localAssemblyPointKey(left.points[left.points.length - 1]) === key
+                        ? left.points : left.points.slice().reverse();
+                    const b = localAssemblyPointKey(right.points[0]) === key
+                        ? right.points : right.points.slice().reverse();
+                    const joined = a.concat(b.slice(1));
+                    if (joined.length > maximumPathVertices) {
+                        localAssemblyAudit.capRejected += 1; continue;
+                    }
+                    const visitedVertices = new Set();
+                    const visitedEdges = new Set();
+                    let unsafe = false;
+                    joined.forEach((point, i) => {
+                        const vertex = localAssemblyPointKey(point);
+                        if (visitedVertices.has(vertex)) unsafe = true;
+                        visitedVertices.add(vertex);
+                        if (i) {
+                            const edge = completedEdgeKey(joined[i - 1], point);
+                            if (visitedEdges.has(edge)) unsafe = true;
+                            visitedEdges.add(edge);
+                        }
+                    });
+                    if (unsafe) { localAssemblyAudit.topologyRejected += 1; continue; }
+                    const merged = { ...left, points: joined,
+                        x1: joined[0].x, y1: joined[0].y,
+                        x2: joined[joined.length - 1].x, y2: joined[joined.length - 1].y,
+                        inferredPerimeterEdgeCount: joined.length - 1,
+                        localSourceProvenAssembly: true,
+                        recoveryEvidence: Array.from(new Set((left.recoveryEvidence || [])
+                            .concat(right.recoveryEvidence || [], ['source-proven-local-continuity', 'exact-endpoint-no-gap']))) };
+                    promotedReconstructedSurfaceSuggestions[Math.min(leftIndex, rightIndex)] = merged;
+                    promotedReconstructedSurfaceSuggestions.splice(Math.max(leftIndex, rightIndex), 1);
+                    localAssemblyAudit.joined += 1;
+                    localAssemblyChanged = true;
+                    break;
+                }
+            }
+            localAssemblyAudit.edgeCountAfter = promotedReconstructedSurfaceSuggestions
+                .reduce((sum, path) => sum + (path.points || []).length - 1, 0);
+
             // IV.30.1G.5Z.2 — Completed Perimeter Path Representation Audit.
             // Observe, but do not alter, the G.5Z completed perimeter as it becomes
             // reviewable paths. These counters deliberately use source edge counts so a
@@ -6887,6 +6974,7 @@
                     illustratedSurfaceLongGapExactLengths: illustratedSurfaceLongGapExactLengths.slice().sort((a,b) => a-b),
                     illustratedSurfaceLongGapGeometry: illustratedSurfaceLongGapGeometry.slice().sort((a,b) => a.edges - b.edges),
                     illustratedSurfacePerimeterEdges,
+                    localAssemblyAudit,
                     reconstructedSurfacePromotedChains: promotedReconstructedSurfaceSuggestions.length,
                     reconstructedSurfaceAssembledEdges,
                     reconstructedSurfaceUnassembledEdges: reconstructedSurfaceUnassembledEdgeCount,
@@ -7400,6 +7488,7 @@
                 const endpointDetails = endpointRecords.map((record) =>
                     `${record.id}:P${record.pathIndex}/${record.endpointRole}@(${record.gridPoint.x},${record.gridPoint.y})/t(${record.tangent.x},${record.tangent.y})/R[${record.suppressedRunIds.join(',') || '-'}]`).join(' · ');
                 const coincident = cartographyEvidenceAudit.residualCoincidentEndpointGroups || [];
+                const assemblyWitness = `G.5Z.26 assembly · ${cartographyEvidenceAudit.localAssemblyAudit?.candidates ?? 0} candidates · ${cartographyEvidenceAudit.localAssemblyAudit?.joined ?? 0} joins · ${cartographyEvidenceAudit.localAssemblyAudit?.sourceRejected ?? 0} source rejects · ${cartographyEvidenceAudit.localAssemblyAudit?.capRejected ?? 0} cap rejects · ${cartographyEvidenceAudit.localAssemblyAudit?.topologyRejected ?? 0} topology rejects · ${cartographyEvidenceAudit.localAssemblyAudit?.edgeCountBefore ?? 0}/${cartographyEvidenceAudit.localAssemblyAudit?.edgeCountAfter ?? 0} edges preserved`;
                 const provenanceWitness = `G.5Z.25 provenance · ${coincident.length} groups · ${coincident.map((group) => `E[${group.endpointIds.join(',')}]/${group.sourceClassification}/components[${group.provenance.map((item) => `P${item.pathIndex}:${item.verifiedComponentId ?? '?'}/${item.segmentCount}e/${item.missingEdges}missing/${item.ambiguousEdges}ambiguous`).join(';')}]`).join(' · ')}`;
                 cartographyAuditRuntimeWitness.dataset.cartographyProvenance = provenanceWitness;
                 const continuityWitness = `G.5Z.24 coincidence · ${coincident.length} coordinate groups · ${coincident.map((group) => `E[${group.endpointIds.join(',')}]@(${group.point.x},${group.point.y})/P[${group.pathIndices.join(',')}]/${group.classification}/source-${group.sharedSourceEvidence ? 'shared' : 'unverified'}/neighbours[${group.pathEdges.map((edge) => `${edge.id}:${edge.neighbour ? `${edge.neighbour.x},${edge.neighbour.y}` : '-'}`).join(';')}]`).join(' · ')}`;
@@ -7407,7 +7496,7 @@
                 const connectivityWitness = `G.5Z.23 connectivity · ${endpointRecords.length} endpoints · ${paired.length} two-endpoint connected runs · ${unmatched.length} no-adjacent-run endpoints [${unmatched.join(',')}] · ${pairings.map((run) => `R${run.runId}:${run.edges}e/E[${run.endpointIds.join(',')}]/${run.classification}`).join(' · ')} · ${endpointDetails}`;
                 cartographyAuditRuntimeWitness.dataset.cartographyConnectivity = connectivityWitness;
             }
-            reportCartographyAuditRuntime(`${cartographyAuditRuntimeWitness.dataset.cartographyProvenance || 'G.5Z.25 provenance unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyCoincidence || 'G.5Z.24 coincidence unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyConnectivity || 'G.5Z.23 connectivity unavailable'} · audit callback ${completedEvidenceAudit ? 'received' : 'MISSING'} · endpoint records ${Array.isArray(endpointRecords) ? endpointRecords.length : 'MISSING'} / expected ${expectedEndpoints ?? 'MISSING'} · SVG markers ${markerCount} · ${Array.isArray(endpointRecords) ? endpointRecords.map((record) => `${record.id}:P${record.pathIndex}/${record.reason}/${record.suppressedRunEdges}e`).join(', ') : 'no endpoint records published'}`);
+            reportCartographyAuditRuntime(`${assemblyWitness} · ${cartographyAuditRuntimeWitness.dataset.cartographyProvenance || 'G.5Z.25 provenance unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyCoincidence || 'G.5Z.24 coincidence unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyConnectivity || 'G.5Z.23 connectivity unavailable'} · audit callback ${completedEvidenceAudit ? 'received' : 'MISSING'} · endpoint records ${Array.isArray(endpointRecords) ? endpointRecords.length : 'MISSING'} / expected ${expectedEndpoints ?? 'MISSING'} · SVG markers ${markerCount} · ${Array.isArray(endpointRecords) ? endpointRecords.map((record) => `${record.id}:P${record.pathIndex}/${record.reason}/${record.suppressedRunEdges}e`).join(', ') : 'no endpoint records published'}`);
             if (cartographySuggestions.length === 0 && cartographyAssistantStatus) {
                 cartographyAssistantStatus.textContent = cartographyEvidenceAudit
                     ? `Evidence Audit · no emitted contour objects · ${cartographyEvidenceAudit.rawChains} raw chains · ${cartographyEvidenceAudit.semanticRejected} semantic rejects · ${cartographyEvidenceAudit.inferredPerimeters} inferred perimeter edges.`
