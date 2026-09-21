@@ -7481,6 +7481,7 @@
             const endpointRecords = cartographyEvidenceAudit?.residualTerminations;
             const markerCount = cartographySuggestionLayer?.querySelectorAll('[data-audit-termination]').length ?? 0;
             const expectedEndpoints = cartographyEvidenceAudit?.reconstructedSurfaceOpenChainTerminations;
+            let assemblyWitness = 'G.5Z.26 assembly · audit unavailable';
             if (cartographyEvidenceAudit && Array.isArray(endpointRecords)) {
                 const pairings = cartographyEvidenceAudit.residualRunPairings || [];
                 const paired = pairings.filter((run) => run.classification === 'two-distinct-endpoints');
@@ -7488,7 +7489,7 @@
                 const endpointDetails = endpointRecords.map((record) =>
                     `${record.id}:P${record.pathIndex}/${record.endpointRole}@(${record.gridPoint.x},${record.gridPoint.y})/t(${record.tangent.x},${record.tangent.y})/R[${record.suppressedRunIds.join(',') || '-'}]`).join(' · ');
                 const coincident = cartographyEvidenceAudit.residualCoincidentEndpointGroups || [];
-                const assemblyWitness = `G.5Z.26 assembly · ${cartographyEvidenceAudit.localAssemblyAudit?.candidates ?? 0} candidates · ${cartographyEvidenceAudit.localAssemblyAudit?.joined ?? 0} joins · ${cartographyEvidenceAudit.localAssemblyAudit?.sourceRejected ?? 0} source rejects · ${cartographyEvidenceAudit.localAssemblyAudit?.capRejected ?? 0} cap rejects · ${cartographyEvidenceAudit.localAssemblyAudit?.topologyRejected ?? 0} topology rejects · ${cartographyEvidenceAudit.localAssemblyAudit?.edgeCountBefore ?? 0}/${cartographyEvidenceAudit.localAssemblyAudit?.edgeCountAfter ?? 0} edges preserved`;
+                assemblyWitness = `G.5Z.26 assembly · ${cartographyEvidenceAudit.localAssemblyAudit?.candidates ?? 0} candidates · ${cartographyEvidenceAudit.localAssemblyAudit?.joined ?? 0} joins · ${cartographyEvidenceAudit.localAssemblyAudit?.sourceRejected ?? 0} source rejects · ${cartographyEvidenceAudit.localAssemblyAudit?.capRejected ?? 0} cap rejects · ${cartographyEvidenceAudit.localAssemblyAudit?.topologyRejected ?? 0} topology rejects · ${cartographyEvidenceAudit.localAssemblyAudit?.edgeCountBefore ?? 0}/${cartographyEvidenceAudit.localAssemblyAudit?.edgeCountAfter ?? 0} edges preserved`;
                 const provenanceWitness = `G.5Z.25 provenance · ${coincident.length} groups · ${coincident.map((group) => `E[${group.endpointIds.join(',')}]/${group.sourceClassification}/components[${group.provenance.map((item) => `P${item.pathIndex}:${item.verifiedComponentId ?? '?'}/${item.segmentCount}e/${item.missingEdges}missing/${item.ambiguousEdges}ambiguous`).join(';')}]`).join(' · ')}`;
                 cartographyAuditRuntimeWitness.dataset.cartographyProvenance = provenanceWitness;
                 const continuityWitness = `G.5Z.24 coincidence · ${coincident.length} coordinate groups · ${coincident.map((group) => `E[${group.endpointIds.join(',')}]@(${group.point.x},${group.point.y})/P[${group.pathIndices.join(',')}]/${group.classification}/source-${group.sharedSourceEvidence ? 'shared' : 'unverified'}/neighbours[${group.pathEdges.map((edge) => `${edge.id}:${edge.neighbour ? `${edge.neighbour.x},${edge.neighbour.y}` : '-'}`).join(';')}]`).join(' · ')}`;
