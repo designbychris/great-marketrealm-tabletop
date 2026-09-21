@@ -19,7 +19,7 @@ final class CoincidentEndpointSourceProvenanceAuditRegressionTest extends TestCa
         self::assertStringContainsString("'same-source-local-continuation-candidate'", $source);
         self::assertStringContainsString('provenance, verifiedSameComponent, sourceClassification,', $source);
         self::assertStringContainsString('G.5Z.25 provenance', $source);
-        self::assertStringContainsString('const maximumReviewObjects = 200;', $source);
+        self::assertStringContainsString('const maximumReviewSuggestions = 200;', $source);
         self::assertLessThan(strpos($source, 'const residualCoincidentEndpointGroups = []'), strpos($source, 'const residualPathProvenance ='));
     }
 }
