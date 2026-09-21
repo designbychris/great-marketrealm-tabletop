@@ -2446,6 +2446,18 @@
     const cartographyApply = document.querySelector('[data-cartography-assistant-apply]');
     const cartographyClear = document.querySelector('[data-cartography-assistant-clear]');
     const cartographyAssistantStatus = document.querySelector('[data-cartography-assistant-status]');
+    // IV.30.1G.5Z.22B: independent runtime witness, not part of the long status text.
+    const cartographyAuditRuntimeWitness = document.createElement('div');
+    cartographyAuditRuntimeWitness.dataset.cartographyAuditRuntime = 'G.5Z.22B';
+    cartographyAuditRuntimeWitness.setAttribute('role', 'status');
+    cartographyAuditRuntimeWitness.style.cssText = 'display:none;padding:6px 9px;margin:5px 0;border:2px solid #7b245d;background:#fff4cc;color:#501638;font-weight:700;white-space:normal;overflow-wrap:anywhere;';
+    if (cartographyAssistantStatus) cartographyAssistantStatus.before(cartographyAuditRuntimeWitness);
+    const reportCartographyAuditRuntime = (message) => {
+        if (!cartographyAssistantStatus) return;
+        cartographyAuditRuntimeWitness.style.display = 'block';
+        cartographyAuditRuntimeWitness.textContent = `G.5Z.22B runtime · ${message}`;
+    };
+
     const cartographyReview = document.querySelector('[data-cartography-assistant-review]');
     let visionBarriers = [];
     let visionTool = null;
@@ -2644,6 +2656,7 @@
     const clearCartographyDraft = (message = 'Draft cleared. No cartography suggestions were saved.') => {
         cartographySuggestions = [];
         cartographyEvidenceAudit = null;
+        cartographyAuditRuntimeWitness.style.display = 'none';
         if (cartographyReview) cartographyReview.replaceChildren();
         if (cartographySuggestionLayer) cartographySuggestionLayer.replaceChildren();
         updateCartographyDraftControls();
@@ -7207,6 +7220,7 @@
         if (detail === 'audit') {
             const existing = new Set(visionBarriers.map(cartographySuggestionKey));
             cartographyEvidenceAudit = null;
+            reportCartographyAuditRuntime('updated JavaScript executing · audit started');
             let completedEvidenceAudit = null;
             cartographySuggestions = livingContourCandidates({
                 evidenceAudit: true,
@@ -7219,6 +7233,11 @@
             // review, rather than relying on mutable state from nested analysis passes.
             if (completedEvidenceAudit) cartographyEvidenceAudit = completedEvidenceAudit;
             renderCartographyReview();
+            // Separate from the legacy summary: its text can be replaced by other UI paths.
+            const endpointRecords = cartographyEvidenceAudit?.residualTerminations;
+            const markerCount = cartographySuggestionLayer?.querySelectorAll('[data-audit-termination]').length ?? 0;
+            const expectedEndpoints = cartographyEvidenceAudit?.reconstructedSurfaceOpenChainTerminations;
+            reportCartographyAuditRuntime(`audit callback ${completedEvidenceAudit ? 'received' : 'MISSING'} · endpoint records ${Array.isArray(endpointRecords) ? endpointRecords.length : 'MISSING'} / expected ${expectedEndpoints ?? 'MISSING'} · SVG markers ${markerCount} · ${Array.isArray(endpointRecords) ? endpointRecords.map((record) => `${record.id}:P${record.pathIndex}/${record.reason}/${record.suppressedRunEdges}e`).join(', ') : 'no endpoint records published'}`);
             if (cartographySuggestions.length === 0 && cartographyAssistantStatus) {
                 cartographyAssistantStatus.textContent = cartographyEvidenceAudit
                     ? `Evidence Audit · no emitted contour objects · ${cartographyEvidenceAudit.rawChains} raw chains · ${cartographyEvidenceAudit.semanticRejected} semantic rejects · ${cartographyEvidenceAudit.inferredPerimeters} inferred perimeter edges.`

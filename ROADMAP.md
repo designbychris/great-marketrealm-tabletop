@@ -1459,3 +1459,8 @@ Diagnostic-only endpoint inventory of the final promoted reconstructed-surface p
 
 - The Evidence Audit status begins with a versioned termination-record count and individual endpoint summaries so deployed-code visibility is distinguishable from a missing or truncated trailing status section. A missing record array is reported explicitly rather than silently treated as zero.
 - Numbered SVG endpoint markers render after review suggestions to remain visible above wall strokes; they remain audit-only, non-interactive, and cleared with the diagnostic layer. No recovered geometry, review admission, wall semantics, or persistence changes.
+
+### IV.30.1G.5Z.22B — Runtime Diagnostic Execution & Asset Verification
+
+- Add a separate, visible G.5Z.22B runtime witness before the Evidence Audit status. It reports when the deployed JavaScript begins the audit, whether the completed audit callback arrived, endpoint-record count versus expected terminations, and the number of numbered SVG markers actually present after rendering.
+- The witness is independent of the long legacy audit status and clears with the draft. This phase changes no floor recovery, boundary admission, review capacity, saved barriers, or wall geometry.
