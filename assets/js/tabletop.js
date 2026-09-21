@@ -6607,6 +6607,52 @@
             });
             const residualUnmatchedEndpointIds = residualTerminations
                 .filter((record) => record.suppressedRunIds.length === 0).map((record) => record.id);
+            // G.5Z.27: diagnostic-only graph of surviving open paths and suppressed runs.
+            // A graph cycle is a closure POSSIBILITY, never evidence for admitting paper edges.
+            const residualClosureAudit = (() => {
+                const links = residualRunPairings.map((run) => {
+                    const endpoints = run.endpointIds.map((id) => residualTerminations.find((entry) => entry.id === id)).filter(Boolean);
+                    const paths = [...new Set(endpoints.map((entry) => entry.pathIndex))];
+                    const classification = run.classification !== 'two-distinct-endpoints' ? 'unpaired-run'
+                        : paths.length !== 2 ? 'same-path-or-ambiguous-closure'
+                        : run.edges >= 64 ? 'extended-unsupported-frontier'
+                        : 'short-unsupported-frontier';
+                    return { runId: run.runId, edges: run.edges, endpointIds: run.endpointIds.slice(),
+                        pathIndices: paths, sourceComponentId: run.sourceComponentId, classification,
+                        admission: 'suppressed-diagnostic-only' };
+                });
+                const nodes = [...new Set(residualTerminations.map((entry) => entry.pathIndex))];
+                const adjacency = new Map(nodes.map((node) => [node, new Set()]));
+                links.filter((link) => link.pathIndices.length === 2 && link.classification !== 'unpaired-run')
+                    .forEach((link) => { const [a, b] = link.pathIndices;
+                        adjacency.get(a)?.add(b); adjacency.get(b)?.add(a); });
+                const seen = new Set();
+                const components = [];
+                nodes.forEach((node) => {
+                    if (seen.has(node)) return;
+                    const stack = [node], paths = [];
+                    while (stack.length) { const current = stack.pop();
+                        if (seen.has(current)) continue;
+                        seen.add(current); paths.push(current);
+                        (adjacency.get(current) || []).forEach((next) => { if (!seen.has(next)) stack.push(next); });
+                    }
+                    const pathSet = new Set(paths);
+                    const componentLinks = links.filter((link) => link.pathIndices.some((index) => pathSet.has(index)));
+                    const degrees = paths.map((index) => componentLinks.filter((link) => link.pathIndices.includes(index)).length);
+                    const paired = componentLinks.every((link) => link.pathIndices.length === 2 &&
+                        link.classification !== 'unpaired-run');
+                    const closureFeasible = paired && degrees.every((degree) => degree === 2) &&
+                        componentLinks.length === paths.length;
+                    components.push({ pathIndices: paths.sort((a, b) => a - b),
+                        runIds: componentLinks.map((link) => link.runId),
+                        classification: closureFeasible ? 'graph-cycle-only-not-geometry-certified'
+                            : 'open-or-ambiguous-network', closureFeasible });
+                });
+                return { diagnosticOnly: true, openPathCount: nodes.length,
+                    endpointCount: residualTerminations.length, runCount: links.length,
+                    links, components, graphClosureCandidates: components.filter((item) => item.closureFeasible).length,
+                    admittedEdges: 0, restoredRuns: 0 };
+            })();
             // A bounded visual witness only: no suppressed edge is admitted or saved.
             const residualPairedRunSegments = suppressedRuns.filter((run) =>
                 residualRunPairings[run.id - 1].classification === 'two-distinct-endpoints')
@@ -7023,6 +7069,7 @@
                     residualTerminations,
                     residualCoincidentEndpointGroups,
                     residualRunPairings,
+                    residualClosureAudit,
                     residualUnmatchedEndpointIds,
                     residualPairedRunSegments,
                     bridgeRepresented,
@@ -7489,6 +7536,10 @@
                 const endpointDetails = endpointRecords.map((record) =>
                     `${record.id}:P${record.pathIndex}/${record.endpointRole}@(${record.gridPoint.x},${record.gridPoint.y})/t(${record.tangent.x},${record.tangent.y})/R[${record.suppressedRunIds.join(',') || '-'}]`).join(' · ');
                 const coincident = cartographyEvidenceAudit.residualCoincidentEndpointGroups || [];
+                const closure = cartographyEvidenceAudit.residualClosureAudit;
+                cartographyAuditRuntimeWitness.dataset.cartographyClosure = closure
+                    ? `G.5Z.27 closure · ${closure.openPathCount} open paths · ${closure.endpointCount} endpoints · ${closure.runCount} suppressed runs · ${closure.components.length} graph components · ${closure.graphClosureCandidates} graph-cycle candidates (NOT geometry-certified) · ${closure.links.map((link) => `R${link.runId}:${link.edges}e/P[${link.pathIndices.join(',')}]/${link.classification}`).join(' · ')} · ${closure.components.map((component) => `C[P${component.pathIndices.join(',P')}]/R[${component.runIds.join(',')}]/${component.classification}`).join(' · ')} · ${closure.admittedEdges} edges admitted · ${closure.restoredRuns} runs restored`
+                    : 'G.5Z.27 closure unavailable';
                 assemblyWitness = `G.5Z.26 assembly · ${cartographyEvidenceAudit.localAssemblyAudit?.candidates ?? 0} candidates · ${cartographyEvidenceAudit.localAssemblyAudit?.joined ?? 0} joins · ${cartographyEvidenceAudit.localAssemblyAudit?.sourceRejected ?? 0} source rejects · ${cartographyEvidenceAudit.localAssemblyAudit?.capRejected ?? 0} cap rejects · ${cartographyEvidenceAudit.localAssemblyAudit?.topologyRejected ?? 0} topology rejects · ${cartographyEvidenceAudit.localAssemblyAudit?.edgeCountBefore ?? 0}/${cartographyEvidenceAudit.localAssemblyAudit?.edgeCountAfter ?? 0} edges preserved`;
                 const provenanceWitness = `G.5Z.25 provenance · ${coincident.length} groups · ${coincident.map((group) => `E[${group.endpointIds.join(',')}]/${group.sourceClassification}/components[${group.provenance.map((item) => `P${item.pathIndex}:${item.verifiedComponentId ?? '?'}/${item.segmentCount}e/${item.missingEdges}missing/${item.ambiguousEdges}ambiguous`).join(';')}]`).join(' · ')}`;
                 cartographyAuditRuntimeWitness.dataset.cartographyProvenance = provenanceWitness;
@@ -7497,7 +7548,7 @@
                 const connectivityWitness = `G.5Z.23 connectivity · ${endpointRecords.length} endpoints · ${paired.length} two-endpoint connected runs · ${unmatched.length} no-adjacent-run endpoints [${unmatched.join(',')}] · ${pairings.map((run) => `R${run.runId}:${run.edges}e/E[${run.endpointIds.join(',')}]/${run.classification}`).join(' · ')} · ${endpointDetails}`;
                 cartographyAuditRuntimeWitness.dataset.cartographyConnectivity = connectivityWitness;
             }
-            reportCartographyAuditRuntime(`${assemblyWitness} · ${cartographyAuditRuntimeWitness.dataset.cartographyProvenance || 'G.5Z.25 provenance unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyCoincidence || 'G.5Z.24 coincidence unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyConnectivity || 'G.5Z.23 connectivity unavailable'} · audit callback ${completedEvidenceAudit ? 'received' : 'MISSING'} · endpoint records ${Array.isArray(endpointRecords) ? endpointRecords.length : 'MISSING'} / expected ${expectedEndpoints ?? 'MISSING'} · SVG markers ${markerCount} · ${Array.isArray(endpointRecords) ? endpointRecords.map((record) => `${record.id}:P${record.pathIndex}/${record.reason}/${record.suppressedRunEdges}e`).join(', ') : 'no endpoint records published'}`);
+            reportCartographyAuditRuntime(`${cartographyAuditRuntimeWitness.dataset.cartographyClosure || 'G.5Z.27 closure unavailable'} · ${assemblyWitness} · ${cartographyAuditRuntimeWitness.dataset.cartographyProvenance || 'G.5Z.25 provenance unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyCoincidence || 'G.5Z.24 coincidence unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyConnectivity || 'G.5Z.23 connectivity unavailable'} · audit callback ${completedEvidenceAudit ? 'received' : 'MISSING'} · endpoint records ${Array.isArray(endpointRecords) ? endpointRecords.length : 'MISSING'} / expected ${expectedEndpoints ?? 'MISSING'} · SVG markers ${markerCount} · ${Array.isArray(endpointRecords) ? endpointRecords.map((record) => `${record.id}:P${record.pathIndex}/${record.reason}/${record.suppressedRunEdges}e`).join(', ') : 'no endpoint records published'}`);
             if (cartographySuggestions.length === 0 && cartographyAssistantStatus) {
                 cartographyAssistantStatus.textContent = cartographyEvidenceAudit
                     ? `Evidence Audit · no emitted contour objects · ${cartographyEvidenceAudit.rawChains} raw chains · ${cartographyEvidenceAudit.semanticRejected} semantic rejects · ${cartographyEvidenceAudit.inferredPerimeters} inferred perimeter edges.`
