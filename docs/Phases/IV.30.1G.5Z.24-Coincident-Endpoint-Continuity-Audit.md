@@ -1,0 +1,3 @@
+# IV.30.1G.5Z.24 — Coincident Endpoint Continuity & Local Path Assembly Audit
+
+Diagnostic-only phase. Group the residual endpoints by exact existing grid vertex; record path identity, start/end role, adjacent existing path vertex, local tangent, available suppressed-neighbour source evidence, and vertex-cap split flag. Report coincident groups in the independent runtime witness. A matching coordinate does not authorize merging paths: source evidence derived from suppressed neighbours is incomplete and must be reported as unverified when absent. No paths or suppressed edges are admitted, merged, saved, or added to the review budget. Preserve the G.5Z.23 connected-run witness and the 200-object ceiling.

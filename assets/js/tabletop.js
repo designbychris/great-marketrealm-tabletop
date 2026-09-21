@@ -6426,6 +6426,48 @@
             });
 
 
+            // G.5Z.24: forensic-only exact coincident endpoint continuity audit.
+            // Endpoint roles and tangents describe the existing path, not permission to merge.
+            const residualCoincidentEndpointGroups = [];
+            const residualEndpointsByPoint = new Map();
+            residualTerminations.forEach((record) => {
+                const key = residualTerminationPointKey(record.point);
+                if (!residualEndpointsByPoint.has(key)) residualEndpointsByPoint.set(key, []);
+                residualEndpointsByPoint.get(key).push(record);
+            });
+            residualEndpointsByPoint.forEach((records, key) => {
+                if (records.length < 2) return;
+                const pathIndices = [...new Set(records.map((record) => record.pathIndex))];
+                const pathEdges = records.map((record) => {
+                    const path = promotedReconstructedSurfaceSuggestions[record.pathIndex - 1];
+                    const points = path.points || [];
+                    const neighbour = record.endpointRole === 'start' ? points[1] : points[points.length - 2];
+                    return { id: record.id, pathIndex: record.pathIndex,
+                        endpointRole: record.endpointRole,
+                        neighbour: neighbour ? { x: neighbour.x, y: neighbour.y } : null,
+                        tangent: { ...record.tangent },
+                        sourceComponentIds: [...record.sourceComponentIds],
+                        vertexCapSegmented: path.vertexCapSegmented === true };
+                });
+                const samePath = pathIndices.length !== records.length;
+                const directions = pathEdges.map((edge) => edge.neighbour
+                    ? `${edge.neighbour.x},${edge.neighbour.y}` : 'missing');
+                const duplicateOutgoingEdge = new Set(directions).size !== directions.length;
+                const sharedSourceEvidence = pathEdges.every((edge) => edge.sourceComponentIds.length > 0)
+                    && pathEdges.some((edge) => edge.sourceComponentIds.some((id) =>
+                        pathEdges.every((other) => other.sourceComponentIds.includes(id))));
+                const classification = records.length !== 2 ? 'ambiguous-multiple-endpoints'
+                    : samePath ? 'same-path-coincidence'
+                    : duplicateOutgoingEdge ? 'overlapping-local-edge'
+                    : !sharedSourceEvidence ? 'source-provenance-unverified'
+                    : pathEdges.some((edge) => edge.vertexCapSegmented) ? 'vertex-cap-split-review'
+                    : 'candidate-continuation-unverified';
+                residualCoincidentEndpointGroups.push({ key, point: { ...records[0].point },
+                    endpointIds: records.map((record) => record.id), pathIndices,
+                    pathEdges, sharedSourceEvidence, classification,
+                    diagnosticOnly: true });
+            });
+
             // Pair only endpoints touching the SAME connected suppressed run.
             // A shared edge count or visual proximity is never sufficient evidence.
             const residualRunPairings = suppressedRuns.map((run) => {
@@ -6853,6 +6895,7 @@
                     reconstructedSurfaceCollapsedEdges,
                     reconstructedSurfaceOpenChainTerminations: reconstructedSurfaceOpenChains * 2,
                     residualTerminations,
+                    residualCoincidentEndpointGroups,
                     residualRunPairings,
                     residualUnmatchedEndpointIds,
                     residualPairedRunSegments,
@@ -7318,10 +7361,13 @@
                 const unmatched = cartographyEvidenceAudit.residualUnmatchedEndpointIds || [];
                 const endpointDetails = endpointRecords.map((record) =>
                     `${record.id}:P${record.pathIndex}/${record.endpointRole}@(${record.gridPoint.x},${record.gridPoint.y})/t(${record.tangent.x},${record.tangent.y})/R[${record.suppressedRunIds.join(',') || '-'}]`).join(' · ');
+                const coincident = cartographyEvidenceAudit.residualCoincidentEndpointGroups || [];
+                const continuityWitness = `G.5Z.24 coincidence · ${coincident.length} coordinate groups · ${coincident.map((group) => `E[${group.endpointIds.join(',')}]@(${group.point.x},${group.point.y})/P[${group.pathIndices.join(',')}]/${group.classification}/source-${group.sharedSourceEvidence ? 'shared' : 'unverified'}/neighbours[${group.pathEdges.map((edge) => `${edge.id}:${edge.neighbour ? `${edge.neighbour.x},${edge.neighbour.y}` : '-'}`).join(';')}]`).join(' · ')}`;
+                cartographyAuditRuntimeWitness.dataset.cartographyCoincidence = continuityWitness;
                 const connectivityWitness = `G.5Z.23 connectivity · ${endpointRecords.length} endpoints · ${paired.length} two-endpoint connected runs · ${unmatched.length} no-adjacent-run endpoints [${unmatched.join(',')}] · ${pairings.map((run) => `R${run.runId}:${run.edges}e/E[${run.endpointIds.join(',')}]/${run.classification}`).join(' · ')} · ${endpointDetails}`;
                 cartographyAuditRuntimeWitness.dataset.cartographyConnectivity = connectivityWitness;
             }
-            reportCartographyAuditRuntime(`${cartographyAuditRuntimeWitness.dataset.cartographyConnectivity || 'G.5Z.23 connectivity unavailable'} · audit callback ${completedEvidenceAudit ? 'received' : 'MISSING'} · endpoint records ${Array.isArray(endpointRecords) ? endpointRecords.length : 'MISSING'} / expected ${expectedEndpoints ?? 'MISSING'} · SVG markers ${markerCount} · ${Array.isArray(endpointRecords) ? endpointRecords.map((record) => `${record.id}:P${record.pathIndex}/${record.reason}/${record.suppressedRunEdges}e`).join(', ') : 'no endpoint records published'}`);
+            reportCartographyAuditRuntime(`${cartographyAuditRuntimeWitness.dataset.cartographyCoincidence || 'G.5Z.24 coincidence unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyConnectivity || 'G.5Z.23 connectivity unavailable'} · audit callback ${completedEvidenceAudit ? 'received' : 'MISSING'} · endpoint records ${Array.isArray(endpointRecords) ? endpointRecords.length : 'MISSING'} / expected ${expectedEndpoints ?? 'MISSING'} · SVG markers ${markerCount} · ${Array.isArray(endpointRecords) ? endpointRecords.map((record) => `${record.id}:P${record.pathIndex}/${record.reason}/${record.suppressedRunEdges}e`).join(', ') : 'no endpoint records published'}`);
             if (cartographySuggestions.length === 0 && cartographyAssistantStatus) {
                 cartographyAssistantStatus.textContent = cartographyEvidenceAudit
                     ? `Evidence Audit · no emitted contour objects · ${cartographyEvidenceAudit.rawChains} raw chains · ${cartographyEvidenceAudit.semanticRejected} semantic rejects · ${cartographyEvidenceAudit.inferredPerimeters} inferred perimeter edges.`
