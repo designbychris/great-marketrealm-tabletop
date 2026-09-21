@@ -1,0 +1,5 @@
+# IV.30.1G.5Z.23 — Residual Endpoint Pairing & Suppressed Boundary Connectivity Audit
+
+Diagnostic-only addition. The existing 14 endpoint records gain exact grid coordinates, incoming/outgoing path tangent, and connected suppressed-run identifiers. Suppressed runs are grouped by exact shared vertices **within the same surface component**; identical edge counts do not establish a connection. A run is labelled `two-distinct-endpoints` only when exactly two endpoint records touch it at different grid vertices. Other labels explicitly retain ambiguity. The runtime witness reports each run and endpoint, including the four previously unmatched endpoints. Dashed cyan lines are non-interactive diagnostic witnesses for two-endpoint connected runs; they are not certified wall geometry, review objects, draft suggestions or saved barriers. No suppressed boundary is restored by this phase. The 200-review-object limit is unchanged.
+
+Verify with `php vendor/bin/phpunit --display-warnings`, clear caches, run Evidence Audit, and inspect the G.5Z.23 connectivity witness alongside the numbered markers. Shared-run identity alone does not certify that an opening should be closed.

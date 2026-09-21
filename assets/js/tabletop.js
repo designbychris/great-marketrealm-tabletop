@@ -2565,6 +2565,20 @@
         // IV.30.1G.5Z.22: numbered, non-interactive audit-only endpoint markers.
         // These are SVG annotations, never draft suggestions or saved barriers.
         if (cartographyDetail?.value === 'audit' && Array.isArray(cartographyEvidenceAudit?.residualTerminations)) {
+            // G.5Z.23: muted dashed witness for connected runs touching exactly
+            // two distinct endpoints. Diagnostic SVG only, never a wall suggestion.
+            (cartographyEvidenceAudit.residualPairedRunSegments || []).forEach((segment) => {
+                const start = barrierPoint(segment.a.x, segment.a.y);
+                const end = barrierPoint(segment.b.x, segment.b.y);
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', String(start.x)); line.setAttribute('y1', String(start.y));
+                line.setAttribute('x2', String(end.x)); line.setAttribute('y2', String(end.y));
+                line.setAttribute('stroke', '#167d91'); line.setAttribute('stroke-width', '1.5');
+                line.setAttribute('stroke-opacity', '0.55'); line.setAttribute('stroke-dasharray', '3 5');
+                line.setAttribute('pointer-events', 'none');
+                line.setAttribute('data-audit-suppressed-run', String(segment.runId));
+                fragment.append(line);
+            });
             cartographyEvidenceAudit.residualTerminations.forEach((record) => {
                 const projected = barrierPoint(record.point.x, record.point.y);
                 const marker = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -6345,6 +6359,34 @@
                 members.forEach((member) => suppressedRunSizeByIndex.set(member, members.size));
             });
             const suppressedRunSizeByEdgeKey = new Map(stillSuppressed.map((edge, index) => [edge.key, suppressedRunSizeByIndex.get(index)]));
+            // G.5Z.23: stable connected-run identity. Group by exact shared vertices
+            // AND source component; equal run lengths alone do not imply pairing.
+            const suppressedRunByIndex = new Map();
+            const suppressedRuns = [];
+            stillSuppressed.forEach((edge, index) => {
+                if (suppressedRunByIndex.has(index)) return;
+                const pending = [index], members = new Set();
+                while (pending.length) {
+                    const next = pending.pop();
+                    if (members.has(next)) continue;
+                    members.add(next);
+                    [stillSuppressed[next].a, stillSuppressed[next].b].forEach((point) =>
+                        (suppressedAdjacency.get(residualTerminationPointKey(point)) || []).forEach((candidate) => {
+                            if (!members.has(candidate) && stillSuppressed[candidate].surfaceComponentId === edge.surfaceComponentId) pending.push(candidate);
+                        }));
+                }
+                const run = { id: suppressedRuns.length + 1, edges: members.size,
+                    sourceComponentId: edge.surfaceComponentId, members: [...members] };
+                suppressedRuns.push(run);
+                members.forEach((member) => suppressedRunByIndex.set(member, run));
+            });
+            const suppressedRunsByPoint = new Map();
+            stillSuppressed.forEach((edge, index) => [edge.a, edge.b].forEach((point) => {
+                const key = residualTerminationPointKey(point);
+                if (!suppressedRunsByPoint.has(key)) suppressedRunsByPoint.set(key, new Set());
+                suppressedRunsByPoint.get(key).add(suppressedRunByIndex.get(index).id);
+            }));
+
             const authorityEndpointKeys = new Set(authoritativeContourSuggestions.flatMap((path) => {
                 const points = path.points || [];
                 return points.length ? [residualTerminationPointKey(points[0]), residualTerminationPointKey(points[points.length - 1])] : [];
@@ -6371,11 +6413,38 @@
                             ? (localInk >= .42 ? 'ink-corroborated-neighbour' : 'suppressed-open-paper-neighbour')
                             : 'no-adjacent-suppressed-edge',
                         // A passage/door cannot be certified from ink or endpoint geometry alone.
-                        openingClassification: 'unresolved'
+                        openingClassification: 'unresolved',
+                        // Grid coordinates are retained exactly; no rounding or snapping.
+                        gridPoint: { x: point.x, y: point.y },
+                        suppressedRunIds: [...(suppressedRunsByPoint.get(residualTerminationPointKey(point)) || [])].sort((a, b) => a - b),
+                        endpointRole: point === points[0] ? 'start' : 'end',
+                        tangent: point === points[0]
+                            ? { x: points[1].x - point.x, y: points[1].y - point.y }
+                            : { x: point.x - points[points.length - 2].x, y: point.y - points[points.length - 2].y }
                     });
                 });
             });
 
+
+            // Pair only endpoints touching the SAME connected suppressed run.
+            // A shared edge count or visual proximity is never sufficient evidence.
+            const residualRunPairings = suppressedRuns.map((run) => {
+                const endpoints = residualTerminations.filter((record) => record.suppressedRunIds.includes(run.id));
+                const distinct = [...new Set(endpoints.map((record) => residualTerminationPointKey(record.point)))];
+                return { runId: run.id, edges: run.edges, sourceComponentId: run.sourceComponentId,
+                    endpointIds: endpoints.map((record) => record.id),
+                    classification: endpoints.length === 2 && distinct.length === 2 ? 'two-distinct-endpoints'
+                        : endpoints.length === 0 ? 'no-adjacent-endpoint'
+                        : endpoints.length === 1 ? 'single-adjacent-endpoint'
+                        : distinct.length !== endpoints.length ? 'coincident-endpoints' : 'ambiguous-multiple-endpoints' };
+            });
+            const residualUnmatchedEndpointIds = residualTerminations
+                .filter((record) => record.suppressedRunIds.length === 0).map((record) => record.id);
+            // A bounded visual witness only: no suppressed edge is admitted or saved.
+            const residualPairedRunSegments = suppressedRuns.filter((run) =>
+                residualRunPairings[run.id - 1].classification === 'two-distinct-endpoints')
+                .flatMap((run) => run.members.map((index) => ({ runId: run.id,
+                    a: { ...stillSuppressed[index].a }, b: { ...stillSuppressed[index].b } })));
 
             // G.5W: a reconstructed surface chain that meets an authoritative endpoint
             // extends that object instead of becoming object 201. This preserves every
@@ -6784,6 +6853,9 @@
                     reconstructedSurfaceCollapsedEdges,
                     reconstructedSurfaceOpenChainTerminations: reconstructedSurfaceOpenChains * 2,
                     residualTerminations,
+                    residualRunPairings,
+                    residualUnmatchedEndpointIds,
+                    residualPairedRunSegments,
                     bridgeRepresented,
                     promotedRepresentedByArbitration,
                     representedPromotedChains: consolidatedPromotedPerimeterSuggestions.filter((item) => representedFinalKeys.has(cartographySuggestionKey(item))).length,
@@ -7240,7 +7312,16 @@
             const endpointRecords = cartographyEvidenceAudit?.residualTerminations;
             const markerCount = cartographySuggestionLayer?.querySelectorAll('[data-audit-termination]').length ?? 0;
             const expectedEndpoints = cartographyEvidenceAudit?.reconstructedSurfaceOpenChainTerminations;
-            reportCartographyAuditRuntime(`audit callback ${completedEvidenceAudit ? 'received' : 'MISSING'} · endpoint records ${Array.isArray(endpointRecords) ? endpointRecords.length : 'MISSING'} / expected ${expectedEndpoints ?? 'MISSING'} · SVG markers ${markerCount} · ${Array.isArray(endpointRecords) ? endpointRecords.map((record) => `${record.id}:P${record.pathIndex}/${record.reason}/${record.suppressedRunEdges}e`).join(', ') : 'no endpoint records published'}`);
+            if (cartographyEvidenceAudit && Array.isArray(endpointRecords)) {
+                const pairings = cartographyEvidenceAudit.residualRunPairings || [];
+                const paired = pairings.filter((run) => run.classification === 'two-distinct-endpoints');
+                const unmatched = cartographyEvidenceAudit.residualUnmatchedEndpointIds || [];
+                const endpointDetails = endpointRecords.map((record) =>
+                    `${record.id}:P${record.pathIndex}/${record.endpointRole}@(${record.gridPoint.x},${record.gridPoint.y})/t(${record.tangent.x},${record.tangent.y})/R[${record.suppressedRunIds.join(',') || '-'}]`).join(' · ');
+                const connectivityWitness = `G.5Z.23 connectivity · ${endpointRecords.length} endpoints · ${paired.length} two-endpoint connected runs · ${unmatched.length} no-adjacent-run endpoints [${unmatched.join(',')}] · ${pairings.map((run) => `R${run.runId}:${run.edges}e/E[${run.endpointIds.join(',')}]/${run.classification}`).join(' · ')} · ${endpointDetails}`;
+                cartographyAuditRuntimeWitness.dataset.cartographyConnectivity = connectivityWitness;
+            }
+            reportCartographyAuditRuntime(`${cartographyAuditRuntimeWitness.dataset.cartographyConnectivity || 'G.5Z.23 connectivity unavailable'} · audit callback ${completedEvidenceAudit ? 'received' : 'MISSING'} · endpoint records ${Array.isArray(endpointRecords) ? endpointRecords.length : 'MISSING'} / expected ${expectedEndpoints ?? 'MISSING'} · SVG markers ${markerCount} · ${Array.isArray(endpointRecords) ? endpointRecords.map((record) => `${record.id}:P${record.pathIndex}/${record.reason}/${record.suppressedRunEdges}e`).join(', ') : 'no endpoint records published'}`);
             if (cartographySuggestions.length === 0 && cartographyAssistantStatus) {
                 cartographyAssistantStatus.textContent = cartographyEvidenceAudit
                     ? `Evidence Audit · no emitted contour objects · ${cartographyEvidenceAudit.rawChains} raw chains · ${cartographyEvidenceAudit.semanticRejected} semantic rejects · ${cartographyEvidenceAudit.inferredPerimeters} inferred perimeter edges.`
