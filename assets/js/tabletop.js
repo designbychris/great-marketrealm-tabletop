@@ -7020,11 +7020,50 @@
                     return { bounds: context.bounds, records,
                         classification: 'orientation-and-neighbourhood-only-no-semantic-wall-certification', wallCertified: false };
                 });
+                // IV.30.1G.5Z.36 — close the *local review*, not the whole-image survey.
+                // Reconcile independent candidate, provenance, continuity and feature
+                // evidence by original bounds; fail closed if a record is missing or
+                // ambiguous. No diagnostic disposition may create gameplay geometry.
+                const residualInkDisposition = review.map((component, index) => {
+                    const provenance = componentProvenance[index];
+                    const continuity = localStructuralContext[index];
+                    const feature = localInkFeatureClassification[index];
+                    const sameBounds = [provenance, continuity, feature].every((record) =>
+                        record && JSON.stringify(record.bounds) === JSON.stringify(component.bounds));
+                    const connectedReviewPixels = continuity?.clusters.reduce((sum, cluster) =>
+                        sum + cluster.reviewPixelsConnected, 0) ?? 0;
+                    const locallyReviewed = sameBounds && component.unrepresentedSamples > 0 &&
+                        connectedReviewPixels === component.unrepresentedSamples &&
+                        continuity.clusters.length > 0 && feature.records.length === continuity.clusters.length &&
+                        feature.records.every((record) => record.bounded && record.simple &&
+                            record.representedProximity === 0 &&
+                            record.classification === 'isolated-short-ink-feature-review-not-wall-certified') &&
+                        provenance.wallCertified === false && continuity.wallCertified === false &&
+                        feature.wallCertified === false;
+                    return { bounds: component.bounds.slice(), reviewCells: component.cells,
+                        unrepresentedSamples: component.unrepresentedSamples,
+                        provenance: provenance?.classification || 'missing-provenance',
+                        continuity: continuity?.classification || 'missing-continuity',
+                        featureClassifications: feature?.records.map((record) => record.classification) || [],
+                        disposition: locallyReviewed
+                            ? 'local-review-complete-isolated-ink-not-wall-certified'
+                            : 'local-review-open-insufficient-evidence',
+                        localReviewComplete: locallyReviewed, wallCertified: false,
+                        reopenOnNewIndependentEvidence: true };
+                });
+                const residualInkClosure = {
+                    diagnosticOnly: true, scope: 'local-ink-review-only-not-whole-illustration',
+                    components: residualInkDisposition,
+                    localReviewsComplete: residualInkDisposition.filter((item) => item.localReviewComplete).length,
+                    localReviewsOpen: residualInkDisposition.filter((item) => !item.localReviewComplete).length,
+                    wholeIllustrationCoverageCertified: false, missingWallsCertified: false,
+                    wallCertified: false, admittedEdges: 0, restoredRuns: 0
+                };
                 return { diagnosticOnly: true, scope: 'independent-whole-mesh-ink-candidate-survey',
                     meshCellsExamined: Math.max(0, contourRows - 4) * Math.max(0, contourColumns - 4),
                     candidateInkCells: candidates.length, componentCount: components.length,
                     representedOnlyComponents: components.length - review.length,
-                    reviewComponentCount: review.length, componentProvenance, localStructuralContext, localInkFeatureClassification,
+                    reviewComponentCount: review.length, componentProvenance, localStructuralContext, localInkFeatureClassification, residualInkClosure,
                     reviewBounds: review.slice(0, 12).map((component) =>
                         `${component.classification}/${component.cells}c/${component.unrepresentedSamples}unrepresented@(${component.bounds.join(',')})`),
                     // Pixel streaks alone cannot prove missing walls or image coverage.
@@ -7505,6 +7544,7 @@
                         diagnosticOnly: true, components: independentIllustratedWallSurvey.localStructuralContext,
                         wallCertified: false, admittedEdges: 0, restoredRuns: 0
                     },
+                    residualInkReviewDispositionAudit: independentIllustratedWallSurvey.residualInkClosure,
                     independentLocalInkFeatureClassificationAudit: {
                         diagnosticOnly: true, components: independentIllustratedWallSurvey.localInkFeatureClassification,
                         wallCertified: false, admittedEdges: 0, restoredRuns: 0
@@ -7984,6 +8024,10 @@
                 const inkProvenance = cartographyEvidenceAudit.independentInkComponentProvenanceAudit;
                 const localInk = cartographyEvidenceAudit.independentLocalInkContinuityAudit;
                 const featureInk = cartographyEvidenceAudit.independentLocalInkFeatureClassificationAudit;
+                const disposition = cartographyEvidenceAudit.residualInkReviewDispositionAudit;
+                cartographyAuditRuntimeWitness.dataset.cartographyInkDisposition = disposition
+                    ? `G.5Z.36 ink disposition · ${disposition.scope} · ${disposition.components.length} review components · ${disposition.localReviewsComplete} local reviews complete · ${disposition.localReviewsOpen} local reviews open · ${disposition.components.map((item) => `B[${item.bounds.join(',')}]/${item.unrepresentedSamples}unrepresented/${item.disposition}/reopen-on-new-evidence`).join(' · ')} · whole illustration certified ${disposition.wholeIllustrationCoverageCertified} · missing walls certified ${disposition.missingWallsCertified} · wall certified ${disposition.wallCertified} · ${disposition.admittedEdges} edges admitted · ${disposition.restoredRuns} runs restored`
+                    : 'G.5Z.36 ink disposition unavailable';
                 cartographyAuditRuntimeWitness.dataset.cartographyInkFeatures = featureInk
                     ? `G.5Z.35 ink features · ${featureInk.components.length} review components · ${featureInk.components.map((item) => `B[${item.bounds.join(',')}]/${item.records.map((record) => `${record.orientation}/${record.pixels}pixels/${record.bounded ? 'bounded' : 'truncated'}/${record.simple ? 'simple' : 'complex'}/${record.nearbyParallel}parallel/${record.nearbyPerpendicular}perpendicular/${record.representedProximity}near-represented/${record.classification}`).join(';')}`).join(' · ')} · wall certified ${featureInk.wallCertified} · ${featureInk.admittedEdges} edges admitted · ${featureInk.restoredRuns} runs restored`
                     : 'G.5Z.35 ink features unavailable';
@@ -8019,7 +8063,7 @@
                 const connectivityWitness = `G.5Z.23 connectivity · ${endpointRecords.length} endpoints · ${paired.length} two-endpoint connected runs · ${unmatched.length} no-adjacent-run endpoints [${unmatched.join(',')}] · ${pairings.map((run) => `R${run.runId}:${run.edges}e/E[${run.endpointIds.join(',')}]/${run.classification}`).join(' · ')} · ${endpointDetails}`;
                 cartographyAuditRuntimeWitness.dataset.cartographyConnectivity = connectivityWitness;
             }
-            reportCartographyAuditRuntime(`${cartographyAuditRuntimeWitness.dataset.cartographyInkFeatures || 'G.5Z.35 ink features unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyLocalInk || 'G.5Z.34 local ink continuity unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyInkProvenance || 'G.5Z.33 ink provenance unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyIndependentWallSurvey || 'G.5Z.32 independent ink survey unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyWallCoverage || 'G.5Z.31 wall coverage unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyTerminationEvidence || 'G.5Z.30 termination evidence unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyFrontier || 'G.5Z.29 frontier unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyGeometry || 'G.5Z.28 geometry unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyClosure || 'G.5Z.27 closure unavailable'} · ${assemblyWitness} · ${cartographyAuditRuntimeWitness.dataset.cartographyProvenance || 'G.5Z.25 provenance unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyCoincidence || 'G.5Z.24 coincidence unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyConnectivity || 'G.5Z.23 connectivity unavailable'} · audit callback ${completedEvidenceAudit ? 'received' : 'MISSING'} · endpoint records ${Array.isArray(endpointRecords) ? endpointRecords.length : 'MISSING'} / expected ${expectedEndpoints ?? 'MISSING'} · SVG markers ${markerCount} · ${Array.isArray(endpointRecords) ? endpointRecords.map((record) => `${record.id}:P${record.pathIndex}/${record.reason}/${record.suppressedRunEdges}e`).join(', ') : 'no endpoint records published'}`);
+            reportCartographyAuditRuntime(`${cartographyAuditRuntimeWitness.dataset.cartographyInkDisposition || 'G.5Z.36 ink disposition unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyInkFeatures || 'G.5Z.35 ink features unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyLocalInk || 'G.5Z.34 local ink continuity unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyInkProvenance || 'G.5Z.33 ink provenance unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyIndependentWallSurvey || 'G.5Z.32 independent ink survey unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyWallCoverage || 'G.5Z.31 wall coverage unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyTerminationEvidence || 'G.5Z.30 termination evidence unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyFrontier || 'G.5Z.29 frontier unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyGeometry || 'G.5Z.28 geometry unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyClosure || 'G.5Z.27 closure unavailable'} · ${assemblyWitness} · ${cartographyAuditRuntimeWitness.dataset.cartographyProvenance || 'G.5Z.25 provenance unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyCoincidence || 'G.5Z.24 coincidence unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyConnectivity || 'G.5Z.23 connectivity unavailable'} · audit callback ${completedEvidenceAudit ? 'received' : 'MISSING'} · endpoint records ${Array.isArray(endpointRecords) ? endpointRecords.length : 'MISSING'} / expected ${expectedEndpoints ?? 'MISSING'} · SVG markers ${markerCount} · ${Array.isArray(endpointRecords) ? endpointRecords.map((record) => `${record.id}:P${record.pathIndex}/${record.reason}/${record.suppressedRunEdges}e`).join(', ') : 'no endpoint records published'}`);
             if (cartographySuggestions.length === 0 && cartographyAssistantStatus) {
                 cartographyAssistantStatus.textContent = cartographyEvidenceAudit
                     ? `Evidence Audit · no emitted contour objects · ${cartographyEvidenceAudit.rawChains} raw chains · ${cartographyEvidenceAudit.semanticRejected} semantic rejects · ${cartographyEvidenceAudit.inferredPerimeters} inferred perimeter edges.`
