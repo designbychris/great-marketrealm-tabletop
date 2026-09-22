@@ -6875,7 +6875,7 @@
                             queue.push({ x: nx, y: ny });
                         }
                     }
-                    components.push({ cells: queue.length, representedSamples: represented,
+                    components.push({ cells: queue.length, sampleCells: queue.map((cell) => ({ x: cell.x, y: cell.y })), representedSamples: represented,
                         unrepresentedSamples: queue.length - represented,
                         bounds: [minX, minY, maxX, maxY].map((value) => value * contourStep),
                         classification: represented === queue.length ? 'near-represented-geometry'
@@ -6884,11 +6884,53 @@
                 }
                 const review = components.filter((component) => component.unrepresentedSamples > 0)
                     .sort((a, b) => b.unrepresentedSamples - a.unrepresentedSamples);
+                // IV.30.1G.5Z.33 — local provenance of the independent review cells.
+                // Revisit the original sampled darkness and existing geometry without
+                // promoting isolated ink, inventing a contour, or changing floor topology.
+                const componentProvenance = review.map((component) => {
+                    const localCells = component.sampleCells.map((cell) => ({ ...cell,
+                        horizontal: inkAt(cell.x - 1, cell.y) >= .72 && inkAt(cell.x + 1, cell.y) >= .72,
+                        vertical: inkAt(cell.x, cell.y - 1) >= .72 && inkAt(cell.x, cell.y + 1) >= .72 }));
+                    const localKeys = new Set(localCells.map((cell) => `${cell.x},${cell.y}`));
+                    let horizontalStreaks = 0, verticalStreaks = 0, nearestDistance = Infinity;
+                    let nearbyInk = 0, nearbyCandidate = 0, strongInk = 0;
+                    const sampleCoordinates = [];
+                    for (const cell of localCells) {
+                        if (!localKeys.has(`${cell.x},${cell.y}`)) continue;
+                        const gx = (cell.x + .5) * contourStep;
+                        const gy = (cell.y + .5) * contourStep;
+                        sampleCoordinates.push(`${(cell.x * contourStep).toFixed(2)},${(cell.y * contourStep).toFixed(2)}`);
+                        if (cell.horizontal) horizontalStreaks += 1;
+                        if (cell.vertical) verticalStreaks += 1;
+                        if (inkAt(cell.x, cell.y) >= .72) strongInk += 1;
+                        for (const [a, b] of representedSegments) {
+                            nearestDistance = Math.min(nearestDistance, pointSegmentDistance(gx, gy, a, b));
+                        }
+                    }
+                    const neighbourhood = new Set();
+                    for (const cell of localCells) {
+                        for (let dy = -2; dy <= 2; dy += 1) {
+                            for (let dx = -2; dx <= 2; dx += 1) {
+                                const x = cell.x + dx, y = cell.y + dy;
+                                if (x < 0 || y < 0 || x >= contourColumns || y >= contourRows) continue;
+                                const key = `${x},${y}`;
+                                if (localKeys.has(key) || neighbourhood.has(key)) continue;
+                                neighbourhood.add(key);
+                                if (inkAt(x, y) >= .72) nearbyInk += 1;
+                                if (candidateKeys.has(key)) nearbyCandidate += 1;
+                            }
+                        }
+                    }
+                    return { bounds: component.bounds, sampleCoordinates, cells: component.cells,
+                        horizontalStreaks, verticalStreaks, strongInk, nearbyInk, nearbyCandidate,
+                        nearestRepresentedDistance: Number.isFinite(nearestDistance) ? nearestDistance : null,
+                        classification: 'local-ink-provenance-review-not-wall-certified', wallCertified: false };
+                });
                 return { diagnosticOnly: true, scope: 'independent-whole-mesh-ink-candidate-survey',
                     meshCellsExamined: Math.max(0, contourRows - 4) * Math.max(0, contourColumns - 4),
                     candidateInkCells: candidates.length, componentCount: components.length,
                     representedOnlyComponents: components.length - review.length,
-                    reviewComponentCount: review.length,
+                    reviewComponentCount: review.length, componentProvenance,
                     reviewBounds: review.slice(0, 12).map((component) =>
                         `${component.classification}/${component.cells}c/${component.unrepresentedSamples}unrepresented@(${component.bounds.join(',')})`),
                     // Pixel streaks alone cannot prove missing walls or image coverage.
@@ -7361,6 +7403,10 @@
                     residualIllustratedTerminationAudit,
                     residualIllustratedWallCoverageAudit,
                     independentIllustratedWallSurvey,
+                    independentInkComponentProvenanceAudit: {
+                        diagnosticOnly: true, components: independentIllustratedWallSurvey.componentProvenance,
+                        wallCertified: false, admittedEdges: 0, restoredRuns: 0
+                    },
                     residualUnmatchedEndpointIds,
                     residualPairedRunSegments,
                     bridgeRepresented,
@@ -7833,6 +7879,10 @@
                 const termination = cartographyEvidenceAudit.residualIllustratedTerminationAudit;
                 const coverage = cartographyEvidenceAudit.residualIllustratedWallCoverageAudit;
                 const independentSurvey = cartographyEvidenceAudit.independentIllustratedWallSurvey;
+                const inkProvenance = cartographyEvidenceAudit.independentInkComponentProvenanceAudit;
+                cartographyAuditRuntimeWitness.dataset.cartographyInkProvenance = inkProvenance
+                    ? `G.5Z.33 ink provenance · ${inkProvenance.components.length} review components · ${inkProvenance.components.map((item) => `B[${item.bounds.join(',')}]/${item.cells}c/${item.horizontalStreaks}h/${item.verticalStreaks}v/${item.strongInk}strong/${item.nearbyInk}nearby-ink/${item.nearbyCandidate}nearby-candidates/nearest-represented-${item.nearestRepresentedDistance === null ? 'none' : item.nearestRepresentedDistance.toFixed(3)}/samples[${item.sampleCoordinates.join(';')}]/${item.classification}`).join(' · ')} · wall certified ${inkProvenance.wallCertified} · ${inkProvenance.admittedEdges} edges admitted · ${inkProvenance.restoredRuns} runs restored`
+                    : 'G.5Z.33 ink provenance unavailable';
                 cartographyAuditRuntimeWitness.dataset.cartographyIndependentWallSurvey = independentSurvey
                     ? `G.5Z.32 independent ink survey · ${independentSurvey.scope} · ${independentSurvey.meshCellsExamined} mesh cells examined · ${independentSurvey.candidateInkCells} candidate ink cells · ${independentSurvey.componentCount} ink components · ${independentSurvey.representedOnlyComponents} near-represented components · ${independentSurvey.reviewComponentCount} components requiring review (NOT certified walls) · review bounds [${independentSurvey.reviewBounds.join(';')}] · whole illustration certified ${independentSurvey.wholeIllustrationCoverageCertified} · missing walls certified ${independentSurvey.missingWallsCertified} · ${independentSurvey.admittedEdges} edges admitted · ${independentSurvey.restoredRuns} runs restored`
                     : 'G.5Z.32 independent ink survey unavailable';
@@ -7859,7 +7909,7 @@
                 const connectivityWitness = `G.5Z.23 connectivity · ${endpointRecords.length} endpoints · ${paired.length} two-endpoint connected runs · ${unmatched.length} no-adjacent-run endpoints [${unmatched.join(',')}] · ${pairings.map((run) => `R${run.runId}:${run.edges}e/E[${run.endpointIds.join(',')}]/${run.classification}`).join(' · ')} · ${endpointDetails}`;
                 cartographyAuditRuntimeWitness.dataset.cartographyConnectivity = connectivityWitness;
             }
-            reportCartographyAuditRuntime(`${cartographyAuditRuntimeWitness.dataset.cartographyIndependentWallSurvey || 'G.5Z.32 independent ink survey unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyWallCoverage || 'G.5Z.31 wall coverage unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyTerminationEvidence || 'G.5Z.30 termination evidence unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyFrontier || 'G.5Z.29 frontier unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyGeometry || 'G.5Z.28 geometry unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyClosure || 'G.5Z.27 closure unavailable'} · ${assemblyWitness} · ${cartographyAuditRuntimeWitness.dataset.cartographyProvenance || 'G.5Z.25 provenance unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyCoincidence || 'G.5Z.24 coincidence unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyConnectivity || 'G.5Z.23 connectivity unavailable'} · audit callback ${completedEvidenceAudit ? 'received' : 'MISSING'} · endpoint records ${Array.isArray(endpointRecords) ? endpointRecords.length : 'MISSING'} / expected ${expectedEndpoints ?? 'MISSING'} · SVG markers ${markerCount} · ${Array.isArray(endpointRecords) ? endpointRecords.map((record) => `${record.id}:P${record.pathIndex}/${record.reason}/${record.suppressedRunEdges}e`).join(', ') : 'no endpoint records published'}`);
+            reportCartographyAuditRuntime(`${cartographyAuditRuntimeWitness.dataset.cartographyInkProvenance || 'G.5Z.33 ink provenance unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyIndependentWallSurvey || 'G.5Z.32 independent ink survey unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyWallCoverage || 'G.5Z.31 wall coverage unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyTerminationEvidence || 'G.5Z.30 termination evidence unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyFrontier || 'G.5Z.29 frontier unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyGeometry || 'G.5Z.28 geometry unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyClosure || 'G.5Z.27 closure unavailable'} · ${assemblyWitness} · ${cartographyAuditRuntimeWitness.dataset.cartographyProvenance || 'G.5Z.25 provenance unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyCoincidence || 'G.5Z.24 coincidence unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyConnectivity || 'G.5Z.23 connectivity unavailable'} · audit callback ${completedEvidenceAudit ? 'received' : 'MISSING'} · endpoint records ${Array.isArray(endpointRecords) ? endpointRecords.length : 'MISSING'} / expected ${expectedEndpoints ?? 'MISSING'} · SVG markers ${markerCount} · ${Array.isArray(endpointRecords) ? endpointRecords.map((record) => `${record.id}:P${record.pathIndex}/${record.reason}/${record.suppressedRunEdges}e`).join(', ') : 'no endpoint records published'}`);
             if (cartographySuggestions.length === 0 && cartographyAssistantStatus) {
                 cartographyAssistantStatus.textContent = cartographyEvidenceAudit
                     ? `Evidence Audit · no emitted contour objects · ${cartographyEvidenceAudit.rawChains} raw chains · ${cartographyEvidenceAudit.semanticRejected} semantic rejects · ${cartographyEvidenceAudit.inferredPerimeters} inferred perimeter edges.`
