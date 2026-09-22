@@ -6778,6 +6778,40 @@
                         : 'mixed-or-incomplete-frontier-evidence',
                     wallCertification: false, admittedEdges: 0, restoredRuns: 0 };
             })();
+            // IV.30.1G.5Z.30 — forensic-only endpoint evidence. Inspect the
+            // actual retained segment touching each termination separately from
+            // the suppressed surface frontier; neither a tangent nor a quiet
+            // neighbour is positive evidence of an illustrated wall.
+            const residualIllustratedTerminationAudit = (() => {
+                const records = residualTerminations.map((record) => {
+                    const path = promotedReconstructedSurfaceSuggestions[record.pathIndex - 1];
+                    const points = Array.isArray(path?.points) ? path.points : [];
+                    const neighbour = record.endpointRole === 'start' ? points[1] : points[points.length - 2];
+                    const touching = (residualSuppressedByEndpoint.get(residualTerminationPointKey(record.point)) || []);
+                    const runIds = [...record.suppressedRunIds];
+                    const corroborated = touching.filter((edge) => edge.exactStructuralBoundary === true
+                        || ['exact-structural', 'strong-local-ink', 'moderate-local-ink'].includes(edge.surfaceBoundaryCorroboration));
+                    const quiet = touching.filter((edge) => edge.suppressedOpenPaper === true);
+                    const retainedSegmentPresent = !!neighbour && Number.isFinite(neighbour.x) && Number.isFinite(neighbour.y)
+                        && (neighbour.x !== record.point.x || neighbour.y !== record.point.y);
+                    const classification = !retainedSegmentPresent ? 'retained-segment-missing'
+                        : corroborated.length ? 'mixed-local-evidence-review-required'
+                        : touching.length && quiet.length === touching.length ? 'retained-path-meets-quiet-frontier'
+                        : touching.length ? 'local-boundary-evidence-unresolved'
+                        : 'retained-path-without-adjacent-suppressed-frontier';
+                    return { endpointId: record.id, pathIndex: record.pathIndex, endpointRole: record.endpointRole,
+                        retainedSegmentPresent, retainedNeighbour: neighbour ? { x: neighbour.x, y: neighbour.y } : null,
+                        suppressedRunIds: runIds, adjacentSuppressedEdges: touching.length,
+                        quietAdjacentEdges: quiet.length, corroboratedAdjacentEdges: corroborated.length,
+                        maximumAdjacentInk: touching.reduce((max, edge) => Math.max(max, Number(edge.boundaryInk) || 0), 0),
+                        classification, illustratedWallTerminationCertified: false, diagnosticOnly: true };
+                });
+                return { diagnosticOnly: true, records, endpointCount: records.length,
+                    retainedSegmentsPresent: records.filter((entry) => entry.retainedSegmentPresent).length,
+                    quietFrontierEndpoints: records.filter((entry) => entry.classification === 'retained-path-meets-quiet-frontier').length,
+                    locallyCorroboratedEndpoints: records.filter((entry) => entry.corroboratedAdjacentEdges > 0).length,
+                    illustratedWallTerminationCertified: false, admittedEdges: 0, restoredRuns: 0 };
+            })();
             // A bounded visual witness only: no suppressed edge is admitted or saved.
             const residualPairedRunSegments = suppressedRuns.filter((run) =>
                 residualRunPairings[run.id - 1].classification === 'two-distinct-endpoints')
@@ -7197,6 +7231,7 @@
                     residualClosureAudit,
                     residualCycleGeometryAudit,
                     residualExteriorFrontierAudit,
+                    residualIllustratedTerminationAudit,
                     residualUnmatchedEndpointIds,
                     residualPairedRunSegments,
                     bridgeRepresented,
@@ -7666,6 +7701,10 @@
                 const closure = cartographyEvidenceAudit.residualClosureAudit;
                 const geometry = cartographyEvidenceAudit.residualCycleGeometryAudit;
                 const frontier = cartographyEvidenceAudit.residualExteriorFrontierAudit;
+                const termination = cartographyEvidenceAudit.residualIllustratedTerminationAudit;
+                cartographyAuditRuntimeWitness.dataset.cartographyTerminationEvidence = termination
+                    ? `G.5Z.30 termination evidence · ${termination.endpointCount} endpoints · ${termination.retainedSegmentsPresent} retained segments · ${termination.quietFrontierEndpoints} quiet-frontier endpoints · ${termination.locallyCorroboratedEndpoints} locally corroborated · ${termination.records.map((entry) => `E${entry.endpointId}:P${entry.pathIndex}/${entry.classification}/R[${entry.suppressedRunIds.join(',')}]/${entry.adjacentSuppressedEdges} adjacent/${entry.quietAdjacentEdges} quiet/${entry.corroboratedAdjacentEdges} corroborated/maxInk${entry.maximumAdjacentInk.toFixed(3)}`).join(' · ')} · wall termination certified ${termination.illustratedWallTerminationCertified} · ${termination.admittedEdges} edges admitted · ${termination.restoredRuns} runs restored`
+                    : 'G.5Z.30 termination evidence unavailable';
                 cartographyAuditRuntimeWitness.dataset.cartographyFrontier = frontier
                     ? `G.5Z.29 frontier · ${frontier.separationClassification} · ${frontier.runs.length} runs · ${frontier.classifiedEdges} classified edges / ${frontier.originalSuppressedEdges} suppressed · ${frontier.quietEdges} quiet pairs · ${frontier.corroboratedEdges} corroborated edges · ${frontier.runs.map((run) => `R${run.runId}:${run.edges}e/${run.provenanceRecorded} provenance/${run.distinctInsideCells} inside cells/${run.distinctOutsideCells} outside cells/${run.quietPairs} quiet/${run.inkSupportedEdges} ink-supported/${run.classification}`).join(' · ')} · wall certified ${frontier.wallCertification} · ${frontier.admittedEdges} edges admitted · ${frontier.restoredRuns} runs restored`
                     : 'G.5Z.29 frontier unavailable';
@@ -7683,7 +7722,7 @@
                 const connectivityWitness = `G.5Z.23 connectivity · ${endpointRecords.length} endpoints · ${paired.length} two-endpoint connected runs · ${unmatched.length} no-adjacent-run endpoints [${unmatched.join(',')}] · ${pairings.map((run) => `R${run.runId}:${run.edges}e/E[${run.endpointIds.join(',')}]/${run.classification}`).join(' · ')} · ${endpointDetails}`;
                 cartographyAuditRuntimeWitness.dataset.cartographyConnectivity = connectivityWitness;
             }
-            reportCartographyAuditRuntime(`${cartographyAuditRuntimeWitness.dataset.cartographyFrontier || 'G.5Z.29 frontier unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyGeometry || 'G.5Z.28 geometry unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyClosure || 'G.5Z.27 closure unavailable'} · ${assemblyWitness} · ${cartographyAuditRuntimeWitness.dataset.cartographyProvenance || 'G.5Z.25 provenance unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyCoincidence || 'G.5Z.24 coincidence unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyConnectivity || 'G.5Z.23 connectivity unavailable'} · audit callback ${completedEvidenceAudit ? 'received' : 'MISSING'} · endpoint records ${Array.isArray(endpointRecords) ? endpointRecords.length : 'MISSING'} / expected ${expectedEndpoints ?? 'MISSING'} · SVG markers ${markerCount} · ${Array.isArray(endpointRecords) ? endpointRecords.map((record) => `${record.id}:P${record.pathIndex}/${record.reason}/${record.suppressedRunEdges}e`).join(', ') : 'no endpoint records published'}`);
+            reportCartographyAuditRuntime(`${cartographyAuditRuntimeWitness.dataset.cartographyTerminationEvidence || 'G.5Z.30 termination evidence unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyFrontier || 'G.5Z.29 frontier unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyGeometry || 'G.5Z.28 geometry unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyClosure || 'G.5Z.27 closure unavailable'} · ${assemblyWitness} · ${cartographyAuditRuntimeWitness.dataset.cartographyProvenance || 'G.5Z.25 provenance unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyCoincidence || 'G.5Z.24 coincidence unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyConnectivity || 'G.5Z.23 connectivity unavailable'} · audit callback ${completedEvidenceAudit ? 'received' : 'MISSING'} · endpoint records ${Array.isArray(endpointRecords) ? endpointRecords.length : 'MISSING'} / expected ${expectedEndpoints ?? 'MISSING'} · SVG markers ${markerCount} · ${Array.isArray(endpointRecords) ? endpointRecords.map((record) => `${record.id}:P${record.pathIndex}/${record.reason}/${record.suppressedRunEdges}e`).join(', ') : 'no endpoint records published'}`);
             if (cartographySuggestions.length === 0 && cartographyAssistantStatus) {
                 cartographyAssistantStatus.textContent = cartographyEvidenceAudit
                     ? `Evidence Audit · no emitted contour objects · ${cartographyEvidenceAudit.rawChains} raw chains · ${cartographyEvidenceAudit.semanticRejected} semantic rejects · ${cartographyEvidenceAudit.inferredPerimeters} inferred perimeter edges.`
