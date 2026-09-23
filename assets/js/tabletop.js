@@ -7305,6 +7305,62 @@
             }
 
             const publishContourEvidenceAudit = (emittedSuggestions) => {
+                // IV.30.1G.5Z.38 — Independently inspect directional ink runs on
+                // the ORIGINAL darkness mesh, not recovered floor or frontier edges.
+                // These are wall-LIKE candidates only: grid, hatching, and decoration
+                // can also form long strokes. Never emit or persist geometry here.
+                const independentWallCoverage = (() => {
+                    const mesh = cartographyEvidenceAudit.independentIllustratedWallSurvey;
+                    const runs = [];
+                    const threshold = .72;
+                    const minimumRun = 4;
+                    const represented = [];
+                    const collect = (path) => {
+                        const points = Array.isArray(path?.points) ? path.points : [];
+                        for (let i = 1; i < points.length; i += 1) represented.push([points[i - 1], points[i]]);
+                    };
+                    authoritativeContourSuggestions.forEach(collect);
+                    promotedReconstructedSurfaceSuggestions.forEach(collect);
+                    const nearExisting = (x, y) => represented.some(([a, b]) => {
+                        const dx = b.x - a.x, dy = b.y - a.y;
+                        const len = dx * dx + dy * dy;
+                        const t = len ? Math.max(0, Math.min(1, ((x-a.x)*dx+(y-a.y)*dy)/len)) : 0;
+                        return Math.hypot(x-a.x-t*dx, y-a.y-t*dy) <= contourStep * 1.5;
+                    });
+                    for (const [axis, dx, dy] of [['horizontal', 1, 0], ['vertical', 0, 1]]) {
+                        for (let y = 2; y < contourRows - 2; y += 1) {
+                            for (let x = 2; x < contourColumns - 2; x += 1) {
+                                if (Number(darkness[y]?.[x] ?? 0) < threshold ||
+                                    Number(darkness[y-dy]?.[x-dx] ?? 0) >= threshold) continue;
+                                let length = 0, near = 0;
+                                while (x + length*dx < contourColumns-2 && y + length*dy < contourRows-2 &&
+                                    Number(darkness[y+length*dy]?.[x+length*dx] ?? 0) >= threshold) {
+                                    const gx = (x+length*dx+.5)*contourStep;
+                                    const gy = (y+length*dy+.5)*contourStep;
+                                    if (nearExisting(gx, gy)) near += 1;
+                                    length += 1;
+                                }
+                                if (length < minimumRun) continue;
+                                runs.push({ axis, start: [x*contourStep, y*contourStep],
+                                    end: [(x+(length-1)*dx)*contourStep, (y+(length-1)*dy)*contourStep],
+                                    samples: length, nearRepresented: near,
+                                    classification: near === length ? 'near-represented-ink-run' :
+                                        near ? 'mixed-ink-run-review' : 'unrepresented-ink-run-review',
+                                    wallCertified: false });
+                            }
+                        }
+                    }
+                    const review = runs.filter((run) => run.nearRepresented < run.samples);
+                    return { diagnosticOnly: true, scope: 'independent-original-ink-directional-run-screen-not-wall-certification',
+                        sourcePresent: Boolean(mesh && Array.isArray(darkness)),
+                        threshold, minimumRun, meshCellsExamined: Math.max(0, contourRows-4)*Math.max(0, contourColumns-4),
+                        runs, reviewRuns: review.length,
+                        reviewSamples: review.reduce((sum, run) => sum + run.samples-run.nearRepresented, 0),
+                        reviewBounds: review.slice(0, 12).map((run) => `${run.axis}@(${run.start.join(',')})-(${run.end.join(',')})/${run.samples}samples/${run.nearRepresented}near`),
+                        limitation: 'directional-ink-can-be-grid-hatching-decoration-or-wall;not-exhaustive-illustration-coverage',
+                        wholeIllustrationCoverageCertified: false, missingWallsCertified: false,
+                        wallCertified: false, admittedEdges: 0, restoredRuns: 0 };
+                })();
                 if (options.evidenceAudit !== true || options.skipOcclusionRecovery === true) return;
                 const emittedKeys = new Set(emittedSuggestions.map(cartographySuggestionKey));
                 const promotedMemberKeys = new Set();
@@ -7544,6 +7600,7 @@
                         diagnosticOnly: true, components: independentIllustratedWallSurvey.localStructuralContext,
                         wallCertified: false, admittedEdges: 0, restoredRuns: 0
                     },
+                    independentWallCoverageAudit: independentWallCoverage,
                     residualInkReviewDispositionAudit: independentIllustratedWallSurvey.residualInkClosure,
                     independentLocalInkFeatureClassificationAudit: {
                         diagnosticOnly: true, components: independentIllustratedWallSurvey.localInkFeatureClassification,
@@ -8025,63 +8082,7 @@
                 const localInk = cartographyEvidenceAudit.independentLocalInkContinuityAudit;
                 const featureInk = cartographyEvidenceAudit.independentLocalInkFeatureClassificationAudit;
                 const disposition = cartographyEvidenceAudit.residualInkReviewDispositionAudit;
-                // IV.30.1G.5Z.38 — Independently inspect directional ink runs on
-                // the ORIGINAL darkness mesh, not recovered floor or frontier edges.
-                // These are wall-LIKE candidates only: grid, hatching, and decoration
-                // can also form long strokes. Never emit or persist geometry here.
-                const independentWallCoverage = (() => {
-                    const mesh = cartographyEvidenceAudit.independentIllustratedWallSurvey;
-                    const runs = [];
-                    const threshold = .72;
-                    const minimumRun = 4;
-                    const represented = [];
-                    const collect = (path) => {
-                        const points = Array.isArray(path?.points) ? path.points : [];
-                        for (let i = 1; i < points.length; i += 1) represented.push([points[i - 1], points[i]]);
-                    };
-                    authoritativeContourSuggestions.forEach(collect);
-                    promotedReconstructedSurfaceSuggestions.forEach(collect);
-                    const nearExisting = (x, y) => represented.some(([a, b]) => {
-                        const dx = b.x - a.x, dy = b.y - a.y;
-                        const len = dx * dx + dy * dy;
-                        const t = len ? Math.max(0, Math.min(1, ((x-a.x)*dx+(y-a.y)*dy)/len)) : 0;
-                        return Math.hypot(x-a.x-t*dx, y-a.y-t*dy) <= contourStep * 1.5;
-                    });
-                    for (const [axis, dx, dy] of [['horizontal', 1, 0], ['vertical', 0, 1]]) {
-                        for (let y = 2; y < contourRows - 2; y += 1) {
-                            for (let x = 2; x < contourColumns - 2; x += 1) {
-                                if (Number(darkness[y]?.[x] ?? 0) < threshold ||
-                                    Number(darkness[y-dy]?.[x-dx] ?? 0) >= threshold) continue;
-                                let length = 0, near = 0;
-                                while (x + length*dx < contourColumns-2 && y + length*dy < contourRows-2 &&
-                                    Number(darkness[y+length*dy]?.[x+length*dx] ?? 0) >= threshold) {
-                                    const gx = (x+length*dx+.5)*contourStep;
-                                    const gy = (y+length*dy+.5)*contourStep;
-                                    if (nearExisting(gx, gy)) near += 1;
-                                    length += 1;
-                                }
-                                if (length < minimumRun) continue;
-                                runs.push({ axis, start: [x*contourStep, y*contourStep],
-                                    end: [(x+(length-1)*dx)*contourStep, (y+(length-1)*dy)*contourStep],
-                                    samples: length, nearRepresented: near,
-                                    classification: near === length ? 'near-represented-ink-run' :
-                                        near ? 'mixed-ink-run-review' : 'unrepresented-ink-run-review',
-                                    wallCertified: false });
-                            }
-                        }
-                    }
-                    const review = runs.filter((run) => run.nearRepresented < run.samples);
-                    return { diagnosticOnly: true, scope: 'independent-original-ink-directional-run-screen-not-wall-certification',
-                        sourcePresent: Boolean(mesh && Array.isArray(darkness)),
-                        threshold, minimumRun, meshCellsExamined: Math.max(0, contourRows-4)*Math.max(0, contourColumns-4),
-                        runs, reviewRuns: review.length,
-                        reviewSamples: review.reduce((sum, run) => sum + run.samples-run.nearRepresented, 0),
-                        reviewBounds: review.slice(0, 12).map((run) => `${run.axis}@(${run.start.join(',')})-(${run.end.join(',')})/${run.samples}samples/${run.nearRepresented}near`),
-                        limitation: 'directional-ink-can-be-grid-hatching-decoration-or-wall;not-exhaustive-illustration-coverage',
-                        wholeIllustrationCoverageCertified: false, missingWallsCertified: false,
-                        wallCertified: false, admittedEdges: 0, restoredRuns: 0 };
-                })();
-                cartographyEvidenceAudit.independentWallCoverageAudit = independentWallCoverage;
+                const independentWallCoverage = cartographyEvidenceAudit.independentWallCoverageAudit;
                 cartographyAuditRuntimeWitness.dataset.cartographyIndependentCoverage =
                     `G.5Z.38 independent wall coverage · ${independentWallCoverage.scope} · source ${independentWallCoverage.sourcePresent ? 'present' : 'INCOMPLETE'} · ` +
                     `${independentWallCoverage.meshCellsExamined} mesh cells examined · ${independentWallCoverage.runs.length} directional ink runs · ` +
