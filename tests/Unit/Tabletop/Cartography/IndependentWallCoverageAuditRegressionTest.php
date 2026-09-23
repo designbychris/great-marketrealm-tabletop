@@ -19,7 +19,8 @@ final class IndependentWallCoverageAuditRegressionTest extends TestCase
         self::assertStringContainsString('promotedReconstructedSurfaceSuggestions.forEach(collect)', $source);
         self::assertStringContainsString("'independent-original-ink-directional-run-screen-not-wall-certification'", $source);
         self::assertStringContainsString('directional-ink-can-be-grid-hatching-decoration-or-wall;not-exhaustive-illustration-coverage', $source);
-        self::assertStringContainsString('cartographyEvidenceAudit.independentWallCoverageAudit = independentWallCoverage', $source);
+        self::assertStringContainsString('independentWallCoverageAudit: independentWallCoverage,', $source);
+        self::assertStringContainsString('const independentWallCoverage = cartographyEvidenceAudit.independentWallCoverageAudit;', $source);
         self::assertStringContainsString('dataset.cartographyIndependentCoverage', $source);
         self::assertStringContainsString('wholeIllustrationCoverageCertified: false, missingWallsCertified: false,', $source);
         self::assertStringContainsString('wallCertified: false, admittedEdges: 0, restoredRuns: 0', $source);
