@@ -20,6 +20,9 @@ final class IndependentWallCoverageAuditRegressionTest extends TestCase
         self::assertStringContainsString("'independent-original-ink-directional-run-screen-not-wall-certification'", $source);
         self::assertStringContainsString('directional-ink-can-be-grid-hatching-decoration-or-wall;not-exhaustive-illustration-coverage', $source);
         self::assertStringContainsString('independentWallCoverageAudit: independentWallCoverage,', $source);
+        // G.5Z.38 must not read the published audit before publication: it is null here.
+        self::assertStringContainsString('const mesh = independentIllustratedWallSurvey;', $source);
+        self::assertStringNotContainsString('const mesh = cartographyEvidenceAudit.independentIllustratedWallSurvey;', $source);
         self::assertStringContainsString('const independentWallCoverage = cartographyEvidenceAudit.independentWallCoverageAudit;', $source);
         self::assertStringContainsString('dataset.cartographyIndependentCoverage', $source);
         self::assertStringContainsString('wholeIllustrationCoverageCertified: false, missingWallsCertified: false,', $source);

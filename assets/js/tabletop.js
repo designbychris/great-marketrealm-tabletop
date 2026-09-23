@@ -7310,7 +7310,9 @@
                 // These are wall-LIKE candidates only: grid, hatching, and decoration
                 // can also form long strokes. Never emit or persist geometry here.
                 const independentWallCoverage = (() => {
-                    const mesh = cartographyEvidenceAudit.independentIllustratedWallSurvey;
+                    // The published audit is still null while this callback builds it.
+                    // Use the already-computed local survey and original darkness mesh.
+                    const mesh = independentIllustratedWallSurvey;
                     const runs = [];
                     const threshold = .72;
                     const minimumRun = 4;
