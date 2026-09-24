@@ -7536,6 +7536,85 @@
                         wholeIllustrationCoverageCertified: false, missingWallsCertified: false,
                         wallCertified: false, admittedEdges: 0, restoredRuns: 0 };
                 })();
+                // IV.30.1G.5Z.42 — Source Image Alignment Audit.
+                // Compare the exact source-to-analysis transform and independent pixel
+                // readings against the existing coarse mesh; diagnostics never emit walls.
+                const sourceImageAlignmentAudit = (() => {
+                    const paths = authoritativeContourSuggestions.concat(promotedReconstructedSurfaceSuggestions);
+                    const threshold = independentWallCoverage.threshold;
+                    const sourceToCanvasX = canvas.width / image.naturalWidth;
+                    const sourceToCanvasY = canvas.height / image.naturalHeight;
+                    const boardToCanvasX = canvas.width / displayWidth;
+                    const boardToCanvasY = canvas.height / displayHeight;
+                    const validTransform = [sourceToCanvasX, sourceToCanvasY, boardToCanvasX, boardToCanvasY,
+                        gridCanvasX, gridCanvasY, contourCellX, contourCellY].every((value) => Number.isFinite(value) && value > 0);
+                    const sourcePixelAt = (x, y) => {
+                        const px = originX + x * gridCanvasX;
+                        const py = originY + y * gridCanvasY;
+                        if (px < 0 || py < 0 || px >= canvas.width || py >= canvas.height) return null;
+                        return luminance(px, py) <= darkThreshold;
+                    };
+                    const meshInkAt = (x, y) => {
+                        const col = Math.floor(x / contourStep), row = Math.floor(y / contourStep);
+                        return col >= 0 && row >= 0 && col < contourColumns && row < contourRows
+                            ? darkness[row][col] >= threshold : null;
+                    };
+                    const offsets = [0, contourStep * .25, contourStep * .5, contourStep];
+                    const totals = offsets.map((offset) => ({ offset, samples: 0, pixelHits: 0, meshHits: 0,
+                        pixelOnly: 0, meshOnly: 0, both: 0, neither: 0, outsideImage: 0 }));
+                    const reviews = [];
+                    let segments = 0, remaining = 120000, skipped = 0;
+                    paths.forEach((path, pathIndex) => {
+                        const points = Array.isArray(path?.points) ? path.points : [];
+                        for (let i = 1; i < points.length; i++) {
+                            const a = points[i - 1], b = points[i];
+                            const dx = b.x - a.x, dy = b.y - a.y, length = Math.hypot(dx, dy);
+                            if (!Number.isFinite(length) || length < 1e-8 || remaining <= 0) { skipped++; continue; }
+                            segments++;
+                            const count = Math.min(Math.max(1, Math.ceil(length / contourStep)), remaining);
+                            remaining -= count;
+                            const nx = -dy / length, ny = dx / length;
+                            let segmentPixelOnly = 0, segmentMeshOnly = 0;
+                            for (let j = 0; j < count; j++) {
+                                const t = (j + .5) / count, x = a.x + dx * t, y = a.y + dy * t;
+                                offsets.forEach((offset, k) => {
+                                    // Both normal directions use the same original-image pixel transform.
+                                    const positions = offset === 0 ? [[x, y]] :
+                                        [[x + nx * offset, y + ny * offset], [x - nx * offset, y - ny * offset]];
+                                    positions.forEach(([sx, sy]) => {
+                                        const pixel = sourcePixelAt(sx, sy), mesh = meshInkAt(sx, sy);
+                                        const total = totals[k];
+                                        if (pixel === null || mesh === null) { total.outsideImage++; return; }
+                                        total.samples++;
+                                        if (pixel) total.pixelHits++;
+                                        if (mesh) total.meshHits++;
+                                        const category = pixel && mesh ? 'both' : pixel ? 'pixelOnly' : mesh ? 'meshOnly' : 'neither';
+                                        total[category]++;
+                                        if (k === 0 && pixel && !mesh) segmentPixelOnly++;
+                                        if (k === 0 && mesh && !pixel) segmentMeshOnly++;
+                                    });
+                                });
+                            }
+                            if ((segmentPixelOnly || segmentMeshOnly) && reviews.length < 12) {
+                                reviews.push({ pathIndex: pathIndex + 1, segmentIndex: i,
+                                    pixelOnly: segmentPixelOnly, meshOnly: segmentMeshOnly,
+                                    classification: 'source-pixel-versus-mesh-disagreement-review-not-wall-certified' });
+                            }
+                        }
+                    });
+                    return { diagnosticOnly: true, scope: 'source-image-to-grid-transform-and-pixel-mesh-correspondence-not-wall-certification',
+                        sourceWidth: image.naturalWidth, sourceHeight: image.naturalHeight,
+                        analysisWidth: canvas.width, analysisHeight: canvas.height,
+                        boardWidth: displayWidth, boardHeight: displayHeight,
+                        sourceToCanvasX, sourceToCanvasY, boardToCanvasX, boardToCanvasY,
+                        originX, originY, gridCanvasX, gridCanvasY, contourCellX, contourCellY,
+                        contourColumns, contourRows, validTransform, representedPaths: paths.length,
+                        representedSegments: segments, skippedSegments: skipped, sampleBudgetExhausted: remaining === 0,
+                        offsets: totals, reviews,
+                        limitation: 'single-pixel-versus-cell-density-is-not-a-wall-identity-test;image-resampling-and-hatching-remain-unresolved;unrepresented-walls-not-enumerated',
+                        wholeIllustrationCoverageCertified: false, missingWallsCertified: false,
+                        wallCertified: false, admittedEdges: 0, restoredRuns: 0 };
+                })();
                 if (options.evidenceAudit !== true || options.skipOcclusionRecovery === true) return;
                 const emittedKeys = new Set(emittedSuggestions.map(cartographySuggestionKey));
                 const promotedMemberKeys = new Set();
@@ -7779,6 +7858,7 @@
                     directionalInkContextAudit: directionalInkContext,
                     illustratedBoundaryCorrespondenceAudit: illustratedBoundaryCorrespondence,
                     samplingAlignmentAudit: samplingAlignmentAudit,
+                    sourceImageAlignmentAudit: sourceImageAlignmentAudit,
                     residualInkReviewDispositionAudit: independentIllustratedWallSurvey.residualInkClosure,
                     independentLocalInkFeatureClassificationAudit: {
                         diagnosticOnly: true, components: independentIllustratedWallSurvey.localInkFeatureClassification,
@@ -8264,6 +8344,15 @@
                 const directionalContext = cartographyEvidenceAudit.directionalInkContextAudit;
                 const correspondence = cartographyEvidenceAudit.illustratedBoundaryCorrespondenceAudit;
                 const alignment = cartographyEvidenceAudit.samplingAlignmentAudit;
+                const sourceAlignment = cartographyEvidenceAudit.sourceImageAlignmentAudit;
+                cartographyAuditRuntimeWitness.dataset.cartographySourceImageAlignment = sourceAlignment
+                    ? `G.5Z.42 source image alignment · ${sourceAlignment.scope} · source ${sourceAlignment.sourceWidth}x${sourceAlignment.sourceHeight} / analysis ${sourceAlignment.analysisWidth}x${sourceAlignment.analysisHeight} / board ${sourceAlignment.boardWidth}x${sourceAlignment.boardHeight} · ` +
+                        `source-to-canvas (${sourceAlignment.sourceToCanvasX.toFixed(5)},${sourceAlignment.sourceToCanvasY.toFixed(5)}) / board-to-canvas (${sourceAlignment.boardToCanvasX.toFixed(5)},${sourceAlignment.boardToCanvasY.toFixed(5)}) · ` +
+                        `origin (${sourceAlignment.originX.toFixed(2)},${sourceAlignment.originY.toFixed(2)}) / grid-cell (${sourceAlignment.gridCanvasX.toFixed(2)},${sourceAlignment.gridCanvasY.toFixed(2)}) / mesh-cell (${sourceAlignment.contourCellX.toFixed(2)},${sourceAlignment.contourCellY.toFixed(2)}) / mesh ${sourceAlignment.contourColumns}x${sourceAlignment.contourRows} · ` +
+                        `transform valid ${sourceAlignment.validTransform} · ${sourceAlignment.representedPaths} paths/${sourceAlignment.representedSegments} segments · ` +
+                        `pixel/mesh offsets [${sourceAlignment.offsets.map((entry) => `${entry.offset.toFixed(3)}:${entry.pixelHits}pixel/${entry.meshHits}mesh/${entry.both}both/${entry.pixelOnly}pixel-only/${entry.meshOnly}mesh-only/${entry.outsideImage}outside/${entry.samples}samples`).join(';')}] · ` +
+                        `${sourceAlignment.reviews.length} discrepancy reviews (first 12) [${sourceAlignment.reviews.map((review) => `P${review.pathIndex}:S${review.segmentIndex}/${review.pixelOnly}pixel-only/${review.meshOnly}mesh-only`).join(';')}] · budget exhausted ${sourceAlignment.sampleBudgetExhausted} · ${sourceAlignment.limitation} · wall certified false · 0 edges admitted · 0 runs restored`
+                    : 'G.5Z.42 source image alignment unavailable';
                 cartographyAuditRuntimeWitness.dataset.cartographySamplingAlignment = alignment
                     ? `G.5Z.41 sampling alignment · ${alignment.scope} · ${alignment.representedPaths} paths/${alignment.representedSegments} segments · ` +
                         `paired offsets [${alignment.offsets.map((entry) =>
@@ -8383,7 +8472,7 @@
                 const connectivityWitness = `G.5Z.23 connectivity · ${endpointRecords.length} endpoints · ${paired.length} two-endpoint connected runs · ${unmatched.length} no-adjacent-run endpoints [${unmatched.join(',')}] · ${pairings.map((run) => `R${run.runId}:${run.edges}e/E[${run.endpointIds.join(',')}]/${run.classification}`).join(' · ')} · ${endpointDetails}`;
                 cartographyAuditRuntimeWitness.dataset.cartographyConnectivity = connectivityWitness;
             }
-            reportCartographyAuditRuntime(`${cartographyAuditRuntimeWitness.dataset.cartographySamplingAlignment || 'G.5Z.41 sampling alignment unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyIllustratedCorrespondence || 'G.5Z.40 illustrated boundary correspondence unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyDirectionalInkContext || 'G.5Z.39 directional ink context unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyIndependentCoverage || 'G.5Z.38 independent wall coverage unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyEvidenceLedger || 'G.5Z.37 evidence ledger unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyInkDisposition || 'G.5Z.36 ink disposition unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyInkFeatures || 'G.5Z.35 ink features unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyLocalInk || 'G.5Z.34 local ink continuity unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyInkProvenance || 'G.5Z.33 ink provenance unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyIndependentWallSurvey || 'G.5Z.32 independent ink survey unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyWallCoverage || 'G.5Z.31 wall coverage unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyTerminationEvidence || 'G.5Z.30 termination evidence unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyFrontier || 'G.5Z.29 frontier unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyGeometry || 'G.5Z.28 geometry unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyClosure || 'G.5Z.27 closure unavailable'} · ${assemblyWitness} · ${cartographyAuditRuntimeWitness.dataset.cartographyProvenance || 'G.5Z.25 provenance unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyCoincidence || 'G.5Z.24 coincidence unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyConnectivity || 'G.5Z.23 connectivity unavailable'} · audit callback ${completedEvidenceAudit ? 'received' : 'MISSING'} · endpoint records ${Array.isArray(endpointRecords) ? endpointRecords.length : 'MISSING'} / expected ${expectedEndpoints ?? 'MISSING'} · SVG markers ${markerCount} · ${Array.isArray(endpointRecords) ? endpointRecords.map((record) => `${record.id}:P${record.pathIndex}/${record.reason}/${record.suppressedRunEdges}e`).join(', ') : 'no endpoint records published'}`);
+            reportCartographyAuditRuntime(`${cartographyAuditRuntimeWitness.dataset.cartographySourceImageAlignment || 'G.5Z.42 source image alignment unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographySamplingAlignment || 'G.5Z.41 sampling alignment unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyIllustratedCorrespondence || 'G.5Z.40 illustrated boundary correspondence unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyDirectionalInkContext || 'G.5Z.39 directional ink context unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyIndependentCoverage || 'G.5Z.38 independent wall coverage unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyEvidenceLedger || 'G.5Z.37 evidence ledger unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyInkDisposition || 'G.5Z.36 ink disposition unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyInkFeatures || 'G.5Z.35 ink features unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyLocalInk || 'G.5Z.34 local ink continuity unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyInkProvenance || 'G.5Z.33 ink provenance unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyIndependentWallSurvey || 'G.5Z.32 independent ink survey unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyWallCoverage || 'G.5Z.31 wall coverage unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyTerminationEvidence || 'G.5Z.30 termination evidence unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyFrontier || 'G.5Z.29 frontier unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyGeometry || 'G.5Z.28 geometry unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyClosure || 'G.5Z.27 closure unavailable'} · ${assemblyWitness} · ${cartographyAuditRuntimeWitness.dataset.cartographyProvenance || 'G.5Z.25 provenance unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyCoincidence || 'G.5Z.24 coincidence unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyConnectivity || 'G.5Z.23 connectivity unavailable'} · audit callback ${completedEvidenceAudit ? 'received' : 'MISSING'} · endpoint records ${Array.isArray(endpointRecords) ? endpointRecords.length : 'MISSING'} / expected ${expectedEndpoints ?? 'MISSING'} · SVG markers ${markerCount} · ${Array.isArray(endpointRecords) ? endpointRecords.map((record) => `${record.id}:P${record.pathIndex}/${record.reason}/${record.suppressedRunEdges}e`).join(', ') : 'no endpoint records published'}`);
             if (cartographySuggestions.length === 0 && cartographyAssistantStatus) {
                 cartographyAssistantStatus.textContent = cartographyEvidenceAudit
                     ? `Evidence Audit · no emitted contour objects · ${cartographyEvidenceAudit.rawChains} raw chains · ${cartographyEvidenceAudit.semanticRejected} semantic rejects · ${cartographyEvidenceAudit.inferredPerimeters} inferred perimeter edges.`
