@@ -3793,9 +3793,19 @@
             let illustratedPropagatedAdmissions = 0;
             let illustratedQuietFloorAdmissions = 0;
             let illustratedExhaustedFrontierCells = 0;
+            // IV.30.1G.5Z.48 — The Cartographer's Propagation Crossing Audit.
+            // Diagnostic provenance only: remember the first certified recovery admission
+            // that made each illustrated cell playable. The ledger never vetoes, admits or
+            // reorders recovery; it exists solely to explain how G.5Z.47's W bands became
+            // playable on both sides.
+            const illustratedAdmissionProvenance = new Map();
+            let illustratedRecoveryAuditStage = 'primary';
+            let illustratedRecoveryFloodSequence = 0;
             const illustratedFloorFloodPass = () => {
                 if (options.skipOcclusionRecovery === true) return 0;
                 let recovered = 0;
+                const recoveryFloodSequence = ++illustratedRecoveryFloodSequence;
+                const recoveryAuditStage = illustratedRecoveryAuditStage;
                 const maximumPasses = Math.max(10, Math.round(contourSubdivisions * 4.5));
                 const orthogonal = [[-1,0],[1,0],[0,-1],[0,1]];
                 const inBounds = (x,y) => x > 0 && y > 0 && x < contourColumns - 1 && y < contourRows - 1;
@@ -3904,7 +3914,11 @@
                         if (!localInteriorSupport && !provisionalDecorationAdmission) { illustratedFrontierInteriorSupportRejects+=1; continue; }
                         if (provisionalDecorationAdmission) illustratedFrontierProvisionalAdmissions+=1;
                         if (quietIllustratedFloor) illustratedQuietFloorAdmissions+=1;
-                        additions.push([column,row]);
+                        additions.push([column,row,seedColumn,seedRow,{
+                            pass: pass + 1, floodSequence: recoveryFloodSequence, stage: recoveryAuditStage,
+                            ink, quietIllustratedFloor, inkIsPlausibleDecoration, localInteriorSupport,
+                            provisionalDecorationAdmission, adjacentPlayable, directionalSupport, opposedSupport
+                        }]);
                         // G.5U historical contract: if (!localInteriorSupport) { illustratedFrontierInteriorSupportRejects+=1; continue; }
                         }
                     }
@@ -3914,10 +3928,15 @@
                     }
                     illustratedPropagationWaves += 1;
                     illustratedPropagationDeepestWave = Math.max(illustratedPropagationDeepestWave, pass + 1);
-                    additions.forEach(([column,row])=>{
+                    additions.forEach(([column,row,parentColumn,parentRow,provenance])=>{
                         if (isTrustedIllustratedSeed(column,row) || illustratedFloorContinuitySurface[row][column]) return;
                         floor[row][column]=true;
                         illustratedFloorContinuitySurface[row][column]=true;
+                        const provenanceKey = `${column},${row}`;
+                        if (!illustratedAdmissionProvenance.has(provenanceKey)) {
+                            illustratedAdmissionProvenance.set(provenanceKey, { column, row,
+                                parentColumn, parentRow, ...provenance });
+                        }
                         illustratedFrontierAdmitted+=1;
                         recovered+=1;
                         if (pass > 0) illustratedPropagatedAdmissions+=1;
@@ -4144,10 +4163,13 @@
             // G.5Y unchanged. Diagnostic mode is not required for the behaviour, while
             // skipOcclusionRecovery continues to disable all illustrated recovery.
             if (options.skipOcclusionRecovery !== true && illustratedSecondarySeedCandidates.length > 0) {
+                illustratedRecoveryAuditStage = 'secondary-g1';
                 illustratedSecondarySeedCandidates.forEach(([column,row]) => {
                     if (isTrustedIllustratedSeed(column,row) || illustratedFloorContinuitySurface[row][column]) return;
                     floor[row][column]=true;
                     illustratedFloorContinuitySurface[row][column]=true;
+                    illustratedAdmissionProvenance.set(`${column},${row}`, { column, row, parentColumn: null, parentRow: null,
+                        pass: 0, floodSequence: illustratedRecoveryFloodSequence + 1, stage: 'secondary-g1-seed', seedAdmission: true });
                     illustratedSecondarySeedsAdmitted+=1;
                 });
                 if (illustratedSecondarySeedsAdmitted > 0) {
@@ -4234,6 +4256,8 @@
                         illustratedFloorContinuitySurface[row][column]=true;
                         record.iterativeSeeded=true;
                         record.iterativeSeedGeneration=generation;
+                        illustratedAdmissionProvenance.set(`${column},${row}`, { column, row, parentColumn: null, parentRow: null,
+                            pass: 0, floodSequence: illustratedRecoveryFloodSequence + 1, stage: `iterative-g${generation}-seed`, seedAdmission: true });
                         generationSeeds+=1;
                     });
                     if (generation===2) illustratedIterativeGeneration2Seeds=generationSeeds;
@@ -4243,6 +4267,7 @@
                         break;
                     }
                     illustratedIterativeGenerationsRun+=1;
+                    illustratedRecoveryAuditStage=`iterative-g${generation}`;
                     const generationFloodRecovered=illustratedFloorFloodPass();
                     const generationRecovered=generationSeeds+generationFloodRecovered;
                     if (generation===2) illustratedIterativeGeneration2RecoveredCells=generationRecovered;
@@ -7940,6 +7965,82 @@
                         wholeIllustrationCoverageCertified: false, missingWallsCertified: false,
                         wallCertified: false, admittedEdges: 0, restoredRuns: 0 };
                 })();
+                // IV.30.1G.5Z.48 — The Cartographer's Propagation Crossing Audit.
+                // Trace each W profile through first-admission provenance. A direct crossing is
+                // reported only when an actual parent→child recovery interface intersects the
+                // W review's bounded normal corridor. Otherwise shared ancestry / independent
+                // roots are reported without inventing a missing edge or searching for a wall.
+                const propagationCrossingAudit = (() => {
+                    const cellKey = (column, row) => `${column},${row}`;
+                    const ancestry = (column, row) => {
+                        const chain = [], seen = new Set();
+                        let key = cellKey(column,row);
+                        for (let guard=0; guard<512 && !seen.has(key); guard+=1) {
+                            seen.add(key);
+                            const record = illustratedAdmissionProvenance.get(key);
+                            if (!record) return { chain, root: key, rootType: isTrustedIllustratedSeed(column,row) ? 'trusted-seed-or-canonical' : 'pre-existing-playable' };
+                            chain.push(record);
+                            if (record.parentColumn === null || record.parentRow === null) return { chain, root: key, rootType: record.stage || 'recovery-seed' };
+                            key = cellKey(record.parentColumn,record.parentRow);
+                            column=record.parentColumn; row=record.parentRow;
+                        }
+                        return { chain, root: key, rootType: 'guarded-provenance-chain' };
+                    };
+                    const interfaceInk = (parentColumn,parentRow,column,row) => {
+                        const x0=(parentColumn+.5)*contourStep, y0=(parentRow+.5)*contourStep;
+                        const x1=(column+.5)*contourStep, y1=(row+.5)*contourStep;
+                        let maximum=0, darkSamples=0, samples=0;
+                        for (let step=0;step<=8;step+=1) {
+                            const t=step/8, wx=x0+(x1-x0)*t, wy=y0+(y1-y0)*t;
+                            const px=Math.round(originX+wx*gridCanvasX), py=Math.round(originY+wy*gridCanvasY);
+                            if (px<0||py<0||px>=canvas.width||py>=canvas.height) continue;
+                            const ink=luminance(px,py)<=darkThreshold?1:0;
+                            maximum=Math.max(maximum,ink); darkSamples+=ink; samples+=1;
+                        }
+                        return { darkSamples, samples, density: darkSamples/Math.max(1,samples), maximum };
+                    };
+                    const reviews = wallBandSeparationAudit.reviews.map((review) => {
+                        const playableSamples=(review.samples||[]).filter((sample)=>sample.inMesh&&sample.playable);
+                        const negative=playableSamples.filter((sample)=>sample.distanceCells<0).sort((a,b)=>Math.abs(a.distanceCells)-Math.abs(b.distanceCells))[0];
+                        const positive=playableSamples.filter((sample)=>sample.distanceCells>0).sort((a,b)=>Math.abs(a.distanceCells)-Math.abs(b.distanceCells))[0];
+                        if (!negative || !positive) return { id:review.id, classification:'playable-side-pair-unavailable', directCrossings:[], recoveryVetoes:0 };
+                        const negativeAncestry=ancestry(negative.column,negative.row), positiveAncestry=ancestry(positive.column,positive.row);
+                        const negativeKeys=new Set(negativeAncestry.chain.map((r)=>cellKey(r.column,r.row)).concat([negativeAncestry.root]));
+                        const positiveKeys=new Set(positiveAncestry.chain.map((r)=>cellKey(r.column,r.row)).concat([positiveAncestry.root]));
+                        const shared=Array.from(negativeKeys).find((key)=>positiveKeys.has(key)) || null;
+                        const candidates=negativeAncestry.chain.concat(positiveAncestry.chain).filter((record)=>record.parentColumn!==null&&record.parentRow!==null);
+                        const directCrossings=[];
+                        candidates.forEach((record)=>{
+                            const parentX=(record.parentColumn+.5)*contourStep, parentY=(record.parentRow+.5)*contourStep;
+                            const childX=(record.column+.5)*contourStep, childY=(record.row+.5)*contourStep;
+                            const vx=childX-parentX, vy=childY-parentY;
+                            const wx=review.point.x-parentX, wy=review.point.y-parentY;
+                            const denominator=vx*vx+vy*vy;
+                            const t=denominator>0?Math.max(0,Math.min(1,(wx*vx+wy*vy)/denominator)):0;
+                            const nearestX=parentX+vx*t, nearestY=parentY+vy*t;
+                            const distance=Math.hypot(nearestX-review.point.x,nearestY-review.point.y)/Math.max(contourStep,1e-8);
+                            if (distance>.8) return;
+                            directCrossings.push({ ...record, distanceCells:distance,
+                                interfaceInk:interfaceInk(record.parentColumn,record.parentRow,record.column,record.row) });
+                        });
+                        directCrossings.sort((a,b)=>a.distanceCells-b.distanceCells);
+                        const first=directCrossings[0]||null;
+                        return { id:review.id, negativeCell:[negative.column,negative.row], positiveCell:[positive.column,positive.row],
+                            negativeRoot:negativeAncestry.root, positiveRoot:positiveAncestry.root, sharedAncestor:shared,
+                            directCrossings:directCrossings.slice(0,3),
+                            classification:first?'first-admission-interface-crossing-near-wall-band'
+                                : shared?'playable-sides-share-recovery-ancestry-without-local-direct-crossing'
+                                :'playable-sides-have-independent-first-admission-roots',
+                            firstCrossing:first, recoveryVetoes:0 };
+                    });
+                    return { diagnosticOnly:true,
+                        scope:'first-admission-recovery-provenance-plus-original-image-interface-ink-not-wall-certification',
+                        reviews, directInterfaceCrossings:reviews.filter((r)=>r.directCrossings?.length>0).length,
+                        sharedAncestryWithoutDirectCrossing:reviews.filter((r)=>r.classification==='playable-sides-share-recovery-ancestry-without-local-direct-crossing').length,
+                        independentRoots:reviews.filter((r)=>r.classification==='playable-sides-have-independent-first-admission-roots').length,
+                        limitation:'first-admission-provenance-only;does-not-enumerate-all-playable-connectivity;no-nearest-wall-search;no-recovery-veto',
+                        wallCertified:false, admittedEdges:0, restoredRuns:0, recoveryVetoes:0 };
+                })();
                 if (options.evidenceAudit !== true || options.skipOcclusionRecovery === true) return;
                 const emittedKeys = new Set(emittedSuggestions.map(cartographySuggestionKey));
                 const promotedMemberKeys = new Set();
@@ -8189,6 +8290,7 @@
                     adaptiveInkSamplingAudit: adaptiveInkSamplingAudit,
                     illustratedWallIdentityAudit: illustratedWallIdentityAudit,
                     wallBandSeparationAudit: wallBandSeparationAudit,
+                    propagationCrossingAudit: propagationCrossingAudit,
                     residualInkReviewDispositionAudit: independentIllustratedWallSurvey.residualInkClosure,
                     independentLocalInkFeatureClassificationAudit: {
                         diagnosticOnly: true, components: independentIllustratedWallSurvey.localInkFeatureClassification,
@@ -8676,6 +8778,10 @@
                 const alignment = cartographyEvidenceAudit.samplingAlignmentAudit;
                 const wallIdentity = cartographyEvidenceAudit.illustratedWallIdentityAudit;
                 const wallBand = cartographyEvidenceAudit.wallBandSeparationAudit;
+                const propagationCrossing = cartographyEvidenceAudit.propagationCrossingAudit;
+                cartographyAuditRuntimeWitness.dataset.cartographyPropagationCrossing = propagationCrossing
+                    ? `G.5Z.48 propagation crossing · ${propagationCrossing.scope} · ${propagationCrossing.reviews.length} W reviews · ${propagationCrossing.directInterfaceCrossings} direct-interface crossings · ${propagationCrossing.sharedAncestryWithoutDirectCrossing} shared-ancestry/no-direct · ${propagationCrossing.independentRoots} independent roots · [${propagationCrossing.reviews.map((r)=>`W${r.id}:${r.classification}${r.firstCrossing?`/${r.firstCrossing.stage}/wave${r.firstCrossing.pass}/from(${r.firstCrossing.parentColumn},${r.firstCrossing.parentRow})->(${r.firstCrossing.column},${r.firstCrossing.row})/interfaceInk${Number(r.firstCrossing.interfaceInk?.density||0).toFixed(3)}`:''}`).join(';')}] · ${propagationCrossing.limitation} · wall certified false · 0 edges admitted · 0 runs restored · 0 recovery vetoes`
+                    : 'G.5Z.48 propagation crossing unavailable';
                 cartographyAuditRuntimeWitness.dataset.cartographyWallBand = wallBand
                     ? `G.5Z.47 wall-band separation · ${wallBand.scope} · ${wallBand.reviews.length} bounded reviews / ${wallBand.geometryAvailable} geometry available / ${wallBand.bandObserved} ink bands / ${wallBand.playableToNonPlayableAcrossBand} playable-to-nonplayable band patterns / ${wallBand.playableBothSides} playable-both-sides / ${wallBand.nonPlayableBothSides} nonplayable-both-sides · profiles [${wallBand.reviews.map((r) => `W${r.id}:${r.classification}/maxInk${Number(r.maxInkDensity || 0).toFixed(3)}/samples[${(r.samples || []).map((sample) => `${sample.distanceCells}:${Number(sample.playable)}/${sample.inkDensity.toFixed(3)}`).join('|')}]`).join(';')}] · ${wallBand.limitation} · wall certified false · 0 edges admitted · 0 runs restored`
                     : 'G.5Z.47 wall-band separation unavailable';
@@ -8822,7 +8928,7 @@
                 const connectivityWitness = `G.5Z.23 connectivity · ${endpointRecords.length} endpoints · ${paired.length} two-endpoint connected runs · ${unmatched.length} no-adjacent-run endpoints [${unmatched.join(',')}] · ${pairings.map((run) => `R${run.runId}:${run.edges}e/E[${run.endpointIds.join(',')}]/${run.classification}`).join(' · ')} · ${endpointDetails}`;
                 cartographyAuditRuntimeWitness.dataset.cartographyConnectivity = connectivityWitness;
             }
-            reportCartographyAuditRuntime(`${cartographyAuditRuntimeWitness.dataset.cartographyWallBand || 'G.5Z.47 wall-band separation unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyWallIdentity || 'G.5Z.46 illustrated wall identity unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyAdaptiveInkSampling || 'G.5Z.45 adaptive ink sampling unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyInkPreservation || 'G.5Z.44 ink preservation unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyPixelMeshFidelity || 'G.5Z.43 pixel-to-mesh fidelity unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographySourceImageAlignment || 'G.5Z.42 source image alignment unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographySamplingAlignment || 'G.5Z.41 sampling alignment unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyIllustratedCorrespondence || 'G.5Z.40 illustrated boundary correspondence unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyDirectionalInkContext || 'G.5Z.39 directional ink context unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyIndependentCoverage || 'G.5Z.38 independent wall coverage unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyEvidenceLedger || 'G.5Z.37 evidence ledger unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyInkDisposition || 'G.5Z.36 ink disposition unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyInkFeatures || 'G.5Z.35 ink features unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyLocalInk || 'G.5Z.34 local ink continuity unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyInkProvenance || 'G.5Z.33 ink provenance unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyIndependentWallSurvey || 'G.5Z.32 independent ink survey unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyWallCoverage || 'G.5Z.31 wall coverage unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyTerminationEvidence || 'G.5Z.30 termination evidence unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyFrontier || 'G.5Z.29 frontier unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyGeometry || 'G.5Z.28 geometry unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyClosure || 'G.5Z.27 closure unavailable'} · ${assemblyWitness} · ${cartographyAuditRuntimeWitness.dataset.cartographyProvenance || 'G.5Z.25 provenance unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyCoincidence || 'G.5Z.24 coincidence unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyConnectivity || 'G.5Z.23 connectivity unavailable'} · audit callback ${completedEvidenceAudit ? 'received' : 'MISSING'} · endpoint records ${Array.isArray(endpointRecords) ? endpointRecords.length : 'MISSING'} / expected ${expectedEndpoints ?? 'MISSING'} · SVG markers ${markerCount} · ${Array.isArray(endpointRecords) ? endpointRecords.map((record) => `${record.id}:P${record.pathIndex}/${record.reason}/${record.suppressedRunEdges}e`).join(', ') : 'no endpoint records published'}`);
+            reportCartographyAuditRuntime(`${cartographyAuditRuntimeWitness.dataset.cartographyPropagationCrossing || 'G.5Z.48 propagation crossing unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyWallBand || 'G.5Z.47 wall-band separation unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyWallIdentity || 'G.5Z.46 illustrated wall identity unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyAdaptiveInkSampling || 'G.5Z.45 adaptive ink sampling unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyInkPreservation || 'G.5Z.44 ink preservation unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyPixelMeshFidelity || 'G.5Z.43 pixel-to-mesh fidelity unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographySourceImageAlignment || 'G.5Z.42 source image alignment unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographySamplingAlignment || 'G.5Z.41 sampling alignment unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyIllustratedCorrespondence || 'G.5Z.40 illustrated boundary correspondence unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyDirectionalInkContext || 'G.5Z.39 directional ink context unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyIndependentCoverage || 'G.5Z.38 independent wall coverage unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyEvidenceLedger || 'G.5Z.37 evidence ledger unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyInkDisposition || 'G.5Z.36 ink disposition unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyInkFeatures || 'G.5Z.35 ink features unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyLocalInk || 'G.5Z.34 local ink continuity unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyInkProvenance || 'G.5Z.33 ink provenance unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyIndependentWallSurvey || 'G.5Z.32 independent ink survey unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyWallCoverage || 'G.5Z.31 wall coverage unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyTerminationEvidence || 'G.5Z.30 termination evidence unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyFrontier || 'G.5Z.29 frontier unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyGeometry || 'G.5Z.28 geometry unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyClosure || 'G.5Z.27 closure unavailable'} · ${assemblyWitness} · ${cartographyAuditRuntimeWitness.dataset.cartographyProvenance || 'G.5Z.25 provenance unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyCoincidence || 'G.5Z.24 coincidence unavailable'} · ${cartographyAuditRuntimeWitness.dataset.cartographyConnectivity || 'G.5Z.23 connectivity unavailable'} · audit callback ${completedEvidenceAudit ? 'received' : 'MISSING'} · endpoint records ${Array.isArray(endpointRecords) ? endpointRecords.length : 'MISSING'} / expected ${expectedEndpoints ?? 'MISSING'} · SVG markers ${markerCount} · ${Array.isArray(endpointRecords) ? endpointRecords.map((record) => `${record.id}:P${record.pathIndex}/${record.reason}/${record.suppressedRunEdges}e`).join(', ') : 'no endpoint records published'}`);
             if (cartographySuggestions.length === 0 && cartographyAssistantStatus) {
                 cartographyAssistantStatus.textContent = cartographyEvidenceAudit
                     ? `Evidence Audit · no emitted contour objects · ${cartographyEvidenceAudit.rawChains} raw chains · ${cartographyEvidenceAudit.semanticRejected} semantic rejects · ${cartographyEvidenceAudit.inferredPerimeters} inferred perimeter edges.`
