@@ -1469,3 +1469,7 @@ Diagnostic-only endpoint inventory of the final promoted reconstructed-surface p
 ### IV.30.1G.5Z.22B.1 — Authoritative Endpoint Initialization Correction
 
 Move the residual termination diagnostic block after authoritative contour initialization and exact-endpoint coalescence, before reconstructed surface authority extensions. This fixes the JavaScript temporal-dead-zone error without changing surface admission, wall geometry, the 200-object review ceiling, or persistence. Add an execution-order regression test.
+
+### IV.30.1G.5Z.46 — The Cartographer's Illustrated Wall Identity Audit
+
+Diagnostic-only bounded follow-up to G.5Z.45. The audit revisits only the adaptive pixel-review windows and combines three independent local observations without granting wall authority: original-image adaptive ink density, ink direction relative to the represented segment, and whether the segment locally separates the completed playable surface from non-playable mesh. Individually numbered `W` markers expose these bounded review locations in Evidence Audit mode. A candidate remains explicitly `not certified`; the phase does not enumerate unrepresented walls, close open chains, restore suppressed frontier, alter floor recovery, change thresholds, snap/bridge geometry, consume review capacity, or persist diagnostic marks. The 200-object review ceiling, 256-vertex cap, certified-overlay separation and G.5Z.18/G.5Z.21 restoration rules remain unchanged.
