@@ -3969,6 +3969,14 @@
                 illustratedDecorationRejectComponents += 1;
                 const queue=[startKey];
                 decorationRejectVisited.add(startKey);
+                // IV.30.1G.5Z.49A — keep the component membership ledger in the
+                // same lexical scope as the decoration-reject component walk. G.5Z.10
+                // intentionally retained these exact keys for later recovery audits;
+                // relying on an outer/transient componentKeys binding makes Evidence
+                // Audit execution cache/order dependent and can abort G.5Z.49 before
+                // provenance is published. This is bookkeeping only: no cell admission,
+                // rejection, geometry, threshold, or persistence behaviour changes.
+                const componentKeys=[];
                 let componentCells=0;
                 let playableContacts=0;
                 let hasMultiSidedPlayableSupport=false;
