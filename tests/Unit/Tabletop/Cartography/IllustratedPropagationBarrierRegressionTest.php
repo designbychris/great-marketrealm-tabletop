@@ -27,6 +27,6 @@ final class IllustratedPropagationBarrierRegressionTest extends TestCase
         self::assertIsString($source);
         self::assertStringContainsString('propagation barriers ${audit.illustratedPropagationBarrierCandidates || 0} candidates', $source);
         self::assertStringContainsString('const maximumPathVertices = 256;', $source);
-        self::assertStringContainsString('const reconstructedSurfaceReviewCeiling=200;', $source);
+        self::assertStringContainsString('const reconstructedSurfaceReviewCeiling = maximumReviewSuggestions;', $source);
     }
 }
