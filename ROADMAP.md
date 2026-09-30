@@ -1528,3 +1528,11 @@ Diagnostic-only follow-up to G.5Z.50D. Preserve every live G.5Z.50 recovery veto
 ### IV.30.1G.5Z.50F — The Wall Knows What Lies Beyond
 
 Diagnostic-only follow-up to G.5Z.50E. Preserve every live G.5Z.50 recovery veto while extending each sustained run's exact two-sided context probe to fixed normal distances of one, two and three mesh cells. For each side of every run≥3 band, publish the dominant context, playable count and mean image ink at each exact distance, then distinguish persistent playable-floor on both sides, persistent playable-floor to hatch/exterior, persistent playable-floor to open-paper, changing/decaying context, and other unresolved persistent profiles. The purpose is to test whether the immediate G.5Z.50E floor/exterior distinction remains spatially stable away from the band; persistence is still review evidence, not wall certification. Sampling is bounded exact-cell topology only: no nearest-wall search, snapping, bridging, recovery replay, threshold change or new wall authority. No veto is added or removed, and recovered floor, structural/exterior safeguards, G.5Z.18/G.5Z.21 restoration rules, the 200-object review ceiling, 256-vertex cap, certified overlays, authoritative geometry and diagnostic non-persistence remain unchanged. G.5Z.50 remains the active production barrier.
+
+### IV.30.1G.5Z.50G — The Wall Must Have Somewhere to Stand
+
+- Adds a diagnostic-only longitudinal structural-spine audit for the sustained G.5Z.50F bands.
+- Compares persistent playable-floor→open-paper candidates against persistent playable-floor↔playable-floor negative controls.
+- Samples only the exact veto interface with bounded tangent offsets; records supported interfaces, centre-line ink, tangent support, longest unsupported gap, and the existing boundary/parallel evidence.
+- Does **not** certify walls, replay recovery, alter G.5Z.50 vetoes, search for nearby walls, snap geometry, bridge gaps, or change reconstruction/restoration budgets.
+- Preserves the 200 review-object ceiling, 256-vertex cap, authoritative geometry, certified overlays, structural/exterior safeguards, and diagnostic non-persistence.
