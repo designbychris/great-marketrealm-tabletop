@@ -8570,8 +8570,9 @@
                 // a nearby wall, snaps geometry, bridges gaps, replays recovery, or changes the
                 // live G.5Z.50 veto.
                 const barrierSpineDarkAtWorld=(wx,wy)=>{
-                    const pixel=sourcePixelAtWorld(wx,wy);
-                    return pixel&&pixel.luma<=112?1:0;
+                    const px=originX+wx*gridCanvasX,py=originY+wy*gridCanvasY;
+                    if (px<0||py<0||px>=canvas.width||py>=canvas.height) return 0;
+                    return luminance(px,py)<=darkThreshold?1:0;
                 };
                 const barrierSpineMemberEvidence=(entry)=>{
                     const wx=entry.interfaceColumn*contourStep,wy=entry.interfaceRow*contourStep;

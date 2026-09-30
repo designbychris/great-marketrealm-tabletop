@@ -15,6 +15,9 @@ final class WallMustHaveSomewhereToStandRegressionTest extends TestCase
 
         self::assertStringContainsString('IV.30.1G.5Z.50G — The Wall Must Have Somewhere to Stand.', $source);
         self::assertStringContainsString('const barrierSpineMemberEvidence=', $source);
+        self::assertStringNotContainsString('sourcePixelAtWorld(', $source);
+        self::assertStringContainsString('originX+wx*gridCanvasX', $source);
+        self::assertStringContainsString('luminance(px,py)<=darkThreshold', $source);
         self::assertStringContainsString("'persistent-playable-floor-to-open-paper'", $source);
         self::assertStringContainsString("'persistent-playable-floor-both-sides'", $source);
         self::assertStringContainsString("'candidate-floor-open'", $source);
