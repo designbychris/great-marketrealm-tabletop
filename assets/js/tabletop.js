@@ -3957,6 +3957,12 @@
                     return !floor[row]?.[column] && !illustratedFloorContinuitySurface[row]?.[column];
                 }));
             const decorationRejectVisited = new Set();
+            // IV.30.1G.5Z.49B — The Cartographer's Provenance Runtime Hardening.
+            // G.5Z.4's post-flood component audit executes after illustratedFloorFloodPass
+            // has returned, so it must own its traversal primitives rather than borrowing
+            // `orthogonal` / `inBounds` from that flood's lexical scope. Diagnostic only.
+            const decorationRejectOrthogonal = [[-1,0],[1,0],[0,-1],[0,1]];
+            const decorationRejectInBounds = (x,y) => x > 0 && y > 0 && x < contourColumns - 1 && y < contourRows - 1;
             let illustratedDecorationRejectComponents = 0;
             let illustratedDecorationRejectAdjacentComponents = 0;
             let illustratedDecorationRejectMultiSidedComponents = 0;
@@ -3989,9 +3995,9 @@
                     componentCells+=1;
                     if (column <= 1 || row <= 1 || column >= contourColumns-2 || row >= contourRows-2) touchesMeshBorder=true;
                     let cellPlayableContacts=0;
-                    orthogonal.forEach(([dx,dy], directionIndex) => {
+                    decorationRejectOrthogonal.forEach(([dx,dy], directionIndex) => {
                         const nx=column+dx,ny=row+dy;
-                        if (!inBounds(nx,ny)) return;
+                        if (!decorationRejectInBounds(nx,ny)) return;
                         const neighbourKey=`${nx},${ny}`;
                         if (finalIllustratedDecorationRejectCells.has(neighbourKey)) {
                             if (!decorationRejectVisited.has(neighbourKey)) {
@@ -7951,6 +7957,10 @@
                         const nonPlayableBothSides = negativeNonPlayable && positiveNonPlayable;
                         const bandObserved = inkBandSamples > 0;
                         return { id: review.id, pathIndex: review.pathIndex, segmentIndex: review.segmentIndex,
+                            // Preserve the exact bounded witness centre for downstream G.5Z.48/49
+                            // provenance diagnostics. Earlier audit output omitted this field and
+                            // G.5Z.48 consequently dereferenced an undefined `review.point`.
+                            point: { x: review.point.x, y: review.point.y },
                             geometryAvailable: true, samples, negativePlayable, positivePlayable,
                             negativeNonPlayable, positiveNonPlayable, inkBandSamples, maxInkDensity,
                             playableToNonPlayableAcrossBand, playableBothSides, nonPlayableBothSides, bandObserved,
@@ -8008,6 +8018,10 @@
                         return { darkSamples, samples, density: darkSamples/Math.max(1,samples), maximum };
                     };
                     const reviews = wallBandSeparationAudit.reviews.map((review) => {
+                        const reviewPoint = review?.point;
+                        if (!reviewPoint || !Number.isFinite(reviewPoint.x) || !Number.isFinite(reviewPoint.y)) {
+                            return { id:review?.id||0, classification:'bounded-review-point-unavailable', directCrossings:[], firstCrossing:null, recoveryVetoes:0 };
+                        }
                         const playableSamples=(review.samples||[]).filter((sample)=>sample.inMesh&&sample.playable);
                         const negative=playableSamples.filter((sample)=>sample.distanceCells<0).sort((a,b)=>Math.abs(a.distanceCells)-Math.abs(b.distanceCells))[0];
                         const positive=playableSamples.filter((sample)=>sample.distanceCells>0).sort((a,b)=>Math.abs(a.distanceCells)-Math.abs(b.distanceCells))[0];
@@ -8016,17 +8030,19 @@
                         const negativeKeys=new Set(negativeAncestry.chain.map((r)=>cellKey(r.column,r.row)).concat([negativeAncestry.root]));
                         const positiveKeys=new Set(positiveAncestry.chain.map((r)=>cellKey(r.column,r.row)).concat([positiveAncestry.root]));
                         const shared=Array.from(negativeKeys).find((key)=>positiveKeys.has(key)) || null;
-                        const candidates=negativeAncestry.chain.concat(positiveAncestry.chain).filter((record)=>record.parentColumn!==null&&record.parentRow!==null);
+                        const candidates=negativeAncestry.chain.concat(positiveAncestry.chain)
+                            .filter((record)=>record && record.parentColumn!==null && record.parentRow!==null
+                                && [record.parentColumn,record.parentRow,record.column,record.row].every(Number.isFinite));
                         const directCrossings=[];
                         candidates.forEach((record)=>{
                             const parentX=(record.parentColumn+.5)*contourStep, parentY=(record.parentRow+.5)*contourStep;
                             const childX=(record.column+.5)*contourStep, childY=(record.row+.5)*contourStep;
                             const vx=childX-parentX, vy=childY-parentY;
-                            const wx=review.point.x-parentX, wy=review.point.y-parentY;
+                            const wx=reviewPoint.x-parentX, wy=reviewPoint.y-parentY;
                             const denominator=vx*vx+vy*vy;
                             const t=denominator>0?Math.max(0,Math.min(1,(wx*vx+wy*vy)/denominator)):0;
                             const nearestX=parentX+vx*t, nearestY=parentY+vy*t;
-                            const distance=Math.hypot(nearestX-review.point.x,nearestY-review.point.y)/Math.max(contourStep,1e-8);
+                            const distance=Math.hypot(nearestX-reviewPoint.x,nearestY-reviewPoint.y)/Math.max(contourStep,1e-8);
                             if (distance>.8) return;
                             directCrossings.push({ ...record, distanceCells:distance,
                                 interfaceInk:interfaceInk(record.parentColumn,record.parentRow,record.column,record.row) });
@@ -8060,6 +8076,9 @@
                     const keyFor = (column,row) => `${column},${row}`;
                     const lineage = (column,row) => {
                         const records=[], keys=[], seen=new Set();
+                        if (!Number.isFinite(column) || !Number.isFinite(row)) {
+                            return { records, keys, root:'unavailable', rootType:'provenance-coordinate-unavailable' };
+                        }
                         let key=keyFor(column,row), rootType='pre-existing-playable';
                         for (let guard=0; guard<512 && !seen.has(key); guard+=1) {
                             seen.add(key); keys.push(key);
@@ -8111,7 +8130,8 @@
                         const positiveKeySet=new Set(positiveLineage.keys);
                         const sharedAncestor=negativeLineage.keys.find((key)=>positiveKeySet.has(key))||null;
                         const candidateRecords=negativeLineage.records.concat(positiveLineage.records)
-                            .filter((record)=>record.parentColumn!==null&&record.parentRow!==null);
+                            .filter((record)=>record && record.parentColumn!==null && record.parentRow!==null
+                                && [record.parentColumn,record.parentRow,record.column,record.row].every(Number.isFinite));
                         const crossings=[];
                         candidateRecords.forEach((record)=>{
                             const px=(record.parentColumn+.5)*contourStep,py=(record.parentRow+.5)*contourStep;
