@@ -1,10 +1,10 @@
 <?php
 /**
- * Plugin Name: Great Marketrealm Tabletop
+ * Plugin Name: Great MarketRealm Tabletop
  * Plugin URI:  https://greatmarketrealm.co.uk/
  * Description: The live virtual tabletop for adventures across The Great Marketrealm.
  * Version:     0.32.0-alpha.8
- * Author:      Great Marketrealm
+ * Author:      Christopher Mitchell
  * Text Domain: great-marketrealm-tabletop
  * Domain Path: /languages
  * Requires PHP: 8.1
