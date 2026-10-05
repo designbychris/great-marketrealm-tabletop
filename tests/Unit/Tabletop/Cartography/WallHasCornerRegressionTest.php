@@ -13,7 +13,7 @@ final class WallHasCornerRegressionTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->source = (string) file_get_contents(dirname(__DIR__, 5) . '/assets/js/tabletop.js');
+        $this->source = (string) file_get_contents(dirname(__DIR__, 4) . '/assets/js/tabletop.js');
     }
 
     public function test_phase_50t_keeps_the_residual_bypass_audit_bounded_and_diagnostic_only(): void
