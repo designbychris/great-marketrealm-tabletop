@@ -2649,6 +2649,7 @@
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.2 certificate/boundary ${audit.illustratedPropagationBarrierCornerBoundaryReady||0} structurally ready / ${audit.illustratedPropagationBarrierCornerBoundaryUncertified||0} withheld · reviews [${(audit.illustratedPropagationBarrierCornerBoundaryReviews||[]).map((entry)=>`B${entry.id}:${entry.classification}/corner[${entry.corners.join('&')}]/new${entry.proposedEdges}/struct${entry.structuralEdges}/sides[${entry.interfaces.map((side)=>`${side.side}:${side.cornerPlayable?'c':''}${side.neighbourPlayable?'p':''}${side.existingBoundary?'existing':''}${side.counterfactualBoundary?'new':''}${side.exactStructural?'struct':''}@${side.localInkPermille}`).join('|')}]`).join(';')}] · diagnostic-only;exact-four-neighbour-boundary-counterfactual;no-wall-admission;no-recovery-replay;no-geometry-mutation`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.3 boundary witnesses ${audit.illustratedPropagationBarrierCornerBoundaryWitnessInterfaces||0} interfaces · reviews [${(audit.illustratedPropagationBarrierCornerBoundaryWitnessReviews||[]).map((entry)=>`B${entry.id}:${entry.classification}/[${entry.witnesses.map((w)=>`${w.side}:${w.classification}/ink[${w.inkSamplesPermille.join(',')}]/adj${w.adjacentRepresented}/struct${w.adjacentStructural}`).join('|')}]`).join(';')}] · diagnostic-only;original-ink-directional-witnesses;no-wall-admission;no-recovery-replay;no-geometry-mutation`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.4 corner neighbours ${audit.illustratedPropagationBarrierCornerNeighbourInterfaces||0} interfaces · reviews [${(audit.illustratedPropagationBarrierCornerNeighbourReviews||[]).map((r)=>`B${r.id}:${r.classification}/[${r.connections.map((c)=>`${c.side}:${c.joined}/2joined/${c.structuralJoined}/2struct/${c.turns}turn/${c.classification}/{${c.endpoints.map((e)=>`${e.at}>${e.neighbours.map((n)=>`${n.to}:${n.represented?'p':''}${n.structural?'s':''}${n.relation}`).join('&')}`).join('|')}}`).join(';')}]`).join(';')}] · diagnostic-only;exact-shared-vertices;no-wall-certification;no-geometry-mutation;G.5Z.50-veto-unchanged`;
+                cartographyAssistantStatus.textContent += ` · G.5Z.50Z.5 missing connections ${audit.illustratedPropagationBarrierCornerMissingConnectionEndpoints||0} endpoints · reviews [${(audit.illustratedPropagationBarrierCornerMissingConnectionReviews||[]).map((r)=>`B${r.id}:${r.classification}/[${r.gaps.map((g)=>`${g.side}:{${g.endpoints.map((e)=>`${e.at}>${e.closest?`${e.closest.at}/${e.closest.distanceQuarter}q/${e.closest.source}/${e.classification}`:e.classification}`).join('|')}}`).join(';')}]`).join(';')}] · diagnostic-only;bounded-quarter-grid-endpoint-survey;no-snapping;no-wall-certification;no-geometry-mutation;G.5Z.50-veto-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50W spine reconciliation ${audit.illustratedPropagationBarrierSpineReconciliationFieldDisagreements||0} field disagreements / ${audit.illustratedPropagationBarrierSpineReconciliationLegacyMissing||0} missing legacy fields · reviews [${(audit.illustratedPropagationBarrierSpineReconciliationReviews||[]).map((entry)=>`B${entry.id}:${entry.role}/G:${entry.actualSpine}/V:${entry.legacySpine}/support${entry.supportedInterfaces}/${entry.length}/centre${entry.centreDarkInterfaces}/${entry.length}/gap${entry.longestUnsupported}/boundary${(entry.boundaryPermille/1000).toFixed(3)}/parallel${(entry.parallelPermille/1000).toFixed(3)}/width${entry.routeContinuous?'yes':'no'}/coherent${entry.routeCoherent?'yes':'no'}/otherFailures[${entry.otherFailures.join('&')}]/${entry.classification}`).join(';')}] · diagnostic-only;G.5Z.50V-gate-unchanged;G.5Z.50-veto-unchanged`;
             } else {
                 const doors = cartographySuggestions.filter((item) => item.type === 'door').length;
@@ -9766,6 +9767,59 @@
                 const illustratedPropagationBarrierCornerNeighbourReviews=barrierCornerNeighbourReviews;
                 const illustratedPropagationBarrierCornerNeighbourInterfaces=barrierCornerNeighbourReviews.reduce((n,r)=>n+r.connections.length,0);
 
+                // IV.30.1G.5Z.50Z.5 — The Corner's Missing Connection.
+                // Read-only bounded endpoint survey. Exact joins remain the sole joins:
+                // nearby fractional-grid geometry is measured, never snapped or admitted.
+                const barrierCornerMissingConnectionReviews=barrierCornerNeighbourReviews.map((review)=>{
+                    const source=barrierCornerBoundaryReviews.find((entry)=>entry.id===review.id);
+                    const gaps=[];
+                    for(const cornerKey of source?.corners||[]){
+                        const [cx,cy]=cornerKey.split(',').map(Number);
+                        for(const [dx,dy,side] of [[-1,0,'west'],[1,0,'east'],[0,-1,'north'],[0,1,'south']]){
+                            if(!source.interfaces.find((item)=>item.side===side)?.counterfactualBoundary)continue;
+                            const [a,b]=completedSurfaceEdge(cx,cy,dx,dy);
+                            const tangent={x:b.x-a.x,y:b.y-a.y};
+                            const endpoints=[a,b].map((point)=>{
+                                let closest=null;
+                                // Only the immediate one-cell neighbourhood, sampled at
+                                // exact quarter-grid coordinates. No global nearest search.
+                                for(let ix=-4;ix<=4;ix++)for(let iy=-4;iy<=4;iy++){
+                                    if(ix===0&&iy===0)continue;
+                                    const other={x:point.x+ix/4,y:point.y+iy/4};
+                                    const represented=completedSurfaceEdgeKeys.has(completedEdgeKey(point,other));
+                                    const structural=Boolean(surfaceStructuralEdge(point.x,point.y,other.x,other.y));
+                                    if(represented||structural)continue; // already inspected in Z.4
+                                    // Probe actual existing edge endpoints, not imaginary
+                                    // lines between this point and an arbitrary candidate.
+                                    for(const [sx,sy] of [[-1,0],[1,0],[0,-1],[0,1]]){
+                                        const end={x:other.x+sx,y:other.y+sy};
+                                        const existing=completedSurfaceEdgeKeys.has(completedEdgeKey(other,end));
+                                        const structure=Boolean(surfaceStructuralEdge(other.x,other.y,end.x,end.y));
+                                        if(!existing&&!structure)continue;
+                                        const distance=Math.hypot(ix/4,iy/4);
+                                        const cross=tangent.x*sy-tangent.y*sx;
+                                        const kind=distance<=0.250001?'fractional-grid-offset-review':
+                                            cross===0?'collinear-separated-review':'directionally-incompatible-or-separated-review';
+                                        const candidate={at:`${other.x},${other.y}`,distanceQuarter:Math.round(distance*4),
+                                            source:structure?'structural':'reconstructed',kind};
+                                        if(!closest||candidate.distanceQuarter<closest.distanceQuarter||
+                                            (candidate.distanceQuarter===closest.distanceQuarter&&candidate.source==='structural'&&closest.source!=='structural'))closest=candidate;
+                                    }
+                                }
+                                return {at:`${point.x},${point.y}`,closest,
+                                    classification:closest?.kind||'no-local-neighbour-geometry-review'};
+                            });
+                            gaps.push({side,endpoints});
+                        }
+                    }
+                    return {id:review.id,certified:review.certified,gaps,
+                        classification:!review.certified?'certificate-withheld-gap-control-review':
+                            'bounded-missing-connection-geometry-review'};
+                }).slice(0,24);
+                const illustratedPropagationBarrierCornerMissingConnectionReviews=barrierCornerMissingConnectionReviews;
+                const illustratedPropagationBarrierCornerMissingConnectionEndpoints=barrierCornerMissingConnectionReviews.reduce(
+                    (n,r)=>n+r.gaps.reduce((m,g)=>m+g.endpoints.length,0),0);
+
                 const publishedEvidenceAudit = {
                     evidenceModel: 'living-contour-evidence-audit-v10',
                     rawChains: contourChains.length,
@@ -9983,6 +10037,8 @@
                     illustratedPropagationBarrierCornerBoundaryWitnessInterfaces,
                     illustratedPropagationBarrierCornerNeighbourReviews,
                     illustratedPropagationBarrierCornerNeighbourInterfaces,
+                    illustratedPropagationBarrierCornerMissingConnectionReviews,
+                    illustratedPropagationBarrierCornerMissingConnectionEndpoints,
                     illustratedPropagationBarrierCornerBoundaryReady,
                     illustratedPropagationBarrierCornerBoundaryUncertified,
                     illustratedPropagationBarrierCornerCertificateControlFailures,
