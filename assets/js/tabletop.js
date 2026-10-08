@@ -2647,6 +2647,7 @@
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Y earned spine replay ${audit.illustratedPropagationBarrierEarnedSpineNewQualifiers||0} new qualifiers / ${audit.illustratedPropagationBarrierEarnedSpineControlFailures||0} control failures · reviews [${(audit.illustratedPropagationBarrierEarnedSpineReplayReviews||[]).map((entry)=>`B${entry.id}:${entry.role}/old${entry.originalMatched}/${entry.total}/new${entry.matched}/${entry.total}/route${entry.routeSupported}/${entry.routeLength}/fixed${entry.fixedRoute?'yes':'no'}/failed[${entry.failed.join('&')}]/${entry.classification}`).join(';')}] · diagnostic-only;exact-18-condition-replay;fixed-H/I-route;G.5Z.50V-gate-unchanged;G.5Z.50-veto-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.1 corner certificates ${audit.illustratedPropagationBarrierCornerCertificates||0} diagnostic / ${audit.illustratedPropagationBarrierCornerCertificateControlFailures||0} control failures · reviews [${(audit.illustratedPropagationBarrierCornerCertificateReviews||[]).map((entry)=>`B${entry.id}:${entry.role}/legacy${entry.legacyMatched}/replay${entry.replayMatched}/${entry.replayTotal}/spineOnly${entry.legacySpineOnly?'yes':'no'}/reconciled${entry.reconciled?'yes':'no'}/certified${entry.certified?'yes':'no'}/${entry.classification}`).join(';')}] · diagnostic-only;no-wall-admission;no-geometry-mutation;G.5Z.50V-gate-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.2 certificate/boundary ${audit.illustratedPropagationBarrierCornerBoundaryReady||0} structurally ready / ${audit.illustratedPropagationBarrierCornerBoundaryUncertified||0} withheld · reviews [${(audit.illustratedPropagationBarrierCornerBoundaryReviews||[]).map((entry)=>`B${entry.id}:${entry.classification}/corner[${entry.corners.join('&')}]/new${entry.proposedEdges}/struct${entry.structuralEdges}/sides[${entry.interfaces.map((side)=>`${side.side}:${side.cornerPlayable?'c':''}${side.neighbourPlayable?'p':''}${side.existingBoundary?'existing':''}${side.counterfactualBoundary?'new':''}${side.exactStructural?'struct':''}@${side.localInkPermille}`).join('|')}]`).join(';')}] · diagnostic-only;exact-four-neighbour-boundary-counterfactual;no-wall-admission;no-recovery-replay;no-geometry-mutation`;
+                cartographyAssistantStatus.textContent += ` · G.5Z.50Z.3 boundary witnesses ${audit.illustratedPropagationBarrierCornerBoundaryWitnessInterfaces||0} interfaces · reviews [${(audit.illustratedPropagationBarrierCornerBoundaryWitnessReviews||[]).map((entry)=>`B${entry.id}:${entry.classification}/[${entry.witnesses.map((w)=>`${w.side}:${w.classification}/ink[${w.inkSamplesPermille.join(',')}]/adj${w.adjacentRepresented}/struct${w.adjacentStructural}`).join('|')}]`).join(';')}] · diagnostic-only;original-ink-directional-witnesses;no-wall-admission;no-recovery-replay;no-geometry-mutation`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50W spine reconciliation ${audit.illustratedPropagationBarrierSpineReconciliationFieldDisagreements||0} field disagreements / ${audit.illustratedPropagationBarrierSpineReconciliationLegacyMissing||0} missing legacy fields · reviews [${(audit.illustratedPropagationBarrierSpineReconciliationReviews||[]).map((entry)=>`B${entry.id}:${entry.role}/G:${entry.actualSpine}/V:${entry.legacySpine}/support${entry.supportedInterfaces}/${entry.length}/centre${entry.centreDarkInterfaces}/${entry.length}/gap${entry.longestUnsupported}/boundary${(entry.boundaryPermille/1000).toFixed(3)}/parallel${(entry.parallelPermille/1000).toFixed(3)}/width${entry.routeContinuous?'yes':'no'}/coherent${entry.routeCoherent?'yes':'no'}/otherFailures[${entry.otherFailures.join('&')}]/${entry.classification}`).join(';')}] · diagnostic-only;G.5Z.50V-gate-unchanged;G.5Z.50-veto-unchanged`;
             } else {
                 const doors = cartographySuggestions.filter((item) => item.type === 'door').length;
@@ -9675,6 +9676,49 @@
                 const illustratedPropagationBarrierCornerBoundaryReady=barrierCornerBoundaryReviews.filter((entry)=>entry.geometryReady).length;
                 const illustratedPropagationBarrierCornerBoundaryUncertified=barrierCornerBoundaryReviews.filter((entry)=>entry.certified&&!entry.geometryReady).length;
 
+                // IV.30.1G.5Z.50Z.3 — The Boundary Calls Its Witnesses.
+                // Read-only, four-interface witness survey; ink and neighbouring
+                // perimeter are evidence for review, never automatic wall identity.
+                const barrierCornerBoundaryWitnessReviews=barrierCornerBoundaryReviews.map((review)=>{
+                    const witnesses=[];
+                    for(const cornerKey of review.corners.slice(0,1)){
+                        const [cx,cy]=cornerKey.split(',').map(Number);
+                        for(const [dx,dy,side] of [[-1,0,'west'],[1,0,'east'],[0,-1,'north'],[0,1,'south']]){
+                            const base=review.interfaces.find((item)=>item.side===side);
+                            if(!base||!base.counterfactualBoundary)continue;
+                            const [a,b]=completedSurfaceEdge(cx,cy,dx,dy);
+                            const horizontal=dy!==0;
+                            const along=horizontal?[[1,0],[-1,0]]:[[0,1],[0,-1]];
+                            const samples=[];
+                            for(const step of [-2,-1,0,1,2]){
+                                const sx=cx+(horizontal?step:0),sy=cy+(horizontal?0:step);
+                                if(sx<0||sy<0||sx>=contourColumns||sy>=contourRows)continue;
+                                samples.push(Math.round(Number(darkness[sy]?.[sx]??0)*1000));
+                            }
+                            let adjacentRepresented=0,adjacentStructural=0;
+                            for(const [ax,ay] of along){
+                                const shiftedA={x:a.x+ax,y:a.y+ay},shiftedB={x:b.x+ax,y:b.y+ay};
+                                if(completedSurfaceEdgeKeys.has(completedEdgeKey(shiftedA,shiftedB)))adjacentRepresented++;
+                                if(surfaceStructuralEdge(shiftedA.x,shiftedA.y,shiftedB.x,shiftedB.y))adjacentStructural++;
+                            }
+                            const alignedSamples=samples.filter((value)=>value>=300).length;
+                            const classification=base.exactStructural?'exact-structural-witness-review':
+                                adjacentStructural>0&&alignedSamples>=3?'adjacent-structural-ink-continuity-review':
+                                alignedSamples>=3?'directional-ink-without-structural-proof-review':
+                                'counterfactual-edge-without-continuous-ink-review';
+                            witnesses.push({side,corner:cornerKey,localInkPermille:base.localInkPermille,
+                                inkSamplesPermille:samples,alignedSamples,adjacentRepresented,adjacentStructural,
+                                exactStructural:base.exactStructural,classification});
+                        }
+                    }
+                    return {id:review.id,certified:review.certified,witnesses,
+                        classification:!review.certified?'certificate-withheld-witness-control-review':
+                            witnesses.length?'four-interface-witnesses-not-wall-certification-review':
+                            'no-counterfactual-interfaces-review'};
+                }).slice(0,24);
+                const illustratedPropagationBarrierCornerBoundaryWitnessReviews=barrierCornerBoundaryWitnessReviews;
+                const illustratedPropagationBarrierCornerBoundaryWitnessInterfaces=barrierCornerBoundaryWitnessReviews.reduce((n,r)=>n+r.witnesses.length,0);
+
                 const publishedEvidenceAudit = {
                     evidenceModel: 'living-contour-evidence-audit-v10',
                     rawChains: contourChains.length,
@@ -9888,6 +9932,8 @@
                     illustratedPropagationBarrierCornerCertificateReviews,
                     illustratedPropagationBarrierCornerCertificates,
                     illustratedPropagationBarrierCornerBoundaryReviews,
+                    illustratedPropagationBarrierCornerBoundaryWitnessReviews,
+                    illustratedPropagationBarrierCornerBoundaryWitnessInterfaces,
                     illustratedPropagationBarrierCornerBoundaryReady,
                     illustratedPropagationBarrierCornerBoundaryUncertified,
                     illustratedPropagationBarrierCornerCertificateControlFailures,
