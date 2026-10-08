@@ -1618,3 +1618,6 @@ Diagnostic-only reconciliation of the original 18-condition corner gate, fixed-r
 
 ### IV.30.1G.5Z.50Z.3 — The Boundary Calls Its Witnesses
 Read-only four-interface ink-continuity and adjacent structural/perimeter witness audit for certified corner closures. No wall admission, recovery replay or geometry mutation.
+
+### IV.30.1G.5Z.50Z.4 — The Corner Must Meet Its Neighbours
+Diagnostic-only exact shared-vertex audit of the four B6 corner counterfactual interfaces. Reports whether each proposed edge meets existing represented or exact structural edges at either endpoint, including collinear versus turning connections. Shared-vertex continuity is **not** wall certification; production propagation, perimeter geometry, review limits, and corner closure remain unchanged.
