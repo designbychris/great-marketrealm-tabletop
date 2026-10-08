@@ -1608,3 +1608,6 @@ Diagnostic-only reconciliation of G.5Z.50G spine evidence with the G.5Z.50H/I bo
 
 ### IV.30.1G.5Z.50X — The Spine Must Follow the Wall
 Diagnostic-only comparison of the original G.5Z.50G exact-interface centre-line spine with the existing G.5Z.50H/I fixed bounded-width route. For B3/B6/B8/B10, resample both frames using the identical five tangent positions, original-image darkness threshold and per-interface support criterion. Publish centre versus route support, exact offsets, rescued/lost support and per-cell ink counts; distinguish a genuinely displaced ink band from an unsupported route. No reclassification, new wall, recovery replay, corner closure, route shift, nearest search or production veto change. Preserve all authoritative geometry, review/vertex limits and non-persistent diagnostic marks.
+
+### IV.30.1G.5Z.50Y — The Wall Must Earn Its Spine
+Diagnostic-only replay of the 18-condition corner signature with fixed H/I bounded-route ink support replacing only the legacy spine field. Reports old/new matches, candidate qualifiers and floor-control failures. No production veto, wall geometry, recovery or persistence changes.
