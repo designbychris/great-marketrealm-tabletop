@@ -9582,6 +9582,33 @@
                 const illustratedPropagationBarrierEarnedSpineNewQualifiers=barrierEarnedSpineReplayReviews.filter((entry)=>entry.qualified&&entry.originalFailed.length>0).length;
                 const illustratedPropagationBarrierEarnedSpineControlFailures=barrierEarnedSpineReplayReviews.filter((entry)=>entry.controlFailure).length;
 
+                // IV.30.1G.5Z.50Z — The First Earned Corner.
+                // Readiness is a diagnostic intersection of the actual veto population and
+                // the existing fixed-route replay, never a second admission/closure path.
+                // No mutation of blocked cells, recovered floors or review objects occurs.
+                const barrierFirstEarnedCornerReviews=barrierEarnedSpineReplayReviews.map((replay)=>{
+                    const original=barrierCornerEarnedReviews.find((entry)=>entry.id===replay.id);
+                    const closure=barrierCornerClosureReviews.find((entry)=>entry.id===replay.id);
+                    const corner=barrierCornerEscapeReviews.find((entry)=>entry.id===replay.id);
+                    const uniqueCells=[...new Set(closure?.closedCornerCells||[])];
+                    const exactCorner=uniqueCells.length===1&&uniqueCells[0]==='140,63';
+                    const inVetoPopulation=Boolean(original&&closure&&corner&&
+                        original.role==='candidate-floor-open'&&closure.role===original.role&&corner.role===original.role);
+                    const demonstratedClosure=closure?.beforeConnected===true&&closure?.afterConnected===false&&
+                        closure?.classification==='corner-closure-eliminates-residual-bypass-review';
+                    const intactSignature=replay.total===18&&replay.matched===18&&replay.failed.length===0&&
+                        replay.fixedRoute&&replay.newSpinePassed&&replay.qualified;
+                    const controlProtected=replay.role!=='control-floor-both'&&!replay.controlFailure;
+                    const ready=inVetoPopulation&&exactCorner&&demonstratedClosure&&intactSignature&&controlProtected;
+                    return {id:replay.id,role:replay.role,cornerCells:uniqueCells,exactCorner,
+                        inVetoPopulation,demonstratedClosure,intactSignature,controlProtected,
+                        ready,classification:ready?'first-earned-corner-production-readiness-review':
+                            'first-earned-corner-not-ready-review'};
+                });
+                const illustratedPropagationBarrierFirstEarnedCornerReviews=barrierFirstEarnedCornerReviews.slice(0,24);
+                const illustratedPropagationBarrierFirstEarnedCornerReady=barrierFirstEarnedCornerReviews.filter((entry)=>entry.ready).length;
+                const illustratedPropagationBarrierFirstEarnedCornerControlFailures=barrierFirstEarnedCornerReviews.filter((entry)=>entry.role==='control-floor-both'&&entry.ready).length;
+
                 const publishedEvidenceAudit = {
                     evidenceModel: 'living-contour-evidence-audit-v10',
                     rawChains: contourChains.length,
@@ -9789,6 +9816,9 @@
                     illustratedPropagationBarrierEarnedSpineReplayReviews,
                     illustratedPropagationBarrierEarnedSpineNewQualifiers,
                     illustratedPropagationBarrierEarnedSpineControlFailures,
+                    illustratedPropagationBarrierFirstEarnedCornerReviews,
+                    illustratedPropagationBarrierFirstEarnedCornerReady,
+                    illustratedPropagationBarrierFirstEarnedCornerControlFailures,
                     illustratedExhaustedFrontierCells,
                     recoveredIllustratedFloorCells,
                     reconstructedIllustratedSurfaces,
