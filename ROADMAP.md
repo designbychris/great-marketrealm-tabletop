@@ -1611,3 +1611,7 @@ Diagnostic-only comparison of the original G.5Z.50G exact-interface centre-line 
 
 ### IV.30.1G.5Z.50Y — The Wall Must Earn Its Spine
 Diagnostic-only replay of the 18-condition corner signature with fixed H/I bounded-route ink support replacing only the legacy spine field. Reports old/new matches, candidate qualifiers and floor-control failures. No production veto, wall geometry, recovery or persistence changes.
+
+### IV.30.1G.5Z.50Z.1 — The Corner Receives Its Certificate
+
+Diagnostic-only reconciliation of the original 18-condition corner gate, fixed-route spine replay, and first-earned-corner readiness. A certificate requires the exact demonstrated corner, proven counterfactual closure, the original veto population, a complete replay, and **only** the legacy bounded-spine condition failing in the original gate. Floor-to-floor controls cannot receive certificates. The evidence audit now publishes certificate counts and per-run reasons; this phase does not change recovery, propagation vetoes, review geometry, or persistence.
