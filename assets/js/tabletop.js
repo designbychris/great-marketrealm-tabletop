@@ -2650,6 +2650,7 @@
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.3 boundary witnesses ${audit.illustratedPropagationBarrierCornerBoundaryWitnessInterfaces||0} interfaces · reviews [${(audit.illustratedPropagationBarrierCornerBoundaryWitnessReviews||[]).map((entry)=>`B${entry.id}:${entry.classification}/[${entry.witnesses.map((w)=>`${w.side}:${w.classification}/ink[${w.inkSamplesPermille.join(',')}]/adj${w.adjacentRepresented}/struct${w.adjacentStructural}`).join('|')}]`).join(';')}] · diagnostic-only;original-ink-directional-witnesses;no-wall-admission;no-recovery-replay;no-geometry-mutation`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.4 corner neighbours ${audit.illustratedPropagationBarrierCornerNeighbourInterfaces||0} interfaces · reviews [${(audit.illustratedPropagationBarrierCornerNeighbourReviews||[]).map((r)=>`B${r.id}:${r.classification}/[${r.connections.map((c)=>`${c.side}:${c.joined}/2joined/${c.structuralJoined}/2struct/${c.turns}turn/${c.classification}/{${c.endpoints.map((e)=>`${e.at}>${e.neighbours.map((n)=>`${n.to}:${n.represented?'p':''}${n.structural?'s':''}${n.relation}`).join('&')}`).join('|')}}`).join(';')}]`).join(';')}] · diagnostic-only;exact-shared-vertices;no-wall-certification;no-geometry-mutation;G.5Z.50-veto-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.5 missing connections ${audit.illustratedPropagationBarrierCornerMissingConnectionEndpoints||0} endpoints · reviews [${(audit.illustratedPropagationBarrierCornerMissingConnectionReviews||[]).map((r)=>`B${r.id}:${r.classification}/[${r.gaps.map((g)=>`${g.side}:{${g.endpoints.map((e)=>`${e.at}>${e.closest?`${e.closest.at}/${e.closest.distanceQuarter}q/${e.closest.source}/${e.classification}`:e.classification}`).join('|')}}`).join(';')}]`).join(';')}] · diagnostic-only;bounded-quarter-grid-endpoint-survey;no-snapping;no-wall-certification;no-geometry-mutation;G.5Z.50-veto-unchanged`;
+                cartographyAssistantStatus.textContent += ` · G.5Z.50Z.6 rightful neighbours ${audit.illustratedPropagationBarrierCornerRightfulNeighbourEdges||0} incident edges · reviews [${(audit.illustratedPropagationBarrierCornerRightfulNeighbourReviews||[]).map((r)=>`B${r.id}:${r.classification}/[${r.sides.map((g)=>`${g.side}:{${g.endpoints.map((e)=>`${e.at}>${e.near||'none'}/${e.classification}/[${e.edges.map((edge)=>`${edge.to}:${edge.source}:${edge.relation}:${edge.approach}`).join(',')}]`).join('|')}}`).join(';')}]`).join(';')}] · diagnostic-only;exact-incident-edge-provenance;no-snapping;no-wall-certification;no-geometry-mutation;G.5Z.50-veto-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50W spine reconciliation ${audit.illustratedPropagationBarrierSpineReconciliationFieldDisagreements||0} field disagreements / ${audit.illustratedPropagationBarrierSpineReconciliationLegacyMissing||0} missing legacy fields · reviews [${(audit.illustratedPropagationBarrierSpineReconciliationReviews||[]).map((entry)=>`B${entry.id}:${entry.role}/G:${entry.actualSpine}/V:${entry.legacySpine}/support${entry.supportedInterfaces}/${entry.length}/centre${entry.centreDarkInterfaces}/${entry.length}/gap${entry.longestUnsupported}/boundary${(entry.boundaryPermille/1000).toFixed(3)}/parallel${(entry.parallelPermille/1000).toFixed(3)}/width${entry.routeContinuous?'yes':'no'}/coherent${entry.routeCoherent?'yes':'no'}/otherFailures[${entry.otherFailures.join('&')}]/${entry.classification}`).join(';')}] · diagnostic-only;G.5Z.50V-gate-unchanged;G.5Z.50-veto-unchanged`;
             } else {
                 const doors = cartographySuggestions.filter((item) => item.type === 'door').length;
@@ -9820,6 +9821,47 @@
                 const illustratedPropagationBarrierCornerMissingConnectionEndpoints=barrierCornerMissingConnectionReviews.reduce(
                     (n,r)=>n+r.gaps.reduce((m,g)=>m+g.endpoints.length,0),0);
 
+                // IV.30.1G.5Z.50Z.6 — The Corner's Rightful Neighbour.
+                // Examine real edges incident on Z.5's bounded neighbour endpoint.
+                // A close endpoint is not a connection; orientation and continuity
+                // are reported separately. Never create, move or snap geometry.
+                const barrierCornerRightfulNeighbourReviews=barrierCornerMissingConnectionReviews.map((review)=>({
+                    id:review.id,
+                    classification:review.certified?'bounded-neighbour-edge-provenance-review':'certificate-withheld-neighbour-edge-control-review',
+                    sides:review.gaps.map((gap)=>({side:gap.side,endpoints:gap.endpoints.map((endpoint)=>{
+                        const nearby=endpoint.closest;
+                        if(!nearby)return {at:endpoint.at,classification:'no-bounded-neighbour-endpoint-review',edges:[]};
+                        const [px,py]=endpoint.at.split(',').map(Number);
+                        const [nx,ny]=nearby.at.split(',').map(Number);
+                        const proposed=gap.side==='west'||gap.side==='east'?'vertical':'horizontal';
+                        const edges=[];
+                        // Z.5 uses exact unit edge neighbours; keep the same
+                        // bounded source geometry and preserve its provenance.
+                        for(const [dx,dy] of [[-1,0],[1,0],[0,-1],[0,1]]){
+                            const end={x:nx+dx,y:ny+dy};
+                            const represented=completedSurfaceEdgeKeys.has(completedEdgeKey({x:nx,y:ny},end));
+                            const structural=Boolean(surfaceStructuralEdge(nx,ny,end.x,end.y));
+                            if(!represented&&!structural)continue;
+                            const axis=dx===0?'vertical':'horizontal';
+                            const toward=(px-nx)*dx+(py-ny)*dy;
+                            edges.push({to:`${end.x},${end.y}`,source:structural?'structural':'reconstructed',
+                                axis,relation:axis===proposed?'parallel':'perpendicular',
+                                approach:toward>0?'toward-corner':toward<0?'away-from-corner':'lateral-to-corner',
+                                exactJoin:nx===px&&ny===py});
+                        }
+                        const parallel=edges.filter((edge)=>edge.relation==='parallel').length;
+                        const toward=edges.filter((edge)=>edge.approach==='toward-corner').length;
+                        return {at:endpoint.at,near:nearby.at,distanceQuarter:nearby.distanceQuarter,
+                            edges,classification:edges.length===0?'neighbour-endpoint-without-observed-edge-review':
+                                parallel&&toward?'aligned-edge-approaches-unjoined-corner-review':
+                                parallel?'parallel-edge-offset-without-approach-review':
+                                'perpendicular-or-unrelated-neighbour-review'};
+                    })}))
+                })).slice(0,24);
+                const illustratedPropagationBarrierCornerRightfulNeighbourReviews=barrierCornerRightfulNeighbourReviews;
+                const illustratedPropagationBarrierCornerRightfulNeighbourEdges=barrierCornerRightfulNeighbourReviews.reduce(
+                    (n,r)=>n+r.sides.reduce((m,g)=>m+g.endpoints.reduce((k,e)=>k+e.edges.length,0),0),0);
+
                 const publishedEvidenceAudit = {
                     evidenceModel: 'living-contour-evidence-audit-v10',
                     rawChains: contourChains.length,
@@ -10039,6 +10081,8 @@
                     illustratedPropagationBarrierCornerNeighbourInterfaces,
                     illustratedPropagationBarrierCornerMissingConnectionReviews,
                     illustratedPropagationBarrierCornerMissingConnectionEndpoints,
+                    illustratedPropagationBarrierCornerRightfulNeighbourReviews,
+                    illustratedPropagationBarrierCornerRightfulNeighbourEdges,
                     illustratedPropagationBarrierCornerBoundaryReady,
                     illustratedPropagationBarrierCornerBoundaryUncertified,
                     illustratedPropagationBarrierCornerCertificateControlFailures,
