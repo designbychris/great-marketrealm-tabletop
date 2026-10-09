@@ -2651,6 +2651,7 @@
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.4 corner neighbours ${audit.illustratedPropagationBarrierCornerNeighbourInterfaces||0} interfaces · reviews [${(audit.illustratedPropagationBarrierCornerNeighbourReviews||[]).map((r)=>`B${r.id}:${r.classification}/[${r.connections.map((c)=>`${c.side}:${c.joined}/2joined/${c.structuralJoined}/2struct/${c.turns}turn/${c.classification}/{${c.endpoints.map((e)=>`${e.at}>${e.neighbours.map((n)=>`${n.to}:${n.represented?'p':''}${n.structural?'s':''}${n.relation}`).join('&')}`).join('|')}}`).join(';')}]`).join(';')}] · diagnostic-only;exact-shared-vertices;no-wall-certification;no-geometry-mutation;G.5Z.50-veto-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.5 missing connections ${audit.illustratedPropagationBarrierCornerMissingConnectionEndpoints||0} endpoints · reviews [${(audit.illustratedPropagationBarrierCornerMissingConnectionReviews||[]).map((r)=>`B${r.id}:${r.classification}/[${r.gaps.map((g)=>`${g.side}:{${g.endpoints.map((e)=>`${e.at}>${e.closest?`${e.closest.at}/${e.closest.distanceQuarter}q/${e.closest.source}/${e.classification}`:e.classification}`).join('|')}}`).join(';')}]`).join(';')}] · diagnostic-only;bounded-quarter-grid-endpoint-survey;no-snapping;no-wall-certification;no-geometry-mutation;G.5Z.50-veto-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.6 rightful neighbours ${audit.illustratedPropagationBarrierCornerRightfulNeighbourEdges||0} incident edges · reviews [${(audit.illustratedPropagationBarrierCornerRightfulNeighbourReviews||[]).map((r)=>`B${r.id}:${r.classification}/[${r.sides.map((g)=>`${g.side}:{${g.endpoints.map((e)=>`${e.at}>${e.near||'none'}/${e.classification}/[${e.edges.map((edge)=>`${edge.to}:${edge.source}:${edge.relation}:${edge.approach}`).join(',')}]`).join('|')}}`).join(';')}]`).join(';')}] · diagnostic-only;exact-incident-edge-provenance;no-snapping;no-wall-certification;no-geometry-mutation;G.5Z.50-veto-unchanged`;
+                cartographyAssistantStatus.textContent += ` · G.5Z.50Z.7 missing handshake ${audit.illustratedPropagationBarrierCornerHandshakeCandidates||0} approaching structural candidates · reviews [${(audit.illustratedPropagationBarrierCornerHandshakeReviews||[]).map((r)=>`B${r.id}:${r.classification}/[${r.sides.map((g)=>`${g.side}:{${g.endpoints.map((e)=>`${e.at}/${e.classification}/[${e.candidates.map((c)=>`${c.from}>${c.to}/ax${c.axialQuarter}q/lat${c.lateralQuarter}q/${c.classification}`).join(',')}]`).join('|')}}`).join(';')}]`).join(';')}] · diagnostic-only;exact-structural-endpoint-handshake;no-snapping;no-geometry-mutation;G.5Z.50-veto-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50W spine reconciliation ${audit.illustratedPropagationBarrierSpineReconciliationFieldDisagreements||0} field disagreements / ${audit.illustratedPropagationBarrierSpineReconciliationLegacyMissing||0} missing legacy fields · reviews [${(audit.illustratedPropagationBarrierSpineReconciliationReviews||[]).map((entry)=>`B${entry.id}:${entry.role}/G:${entry.actualSpine}/V:${entry.legacySpine}/support${entry.supportedInterfaces}/${entry.length}/centre${entry.centreDarkInterfaces}/${entry.length}/gap${entry.longestUnsupported}/boundary${(entry.boundaryPermille/1000).toFixed(3)}/parallel${(entry.parallelPermille/1000).toFixed(3)}/width${entry.routeContinuous?'yes':'no'}/coherent${entry.routeCoherent?'yes':'no'}/otherFailures[${entry.otherFailures.join('&')}]/${entry.classification}`).join(';')}] · diagnostic-only;G.5Z.50V-gate-unchanged;G.5Z.50-veto-unchanged`;
             } else {
                 const doors = cartographySuggestions.filter((item) => item.type === 'door').length;
@@ -9862,6 +9863,42 @@
                 const illustratedPropagationBarrierCornerRightfulNeighbourEdges=barrierCornerRightfulNeighbourReviews.reduce(
                     (n,r)=>n+r.sides.reduce((m,g)=>m+g.endpoints.reduce((k,e)=>k+e.edges.length,0),0),0);
 
+                // IV.30.1G.5Z.50Z.7 — The Corner's Missing Handshake.
+                // Compare the actual structural edge endpoints with each proposed
+                // counterfactual boundary endpoint. Report quarter-grid displacement,
+                // axis agreement and original-image ink; never snap or join edges.
+                const barrierCornerHandshakeReviews=barrierCornerRightfulNeighbourReviews.map((review)=>({
+                    id:review.id,
+                    classification:review.classification==='certificate-withheld-neighbour-edge-control-review'?
+                        'certificate-withheld-handshake-control-review':'bounded-missing-handshake-review',
+                    sides:review.sides.map((side)=>({side:side.side,endpoints:side.endpoints.map((endpoint)=>{
+                        const [px,py]=endpoint.at.split(',').map(Number);
+                        const proposedAxis=side.side==='west'||side.side==='east'?'vertical':'horizontal';
+                        const approaching=endpoint.edges.filter((edge)=>edge.source==='structural'&&
+                            edge.relation==='parallel'&&edge.approach==='toward-corner');
+                        const candidates=approaching.map((edge)=>{
+                            const [ex,ey]=edge.to.split(',').map(Number);
+                            const [nx,ny]=(endpoint.near||'').split(',').map(Number);
+                            const axialGap=proposedAxis==='vertical'?Math.abs(py-ey):Math.abs(px-ex);
+                            const lateralGap=proposedAxis==='vertical'?Math.abs(px-ex):Math.abs(py-ey);
+                            const exactJoin=ex===px&&ey===py;
+                            const quarterGridAligned=Number.isInteger(axialGap*4)&&Number.isInteger(lateralGap*4);
+                            return {from:endpoint.near,to:edge.to,source:edge.source,axis:edge.axis,
+                                axialQuarter:Math.round(axialGap*4),lateralQuarter:Math.round(lateralGap*4),
+                                quarterGridAligned,exactJoin,
+                                classification:exactJoin?'exact-shared-vertex-handshake-review':
+                                    lateralGap===0?'collinear-endpoint-gap-without-join-review':
+                                    'fractional-lateral-offset-without-join-review'};
+                        });
+                        return {at:endpoint.at,candidates,
+                            classification:candidates.some((c)=>c.exactJoin)?'exact-structural-handshake-review':
+                                candidates.length?'approaching-structural-edge-unjoined-review':
+                                'no-approaching-structural-edge-control-review'};
+                    })}))
+                })).slice(0,24);
+                const illustratedPropagationBarrierCornerHandshakeReviews=barrierCornerHandshakeReviews;
+                const illustratedPropagationBarrierCornerHandshakeCandidates=barrierCornerHandshakeReviews.reduce(
+                    (n,r)=>n+r.sides.reduce((m,g)=>m+g.endpoints.reduce((k,e)=>k+e.candidates.length,0),0),0);
                 const publishedEvidenceAudit = {
                     evidenceModel: 'living-contour-evidence-audit-v10',
                     rawChains: contourChains.length,
@@ -10083,6 +10120,8 @@
                     illustratedPropagationBarrierCornerMissingConnectionEndpoints,
                     illustratedPropagationBarrierCornerRightfulNeighbourReviews,
                     illustratedPropagationBarrierCornerRightfulNeighbourEdges,
+                    illustratedPropagationBarrierCornerHandshakeReviews,
+                    illustratedPropagationBarrierCornerHandshakeCandidates,
                     illustratedPropagationBarrierCornerBoundaryReady,
                     illustratedPropagationBarrierCornerBoundaryUncertified,
                     illustratedPropagationBarrierCornerCertificateControlFailures,

@@ -1621,3 +1621,6 @@ Read-only four-interface ink-continuity and adjacent structural/perimeter witnes
 
 ### IV.30.1G.5Z.50Z.4 — The Corner Must Meet Its Neighbours
 Diagnostic-only exact shared-vertex audit of the four B6 corner counterfactual interfaces. Reports whether each proposed edge meets existing represented or exact structural edges at either endpoint, including collinear versus turning connections. Shared-vertex continuity is **not** wall certification; production propagation, perimeter geometry, review limits, and corner closure remain unchanged.
+
+### IV.30.1G.5Z.50Z.7 — The Corner's Missing Handshake
+Diagnostic-only comparison of Z.6's actual approaching structural edge endpoints with Z.2's counterfactual B6 corner interfaces. Report exact endpoint coordinates, axial/lateral quarter-grid gaps and whether an exact shared-vertex handshake exists. Distinguish collinear gaps from fractional lateral offsets and preserve withheld B3/B8/B10 controls. A nearby aligned edge is not a certified junction. No snapping, bridging, wall admission, propagation replay, geometry mutation or diagnostic persistence; G.5Z.50 veto and established caps remain unchanged.
