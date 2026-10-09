@@ -2652,6 +2652,7 @@
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.5 missing connections ${audit.illustratedPropagationBarrierCornerMissingConnectionEndpoints||0} endpoints · reviews [${(audit.illustratedPropagationBarrierCornerMissingConnectionReviews||[]).map((r)=>`B${r.id}:${r.classification}/[${r.gaps.map((g)=>`${g.side}:{${g.endpoints.map((e)=>`${e.at}>${e.closest?`${e.closest.at}/${e.closest.distanceQuarter}q/${e.closest.source}/${e.classification}`:e.classification}`).join('|')}}`).join(';')}]`).join(';')}] · diagnostic-only;bounded-quarter-grid-endpoint-survey;no-snapping;no-wall-certification;no-geometry-mutation;G.5Z.50-veto-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.6 rightful neighbours ${audit.illustratedPropagationBarrierCornerRightfulNeighbourEdges||0} incident edges · reviews [${(audit.illustratedPropagationBarrierCornerRightfulNeighbourReviews||[]).map((r)=>`B${r.id}:${r.classification}/[${r.sides.map((g)=>`${g.side}:{${g.endpoints.map((e)=>`${e.at}>${e.near||'none'}/${e.classification}/[${e.edges.map((edge)=>`${edge.to}:${edge.source}:${edge.relation}:${edge.approach}`).join(',')}]`).join('|')}}`).join(';')}]`).join(';')}] · diagnostic-only;exact-incident-edge-provenance;no-snapping;no-wall-certification;no-geometry-mutation;G.5Z.50-veto-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.7 missing handshake ${audit.illustratedPropagationBarrierCornerHandshakeCandidates||0} approaching structural candidates · reviews [${(audit.illustratedPropagationBarrierCornerHandshakeReviews||[]).map((r)=>`B${r.id}:${r.classification}/[${r.sides.map((g)=>`${g.side}:{${g.endpoints.map((e)=>`${e.at}/${e.classification}/[${e.candidates.map((c)=>`${c.from}>${c.to}/ax${c.axialQuarter}q/lat${c.lateralQuarter}q/${c.classification}`).join(',')}]`).join('|')}}`).join(';')}]`).join(';')}] · diagnostic-only;exact-structural-endpoint-handshake;no-snapping;no-geometry-mutation;G.5Z.50-veto-unchanged`;
+                cartographyAssistantStatus.textContent += ` · G.5Z.50Z.8 rightful meeting ${audit.illustratedPropagationBarrierCornerMeetingPointCandidates||0} paired candidates · reviews [${(audit.illustratedPropagationBarrierCornerMeetingPointReviews||[]).map((r)=>`B${r.id}:${r.classification}/approaches[${r.approaches.map((a)=>`${a.side}:${a.to}>${a.target}/ax${a.axialQuarter}q/lat${a.lateralQuarter}q/ink${a.inkPermille}/${a.classification}`).join('|')}]/meetings[${r.meetings.map((m)=>`${m.sides.join('+')}:${m.target||'none'}/${m.classification}`).join('|')}]`).join(';')}] · diagnostic-only;bounded-structural-meeting-hypothesis;no-snapping;no-wall-admission;no-geometry-mutation;G.5Z.50-veto-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50W spine reconciliation ${audit.illustratedPropagationBarrierSpineReconciliationFieldDisagreements||0} field disagreements / ${audit.illustratedPropagationBarrierSpineReconciliationLegacyMissing||0} missing legacy fields · reviews [${(audit.illustratedPropagationBarrierSpineReconciliationReviews||[]).map((entry)=>`B${entry.id}:${entry.role}/G:${entry.actualSpine}/V:${entry.legacySpine}/support${entry.supportedInterfaces}/${entry.length}/centre${entry.centreDarkInterfaces}/${entry.length}/gap${entry.longestUnsupported}/boundary${(entry.boundaryPermille/1000).toFixed(3)}/parallel${(entry.parallelPermille/1000).toFixed(3)}/width${entry.routeContinuous?'yes':'no'}/coherent${entry.routeCoherent?'yes':'no'}/otherFailures[${entry.otherFailures.join('&')}]/${entry.classification}`).join(';')}] · diagnostic-only;G.5Z.50V-gate-unchanged;G.5Z.50-veto-unchanged`;
             } else {
                 const doors = cartographySuggestions.filter((item) => item.type === 'door').length;
@@ -9899,6 +9900,54 @@
                 const illustratedPropagationBarrierCornerHandshakeReviews=barrierCornerHandshakeReviews;
                 const illustratedPropagationBarrierCornerHandshakeCandidates=barrierCornerHandshakeReviews.reduce(
                     (n,r)=>n+r.sides.reduce((m,g)=>m+g.endpoints.reduce((k,e)=>k+e.candidates.length,0),0),0);
+                // IV.30.1G.5Z.50Z.8 — The Corner's Rightful Meeting Point.
+                // Compare only Z.7's bounded real structural approaches. A projected
+                // intersection is a hypothesis, never a vertex or an admitted wall.
+                const barrierCornerMeetingPointReviews=barrierCornerHandshakeReviews.map((review)=>{
+                    const source=barrierCornerBoundaryReviews.find((entry)=>entry.id===review.id);
+                    const approaches=[];
+                    for(const side of review.sides)for(const endpoint of side.endpoints){
+                        const [px,py]=endpoint.at.split(',').map(Number);
+                        for(const candidate of endpoint.candidates){
+                            const [ex,ey]=candidate.to.split(',').map(Number);
+                            const [fx,fy]=candidate.from.split(',').map(Number);
+                            const dx=ex-fx,dy=ey-fy;
+                            const axial=dx===0?Math.abs(py-ey):Math.abs(px-ex);
+                            const lateral=dx===0?Math.abs(px-ex):Math.abs(py-ey);
+                            const toward=(px-ex)*dx+(py-ey)*dy;
+                            const bounded=axial<=1&&lateral<=1&&toward>=0;
+                            const interfaceWitness=source?.interfaces.find((item)=>item.side===side.side);
+                            approaches.push({side:side.side,target:endpoint.at,from:candidate.from,to:candidate.to,
+                                axis:candidate.axis,axialQuarter:candidate.axialQuarter,
+                                lateralQuarter:candidate.lateralQuarter,bounded,
+                                inkPermille:Math.round(Number(interfaceWitness?.localInkPermille||0)),
+                                classification:!bounded?'outside-bounded-forward-projection-review':
+                                    lateral===0?'collinear-forward-projection-unjoined-review':
+                                    'lateral-offset-requires-unproven-turn-review'});
+                        }
+                    }
+                    const meetings=[];
+                    for(let i=0;i<approaches.length;i++)for(let j=i+1;j<approaches.length;j++){
+                        const a=approaches[i],b=approaches[j];
+                        if(a.side===b.side||!a.bounded||!b.bounded)continue;
+                        // Same counterfactual corner vertex is a shared *proposal*,
+                        // not evidence that the original structural edges intersect.
+                        const commonTarget=a.target===b.target;
+                        const exact=a.to===b.to;
+                        meetings.push({sides:[a.side,b.side],target:commonTarget?a.target:null,
+                            exactStructuralMeeting:exact,commonProposedTarget:commonTarget,
+                            classification:exact?'exact-existing-structural-vertex-review':
+                                commonTarget?'shared-proposed-target-without-structural-join-review':
+                                'distinct-targets-no-demonstrated-meeting-review'});
+                    }
+                    return {id:review.id,certified:source?.certified===true,approaches,meetings,
+                        classification:source?.certified!==true?'certificate-withheld-meeting-control-review':
+                            meetings.some((m)=>m.exactStructuralMeeting)?'existing-structural-meeting-review':
+                            'rightful-meeting-point-not-yet-proven-review'};
+                }).slice(0,24);
+                const illustratedPropagationBarrierCornerMeetingPointReviews=barrierCornerMeetingPointReviews;
+                const illustratedPropagationBarrierCornerMeetingPointCandidates=barrierCornerMeetingPointReviews.reduce(
+                    (n,r)=>n+r.meetings.length,0);
                 const publishedEvidenceAudit = {
                     evidenceModel: 'living-contour-evidence-audit-v10',
                     rawChains: contourChains.length,
@@ -10122,6 +10171,8 @@
                     illustratedPropagationBarrierCornerRightfulNeighbourEdges,
                     illustratedPropagationBarrierCornerHandshakeReviews,
                     illustratedPropagationBarrierCornerHandshakeCandidates,
+                    illustratedPropagationBarrierCornerMeetingPointReviews,
+                    illustratedPropagationBarrierCornerMeetingPointCandidates,
                     illustratedPropagationBarrierCornerBoundaryReady,
                     illustratedPropagationBarrierCornerBoundaryUncertified,
                     illustratedPropagationBarrierCornerCertificateControlFailures,

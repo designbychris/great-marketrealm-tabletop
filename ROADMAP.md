@@ -1624,3 +1624,6 @@ Diagnostic-only exact shared-vertex audit of the four B6 corner counterfactual i
 
 ### IV.30.1G.5Z.50Z.7 — The Corner's Missing Handshake
 Diagnostic-only comparison of Z.6's actual approaching structural edge endpoints with Z.2's counterfactual B6 corner interfaces. Report exact endpoint coordinates, axial/lateral quarter-grid gaps and whether an exact shared-vertex handshake exists. Distinguish collinear gaps from fractional lateral offsets and preserve withheld B3/B8/B10 controls. A nearby aligned edge is not a certified junction. No snapping, bridging, wall admission, propagation replay, geometry mutation or diagnostic persistence; G.5Z.50 veto and established caps remain unchanged.
+
+### IV.30.1G.5Z.50Z.8 — The Corner's Rightful Meeting Point
+Diagnostic-only bounded comparison of Z.7's actual structural approaches and their proposed counterfactual endpoints. Report forward projection, axial/lateral quarter-grid offsets, local interface ink witness and any shared proposed target separately from an exact existing structural vertex. A projected point does **not** certify a wall or justify snapping, bridging or changing the G.5Z.50 veto. Withheld corner controls remain withheld.
