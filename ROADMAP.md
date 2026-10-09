@@ -1631,3 +1631,7 @@ Diagnostic-only bounded comparison of Z.7's actual structural approaches and the
 ### IV.30.1G.5Z.50Z.9 — The Corner's Missing Partner
 
 Diagnostic-only bounded survey of exact perpendicular structural edges near the G.5Z.50Z.8 B6 approaches. Records exact existing endpoint/intersection versus nearby unjoined perpendicular geometry, with controls retained. No snapping, wall admission, recovery replay or geometry mutation.
+
+
+### IV.30.1G.5Z.50Z.10 — The Corner's Illustrated Witness
+Diagnostic-only original-image pixel sampling at Z.8's exact structural approaches and proposed corner targets. Three fixed quarter-grid parallel tracks, nine stations per track, and a five-sample transverse crossing witness distinguish continuous directional ink hypotheses from interrupted/hatching-like marks. Reports controls B3/B8/B10, out-of-image unknowns, and raw binary sample evidence. These are **ink hypotheses**, not wall certification. No geometry snapping, admission, replay, persistence, or change to G.5Z.50 veto.

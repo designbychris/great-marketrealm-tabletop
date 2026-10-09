@@ -2654,6 +2654,7 @@
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.7 missing handshake ${audit.illustratedPropagationBarrierCornerHandshakeCandidates||0} approaching structural candidates · reviews [${(audit.illustratedPropagationBarrierCornerHandshakeReviews||[]).map((r)=>`B${r.id}:${r.classification}/[${r.sides.map((g)=>`${g.side}:{${g.endpoints.map((e)=>`${e.at}/${e.classification}/[${e.candidates.map((c)=>`${c.from}>${c.to}/ax${c.axialQuarter}q/lat${c.lateralQuarter}q/${c.classification}`).join(',')}]`).join('|')}}`).join(';')}]`).join(';')}] · diagnostic-only;exact-structural-endpoint-handshake;no-snapping;no-geometry-mutation;G.5Z.50-veto-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.8 rightful meeting ${audit.illustratedPropagationBarrierCornerMeetingPointCandidates||0} paired candidates · reviews [${(audit.illustratedPropagationBarrierCornerMeetingPointReviews||[]).map((r)=>`B${r.id}:${r.classification}/approaches[${r.approaches.map((a)=>`${a.side}:${a.to}>${a.target}/ax${a.axialQuarter}q/lat${a.lateralQuarter}q/ink${a.inkPermille}/${a.classification}`).join('|')}]/meetings[${r.meetings.map((m)=>`${m.sides.join('+')}:${m.target||'none'}/${m.classification}`).join('|')}]`).join(';')}] · diagnostic-only;bounded-structural-meeting-hypothesis;no-snapping;no-wall-admission;no-geometry-mutation;G.5Z.50-veto-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.9 missing partner ${audit.illustratedPropagationBarrierCornerMissingPartnerEdges||0} bounded structural edges · reviews [${(audit.illustratedPropagationBarrierCornerMissingPartnerReviews||[]).map((r)=>`B${r.id}:${r.classification}/[${r.partners.map((p)=>`${p.edge}/${p.axis}/off${p.offsetQuarter}q/${p.classification}`).join('|')}]`).join(';')}] · diagnostic-only;bounded-exact-perpendicular-structural-survey;no-snapping;no-wall-admission;no-geometry-mutation;G.5Z.50-veto-unchanged`;
+                cartographyAssistantStatus.textContent += ` · G.5Z.50Z.10 illustrated witness ${audit.illustratedPropagationBarrierCornerIllustratedWitnessSamples||0} approaches · reviews [${(audit.illustratedPropagationBarrierCornerIllustratedWitnessReviews||[]).map((r)=>`B${r.id}:${r.classification}/[${r.witnesses.map((w)=>`${w.side}:${w.axis}/${w.target}/tracks[${w.tracks.map((t)=>`${t.offset}:${t.samples}:run${t.longest}:flip${t.transitions}`).join('|')}]/cross${w.cross}/${w.classification}`).join(';')}]`).join(';')}] · diagnostic-only;original-image-fixed-quarter-grid-pixel-tracks;ink-hypothesis-not-wall-certification;no-snapping;no-wall-admission;no-recovery-replay;G.5Z.50-veto-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50W spine reconciliation ${audit.illustratedPropagationBarrierSpineReconciliationFieldDisagreements||0} field disagreements / ${audit.illustratedPropagationBarrierSpineReconciliationLegacyMissing||0} missing legacy fields · reviews [${(audit.illustratedPropagationBarrierSpineReconciliationReviews||[]).map((entry)=>`B${entry.id}:${entry.role}/G:${entry.actualSpine}/V:${entry.legacySpine}/support${entry.supportedInterfaces}/${entry.length}/centre${entry.centreDarkInterfaces}/${entry.length}/gap${entry.longestUnsupported}/boundary${(entry.boundaryPermille/1000).toFixed(3)}/parallel${(entry.parallelPermille/1000).toFixed(3)}/width${entry.routeContinuous?'yes':'no'}/coherent${entry.routeCoherent?'yes':'no'}/otherFailures[${entry.otherFailures.join('&')}]/${entry.classification}`).join(';')}] · diagnostic-only;G.5Z.50V-gate-unchanged;G.5Z.50-veto-unchanged`;
             } else {
                 const doors = cartographySuggestions.filter((item) => item.type === 'door').length;
@@ -9998,6 +9999,61 @@
                 const illustratedPropagationBarrierCornerMissingPartnerReviews=barrierCornerMissingPartnerReviews;
                 const illustratedPropagationBarrierCornerMissingPartnerEdges=barrierCornerMissingPartnerReviews.reduce(
                     (n,r)=>n+r.partners.length,0);
+                // IV.30.1G.5Z.50Z.10 — The Corner's Illustrated Witness.
+                // Fixed original-image pixel samples, bounded to the exact Z.8
+                // approaches and their proposed target. No geometry is inferred.
+                const barrierCornerIllustratedWitnessReviews=barrierCornerMeetingPointReviews.map((review)=>{
+                    const witnesses=[];
+                    for(const approach of review.approaches.slice(0,8)){
+                        const [tx,ty]=approach.target.split(',').map(Number);
+                        const [ex,ey]=approach.to.split(',').map(Number);
+                        const [fx,fy]=approach.from.split(',').map(Number);
+                        const vertical=fx===ex;
+                        const pixel=(x,y)=>{
+                            const px=originX+x*gridCanvasX,py=originY+y*gridCanvasY;
+                            if(px<0||py<0||px>=canvas.width||py>=canvas.height)return null;
+                            return luminance(px,py)<=darkThreshold;
+                        };
+                        // Quarter-grid station spacing, three fixed parallel tracks;
+                        // keep out-of-image samples unknown rather than calling them blank.
+                        const tracks=[-.25,0,.25].map((offset)=>{
+                            const samples=[];
+                            for(let step=-4;step<=4;step++){
+                                const travel=step*.25;
+                                samples.push(pixel(tx+(vertical?offset:travel),ty+(vertical?travel:offset)));
+                            }
+                            const hits=samples.filter((v)=>v===true).length;
+                            let longest=0,run=0,transitions=0;
+                            for(let i=0;i<samples.length;i++){
+                                run=samples[i]===true?run+1:0;
+                                longest=Math.max(longest,run);
+                                if(i&&samples[i]!==null&&samples[i-1]!==null&&samples[i]!==samples[i-1])transitions++;
+                            }
+                            return {offset,hits,longest,transitions,unknown:samples.filter((v)=>v===null).length,
+                                samples:samples.map((v)=>v===null?'?':v?'1':'0').join('')};
+                        });
+                        const crossing=[-.5,-.25,0,.25,.5].map((offset)=>pixel(
+                            tx+(vertical?offset:0),ty+(vertical?0:offset)));
+                        const centre=tracks[1];
+                        const classification=tracks.some((t)=>t.unknown>0)||crossing.includes(null)?
+                            'incomplete-original-image-witness-review':
+                            centre.longest>=5&&centre.transitions<=2&&crossing.filter(Boolean).length>=3?
+                            'continuous-directional-ink-hypothesis-review':
+                            tracks.some((t)=>t.hits>=3)?'interrupted-or-hatching-like-ink-review':
+                            'no-bounded-directional-ink-continuity-review';
+                        witnesses.push({side:approach.side,target:approach.target,from:approach.from,to:approach.to,
+                            axis:vertical?'vertical':'horizontal',tracks,
+                            cross:crossing.map((v)=>v===null?'?':v?'1':'0').join(''),classification});
+                    }
+                    return {id:review.id,certified:review.certified,witnesses,
+                        classification:!review.certified?'certificate-withheld-illustrated-control-review':
+                            witnesses.some((w)=>w.classification==='continuous-directional-ink-hypothesis-review')?
+                            'illustrated-continuity-hypothesis-not-wall-certification-review':
+                            'illustrated-junction-not-proven-review'};
+                }).slice(0,24);
+                const illustratedPropagationBarrierCornerIllustratedWitnessReviews=barrierCornerIllustratedWitnessReviews;
+                const illustratedPropagationBarrierCornerIllustratedWitnessSamples=barrierCornerIllustratedWitnessReviews.reduce(
+                    (n,r)=>n+r.witnesses.length,0);
                 const publishedEvidenceAudit = {
                     evidenceModel: 'living-contour-evidence-audit-v10',
                     rawChains: contourChains.length,
@@ -10225,6 +10281,8 @@
                     illustratedPropagationBarrierCornerMeetingPointCandidates,
                     illustratedPropagationBarrierCornerMissingPartnerReviews,
                     illustratedPropagationBarrierCornerMissingPartnerEdges,
+                    illustratedPropagationBarrierCornerIllustratedWitnessReviews,
+                    illustratedPropagationBarrierCornerIllustratedWitnessSamples,
                     illustratedPropagationBarrierCornerBoundaryReady,
                     illustratedPropagationBarrierCornerBoundaryUncertified,
                     illustratedPropagationBarrierCornerCertificateControlFailures,
