@@ -1627,3 +1627,7 @@ Diagnostic-only comparison of Z.6's actual approaching structural edge endpoints
 
 ### IV.30.1G.5Z.50Z.8 — The Corner's Rightful Meeting Point
 Diagnostic-only bounded comparison of Z.7's actual structural approaches and their proposed counterfactual endpoints. Report forward projection, axial/lateral quarter-grid offsets, local interface ink witness and any shared proposed target separately from an exact existing structural vertex. A projected point does **not** certify a wall or justify snapping, bridging or changing the G.5Z.50 veto. Withheld corner controls remain withheld.
+
+### IV.30.1G.5Z.50Z.9 — The Corner's Missing Partner
+
+Diagnostic-only bounded survey of exact perpendicular structural edges near the G.5Z.50Z.8 B6 approaches. Records exact existing endpoint/intersection versus nearby unjoined perpendicular geometry, with controls retained. No snapping, wall admission, recovery replay or geometry mutation.
