@@ -2655,6 +2655,7 @@
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.8 rightful meeting ${audit.illustratedPropagationBarrierCornerMeetingPointCandidates||0} paired candidates · reviews [${(audit.illustratedPropagationBarrierCornerMeetingPointReviews||[]).map((r)=>`B${r.id}:${r.classification}/approaches[${r.approaches.map((a)=>`${a.side}:${a.to}>${a.target}/ax${a.axialQuarter}q/lat${a.lateralQuarter}q/ink${a.inkPermille}/${a.classification}`).join('|')}]/meetings[${r.meetings.map((m)=>`${m.sides.join('+')}:${m.target||'none'}/${m.classification}`).join('|')}]`).join(';')}] · diagnostic-only;bounded-structural-meeting-hypothesis;no-snapping;no-wall-admission;no-geometry-mutation;G.5Z.50-veto-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.9 missing partner ${audit.illustratedPropagationBarrierCornerMissingPartnerEdges||0} bounded structural edges · reviews [${(audit.illustratedPropagationBarrierCornerMissingPartnerReviews||[]).map((r)=>`B${r.id}:${r.classification}/[${r.partners.map((p)=>`${p.edge}/${p.axis}/off${p.offsetQuarter}q/${p.classification}`).join('|')}]`).join(';')}] · diagnostic-only;bounded-exact-perpendicular-structural-survey;no-snapping;no-wall-admission;no-geometry-mutation;G.5Z.50-veto-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.10 illustrated witness ${audit.illustratedPropagationBarrierCornerIllustratedWitnessSamples||0} approaches · reviews [${(audit.illustratedPropagationBarrierCornerIllustratedWitnessReviews||[]).map((r)=>`B${r.id}:${r.classification}/[${r.witnesses.map((w)=>`${w.side}:${w.axis}/${w.target}/tracks[${w.tracks.map((t)=>`${t.offset}:${t.samples}:run${t.longest}:flip${t.transitions}`).join('|')}]/cross${w.cross}/${w.classification}`).join(';')}]`).join(';')}] · diagnostic-only;original-image-fixed-quarter-grid-pixel-tracks;ink-hypothesis-not-wall-certification;no-snapping;no-wall-admission;no-recovery-replay;G.5Z.50-veto-unchanged`;
+                cartographyAssistantStatus.textContent += ` · G.5Z.50Z.11 ink or ornament ${audit.illustratedPropagationBarrierCornerInkOrOrnamentSamples||0} approaches · reviews [${(audit.illustratedPropagationBarrierCornerInkOrOrnamentReviews||[]).map((r)=>`B${r.id}:${r.classification}/[${r.witnesses.map((w)=>`${w.side}:${w.axis}/${w.target}/run${w.centreRun}/bands${w.transverseBands}/parallel${w.parallelTracks.join(',')}/${w.classification}`).join(';')}]`).join(';')}] · diagnostic-only;bounded-original-image-stroke-shape;ornament-hypothesis-not-wall-certification;no-snapping;no-wall-admission;no-recovery-replay;G.5Z.50-veto-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50W spine reconciliation ${audit.illustratedPropagationBarrierSpineReconciliationFieldDisagreements||0} field disagreements / ${audit.illustratedPropagationBarrierSpineReconciliationLegacyMissing||0} missing legacy fields · reviews [${(audit.illustratedPropagationBarrierSpineReconciliationReviews||[]).map((entry)=>`B${entry.id}:${entry.role}/G:${entry.actualSpine}/V:${entry.legacySpine}/support${entry.supportedInterfaces}/${entry.length}/centre${entry.centreDarkInterfaces}/${entry.length}/gap${entry.longestUnsupported}/boundary${(entry.boundaryPermille/1000).toFixed(3)}/parallel${(entry.parallelPermille/1000).toFixed(3)}/width${entry.routeContinuous?'yes':'no'}/coherent${entry.routeCoherent?'yes':'no'}/otherFailures[${entry.otherFailures.join('&')}]/${entry.classification}`).join(';')}] · diagnostic-only;G.5Z.50V-gate-unchanged;G.5Z.50-veto-unchanged`;
             } else {
                 const doors = cartographySuggestions.filter((item) => item.type === 'door').length;
@@ -10054,6 +10055,49 @@
                 const illustratedPropagationBarrierCornerIllustratedWitnessReviews=barrierCornerIllustratedWitnessReviews;
                 const illustratedPropagationBarrierCornerIllustratedWitnessSamples=barrierCornerIllustratedWitnessReviews.reduce(
                     (n,r)=>n+r.witnesses.length,0);
+                // IV.30.1G.5Z.50Z.11 — The Corner's Ink or Ornament.
+                // Compare local stroke continuity and transverse repetition at the
+                // certified-candidate meeting point. Diagnostic only: no admission.
+                const barrierCornerInkOrOrnamentReviews=barrierCornerIllustratedWitnessReviews.map((review)=>{
+                    const witnesses=review.witnesses.map((w)=>{
+                        const [tx,ty]=w.target.split(',').map(Number);
+                        const vertical=w.axis==='vertical';
+                        const sample=(along,across)=>{
+                            const x=tx+(vertical?across:along),y=ty+(vertical?along:across);
+                            const px=originX+x*gridCanvasX,py=originY+y*gridCanvasY;
+                            return px>=0&&py>=0&&px<canvas.width&&py<canvas.height?
+                                luminance(px,py)<=darkThreshold:null;
+                        };
+                        const rows=[];
+                        for(let i=-4;i<=4;i++){
+                            const bits=[];
+                            for(let j=-4;j<=4;j++)bits.push(sample(i*.125,j*.125));
+                            rows.push(bits);
+                        }
+                        const centre=rows.map((r)=>r[4]);
+                        const runLengths=[];
+                        let run=0;
+                        for(const v of [...centre,false]){
+                            if(v===true)run++;
+                            else if(run){runLengths.push(run);run=0;}
+                        }
+                        const longest=Math.max(0,...runLengths);
+                        const transverseBands=rows.filter((r)=>r.filter((v)=>v===true).length>=5).length;
+                        const parallelTracks=[2,4,6].map((j)=>rows.reduce((n,r)=>n+(r[j]===true?1:0),0));
+                        const unknown=rows.flat().filter((v)=>v===null).length;
+                        const classification=unknown?'incomplete-local-ink-shape-review':
+                            longest>=6&&transverseBands<=3?'directional-stroke-hypothesis-review':
+                            transverseBands>=4&&longest<6?'repeated-transverse-ornament-hypothesis-review':
+                            'fragmented-ink-or-ornament-unresolved-review';
+                        return {side:w.side,axis:w.axis,target:w.target,centreRun:longest,
+                            centreRuns:runLengths,transverseBands,parallelTracks,unknown,classification};
+                    });
+                    return {id:review.id,certified:review.certified,witnesses,
+                        classification:'ink-versus-ornament-not-wall-certification-review'};
+                }).slice(0,24);
+                const illustratedPropagationBarrierCornerInkOrOrnamentReviews=barrierCornerInkOrOrnamentReviews;
+                const illustratedPropagationBarrierCornerInkOrOrnamentSamples=barrierCornerInkOrOrnamentReviews.reduce(
+                    (n,r)=>n+r.witnesses.length,0);
                 const publishedEvidenceAudit = {
                     evidenceModel: 'living-contour-evidence-audit-v10',
                     rawChains: contourChains.length,
@@ -10283,6 +10327,8 @@
                     illustratedPropagationBarrierCornerMissingPartnerEdges,
                     illustratedPropagationBarrierCornerIllustratedWitnessReviews,
                     illustratedPropagationBarrierCornerIllustratedWitnessSamples,
+                    illustratedPropagationBarrierCornerInkOrOrnamentReviews,
+                    illustratedPropagationBarrierCornerInkOrOrnamentSamples,
                     illustratedPropagationBarrierCornerBoundaryReady,
                     illustratedPropagationBarrierCornerBoundaryUncertified,
                     illustratedPropagationBarrierCornerCertificateControlFailures,
