@@ -2663,6 +2663,7 @@
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.16 broken arms ${audit.illustratedPropagationBarrierCornerBrokenArmsSamples||0} approaches · reviews [${(audit.illustratedPropagationBarrierCornerBrokenArmsReviews||[]).map(r=>`B${r.id}:partner=${r.structuralPartner}/handshake=${r.structuralHandshake}/[${r.witnesses.map(w=>`${w.side}:${w.axis}/${w.target}/bridges${w.onePixelBridges}/junctions${w.candidateJunctions}/unsupported${w.unsupportedGaps}/spokes${w.bestLongitudinal},${w.bestTransverse}/${w.classification}`).join(';')}]`).join(';')}] · diagnostic-only;fixed-nine-by-nine-single-pixel-bracketed-cardinal-gaps;no-pixel-joining;no-snapping;no-wall-admission;no-recovery-replay;G.5Z.50-veto-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.17 false bridges ${audit.illustratedPropagationBarrierCornerFalseBridgesSamples||0} approaches · reviews [${(audit.illustratedPropagationBarrierCornerFalseBridgesReviews||[]).map(r=>`B${r.id}:partner=${r.structuralPartner}/handshake=${r.structuralHandshake}/[${r.witnesses.map(w=>`${w.side}:${w.axis}/${w.target}/distinct${w.distinctGaps}/clean${w.clean}/hatch${w.hatchRisk}/unknown${w.indeterminate}/${w.classification}`).join(';')}]`).join(';')}] · diagnostic-only;exact-Z16-single-pixel-gap-recheck;deduplicated-orientation-gaps;bounded-perpendicular-hatch-controls;no-pixel-joining;no-snapping;no-wall-admission;no-recovery-replay;G.5Z.50-veto-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.18 borrowed ink ${audit.illustratedPropagationBarrierCornerBorrowedInkSamples||0} approaches · reviews [${(audit.illustratedPropagationBarrierCornerBorrowedInkReviews||[]).map(r=>`B${r.id}:partner=${r.structuralPartner}/handshake=${r.structuralHandshake}/[${r.witnesses.map(w=>`${w.side}:${w.axis}/${w.target}/distinct${w.distinctGaps}/directional${w.directional}/ornament${w.ornament}/short${w.short}/unknown${w.unknown}/${w.classification}`).join(';')}]`).join(';')}] · diagnostic-only;exact-Z17-deduplicated-gaps;fixed-two-sample-longitudinal-context;bounded-lateral-ornament-competition;no-pixel-joining;no-snapping;no-wall-admission;no-recovery-replay;G.5Z.50-veto-unchanged`;
+                cartographyAssistantStatus.textContent += ` · G.5Z.50Z.19 rightful ink ${audit.illustratedPropagationBarrierCornerRightfulInkSamples||0} candidate gaps · reviews [${(audit.illustratedPropagationBarrierCornerRightfulInkReviews||[]).map(r=>`B${r.id}:partner=${r.structuralPartner}/handshake=${r.structuralHandshake}/[${r.witnesses.map(w=>`${w.side}:${w.axis}/${w.target}/examined${w.examined}/directional${w.directional}/unknown${w.unknown}/unborrowed${w.owned}/borrowed${w.borrowed}/interrupted${w.interrupted}/incomplete${w.incomplete}/ornamentControls${w.ornamentControls}/gaps[${w.details.map(d=>`${d.gap}:${d.axial}:${d.lateral.join(',')}:${d.verdict}`).join('|')}]`).join(';')}]`).join(';')}] · diagnostic-only;exact-Z18-directional-and-unresolved-gaps;fixed-six-axial-and-two-five-sample-lateral-tracks;ornament-negative-controls;no-pixel-joining;no-snapping;no-wall-admission;no-recovery-replay;G.5Z.50-veto-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50W spine reconciliation ${audit.illustratedPropagationBarrierSpineReconciliationFieldDisagreements||0} field disagreements / ${audit.illustratedPropagationBarrierSpineReconciliationLegacyMissing||0} missing legacy fields · reviews [${(audit.illustratedPropagationBarrierSpineReconciliationReviews||[]).map((entry)=>`B${entry.id}:${entry.role}/G:${entry.actualSpine}/V:${entry.legacySpine}/support${entry.supportedInterfaces}/${entry.length}/centre${entry.centreDarkInterfaces}/${entry.length}/gap${entry.longestUnsupported}/boundary${(entry.boundaryPermille/1000).toFixed(3)}/parallel${(entry.parallelPermille/1000).toFixed(3)}/width${entry.routeContinuous?'yes':'no'}/coherent${entry.routeCoherent?'yes':'no'}/otherFailures[${entry.otherFailures.join('&')}]/${entry.classification}`).join(';')}] · diagnostic-only;G.5Z.50V-gate-unchanged;G.5Z.50-veto-unchanged`;
             } else {
                 const doors = cartographySuggestions.filter((item) => item.type === 'door').length;
@@ -10537,7 +10538,10 @@
                                         lateralBorrow?'neighbouring-ornament-favoured-review':
                                         continuity?'isolated-directional-bridge-hypothesis-review':
                                         'short-bracket-without-sustained-direction-review';
-                                    gaps.set(key,{classification,competing,continuity,lateralBorrow});
+                                    // Preserve the exact Z.18 gap and its original pixel window
+                                    // for the bounded Z.19 ownership test (no new gap search).
+                                    gaps.set(key,{classification,competing,continuity,lateralBorrow,
+                                        i,j,di,dj,rows});
                                     k++;
                                 }
                             }
@@ -10549,8 +10553,45 @@
                             else if(gap.classification==='short-bracket-without-sustained-direction-review')counts.short++;
                             else counts.unknown++;
                         }
+                        // IV.30.1G.5Z.50Z.19 — The Corner's Rightful Ink.
+                        // Re-examine only the Z.18 directional/unknown gaps. Require
+                        // uninterrupted axial support on both sides of the missing pixel,
+                        // and check both lateral tracks for borrowed ornament. A clean
+                        // observation is still an ink hypothesis, never wall evidence.
+                        const rightful={examined:0,directional:0,unknown:0,owned:0,
+                            borrowed:0,interrupted:0,incomplete:0,ornamentControls:0,details:[]};
+                        for(const [key,gap] of gaps){
+                            if(gap.classification==='neighbouring-ornament-favoured-review'){
+                                rightful.ornamentControls++;continue;
+                            }
+                            if(!['isolated-directional-bridge-hypothesis-review',
+                                'borrowed-ink-context-incomplete-review'].includes(gap.classification))continue;
+                            rightful.examined++;
+                            if(gap.classification==='isolated-directional-bridge-hypothesis-review')rightful.directional++;
+                            else rightful.unknown++;
+                            const {i,j,di,dj,rows:ink}=gap;
+                            const axial=[-3,-2,-1,1,2,3].map(k=>ink[i+di*k]?.[j+dj*k]);
+                            const lateral=di!==0?[[0,-1],[0,1]]:[[-1,0],[1,0]];
+                            const neighbour=lateral.map(([li,lj])=>[-2,-1,0,1,2].map(k=>
+                                ink[i+di*k+li]?.[j+dj*k+lj]));
+                            const incomplete=[...axial,...neighbour.flat()].some(v=>v==null);
+                            const borrowed=neighbour.some(track=>track[2]===true||
+                                (track[1]===true&&track[3]===true));
+                            const sustained=axial.every(v=>v===true);
+                            const verdict=incomplete?'rightful-ink-window-incomplete-review':
+                                borrowed?'rightful-ink-borrowed-by-ornament-review':
+                                sustained?'unborrowed-axial-ink-hypothesis-review':
+                                'rightful-ink-interrupted-axis-review';
+                            if(incomplete)rightful.incomplete++;
+                            else if(borrowed)rightful.borrowed++;
+                            else if(sustained)rightful.owned++;
+                            else rightful.interrupted++;
+                            rightful.details.push({gap:key,axial:axial.map(v=>v===null?'?':v?'1':'0').join(''),
+                                lateral:neighbour.map(track=>track.map(v=>v==null?'?':v?'1':'0').join('')),
+                                verdict});
+                        }
                         return {side:w.side,axis:w.axis,target:w.target,distinctGaps:gaps.size,
-                            ...counts,classification:counts.ornament>0?'borrowed-ink-competes-with-corner-review':
+                            ...counts,rightful,classification:counts.ornament>0?'borrowed-ink-competes-with-corner-review':
                                 counts.directional>0?'directional-ink-remains-uncertified-review':
                                 'no-sustained-unborrowed-bridge-review'};
                     });
@@ -10561,6 +10602,14 @@
                 const illustratedPropagationBarrierCornerBorrowedInkReviews=barrierCornerBorrowedInkReviews;
                 const illustratedPropagationBarrierCornerBorrowedInkSamples=barrierCornerBorrowedInkReviews.reduce(
                     (n,r)=>n+r.witnesses.length,0);
+                const barrierCornerRightfulInkReviews=barrierCornerBorrowedInkReviews.map(r=>({
+                    id:r.id,certified:false,structuralPartner:'unproven',structuralHandshake:'unproven',
+                    witnesses:r.witnesses.map(w=>({side:w.side,axis:w.axis,target:w.target,...w.rightful})),
+                    classification:'rightful-ink-not-wall-certification-review'
+                }));
+                const illustratedPropagationBarrierCornerRightfulInkReviews=barrierCornerRightfulInkReviews;
+                const illustratedPropagationBarrierCornerRightfulInkSamples=barrierCornerRightfulInkReviews.reduce(
+                    (n,r)=>n+r.witnesses.reduce((sum,w)=>sum+w.examined,0),0);
                 const publishedEvidenceAudit = {
                     evidenceModel: 'living-contour-evidence-audit-v10',
                     rawChains: contourChains.length,
@@ -10806,6 +10855,8 @@
                     illustratedPropagationBarrierCornerFalseBridgesSamples,
                     illustratedPropagationBarrierCornerBorrowedInkReviews,
                     illustratedPropagationBarrierCornerBorrowedInkSamples,
+                    illustratedPropagationBarrierCornerRightfulInkReviews,
+                    illustratedPropagationBarrierCornerRightfulInkSamples,
                     illustratedPropagationBarrierCornerBoundaryReady,
                     illustratedPropagationBarrierCornerBoundaryUncertified,
                     illustratedPropagationBarrierCornerCertificateControlFailures,
