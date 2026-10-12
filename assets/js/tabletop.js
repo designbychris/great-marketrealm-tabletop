@@ -2661,6 +2661,10 @@
                     const choice = audit.pippinPathChoice;
                     cartographyAssistantStatus.textContent += ` · IV.30.2C.5 Pippin chooses his path ${choice.examined} plausible strokes / ${choice.groups.length} conflict groups / ${choice.unresolved} unresolved · reviews [${choice.groups.map(g=>`${g.endpointIds.join('-')}:${g.classification}/preferred${g.preferred?g.preferred.join('-'):'none'}/margin${g.margin??'na'}/candidates[${g.candidates.map(c=>`${c.endpointIds.join('-')}:${c.score}`).join('|')}]`).join(';')}] · diagnostic-only;no-wall-certification;no-geometry-mutation`;
                 }
+                if (audit.pippinJunctionExamination) {
+                    const junction = audit.pippinJunctionExamination;
+                    cartographyAssistantStatus.textContent += ` · IV.30.2C.7 Pippin examines the junction ${junction.examined} groups / ${junction.unresolved} unresolved · reviews [${junction.reviews.map(r=>`${r.endpointIds.join('-')}:${r.classification}/opposed[${r.opposedJunctions.join(',')}]/sameRay[${r.nearCollinearJunctions.join(',')}]/branch[${r.branchingJunctions.join(',')}]/struct${r.structuralStrokeCount}/${r.strokes.length}/ink[${r.strokes.map(t=>`${t.endpointIds.join('-')}:${t.continuityPermille??'na'}`).join('|')}]`).join(';')}] · diagnostic-only;no-wall-certification;no-geometry-mutation`;
+                }
                 if (audit.pippinHandshake) {
                     const handshake = audit.pippinHandshake;
                     cartographyAssistantStatus.textContent += ` · IV.30.2C.6 Pippin finds the right handshake ${handshake.examined} strokes / ${handshake.groups} groups / ${handshake.unresolved} unresolved · reviews [${handshake.reviews.map(g=>`${g.endpointIds.join('-')}:${g.classification}/candidates[${g.candidates.map(c=>`${c.endpointIds.join('-')}:${c.classification}/axis${c.axialAgreement.join(',')}/struct${c.structural?'yes':'no'}`).join('|')}]/junctions[${g.junctions.map(j=>`${j.sharedEndpoint}:${j.angleDegrees??'na'}deg/${j.classification}`).join('|')}]`).join(';')}] · diagnostic-only;no-wall-certification;no-geometry-mutation`;
@@ -11093,6 +11097,48 @@
                         proposedGeometry:0,changedGeometry:0,examined:reviews.reduce((n,r)=>n+r.candidates.length,0),
                         groups:reviews.length,unresolved:reviews.length,reviews});
                 })();
+                // IV.30.2C.7 — Pippin Examines the Junction.
+                // Diagnose the entire conflict triangle using only existing endpoints,
+                // traced strokes and handshake evidence. This is not a wall-joining rule.
+                const pippinJunctionExamination = (() => {
+                    const endpointById = new Map(residualTerminations.map(e => [e.id,e]));
+                    const strokeByKey = new Map(pippinStrokeTrace.traces.map(t => [t.endpointIds.join('-'),t]));
+                    const reviews = pippinHandshake.reviews.map(group => {
+                        const ids = group.endpointIds;
+                        const links = group.candidates;
+                        const degrees = group.junctions.filter(j => j.angleDegrees !== null);
+                        const straight = degrees.filter(j => j.angleDegrees >= 155);
+                        const sameRay = degrees.filter(j => j.angleDegrees <= 25);
+                        const branch = degrees.filter(j => j.angleDegrees > 25 && j.angleDegrees < 155);
+                        const strokes = links.map(c => {
+                            const trace = strokeByKey.get(c.endpointIds.join('-'));
+                            return {endpointIds:c.endpointIds,
+                                continuityPermille:trace?.continuityPermille ?? null,
+                                structural:c.structural,
+                                direction:c.classification,
+                                classification:!c.structural?'illustrated-stroke-without-structural-proof-review'
+                                    :'structurally-contextual-stroke-review'};
+                        });
+                        const completeTriangle = ids.length===3 && links.length===3 &&
+                            ids.every(id=>links.filter(c=>c.endpointIds.includes(id)).length===2);
+                        const structuralCount=links.filter(c=>c.structural).length;
+                        const classification=!completeTriangle?'non-triangular-junction-conflict-review'
+                            :branch.length>0?'possible-branch-unproven-review'
+                            :straight.length>0 && sameRay.length===2?'collinear-rival-strokes-not-a-branch-review'
+                            :'junction-topology-ambiguous-review';
+                        return {endpointIds:ids,classification,completeTriangle,
+                            opposedJunctions:straight.map(j=>j.sharedEndpoint),
+                            nearCollinearJunctions:sameRay.map(j=>j.sharedEndpoint),
+                            branchingJunctions:branch.map(j=>j.sharedEndpoint),
+                            structuralStrokeCount:structuralCount,
+                            endpointsWithExactStructuralEvidence:ids.filter(id=>!!endpointById.get(id)?.exactStructural),
+                            strokes,preferred:null,wallCertified:false,keeperApproved:false};
+                    });
+                    return Object.freeze({phase:'IV.30.2C.7',diagnosticOnly:true,wallCertified:false,
+                        proposedGeometry:0,changedGeometry:0,examined:reviews.length,
+                        unresolved:reviews.filter(r=>r.structuralStrokeCount!==r.strokes.length).length,
+                        reviews});
+                })();
                 const publishedEvidenceAudit = {
                     evidenceModel: 'living-contour-evidence-audit-v10',
                     wholeRoomJudgement,
@@ -11101,6 +11147,7 @@
                     pippinStrokeTrace,
                     pippinPathChoice,
                     pippinHandshake,
+                    pippinJunctionExamination,
                     rawChains: contourChains.length,
                     recoverableChains: recoverableChains.length,
                     semanticRejected: recoverableChains.filter((entry) => !semanticRoleIsAutomaticWall(entry.semanticBoundary?.role)).length,
