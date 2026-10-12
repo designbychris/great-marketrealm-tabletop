@@ -2660,6 +2660,7 @@
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.13 missing turn ${audit.illustratedPropagationBarrierCornerMissingTurnSamples||0} approaches · reviews [${(audit.illustratedPropagationBarrierCornerMissingTurnReviews||[]).map((r)=>`B${r.id}:partner=${r.structuralPartner}/handshake=${r.structuralHandshake}/[${r.witnesses.map((w)=>`${w.side}:${w.axis}/${w.target}/turn${w.connectedTurns}/fragments${w.independentFragments}/largest${w.largestComponent}/${w.classification}`).join(';')}]`).join(';')}] · diagnostic-only;bounded-four-connected-original-image-pixel-turn;no-snapping;no-wall-admission;no-recovery-replay;G.5Z.50-veto-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.14 true junction ${audit.illustratedPropagationBarrierCornerTrueJunctionSamples||0} approaches · reviews [${(audit.illustratedPropagationBarrierCornerTrueJunctionReviews||[]).map(r=>`B${r.id}:partner=${r.structuralPartner}/handshake=${r.structuralHandshake}/[${r.witnesses.map(w=>`${w.side}:${w.axis}/${w.target}/near${w.nearJunctions}/arms${w.armConnected}/ornament${w.ornamentTurns}/largest${w.largestJunction}/${w.classification}`).join(';')}]`).join(';')}] · diagnostic-only;fixed-nine-by-nine-same-component-cross-axis-junction;no-snapping;no-wall-admission;no-recovery-replay;G.5Z.50-veto-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.15 rightful arms ${audit.illustratedPropagationBarrierCornerRightfulArmsSamples||0} approaches · reviews [${(audit.illustratedPropagationBarrierCornerRightfulArmsReviews||[]).map(r=>`B${r.id}:partner=${r.structuralPartner}/handshake=${r.structuralHandshake}/[${r.witnesses.map(w=>`${w.side}:${w.axis}/${w.target}/near${w.nearComponents}/arms${w.qualifiedComponents}/ornament${w.ornamentComponents}/spokes${w.bestLongitudinal},${w.bestTransverse}/largest${w.bestSize}/${w.classification}`).join(';')}]`).join(';')}] · diagnostic-only;fixed-nine-by-nine-same-component-sustained-orthogonal-spokes;no-snapping;no-wall-admission;no-recovery-replay;G.5Z.50-veto-unchanged`;
+                cartographyAssistantStatus.textContent += ` · G.5Z.50Z.16 broken arms ${audit.illustratedPropagationBarrierCornerBrokenArmsSamples||0} approaches · reviews [${(audit.illustratedPropagationBarrierCornerBrokenArmsReviews||[]).map(r=>`B${r.id}:partner=${r.structuralPartner}/handshake=${r.structuralHandshake}/[${r.witnesses.map(w=>`${w.side}:${w.axis}/${w.target}/bridges${w.onePixelBridges}/junctions${w.candidateJunctions}/unsupported${w.unsupportedGaps}/spokes${w.bestLongitudinal},${w.bestTransverse}/${w.classification}`).join(';')}]`).join(';')}] · diagnostic-only;fixed-nine-by-nine-single-pixel-bracketed-cardinal-gaps;no-pixel-joining;no-snapping;no-wall-admission;no-recovery-replay;G.5Z.50-veto-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50W spine reconciliation ${audit.illustratedPropagationBarrierSpineReconciliationFieldDisagreements||0} field disagreements / ${audit.illustratedPropagationBarrierSpineReconciliationLegacyMissing||0} missing legacy fields · reviews [${(audit.illustratedPropagationBarrierSpineReconciliationReviews||[]).map((entry)=>`B${entry.id}:${entry.role}/G:${entry.actualSpine}/V:${entry.legacySpine}/support${entry.supportedInterfaces}/${entry.length}/centre${entry.centreDarkInterfaces}/${entry.length}/gap${entry.longestUnsupported}/boundary${(entry.boundaryPermille/1000).toFixed(3)}/parallel${(entry.parallelPermille/1000).toFixed(3)}/width${entry.routeContinuous?'yes':'no'}/coherent${entry.routeCoherent?'yes':'no'}/otherFailures[${entry.otherFailures.join('&')}]/${entry.classification}`).join(';')}] · diagnostic-only;G.5Z.50V-gate-unchanged;G.5Z.50-veto-unchanged`;
             } else {
                 const doors = cartographySuggestions.filter((item) => item.type === 'door').length;
@@ -10348,6 +10349,70 @@
                 const illustratedPropagationBarrierCornerRightfulArmsReviews=barrierCornerRightfulArmsReviews;
                 const illustratedPropagationBarrierCornerRightfulArmsSamples=barrierCornerRightfulArmsReviews.reduce(
                     (n,r)=>n+r.witnesses.length,0);
+                // IV.30.1G.5Z.50Z.16 — The Corner's Broken Arms.
+                // Count only single missing samples between ink pixels on a straight
+                // cardinal spoke. Never paint the missing pixel or connect components.
+                // A pair of supported orthogonal directions is an ink hypothesis only.
+                const barrierCornerBrokenArmsReviews=barrierCornerRightfulArmsReviews.map((review)=>{
+                    const witnesses=review.witnesses.map((w)=>{
+                        const [tx,ty]=w.target.split(',').map(Number);
+                        const vertical=w.axis==='vertical',rows=[];
+                        for(let i=-4;i<=4;i++){
+                            const row=[];
+                            for(let j=-4;j<=4;j++){
+                                const x=tx+(vertical?j:i)*.125,y=ty+(vertical?i:j)*.125;
+                                const px=originX+x*gridCanvasX,py=originY+y*gridCanvasY;
+                                row.push(px>=0&&py>=0&&px<canvas.width&&py<canvas.height?
+                                    luminance(px,py)<=darkThreshold:null);
+                            }
+                            rows.push(row);
+                        }
+                        const unknown=rows.flat().some(v=>v===null);
+                        let bestLongitudinal=0,bestTransverse=0,onePixelBridges=0;
+                        let candidateJunctions=0,unsupportedGaps=0;
+                        // Anchor both axes to an actual ink pixel near the corner.
+                        for(let a=3;a<=5;a++)for(let b=3;b<=5;b++){
+                            if(rows[a][b]!==true)continue;
+                            const arms=[[1,0],[-1,0],[0,1],[0,-1]].map(([di,dj])=>{
+                                let reach=0,gaps=0,stopped=false;
+                                for(let k=1;k<=4;k++){
+                                    const ni=a+di*k,nj=b+dj*k;
+                                    if(ni<0||ni>=9||nj<0||nj>=9||rows[ni][nj]===null)break;
+                                    if(rows[ni][nj]===true){reach=k;continue;}
+                                    // A single missing pixel must be bracketed by ink
+                                    // on the SAME straight spoke, with no second gap.
+                                    const nextI=ni+di,nextJ=nj+dj;
+                                    if(gaps===0&&nextI>=0&&nextI<9&&nextJ>=0&&nextJ<9&&
+                                        rows[nextI][nextJ]===true&&k<4){
+                                        gaps++;onePixelBridges++;k++;reach=k;continue;
+                                    }
+                                    stopped=true;break;
+                                }
+                                return {reach,gaps,stopped};
+                            });
+                            const longitudinal=Math.max(arms[0].reach,arms[1].reach);
+                            const transverse=Math.max(arms[2].reach,arms[3].reach);
+                            bestLongitudinal=Math.max(bestLongitudinal,longitudinal);
+                            bestTransverse=Math.max(bestTransverse,transverse);
+                            if(longitudinal>=2&&transverse>=2&&
+                                (arms.some(arm=>arm.gaps>0)))candidateJunctions++;
+                            if(longitudinal<2||transverse<2)unsupportedGaps++;
+                        }
+                        const classification=unknown?'incomplete-broken-arms-window-review':
+                            candidateJunctions>0?'single-gap-orthogonal-ink-hypothesis-review':
+                            onePixelBridges>0?'broken-stroke-without-two-arms-review':
+                            'no-bounded-single-gap-arm-evidence-review';
+                        return {side:w.side,axis:w.axis,target:w.target,onePixelBridges,
+                            candidateJunctions,unsupportedGaps,bestLongitudinal,bestTransverse,
+                            unknown,classification};
+                    });
+                    return {id:review.id,certified:false,witnesses,
+                        structuralPartner:'unproven',structuralHandshake:'unproven',
+                        classification:'broken-arms-not-wall-certification-review'};
+                }).slice(0,24);
+                const illustratedPropagationBarrierCornerBrokenArmsReviews=barrierCornerBrokenArmsReviews;
+                const illustratedPropagationBarrierCornerBrokenArmsSamples=barrierCornerBrokenArmsReviews.reduce(
+                    (n,r)=>n+r.witnesses.length,0);
                 const publishedEvidenceAudit = {
                     evidenceModel: 'living-contour-evidence-audit-v10',
                     rawChains: contourChains.length,
@@ -10587,6 +10652,8 @@
                     illustratedPropagationBarrierCornerTrueJunctionSamples,
                     illustratedPropagationBarrierCornerRightfulArmsReviews,
                     illustratedPropagationBarrierCornerRightfulArmsSamples,
+                    illustratedPropagationBarrierCornerBrokenArmsReviews,
+                    illustratedPropagationBarrierCornerBrokenArmsSamples,
                     illustratedPropagationBarrierCornerBoundaryReady,
                     illustratedPropagationBarrierCornerBoundaryUncertified,
                     illustratedPropagationBarrierCornerCertificateControlFailures,
