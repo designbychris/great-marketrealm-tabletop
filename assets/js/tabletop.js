@@ -2659,6 +2659,7 @@
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.12 direction of travel ${audit.illustratedPropagationBarrierCornerDirectionOfTravelSamples||0} approaches · reviews [${(audit.illustratedPropagationBarrierCornerDirectionOfTravelReviews||[]).map((r)=>`B${r.id}:turn=${r.cornerTurnDemonstrated?'yes':'unproven'}/handshake=${r.structuralHandshake}/[${r.witnesses.map((w)=>`${w.side}:${w.axis}/${w.target}/long${w.longitudinalPairs}/cross${w.transversePairs}/near${w.centreNear}/far${w.centreFar}/${w.classification}`).join(';')}]`).join(';')}] · diagnostic-only;bounded-original-image-directional-travel;no-snapping;no-wall-admission;no-recovery-replay;G.5Z.50-veto-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.13 missing turn ${audit.illustratedPropagationBarrierCornerMissingTurnSamples||0} approaches · reviews [${(audit.illustratedPropagationBarrierCornerMissingTurnReviews||[]).map((r)=>`B${r.id}:partner=${r.structuralPartner}/handshake=${r.structuralHandshake}/[${r.witnesses.map((w)=>`${w.side}:${w.axis}/${w.target}/turn${w.connectedTurns}/fragments${w.independentFragments}/largest${w.largestComponent}/${w.classification}`).join(';')}]`).join(';')}] · diagnostic-only;bounded-four-connected-original-image-pixel-turn;no-snapping;no-wall-admission;no-recovery-replay;G.5Z.50-veto-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.14 true junction ${audit.illustratedPropagationBarrierCornerTrueJunctionSamples||0} approaches · reviews [${(audit.illustratedPropagationBarrierCornerTrueJunctionReviews||[]).map(r=>`B${r.id}:partner=${r.structuralPartner}/handshake=${r.structuralHandshake}/[${r.witnesses.map(w=>`${w.side}:${w.axis}/${w.target}/near${w.nearJunctions}/arms${w.armConnected}/ornament${w.ornamentTurns}/largest${w.largestJunction}/${w.classification}`).join(';')}]`).join(';')}] · diagnostic-only;fixed-nine-by-nine-same-component-cross-axis-junction;no-snapping;no-wall-admission;no-recovery-replay;G.5Z.50-veto-unchanged`;
+                cartographyAssistantStatus.textContent += ` · G.5Z.50Z.15 rightful arms ${audit.illustratedPropagationBarrierCornerRightfulArmsSamples||0} approaches · reviews [${(audit.illustratedPropagationBarrierCornerRightfulArmsReviews||[]).map(r=>`B${r.id}:partner=${r.structuralPartner}/handshake=${r.structuralHandshake}/[${r.witnesses.map(w=>`${w.side}:${w.axis}/${w.target}/near${w.nearComponents}/arms${w.qualifiedComponents}/ornament${w.ornamentComponents}/spokes${w.bestLongitudinal},${w.bestTransverse}/largest${w.bestSize}/${w.classification}`).join(';')}]`).join(';')}] · diagnostic-only;fixed-nine-by-nine-same-component-sustained-orthogonal-spokes;no-snapping;no-wall-admission;no-recovery-replay;G.5Z.50-veto-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50W spine reconciliation ${audit.illustratedPropagationBarrierSpineReconciliationFieldDisagreements||0} field disagreements / ${audit.illustratedPropagationBarrierSpineReconciliationLegacyMissing||0} missing legacy fields · reviews [${(audit.illustratedPropagationBarrierSpineReconciliationReviews||[]).map((entry)=>`B${entry.id}:${entry.role}/G:${entry.actualSpine}/V:${entry.legacySpine}/support${entry.supportedInterfaces}/${entry.length}/centre${entry.centreDarkInterfaces}/${entry.length}/gap${entry.longestUnsupported}/boundary${(entry.boundaryPermille/1000).toFixed(3)}/parallel${(entry.parallelPermille/1000).toFixed(3)}/width${entry.routeContinuous?'yes':'no'}/coherent${entry.routeCoherent?'yes':'no'}/otherFailures[${entry.otherFailures.join('&')}]/${entry.classification}`).join(';')}] · diagnostic-only;G.5Z.50V-gate-unchanged;G.5Z.50-veto-unchanged`;
             } else {
                 const doors = cartographySuggestions.filter((item) => item.type === 'door').length;
@@ -10270,6 +10271,83 @@
                 const illustratedPropagationBarrierCornerTrueJunctionReviews=barrierCornerTrueJunctionReviews;
                 const illustratedPropagationBarrierCornerTrueJunctionSamples=barrierCornerTrueJunctionReviews.reduce(
                     (n,r)=>n+r.witnesses.length,0);
+                // IV.30.1G.5Z.50Z.15 — The Corner's Rightful Arms.
+                // Follow the same fixed 9x9 original-image four-connected component
+                // from a near-centre junction. Require distinct longitudinal and
+                // transverse spokes with independent pixel runs, not merely a turn.
+                // This is a diagnostic hypothesis, never a structural handshake.
+                const barrierCornerRightfulArmsReviews=barrierCornerTrueJunctionReviews.map((review)=>{
+                    const witnesses=review.witnesses.map((w)=>{
+                        const [tx,ty]=w.target.split(',').map(Number);
+                        const vertical=w.axis==='vertical',rows=[];
+                        for(let i=-4;i<=4;i++){
+                            const row=[];
+                            for(let j=-4;j<=4;j++){
+                                const x=tx+(vertical?j:i)*.125,y=ty+(vertical?i:j)*.125;
+                                const px=originX+x*gridCanvasX,py=originY+y*gridCanvasY;
+                                row.push(px>=0&&py>=0&&px<canvas.width&&py<canvas.height?
+                                    luminance(px,py)<=darkThreshold:null);
+                            }
+                            rows.push(row);
+                        }
+                        const unknown=rows.flat().some(v=>v===null),visited=new Set();
+                        let nearComponents=0,qualifiedComponents=0,ornamentComponents=0;
+                        let bestLongitudinal=0,bestTransverse=0,bestSize=0;
+                        for(let i=0;i<9;i++)for(let j=0;j<9;j++){
+                            const key=i*9+j;
+                            if(rows[i][j]!==true||visited.has(key))continue;
+                            const queue=[[i,j]],component=[];visited.add(key);
+                            for(let head=0;head<queue.length;head++){
+                                const [a,b]=queue[head];component.push([a,b]);
+                                for(const [di,dj] of [[-1,0],[1,0],[0,-1],[0,1]]){
+                                    const ni=a+di,nj=b+dj,nk=ni*9+nj;
+                                    if(ni<0||ni>=9||nj<0||nj>=9||rows[ni][nj]!==true||visited.has(nk))continue;
+                                    visited.add(nk);queue.push([ni,nj]);
+                                }
+                            }
+                            if(!component.some(([a,b])=>Math.abs(a-4)<=1&&Math.abs(b-4)<=1))continue;
+                            nearComponents++;
+                            const member=new Set(component.map(([a,b])=>a*9+b));
+                            // Count consecutive spokes extending from a near-centre
+                            // pixel in four cardinal directions within the SAME component.
+                            let componentQualified=false;
+                            for(const [a,b] of component){
+                                if(Math.abs(a-4)>1||Math.abs(b-4)>1)continue;
+                                const runs=[[1,0],[-1,0],[0,1],[0,-1]].map(([di,dj])=>{
+                                    let length=0;
+                                    for(let k=1;k<=4;k++){
+                                        const ni=a+di*k,nj=b+dj*k;
+                                        if(ni<0||ni>=9||nj<0||nj>=9||!member.has(ni*9+nj))break;
+                                        length++;
+                                    }
+                                    return length;
+                                });
+                                const longitudinal=Math.max(runs[0],runs[1]);
+                                const transverse=Math.max(runs[2],runs[3]);
+                                bestLongitudinal=Math.max(bestLongitudinal,longitudinal);
+                                bestTransverse=Math.max(bestTransverse,transverse);
+                                // Two independent spokes of at least two samples,
+                                // both anchored to one junction pixel.
+                                if(longitudinal>=2&&transverse>=2)componentQualified=true;
+                            }
+                            if(componentQualified){qualifiedComponents++;bestSize=Math.max(bestSize,component.length);}
+                            else ornamentComponents++;
+                        }
+                        const classification=unknown?'incomplete-rightful-arms-window-review':
+                            qualifiedComponents>0?'same-junction-two-sustained-arms-hypothesis-review':
+                            nearComponents>0?'near-junction-without-two-sustained-arms-review':
+                            'no-near-junction-arms-control-review';
+                        return {side:w.side,axis:w.axis,target:w.target,nearComponents,
+                            qualifiedComponents,ornamentComponents,bestLongitudinal,bestTransverse,
+                            bestSize,unknown,classification};
+                    });
+                    return {id:review.id,certified:review.certified,witnesses,
+                        structuralPartner:'unproven',structuralHandshake:'unproven',
+                        classification:'rightful-arms-not-wall-certification-review'};
+                }).slice(0,24);
+                const illustratedPropagationBarrierCornerRightfulArmsReviews=barrierCornerRightfulArmsReviews;
+                const illustratedPropagationBarrierCornerRightfulArmsSamples=barrierCornerRightfulArmsReviews.reduce(
+                    (n,r)=>n+r.witnesses.length,0);
                 const publishedEvidenceAudit = {
                     evidenceModel: 'living-contour-evidence-audit-v10',
                     rawChains: contourChains.length,
@@ -10507,6 +10585,8 @@
                     illustratedPropagationBarrierCornerMissingTurnSamples,
                     illustratedPropagationBarrierCornerTrueJunctionReviews,
                     illustratedPropagationBarrierCornerTrueJunctionSamples,
+                    illustratedPropagationBarrierCornerRightfulArmsReviews,
+                    illustratedPropagationBarrierCornerRightfulArmsSamples,
                     illustratedPropagationBarrierCornerBoundaryReady,
                     illustratedPropagationBarrierCornerBoundaryUncertified,
                     illustratedPropagationBarrierCornerCertificateControlFailures,
