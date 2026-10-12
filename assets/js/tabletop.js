@@ -10478,41 +10478,6 @@
                             hatchRisk>0?'parallel-hatch-competes-with-bridge-review':
                             clean>0?'collinear-bracket-without-local-hatch-review':
                             'no-distinct-bracketed-gaps-review';
-                        // IV.30.1G.5Z.50Z.22 — The Broken Stroke's Witness.
-                        // Compare the existing fixed-axis Z.21 samples with their own
-                        // adjacent longitudinal and lateral tracks. This is a bounded
-                        // pattern comparison, not a reconstruction of missing pixels.
-                        const brokenWitness={examined:0,aligned:0,fragmented:0,
-                            hatchCompeted:0,incomplete:0,details:[]};
-                        for(const detail of beyond.details){
-                            const arms=[detail.near,detail.far];
-                            const tracks=detail.lateral;
-                            const incomplete=[...arms,...tracks].some(bits=>bits.includes('?'));
-                            const runs=arms.map(bits=>{
-                                let longest=0,current=0,transitions=0;
-                                for(let k=0;k<bits.length;k++){
-                                    current=bits[k]==='1'?current+1:0;
-                                    longest=Math.max(longest,current);
-                                    if(k>0&&bits[k]!==bits[k-1])transitions++;
-                                }
-                                return {longest,transitions};
-                            });
-                            const lateralDensity=tracks.map(bits=>[...bits].filter(v=>v==='1').length);
-                            const competing=lateralDensity.some(n=>n>=3);
-                            const aligned=runs.every(r=>r.longest>=3&&r.transitions<=2);
-                            const verdict=incomplete?'broken-stroke-window-incomplete-review':
-                                competing?'broken-stroke-parallel-hatching-competes-review':
-                                aligned?'broken-stroke-directional-alignment-hypothesis-review':
-                                'broken-stroke-fragmented-or-independent-review';
-                            brokenWitness.examined++;
-                            if(incomplete)brokenWitness.incomplete++;
-                            else if(competing)brokenWitness.hatchCompeted++;
-                            else if(aligned)brokenWitness.aligned++;
-                            else brokenWitness.fragmented++;
-                            brokenWitness.details.push({gap:detail.gap,
-                                runs:runs.map(r=>r.longest),transitions:runs.map(r=>r.transitions),
-                                lateralDensity,verdict});
-                        }
                         return {side:w.side,axis:w.axis,target:w.target,distinctGaps:gaps.size,
                             clean,hatchRisk,indeterminate,classification};
                     });
@@ -10704,6 +10669,41 @@
                                 far:far.map(v=>v===null?'?':v?'1':'0').join(''),
                                 lateral:lateral.map(track=>track.map(v=>v===null?'?':v?'1':'0').join('')),
                                 verdict});
+                        }
+                        // IV.30.1G.5Z.50Z.22 — The Broken Stroke's Witness.
+                        // Compare the existing fixed-axis Z.21 samples with their own
+                        // adjacent longitudinal and lateral tracks. This is a bounded
+                        // pattern comparison, not a reconstruction of missing pixels.
+                        const brokenWitness={examined:0,aligned:0,fragmented:0,
+                            hatchCompeted:0,incomplete:0,details:[]};
+                        for(const detail of beyond.details){
+                            const arms=[detail.near,detail.far];
+                            const tracks=detail.lateral;
+                            const incomplete=[...arms,...tracks].some(bits=>bits.includes('?'));
+                            const runs=arms.map(bits=>{
+                                let longest=0,current=0,transitions=0;
+                                for(let k=0;k<bits.length;k++){
+                                    current=bits[k]==='1'?current+1:0;
+                                    longest=Math.max(longest,current);
+                                    if(k>0&&bits[k]!==bits[k-1])transitions++;
+                                }
+                                return {longest,transitions};
+                            });
+                            const lateralDensity=tracks.map(bits=>[...bits].filter(v=>v==='1').length);
+                            const competing=lateralDensity.some(n=>n>=3);
+                            const aligned=runs.every(r=>r.longest>=3&&r.transitions<=2);
+                            const verdict=incomplete?'broken-stroke-window-incomplete-review':
+                                competing?'broken-stroke-parallel-hatching-competes-review':
+                                aligned?'broken-stroke-directional-alignment-hypothesis-review':
+                                'broken-stroke-fragmented-or-independent-review';
+                            brokenWitness.examined++;
+                            if(incomplete)brokenWitness.incomplete++;
+                            else if(competing)brokenWitness.hatchCompeted++;
+                            else if(aligned)brokenWitness.aligned++;
+                            else brokenWitness.fragmented++;
+                            brokenWitness.details.push({gap:detail.gap,
+                                runs:runs.map(r=>r.longest),transitions:runs.map(r=>r.transitions),
+                                lateralDensity,verdict});
                         }
                         return {side:w.side,axis:w.axis,target:w.target,distinctGaps:gaps.size,
                             ...counts,rightful,holding,beyond,brokenWitness,classification:counts.ornament>0?'borrowed-ink-competes-with-corner-review':

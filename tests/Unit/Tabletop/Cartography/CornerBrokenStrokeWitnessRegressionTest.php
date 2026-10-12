@@ -14,6 +14,10 @@ final class CornerBrokenStrokeWitnessRegressionTest extends TestCase
         self::assertIsString($source);
         self::assertStringContainsString('IV.30.1G.5Z.50Z.22 — The Broken Stroke\'s Witness', $source);
         self::assertStringContainsString('for(const detail of beyond.details)', $source);
+        self::assertGreaterThan(
+            strpos($source, 'const beyond={examined:0,extended:0,interrupted:0,'),
+            strpos($source, 'const brokenWitness={examined:0,aligned:0,fragmented:0,')
+        );
         self::assertStringContainsString('broken-stroke-parallel-hatching-competes-review', $source);
         self::assertStringContainsString('broken-stroke-directional-alignment-hypothesis-review', $source);
         self::assertStringContainsString('broken-stroke-fragmented-or-independent-review', $source);
