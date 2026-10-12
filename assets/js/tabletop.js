@@ -2657,6 +2657,10 @@
                     const trace = audit.pippinStrokeTrace;
                     cartographyAssistantStatus.textContent += ` · IV.30.2C.4 Pippin follows the stroke ${trace.examined} directional pairs / ${trace.plausible} stroke-plausible / ${trace.endpointConflicts} endpoint-conflicted · reviews [${trace.traces.map(t=>`${t.endpointIds.join('-')}:${t.classification}/ink${t.supported}/${t.samples}/gap${t.longestGap}/travel${t.trackTravel}/width${t.meanWidthTracks}`).join(';')}] · diagnostic-only;no-wall-certification;no-geometry-mutation`;
                 }
+                if (audit.pippinPathChoice) {
+                    const choice = audit.pippinPathChoice;
+                    cartographyAssistantStatus.textContent += ` · IV.30.2C.5 Pippin chooses his path ${choice.examined} plausible strokes / ${choice.groups.length} conflict groups / ${choice.unresolved} unresolved · reviews [${choice.groups.map(g=>`${g.endpointIds.join('-')}:${g.classification}/preferred${g.preferred?g.preferred.join('-'):'none'}/margin${g.margin??'na'}/candidates[${g.candidates.map(c=>`${c.endpointIds.join('-')}:${c.score}`).join('|')}]`).join(';')}] · diagnostic-only;no-wall-certification;no-geometry-mutation`;
+                }
                 if (audit.pippinInkStudy) {
                     const ink = audit.pippinInkStudy;
                     cartographyAssistantStatus.textContent += ` · IV.30.2C.3 Pippin studies the ink ${ink.examined} plausible pairs / ${ink.directional} directional / ${ink.hatching} hatch-competing / ${ink.competing} shared-endpoint conflicts · first 20 [${ink.reviews.slice(0,20).map(r=>`${r.endpointIds.join('-')}:${r.classification}/run${r.longestRun}/${r.samples}/axis${r.axialInkPermille}/lateral${r.lateralInkPermille}${r.competing?'/competing':''}`).join(';')}] · diagnostic-only;no-wall-certification;no-geometry-mutation`;
@@ -10984,12 +10988,54 @@
                         plausible:traces.filter(t=>t.classification.startsWith('stroke-plausible')).length,
                         traces});
                 })();
+                // IV.30.2C.5 — Pippin Chooses His Path.
+                // Compare conflicting plausible strokes as a group, not as independent walls.
+                const pippinPathChoice = (() => {
+                    const plausible = pippinStrokeTrace.traces.filter(t => t.classification.startsWith('stroke-plausible'));
+                    const candidates = plausible.map(t => {
+                        const ink = pippinInkStudy.reviews.find(r => r.endpointIds.join('-') === t.endpointIds.join('-'));
+                        const pencil = pippinsPencil.candidates.find(r => r.endpointIds.join('-') === t.endpointIds.join('-'));
+                        const continuity = t.supported / Math.max(1,t.samples);
+                        const score = Math.round(1000 * (continuity*.45 + (1-Math.min(1,t.trackTravel/Math.max(1,t.samples)))*.20
+                            + (ink?.continuityPermille || 0)/1000*.20 + (1-Math.min(1,(pencil?.distance || 0)/4))*.15));
+                        return {endpointIds:t.endpointIds,score,continuityPermille:Math.round(continuity*1000),
+                            longestGap:t.longestGap,trackTravel:t.trackTravel,
+                            competing:t.competing,wallCertified:false,keeperApproved:false};
+                    });
+                    const seen = new Set(), groups=[];
+                    for (const candidate of candidates) {
+                        const key=candidate.endpointIds.join('-');
+                        if(seen.has(key)) continue;
+                        const group=[candidate];seen.add(key);
+                        for(let i=0;i<group.length;i++) {
+                            for(const other of candidates) {
+                                const otherKey=other.endpointIds.join('-');
+                                if(seen.has(otherKey)) continue;
+                                if(other.endpointIds.some(id=>group[i].endpointIds.includes(id))) {
+                                    group.push(other);seen.add(otherKey);
+                                }
+                            }
+                        }
+                        group.sort((a,b)=>b.score-a.score || a.endpointIds[0]-b.endpointIds[0] || a.endpointIds[1]-b.endpointIds[1]);
+                        const best=group[0],runnerUp=group[1];
+                        // Shared endpoints and close scores remain explicitly unresolved.
+                        const resolved=group.length===1 || (best.score-(runnerUp?.score||0)>=150 && best.longestGap===0);
+                        groups.push({endpointIds:[...new Set(group.flatMap(c=>c.endpointIds))].sort((a,b)=>a-b),
+                            classification:group.length>1?(resolved?'preferred-stroke-review-only':'shared-endpoint-unresolved-review'):'isolated-stroke-review-only',
+                            preferred:resolved?best.endpointIds:null,margin:runnerUp?best.score-runnerUp.score:null,
+                            candidates:group,wallCertified:false,keeperApproved:false});
+                    }
+                    return Object.freeze({phase:'IV.30.2C.5',diagnosticOnly:true,wallCertified:false,
+                        proposedGeometry:0,changedGeometry:0,examined:candidates.length,groups,
+                        unresolved:groups.filter(g=>g.classification==='shared-endpoint-unresolved-review').length});
+                })();
                 const publishedEvidenceAudit = {
                     evidenceModel: 'living-contour-evidence-audit-v10',
                     wholeRoomJudgement,
                     pippinsPencil,
                     pippinInkStudy,
                     pippinStrokeTrace,
+                    pippinPathChoice,
                     rawChains: contourChains.length,
                     recoverableChains: recoverableChains.length,
                     semanticRejected: recoverableChains.filter((entry) => !semanticRoleIsAutomaticWall(entry.semanticBoundary?.role)).length,
