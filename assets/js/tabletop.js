@@ -2665,6 +2665,7 @@
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.18 borrowed ink ${audit.illustratedPropagationBarrierCornerBorrowedInkSamples||0} approaches · reviews [${(audit.illustratedPropagationBarrierCornerBorrowedInkReviews||[]).map(r=>`B${r.id}:partner=${r.structuralPartner}/handshake=${r.structuralHandshake}/[${r.witnesses.map(w=>`${w.side}:${w.axis}/${w.target}/distinct${w.distinctGaps}/directional${w.directional}/ornament${w.ornament}/short${w.short}/unknown${w.unknown}/${w.classification}`).join(';')}]`).join(';')}] · diagnostic-only;exact-Z17-deduplicated-gaps;fixed-two-sample-longitudinal-context;bounded-lateral-ornament-competition;no-pixel-joining;no-snapping;no-wall-admission;no-recovery-replay;G.5Z.50-veto-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.19 rightful ink ${audit.illustratedPropagationBarrierCornerRightfulInkSamples||0} candidate gaps · reviews [${(audit.illustratedPropagationBarrierCornerRightfulInkReviews||[]).map(r=>`B${r.id}:partner=${r.structuralPartner}/handshake=${r.structuralHandshake}/[${r.witnesses.map(w=>`${w.side}:${w.axis}/${w.target}/examined${w.examined}/directional${w.directional}/unknown${w.unknown}/unborrowed${w.owned}/borrowed${w.borrowed}/interrupted${w.interrupted}/incomplete${w.incomplete}/ornamentControls${w.ornamentControls}/gaps[${w.details.map(d=>`${d.gap}:${d.axial}:${d.lateral.join(',')}:${d.verdict}`).join('|')}]`).join(';')}]`).join(';')}] · diagnostic-only;exact-Z18-directional-and-unresolved-gaps;fixed-six-axial-and-two-five-sample-lateral-tracks;ornament-negative-controls;no-pixel-joining;no-snapping;no-wall-admission;no-recovery-replay;G.5Z.50-veto-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.20 ink holds its line ${audit.illustratedPropagationBarrierCornerInkHoldingSamples||0} candidate gaps · reviews [${(audit.illustratedPropagationBarrierCornerInkHoldingReviews||[]).map(r=>`B${r.id}:partner=${r.structuralPartner}/handshake=${r.structuralHandshake}/[${r.witnesses.map(w=>`${w.side}:${w.axis}/${w.target}/examined${w.examined}/continuous${w.continuous}/interrupted${w.interrupted}/ornament${w.ornamentCompeted}/incomplete${w.incomplete}/gaps[${w.details.map(d=>`${d.gap}:near${d.nearRun}/far${d.awayRun}/missing${d.missing}/lateral${d.lateralAtGap}-${d.lateralBrackets}/${d.verdict}`).join('|')}]`).join(';')}]`).join(';')}] · diagnostic-only;exact-Z19-candidate-gaps;bounded-axial-runs-and-lateral-ornament-controls;no-pixel-joining;no-snapping;no-wall-admission;no-recovery-replay;G.5Z.50-veto-unchanged`;
+                cartographyAssistantStatus.textContent += ` · G.5Z.50Z.21 ink beyond window ${audit.illustratedPropagationBarrierCornerBeyondWindowSamples||0} candidate gaps · reviews [${(audit.illustratedPropagationBarrierCornerBeyondWindowReviews||[]).map(r=>`B${r.id}:partner=${r.structuralPartner}/handshake=${r.structuralHandshake}/[${r.witnesses.map(w=>`${w.side}:${w.axis}/${w.target}/examined${w.examined}/extended${w.extended}/interrupted${w.interrupted}/ornament${w.ornamentCompeted}/incomplete${w.incomplete}/gaps[${w.details.map(d=>`${d.gap}:near${d.near}/far${d.far}/ink${d.nearInk}-${d.farInk}/lateral[${d.lateral.join(',')}]/${d.verdict}`).join('|')}]`).join(';')}]`).join(';')}] · diagnostic-only;exact-Z20-candidate-gaps;fixed-original-image-wider-window;no-axis-shift;no-pixel-joining;no-snapping;no-wall-admission;no-recovery-replay;G.5Z.50-veto-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50W spine reconciliation ${audit.illustratedPropagationBarrierSpineReconciliationFieldDisagreements||0} field disagreements / ${audit.illustratedPropagationBarrierSpineReconciliationLegacyMissing||0} missing legacy fields · reviews [${(audit.illustratedPropagationBarrierSpineReconciliationReviews||[]).map((entry)=>`B${entry.id}:${entry.role}/G:${entry.actualSpine}/V:${entry.legacySpine}/support${entry.supportedInterfaces}/${entry.length}/centre${entry.centreDarkInterfaces}/${entry.length}/gap${entry.longestUnsupported}/boundary${(entry.boundaryPermille/1000).toFixed(3)}/parallel${(entry.parallelPermille/1000).toFixed(3)}/width${entry.routeContinuous?'yes':'no'}/coherent${entry.routeCoherent?'yes':'no'}/otherFailures[${entry.otherFailures.join('&')}]/${entry.classification}`).join(';')}] · diagnostic-only;G.5Z.50V-gate-unchanged;G.5Z.50-veto-unchanged`;
             } else {
                 const doors = cartographySuggestions.filter((item) => item.type === 'door').length;
@@ -10623,8 +10624,53 @@
                             holding.details.push({gap:detail.gap,nearRun,awayRun,missing,
                                 lateralAtGap,lateralBrackets,verdict});
                         }
+                        // IV.30.1G.5Z.50Z.21 — The Ink Beyond the Window.
+                        // Revisit ONLY the five Z.20 candidates, at their original
+                        // coordinates and axes. Sample a fixed wider window from the
+                        // original image; never shift the axis to seek stronger ink.
+                        const beyond={examined:0,extended:0,interrupted:0,
+                            ornamentCompeted:0,incomplete:0,details:[]};
+                        for(const detail of holding.details){
+                            const gap=gaps.get(detail.gap);
+                            if(!gap)continue;
+                            const {i,j,di,dj}=gap;
+                            const sample=(offset,lateral=0)=>{
+                                const step=.125;
+                                const vertical=w.axis==='vertical';
+                                const ai=i+di*offset+(di!==0?0:lateral);
+                                const aj=j+dj*offset+(di!==0?lateral:0);
+                                const x=tx+(vertical?aj-4:ai-4)*step;
+                                const y=ty+(vertical?ai-4:aj-4)*step;
+                                const px=originX+x*gridCanvasX,py=originY+y*gridCanvasY;
+                                return px>=0&&py>=0&&px<canvas.width&&py<canvas.height?
+                                    luminance(px,py)<=darkThreshold:null;
+                            };
+                            // Five fixed samples beyond each original three-pixel arm.
+                            const near=[-8,-7,-6,-5,-4].map(k=>sample(k));
+                            const far=[4,5,6,7,8].map(k=>sample(k));
+                            const lateral=[-1,1].map(side=>[-5,-4,-3,3,4,5]
+                                .map(k=>sample(k,side)));
+                            const incomplete=[...near,...far,...lateral.flat()].some(v=>v===null);
+                            const nearInk=near.filter(v=>v===true).length;
+                            const farInk=far.filter(v=>v===true).length;
+                            const competing=lateral.some(track=>track.filter(v=>v===true).length>=4);
+                            const verdict=incomplete?'beyond-window-sampling-incomplete-review':
+                                competing?'beyond-window-parallel-ornament-competes-review':
+                                nearInk>=4&&farInk>=4?'beyond-window-directional-ink-persists-review':
+                                'beyond-window-directional-ink-interrupted-review';
+                            beyond.examined++;
+                            if(incomplete)beyond.incomplete++;
+                            else if(competing)beyond.ornamentCompeted++;
+                            else if(nearInk>=4&&farInk>=4)beyond.extended++;
+                            else beyond.interrupted++;
+                            beyond.details.push({gap:detail.gap,nearInk,farInk,
+                                near:near.map(v=>v===null?'?':v?'1':'0').join(''),
+                                far:far.map(v=>v===null?'?':v?'1':'0').join(''),
+                                lateral:lateral.map(track=>track.map(v=>v===null?'?':v?'1':'0').join('')),
+                                verdict});
+                        }
                         return {side:w.side,axis:w.axis,target:w.target,distinctGaps:gaps.size,
-                            ...counts,rightful,holding,classification:counts.ornament>0?'borrowed-ink-competes-with-corner-review':
+                            ...counts,rightful,holding,beyond,classification:counts.ornament>0?'borrowed-ink-competes-with-corner-review':
                                 counts.directional>0?'directional-ink-remains-uncertified-review':
                                 'no-sustained-unborrowed-bridge-review'};
                     });
@@ -10650,6 +10696,14 @@
                 }));
                 const illustratedPropagationBarrierCornerInkHoldingReviews=barrierCornerInkHoldingReviews;
                 const illustratedPropagationBarrierCornerInkHoldingSamples=barrierCornerInkHoldingReviews.reduce(
+                    (n,r)=>n+r.witnesses.reduce((sum,w)=>sum+w.examined,0),0);
+                const barrierCornerBeyondWindowReviews=barrierCornerBorrowedInkReviews.map(r=>({
+                    id:r.id,certified:false,structuralPartner:'unproven',structuralHandshake:'unproven',
+                    witnesses:r.witnesses.map(w=>({side:w.side,axis:w.axis,target:w.target,...w.beyond})),
+                    classification:'beyond-window-ink-not-wall-certification-review'
+                }));
+                const illustratedPropagationBarrierCornerBeyondWindowReviews=barrierCornerBeyondWindowReviews;
+                const illustratedPropagationBarrierCornerBeyondWindowSamples=barrierCornerBeyondWindowReviews.reduce(
                     (n,r)=>n+r.witnesses.reduce((sum,w)=>sum+w.examined,0),0);
                 const publishedEvidenceAudit = {
                     evidenceModel: 'living-contour-evidence-audit-v10',
@@ -10900,6 +10954,8 @@
                     illustratedPropagationBarrierCornerRightfulInkSamples,
                     illustratedPropagationBarrierCornerInkHoldingReviews,
                     illustratedPropagationBarrierCornerInkHoldingSamples,
+                    illustratedPropagationBarrierCornerBeyondWindowReviews,
+                    illustratedPropagationBarrierCornerBeyondWindowSamples,
                     illustratedPropagationBarrierCornerBoundaryReady,
                     illustratedPropagationBarrierCornerBoundaryUncertified,
                     illustratedPropagationBarrierCornerCertificateControlFailures,
