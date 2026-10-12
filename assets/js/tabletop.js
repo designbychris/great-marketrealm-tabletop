@@ -2649,6 +2649,10 @@
                     const room = audit.wholeRoomJudgement;
                     cartographyAssistantStatus.textContent += ` · IV.30.2C.1 whole-room structural review ${room.reconstructedSurfaces} surfaces / ${room.completedPlayableCells} playable cells / ${room.disconnectedIslands} unresolved islands / ${room.reviewedPaths} open paths / ${room.terminationCount} endpoints · paths [${room.reviews.map(r=>`P${r.pathIndex}:${r.classification}/ends${r.endpointIds.join(',')}/components${r.componentIds.join(',')}`).join(';')}] · diagnostic-only;no-wall-certification;no-geometry-mutation`;
                 }
+                if (audit.pippinsPencil) {
+                    const pencil = audit.pippinsPencil;
+                    cartographyAssistantStatus.textContent += ` · IV.30.2C.2 Pippin offers his pencil ${pencil.endpointCount} endpoints → ${pencil.candidateCount} nearby candidate pairs (strong ${pencil.strong}, plausible ${pencil.plausible}, uncertain ${pencil.uncertain}) · first 20 [${pencil.candidates.slice(0,20).map(c=>`${c.endpointIds.join('-')}:${c.distance}g/${c.classification}/${c.reasons.join('+')}`).join(';')}] · diagnostic-only;no-wall-certification;no-geometry-mutation`;
+                }
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.1 corner certificates ${audit.illustratedPropagationBarrierCornerCertificates||0} diagnostic / ${audit.illustratedPropagationBarrierCornerCertificateControlFailures||0} control failures · reviews [${(audit.illustratedPropagationBarrierCornerCertificateReviews||[]).map((entry)=>`B${entry.id}:${entry.role}/legacy${entry.legacyMatched}/replay${entry.replayMatched}/${entry.replayTotal}/spineOnly${entry.legacySpineOnly?'yes':'no'}/reconciled${entry.reconciled?'yes':'no'}/certified${entry.certified?'yes':'no'}/${entry.classification}`).join(';')}] · diagnostic-only;no-wall-admission;no-geometry-mutation;G.5Z.50V-gate-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.2 certificate/boundary ${audit.illustratedPropagationBarrierCornerBoundaryReady||0} structurally ready / ${audit.illustratedPropagationBarrierCornerBoundaryUncertified||0} withheld · reviews [${(audit.illustratedPropagationBarrierCornerBoundaryReviews||[]).map((entry)=>`B${entry.id}:${entry.classification}/corner[${entry.corners.join('&')}]/new${entry.proposedEdges}/struct${entry.structuralEdges}/sides[${entry.interfaces.map((side)=>`${side.side}:${side.cornerPlayable?'c':''}${side.neighbourPlayable?'p':''}${side.existingBoundary?'existing':''}${side.counterfactualBoundary?'new':''}${side.exactStructural?'struct':''}@${side.localInkPermille}`).join('|')}]`).join(';')}] · diagnostic-only;exact-four-neighbour-boundary-counterfactual;no-wall-admission;no-recovery-replay;no-geometry-mutation`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.3 boundary witnesses ${audit.illustratedPropagationBarrierCornerBoundaryWitnessInterfaces||0} interfaces · reviews [${(audit.illustratedPropagationBarrierCornerBoundaryWitnessReviews||[]).map((entry)=>`B${entry.id}:${entry.classification}/[${entry.witnesses.map((w)=>`${w.side}:${w.classification}/ink[${w.inkSamplesPermille.join(',')}]/adj${w.adjacentRepresented}/struct${w.adjacentStructural}`).join('|')}]`).join(';')}] · diagnostic-only;original-ink-directional-witnesses;no-wall-admission;no-recovery-replay;no-geometry-mutation`;
@@ -10790,9 +10794,53 @@
                         reviews
                     });
                 })();
+                // IV.30.2C.2 — Pippin Offers His Pencil.
+                // Candidate suggestions are deliberately NOT contour suggestions or saved geometry.
+                // Pair exact existing endpoints, retain competing hypotheses, and never infer a wall.
+                const pippinsPencil = (() => {
+                    const ends = residualTerminations.filter(e => Number.isFinite(e.point?.x) && Number.isFinite(e.point?.y));
+                    const candidates = [];
+                    const dot = (a, b) => a.x * b.x + a.y * b.y;
+                    const length = a => Math.hypot(a.x, a.y);
+                    for (let i = 0; i < ends.length; i++) for (let j = i + 1; j < ends.length; j++) {
+                        const a = ends[i], b = ends[j];
+                        const delta = {x:b.point.x-a.point.x, y:b.point.y-a.point.y};
+                        const distance = length(delta);
+                        if (distance < 0.001 || distance > 3) continue;
+                        const ta = a.tangent, tb = b.tangent;
+                        const tangentValid = ta && tb && length(ta) > 0 && length(tb) > 0;
+                        const facing = tangentValid && dot(ta, delta) < -0.5 * length(ta) * distance
+                            && dot(tb, delta) < -0.5 * length(tb) * distance;
+                        const samePath = a.pathIndex === b.pathIndex;
+                        const structural = a.exactStructural === true && b.exactStructural === true;
+                        const ink = Math.min(Number(a.localInk || 0), Number(b.localInk || 0));
+                        const reasons = [samePath ? 'same-path-ends' : 'cross-path-ends',
+                            facing ? 'tangents-face-gap' : 'tangent-alignment-unproven',
+                            structural ? 'both-ends-structural' : 'structural-proof-missing',
+                            ink >= 0.42 ? 'both-ends-ink-corroborated' : 'ink-continuity-unproven'];
+                        const classification = facing && structural && distance <= 1 && ink >= 0.42
+                            ? 'strong-review-only' : facing && distance <= 2
+                            ? 'plausible-review-only' : 'uncertain-review-only';
+                        candidates.push({ endpointIds:[a.id,b.id], pathIndices:[a.pathIndex,b.pathIndex],
+                            from:{...a.point}, to:{...b.point}, distance:Math.round(distance*1000)/1000,
+                            classification, reasons, wallCertified:false, keeperApproved:false });
+                    }
+                    const priority = {'strong-review-only':0,'plausible-review-only':1,'uncertain-review-only':2};
+                    candidates.sort((a,b)=>priority[a.classification]-priority[b.classification]
+                        || a.distance-b.distance || a.endpointIds[0]-b.endpointIds[0] || a.endpointIds[1]-b.endpointIds[1]);
+                    return Object.freeze({phase:'IV.30.2C.2', diagnosticOnly:true,
+                        wallCertified:false, proposedGeometry:0, changedGeometry:0,
+                        endpointCount:ends.length, candidateCount:candidates.length,
+                        strong:candidates.filter(c=>c.classification==='strong-review-only').length,
+                        plausible:candidates.filter(c=>c.classification==='plausible-review-only').length,
+                        uncertain:candidates.filter(c=>c.classification==='uncertain-review-only').length,
+                        // Keep every competing candidate for review; do not silently pair off endpoints.
+                        candidates });
+                })();
                 const publishedEvidenceAudit = {
                     evidenceModel: 'living-contour-evidence-audit-v10',
                     wholeRoomJudgement,
+                    pippinsPencil,
                     rawChains: contourChains.length,
                     recoverableChains: recoverableChains.length,
                     semanticRejected: recoverableChains.filter((entry) => !semanticRoleIsAutomaticWall(entry.semanticBoundary?.role)).length,
