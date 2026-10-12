@@ -2656,6 +2656,7 @@
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.9 missing partner ${audit.illustratedPropagationBarrierCornerMissingPartnerEdges||0} bounded structural edges · reviews [${(audit.illustratedPropagationBarrierCornerMissingPartnerReviews||[]).map((r)=>`B${r.id}:${r.classification}/[${r.partners.map((p)=>`${p.edge}/${p.axis}/off${p.offsetQuarter}q/${p.classification}`).join('|')}]`).join(';')}] · diagnostic-only;bounded-exact-perpendicular-structural-survey;no-snapping;no-wall-admission;no-geometry-mutation;G.5Z.50-veto-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.10 illustrated witness ${audit.illustratedPropagationBarrierCornerIllustratedWitnessSamples||0} approaches · reviews [${(audit.illustratedPropagationBarrierCornerIllustratedWitnessReviews||[]).map((r)=>`B${r.id}:${r.classification}/[${r.witnesses.map((w)=>`${w.side}:${w.axis}/${w.target}/tracks[${w.tracks.map((t)=>`${t.offset}:${t.samples}:run${t.longest}:flip${t.transitions}`).join('|')}]/cross${w.cross}/${w.classification}`).join(';')}]`).join(';')}] · diagnostic-only;original-image-fixed-quarter-grid-pixel-tracks;ink-hypothesis-not-wall-certification;no-snapping;no-wall-admission;no-recovery-replay;G.5Z.50-veto-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.11 ink or ornament ${audit.illustratedPropagationBarrierCornerInkOrOrnamentSamples||0} approaches · reviews [${(audit.illustratedPropagationBarrierCornerInkOrOrnamentReviews||[]).map((r)=>`B${r.id}:${r.classification}/[${r.witnesses.map((w)=>`${w.side}:${w.axis}/${w.target}/run${w.centreRun}/bands${w.transverseBands}/parallel${w.parallelTracks.join(',')}/${w.classification}`).join(';')}]`).join(';')}] · diagnostic-only;bounded-original-image-stroke-shape;ornament-hypothesis-not-wall-certification;no-snapping;no-wall-admission;no-recovery-replay;G.5Z.50-veto-unchanged`;
+                cartographyAssistantStatus.textContent += ` · G.5Z.50Z.12 direction of travel ${audit.illustratedPropagationBarrierCornerDirectionOfTravelSamples||0} approaches · reviews [${(audit.illustratedPropagationBarrierCornerDirectionOfTravelReviews||[]).map((r)=>`B${r.id}:turn=${r.cornerTurnDemonstrated?'yes':'unproven'}/handshake=${r.structuralHandshake}/[${r.witnesses.map((w)=>`${w.side}:${w.axis}/${w.target}/long${w.longitudinalPairs}/cross${w.transversePairs}/near${w.centreNear}/far${w.centreFar}/${w.classification}`).join(';')}]`).join(';')}] · diagnostic-only;bounded-original-image-directional-travel;no-snapping;no-wall-admission;no-recovery-replay;G.5Z.50-veto-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50W spine reconciliation ${audit.illustratedPropagationBarrierSpineReconciliationFieldDisagreements||0} field disagreements / ${audit.illustratedPropagationBarrierSpineReconciliationLegacyMissing||0} missing legacy fields · reviews [${(audit.illustratedPropagationBarrierSpineReconciliationReviews||[]).map((entry)=>`B${entry.id}:${entry.role}/G:${entry.actualSpine}/V:${entry.legacySpine}/support${entry.supportedInterfaces}/${entry.length}/centre${entry.centreDarkInterfaces}/${entry.length}/gap${entry.longestUnsupported}/boundary${(entry.boundaryPermille/1000).toFixed(3)}/parallel${(entry.parallelPermille/1000).toFixed(3)}/width${entry.routeContinuous?'yes':'no'}/coherent${entry.routeCoherent?'yes':'no'}/otherFailures[${entry.otherFailures.join('&')}]/${entry.classification}`).join(';')}] · diagnostic-only;G.5Z.50V-gate-unchanged;G.5Z.50-veto-unchanged`;
             } else {
                 const doors = cartographySuggestions.filter((item) => item.type === 'door').length;
@@ -10098,6 +10099,54 @@
                 const illustratedPropagationBarrierCornerInkOrOrnamentReviews=barrierCornerInkOrOrnamentReviews;
                 const illustratedPropagationBarrierCornerInkOrOrnamentSamples=barrierCornerInkOrOrnamentReviews.reduce(
                     (n,r)=>n+r.witnesses.length,0);
+                // IV.30.1G.5Z.50Z.12 — The Corner's Direction of Travel.
+                // Re-sample only the bounded Z.11 neighbourhood. Orientation is a
+                // hypothesis, never a structural handshake or admission permission.
+                const barrierCornerDirectionOfTravelReviews=barrierCornerIllustratedWitnessReviews.map((review)=>{
+                    const witnesses=review.witnesses.map((w)=>{
+                        const [tx,ty]=w.target.split(',').map(Number);
+                        const vertical=w.axis==='vertical';
+                        const sample=(along,across)=>{
+                            const x=tx+(vertical?across:along),y=ty+(vertical?along:across);
+                            const px=originX+x*gridCanvasX,py=originY+y*gridCanvasY;
+                            return px>=0&&py>=0&&px<canvas.width&&py<canvas.height?
+                                luminance(px,py)<=darkThreshold:null;
+                        };
+                        const rows=[];
+                        for(let i=-4;i<=4;i++){
+                            const row=[];
+                            for(let j=-4;j<=4;j++)row.push(sample(i*.125,j*.125));
+                            rows.push(row);
+                        }
+                        const unknown=rows.flat().filter((v)=>v===null).length;
+                        // Adjacent dark pairs indicate orientation, not a connected wall.
+                        let longitudinalPairs=0,transversePairs=0;
+                        for(let i=0;i<9;i++)for(let j=0;j<9;j++){
+                            if(rows[i][j]!==true)continue;
+                            if(i<8&&rows[i+1][j]===true)longitudinalPairs++;
+                            if(j<8&&rows[i][j+1]===true)transversePairs++;
+                        }
+                        const centreNear=rows.slice(3,6).reduce((n,r)=>n+(r[4]===true?1:0),0);
+                        const centreFar=rows.filter((r,i)=>(i<=1||i>=7)&&r[4]===true).length;
+                        const longitudinalCoherence=longitudinalPairs>transversePairs&&longitudinalPairs>=3;
+                        const transverseInterference=transversePairs>=longitudinalPairs&&transversePairs>=3;
+                        const junctionConvergence=centreNear>=2&&centreFar>=1;
+                        const classification=unknown?'incomplete-directional-travel-review':
+                            longitudinalCoherence&&junctionConvergence&&!transverseInterference?
+                                'directionally-coherent-ink-hypothesis-review':
+                            transverseInterference?'transverse-or-hatching-competing-hypothesis-review':
+                                'fragmented-directional-travel-unresolved-review';
+                        return {side:w.side,axis:w.axis,target:w.target,longitudinalPairs,
+                            transversePairs,centreNear,centreFar,unknown,longitudinalCoherence,
+                            transverseInterference,junctionConvergence,classification};
+                    });
+                    return {id:review.id,certified:review.certified,witnesses,
+                        cornerTurnDemonstrated:false,structuralHandshake:'unproven',
+                        classification:'directional-travel-not-wall-certification-review'};
+                }).slice(0,24);
+                const illustratedPropagationBarrierCornerDirectionOfTravelReviews=barrierCornerDirectionOfTravelReviews;
+                const illustratedPropagationBarrierCornerDirectionOfTravelSamples=barrierCornerDirectionOfTravelReviews.reduce(
+                    (n,r)=>n+r.witnesses.length,0);
                 const publishedEvidenceAudit = {
                     evidenceModel: 'living-contour-evidence-audit-v10',
                     rawChains: contourChains.length,
@@ -10329,6 +10378,8 @@
                     illustratedPropagationBarrierCornerIllustratedWitnessSamples,
                     illustratedPropagationBarrierCornerInkOrOrnamentReviews,
                     illustratedPropagationBarrierCornerInkOrOrnamentSamples,
+                    illustratedPropagationBarrierCornerDirectionOfTravelReviews,
+                    illustratedPropagationBarrierCornerDirectionOfTravelSamples,
                     illustratedPropagationBarrierCornerBoundaryReady,
                     illustratedPropagationBarrierCornerBoundaryUncertified,
                     illustratedPropagationBarrierCornerCertificateControlFailures,
