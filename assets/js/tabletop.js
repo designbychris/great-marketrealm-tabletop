@@ -2658,6 +2658,7 @@
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.11 ink or ornament ${audit.illustratedPropagationBarrierCornerInkOrOrnamentSamples||0} approaches · reviews [${(audit.illustratedPropagationBarrierCornerInkOrOrnamentReviews||[]).map((r)=>`B${r.id}:${r.classification}/[${r.witnesses.map((w)=>`${w.side}:${w.axis}/${w.target}/run${w.centreRun}/bands${w.transverseBands}/parallel${w.parallelTracks.join(',')}/${w.classification}`).join(';')}]`).join(';')}] · diagnostic-only;bounded-original-image-stroke-shape;ornament-hypothesis-not-wall-certification;no-snapping;no-wall-admission;no-recovery-replay;G.5Z.50-veto-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.12 direction of travel ${audit.illustratedPropagationBarrierCornerDirectionOfTravelSamples||0} approaches · reviews [${(audit.illustratedPropagationBarrierCornerDirectionOfTravelReviews||[]).map((r)=>`B${r.id}:turn=${r.cornerTurnDemonstrated?'yes':'unproven'}/handshake=${r.structuralHandshake}/[${r.witnesses.map((w)=>`${w.side}:${w.axis}/${w.target}/long${w.longitudinalPairs}/cross${w.transversePairs}/near${w.centreNear}/far${w.centreFar}/${w.classification}`).join(';')}]`).join(';')}] · diagnostic-only;bounded-original-image-directional-travel;no-snapping;no-wall-admission;no-recovery-replay;G.5Z.50-veto-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.13 missing turn ${audit.illustratedPropagationBarrierCornerMissingTurnSamples||0} approaches · reviews [${(audit.illustratedPropagationBarrierCornerMissingTurnReviews||[]).map((r)=>`B${r.id}:partner=${r.structuralPartner}/handshake=${r.structuralHandshake}/[${r.witnesses.map((w)=>`${w.side}:${w.axis}/${w.target}/turn${w.connectedTurns}/fragments${w.independentFragments}/largest${w.largestComponent}/${w.classification}`).join(';')}]`).join(';')}] · diagnostic-only;bounded-four-connected-original-image-pixel-turn;no-snapping;no-wall-admission;no-recovery-replay;G.5Z.50-veto-unchanged`;
+                cartographyAssistantStatus.textContent += ` · G.5Z.50Z.14 true junction ${audit.illustratedPropagationBarrierCornerTrueJunctionSamples||0} approaches · reviews [${(audit.illustratedPropagationBarrierCornerTrueJunctionReviews||[]).map(r=>`B${r.id}:partner=${r.structuralPartner}/handshake=${r.structuralHandshake}/[${r.witnesses.map(w=>`${w.side}:${w.axis}/${w.target}/near${w.nearJunctions}/arms${w.armConnected}/ornament${w.ornamentTurns}/largest${w.largestJunction}/${w.classification}`).join(';')}]`).join(';')}] · diagnostic-only;fixed-nine-by-nine-same-component-cross-axis-junction;no-snapping;no-wall-admission;no-recovery-replay;G.5Z.50-veto-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50W spine reconciliation ${audit.illustratedPropagationBarrierSpineReconciliationFieldDisagreements||0} field disagreements / ${audit.illustratedPropagationBarrierSpineReconciliationLegacyMissing||0} missing legacy fields · reviews [${(audit.illustratedPropagationBarrierSpineReconciliationReviews||[]).map((entry)=>`B${entry.id}:${entry.role}/G:${entry.actualSpine}/V:${entry.legacySpine}/support${entry.supportedInterfaces}/${entry.length}/centre${entry.centreDarkInterfaces}/${entry.length}/gap${entry.longestUnsupported}/boundary${(entry.boundaryPermille/1000).toFixed(3)}/parallel${(entry.parallelPermille/1000).toFixed(3)}/width${entry.routeContinuous?'yes':'no'}/coherent${entry.routeCoherent?'yes':'no'}/otherFailures[${entry.otherFailures.join('&')}]/${entry.classification}`).join(';')}] · diagnostic-only;G.5Z.50V-gate-unchanged;G.5Z.50-veto-unchanged`;
             } else {
                 const doors = cartographySuggestions.filter((item) => item.type === 'door').length;
@@ -10209,6 +10210,66 @@
                 const illustratedPropagationBarrierCornerMissingTurnReviews=barrierCornerMissingTurnReviews;
                 const illustratedPropagationBarrierCornerMissingTurnSamples=barrierCornerMissingTurnReviews.reduce(
                     (n,r)=>n+r.witnesses.length,0);
+                // IV.30.1G.5Z.50Z.14 — The Corner's True Junction.
+                // Inspect only the fixed 9x9 original-image window at each existing
+                // approach. A junction requires the SAME four-connected component
+                // to reach the longitudinal and transverse arms near the target;
+                // disconnected decorative strokes cannot contribute either arm.
+                const barrierCornerTrueJunctionReviews=barrierCornerIllustratedWitnessReviews.map((review)=>{
+                    const witnesses=review.witnesses.map((w)=>{
+                        const [tx,ty]=w.target.split(',').map(Number);
+                        const vertical=w.axis==='vertical',rows=[];
+                        for(let i=-4;i<=4;i++){
+                            const row=[];
+                            for(let j=-4;j<=4;j++){
+                                const x=tx+(vertical?j:i)*.125,y=ty+(vertical?i:j)*.125;
+                                const px=originX+x*gridCanvasX,py=originY+y*gridCanvasY;
+                                row.push(px>=0&&py>=0&&px<canvas.width&&py<canvas.height?
+                                    luminance(px,py)<=darkThreshold:null);
+                            }
+                            rows.push(row);
+                        }
+                        const unknown=rows.flat().some(v=>v===null),visited=new Set();
+                        let nearJunctions=0,armConnected=0,ornamentTurns=0,largestJunction=0;
+                        for(let i=0;i<9;i++)for(let j=0;j<9;j++){
+                            const key=i*9+j;
+                            if(rows[i][j]!==true||visited.has(key))continue;
+                            const queue=[[i,j]],component=[];visited.add(key);
+                            for(let head=0;head<queue.length;head++){
+                                const [a,b]=queue[head];component.push([a,b]);
+                                for(const [di,dj] of [[-1,0],[1,0],[0,-1],[0,1]]){
+                                    const ni=a+di,nj=b+dj,nk=ni*9+nj;
+                                    if(ni<0||ni>=9||nj<0||nj>=9||rows[ni][nj]!==true||visited.has(nk))continue;
+                                    visited.add(nk);queue.push([ni,nj]);
+                                }
+                            }
+                            const hasTurn=component.some(([a,b])=>
+                                ((a>0&&rows[a-1][b]===true)||(a<8&&rows[a+1][b]===true))&&
+                                ((b>0&&rows[a][b-1]===true)||(b<8&&rows[a][b+1]===true)));
+                            if(!hasTurn)continue;
+                            const near=component.some(([a,b])=>Math.abs(a-4)<=1&&Math.abs(b-4)<=1);
+                            const longitudinal=component.some(([a,b])=>a<=2&&Math.abs(b-4)<=1)&&
+                                component.some(([a,b])=>a>=6&&Math.abs(b-4)<=1);
+                            const transverse=component.some(([a,b])=>b<=2&&Math.abs(a-4)<=1)||
+                                component.some(([a,b])=>b>=6&&Math.abs(a-4)<=1);
+                            if(near)nearJunctions++;
+                            if(near&&longitudinal&&transverse){armConnected++;largestJunction=Math.max(largestJunction,component.length);}
+                            else ornamentTurns++;
+                        }
+                        const classification=unknown?'incomplete-true-junction-window-review':
+                            armConnected>0?'same-component-cross-axis-junction-hypothesis-review':
+                            nearJunctions>0?'near-corner-turn-without-both-arms-review':
+                            'ornamental-or-displaced-turn-review';
+                        return {side:w.side,axis:w.axis,target:w.target,nearJunctions,armConnected,
+                            ornamentTurns,largestJunction,unknown,classification};
+                    });
+                    return {id:review.id,certified:review.certified,witnesses,
+                        structuralPartner:'unproven',structuralHandshake:'unproven',
+                        classification:'pixel-junction-not-wall-certification-review'};
+                }).slice(0,24);
+                const illustratedPropagationBarrierCornerTrueJunctionReviews=barrierCornerTrueJunctionReviews;
+                const illustratedPropagationBarrierCornerTrueJunctionSamples=barrierCornerTrueJunctionReviews.reduce(
+                    (n,r)=>n+r.witnesses.length,0);
                 const publishedEvidenceAudit = {
                     evidenceModel: 'living-contour-evidence-audit-v10',
                     rawChains: contourChains.length,
@@ -10444,6 +10505,8 @@
                     illustratedPropagationBarrierCornerDirectionOfTravelSamples,
                     illustratedPropagationBarrierCornerMissingTurnReviews,
                     illustratedPropagationBarrierCornerMissingTurnSamples,
+                    illustratedPropagationBarrierCornerTrueJunctionReviews,
+                    illustratedPropagationBarrierCornerTrueJunctionSamples,
                     illustratedPropagationBarrierCornerBoundaryReady,
                     illustratedPropagationBarrierCornerBoundaryUncertified,
                     illustratedPropagationBarrierCornerCertificateControlFailures,
