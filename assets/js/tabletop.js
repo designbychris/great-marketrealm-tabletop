@@ -2666,6 +2666,7 @@
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.19 rightful ink ${audit.illustratedPropagationBarrierCornerRightfulInkSamples||0} candidate gaps · reviews [${(audit.illustratedPropagationBarrierCornerRightfulInkReviews||[]).map(r=>`B${r.id}:partner=${r.structuralPartner}/handshake=${r.structuralHandshake}/[${r.witnesses.map(w=>`${w.side}:${w.axis}/${w.target}/examined${w.examined}/directional${w.directional}/unknown${w.unknown}/unborrowed${w.owned}/borrowed${w.borrowed}/interrupted${w.interrupted}/incomplete${w.incomplete}/ornamentControls${w.ornamentControls}/gaps[${w.details.map(d=>`${d.gap}:${d.axial}:${d.lateral.join(',')}:${d.verdict}`).join('|')}]`).join(';')}]`).join(';')}] · diagnostic-only;exact-Z18-directional-and-unresolved-gaps;fixed-six-axial-and-two-five-sample-lateral-tracks;ornament-negative-controls;no-pixel-joining;no-snapping;no-wall-admission;no-recovery-replay;G.5Z.50-veto-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.20 ink holds its line ${audit.illustratedPropagationBarrierCornerInkHoldingSamples||0} candidate gaps · reviews [${(audit.illustratedPropagationBarrierCornerInkHoldingReviews||[]).map(r=>`B${r.id}:partner=${r.structuralPartner}/handshake=${r.structuralHandshake}/[${r.witnesses.map(w=>`${w.side}:${w.axis}/${w.target}/examined${w.examined}/continuous${w.continuous}/interrupted${w.interrupted}/ornament${w.ornamentCompeted}/incomplete${w.incomplete}/gaps[${w.details.map(d=>`${d.gap}:near${d.nearRun}/far${d.awayRun}/missing${d.missing}/lateral${d.lateralAtGap}-${d.lateralBrackets}/${d.verdict}`).join('|')}]`).join(';')}]`).join(';')}] · diagnostic-only;exact-Z19-candidate-gaps;bounded-axial-runs-and-lateral-ornament-controls;no-pixel-joining;no-snapping;no-wall-admission;no-recovery-replay;G.5Z.50-veto-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.21 ink beyond window ${audit.illustratedPropagationBarrierCornerBeyondWindowSamples||0} candidate gaps · reviews [${(audit.illustratedPropagationBarrierCornerBeyondWindowReviews||[]).map(r=>`B${r.id}:partner=${r.structuralPartner}/handshake=${r.structuralHandshake}/[${r.witnesses.map(w=>`${w.side}:${w.axis}/${w.target}/examined${w.examined}/extended${w.extended}/interrupted${w.interrupted}/ornament${w.ornamentCompeted}/incomplete${w.incomplete}/gaps[${w.details.map(d=>`${d.gap}:near${d.near}/far${d.far}/ink${d.nearInk}-${d.farInk}/lateral[${d.lateral.join(',')}]/${d.verdict}`).join('|')}]`).join(';')}]`).join(';')}] · diagnostic-only;exact-Z20-candidate-gaps;fixed-original-image-wider-window;no-axis-shift;no-pixel-joining;no-snapping;no-wall-admission;no-recovery-replay;G.5Z.50-veto-unchanged`;
+                cartographyAssistantStatus.textContent += ` · G.5Z.50Z.22 broken stroke witness ${audit.illustratedPropagationBarrierCornerBrokenStrokeSamples||0} candidate gaps · reviews [${(audit.illustratedPropagationBarrierCornerBrokenStrokeReviews||[]).map(r=>`B${r.id}:partner=${r.structuralPartner}/handshake=${r.structuralHandshake}/[${r.witnesses.map(w=>`${w.side}:${w.axis}/${w.target}/examined${w.examined}/aligned${w.aligned}/fragmented${w.fragmented}/hatch${w.hatchCompeted}/incomplete${w.incomplete}/gaps[${w.details.map(d=>`${d.gap}:runs${d.runs.join('-')}/flips${d.transitions.join('-')}/lateral${d.lateralDensity.join('-')}/${d.verdict}`).join('|')}]`).join(';')}]`).join(';')}] · diagnostic-only;exact-Z21-candidate-gaps;fixed-axis-original-image-samples;no-pixel-joining;no-snapping;no-wall-admission;no-recovery-replay;G.5Z.50-veto-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50W spine reconciliation ${audit.illustratedPropagationBarrierSpineReconciliationFieldDisagreements||0} field disagreements / ${audit.illustratedPropagationBarrierSpineReconciliationLegacyMissing||0} missing legacy fields · reviews [${(audit.illustratedPropagationBarrierSpineReconciliationReviews||[]).map((entry)=>`B${entry.id}:${entry.role}/G:${entry.actualSpine}/V:${entry.legacySpine}/support${entry.supportedInterfaces}/${entry.length}/centre${entry.centreDarkInterfaces}/${entry.length}/gap${entry.longestUnsupported}/boundary${(entry.boundaryPermille/1000).toFixed(3)}/parallel${(entry.parallelPermille/1000).toFixed(3)}/width${entry.routeContinuous?'yes':'no'}/coherent${entry.routeCoherent?'yes':'no'}/otherFailures[${entry.otherFailures.join('&')}]/${entry.classification}`).join(';')}] · diagnostic-only;G.5Z.50V-gate-unchanged;G.5Z.50-veto-unchanged`;
             } else {
                 const doors = cartographySuggestions.filter((item) => item.type === 'door').length;
@@ -10477,6 +10478,41 @@
                             hatchRisk>0?'parallel-hatch-competes-with-bridge-review':
                             clean>0?'collinear-bracket-without-local-hatch-review':
                             'no-distinct-bracketed-gaps-review';
+                        // IV.30.1G.5Z.50Z.22 — The Broken Stroke's Witness.
+                        // Compare the existing fixed-axis Z.21 samples with their own
+                        // adjacent longitudinal and lateral tracks. This is a bounded
+                        // pattern comparison, not a reconstruction of missing pixels.
+                        const brokenWitness={examined:0,aligned:0,fragmented:0,
+                            hatchCompeted:0,incomplete:0,details:[]};
+                        for(const detail of beyond.details){
+                            const arms=[detail.near,detail.far];
+                            const tracks=detail.lateral;
+                            const incomplete=[...arms,...tracks].some(bits=>bits.includes('?'));
+                            const runs=arms.map(bits=>{
+                                let longest=0,current=0,transitions=0;
+                                for(let k=0;k<bits.length;k++){
+                                    current=bits[k]==='1'?current+1:0;
+                                    longest=Math.max(longest,current);
+                                    if(k>0&&bits[k]!==bits[k-1])transitions++;
+                                }
+                                return {longest,transitions};
+                            });
+                            const lateralDensity=tracks.map(bits=>[...bits].filter(v=>v==='1').length);
+                            const competing=lateralDensity.some(n=>n>=3);
+                            const aligned=runs.every(r=>r.longest>=3&&r.transitions<=2);
+                            const verdict=incomplete?'broken-stroke-window-incomplete-review':
+                                competing?'broken-stroke-parallel-hatching-competes-review':
+                                aligned?'broken-stroke-directional-alignment-hypothesis-review':
+                                'broken-stroke-fragmented-or-independent-review';
+                            brokenWitness.examined++;
+                            if(incomplete)brokenWitness.incomplete++;
+                            else if(competing)brokenWitness.hatchCompeted++;
+                            else if(aligned)brokenWitness.aligned++;
+                            else brokenWitness.fragmented++;
+                            brokenWitness.details.push({gap:detail.gap,
+                                runs:runs.map(r=>r.longest),transitions:runs.map(r=>r.transitions),
+                                lateralDensity,verdict});
+                        }
                         return {side:w.side,axis:w.axis,target:w.target,distinctGaps:gaps.size,
                             clean,hatchRisk,indeterminate,classification};
                     });
@@ -10670,7 +10706,7 @@
                                 verdict});
                         }
                         return {side:w.side,axis:w.axis,target:w.target,distinctGaps:gaps.size,
-                            ...counts,rightful,holding,beyond,classification:counts.ornament>0?'borrowed-ink-competes-with-corner-review':
+                            ...counts,rightful,holding,beyond,brokenWitness,classification:counts.ornament>0?'borrowed-ink-competes-with-corner-review':
                                 counts.directional>0?'directional-ink-remains-uncertified-review':
                                 'no-sustained-unborrowed-bridge-review'};
                     });
@@ -10704,6 +10740,14 @@
                 }));
                 const illustratedPropagationBarrierCornerBeyondWindowReviews=barrierCornerBeyondWindowReviews;
                 const illustratedPropagationBarrierCornerBeyondWindowSamples=barrierCornerBeyondWindowReviews.reduce(
+                    (n,r)=>n+r.witnesses.reduce((sum,w)=>sum+w.examined,0),0);
+                const barrierCornerBrokenStrokeReviews=barrierCornerBorrowedInkReviews.map(r=>({
+                    id:r.id,certified:false,structuralPartner:'unproven',structuralHandshake:'unproven',
+                    witnesses:r.witnesses.map(w=>({side:w.side,axis:w.axis,target:w.target,...w.brokenWitness})),
+                    classification:'broken-stroke-not-wall-certification-review'
+                }));
+                const illustratedPropagationBarrierCornerBrokenStrokeReviews=barrierCornerBrokenStrokeReviews;
+                const illustratedPropagationBarrierCornerBrokenStrokeSamples=barrierCornerBrokenStrokeReviews.reduce(
                     (n,r)=>n+r.witnesses.reduce((sum,w)=>sum+w.examined,0),0);
                 const publishedEvidenceAudit = {
                     evidenceModel: 'living-contour-evidence-audit-v10',
@@ -10956,6 +11000,8 @@
                     illustratedPropagationBarrierCornerInkHoldingSamples,
                     illustratedPropagationBarrierCornerBeyondWindowReviews,
                     illustratedPropagationBarrierCornerBeyondWindowSamples,
+                    illustratedPropagationBarrierCornerBrokenStrokeReviews,
+                    illustratedPropagationBarrierCornerBrokenStrokeSamples,
                     illustratedPropagationBarrierCornerBoundaryReady,
                     illustratedPropagationBarrierCornerBoundaryUncertified,
                     illustratedPropagationBarrierCornerCertificateControlFailures,
