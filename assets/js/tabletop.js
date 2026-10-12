@@ -2653,6 +2653,10 @@
                     const pencil = audit.pippinsPencil;
                     cartographyAssistantStatus.textContent += ` · IV.30.2C.2 Pippin offers his pencil ${pencil.endpointCount} endpoints → ${pencil.candidateCount} nearby candidate pairs (strong ${pencil.strong}, plausible ${pencil.plausible}, uncertain ${pencil.uncertain}) · first 20 [${pencil.candidates.slice(0,20).map(c=>`${c.endpointIds.join('-')}:${c.distance}g/${c.classification}/${c.reasons.join('+')}`).join(';')}] · diagnostic-only;no-wall-certification;no-geometry-mutation`;
                 }
+                if (audit.pippinStrokeTrace) {
+                    const trace = audit.pippinStrokeTrace;
+                    cartographyAssistantStatus.textContent += ` · IV.30.2C.4 Pippin follows the stroke ${trace.examined} directional pairs / ${trace.plausible} stroke-plausible / ${trace.endpointConflicts} endpoint-conflicted · reviews [${trace.traces.map(t=>`${t.endpointIds.join('-')}:${t.classification}/ink${t.supported}/${t.samples}/gap${t.longestGap}/travel${t.trackTravel}/width${t.meanWidthTracks}`).join(';')}] · diagnostic-only;no-wall-certification;no-geometry-mutation`;
+                }
                 if (audit.pippinInkStudy) {
                     const ink = audit.pippinInkStudy;
                     cartographyAssistantStatus.textContent += ` · IV.30.2C.3 Pippin studies the ink ${ink.examined} plausible pairs / ${ink.directional} directional / ${ink.hatching} hatch-competing / ${ink.competing} shared-endpoint conflicts · first 20 [${ink.reviews.slice(0,20).map(r=>`${r.endpointIds.join('-')}:${r.classification}/run${r.longestRun}/${r.samples}/axis${r.axialInkPermille}/lateral${r.lateralInkPermille}${r.competing?'/competing':''}`).join(';')}] · diagnostic-only;no-wall-certification;no-geometry-mutation`;
@@ -10916,11 +10920,76 @@
                         hatching:reviews.filter(r=>r.classification==='hatching-or-parallel-ink-competes-review').length,
                         reviews});
                 })();
+                // IV.30.2C.4 — Pippin Follows the Stroke.
+                // Trace ONLY C.3 directional candidates along their fixed chord; never mutate geometry.
+                const pippinStrokeTrace = (() => {
+                    const candidates = pippinInkStudy.reviews.filter(r => r.classification === 'directional-ink-review-only');
+                    const source = new Map(pippinsPencil.candidates.map(c => [c.endpointIds.join('-'), c]));
+                    const traces = candidates.map(r => {
+                        const c = source.get(r.endpointIds.join('-'));
+                        const dx = c.to.x-c.from.x, dy = c.to.y-c.from.y;
+                        const length = Math.hypot(dx,dy);
+                        const nx = -dy/length, ny = dx/length;
+                        const steps = Math.max(9,Math.min(65,Math.ceil(length*16)+1));
+                        const tracks = [-.375,-.25,-.125,0,.125,.25,.375];
+                        const rows = [];
+                        for(let i=0;i<steps;i++) {
+                            const t=(i+.5)/steps, x=c.from.x+dx*t, y=c.from.y+dy*t;
+                            const ink = tracks.map(offset => {
+                                const px=Math.round(originX+(x+nx*offset)*gridCanvasX);
+                                const py=Math.round(originY+(y+ny*offset)*gridCanvasY);
+                                if(px<0||py<0||px>=canvas.width||py>=canvas.height) return null;
+                                return luminance(px,py)<=darkThreshold;
+                            });
+                            rows.push(ink);
+                        }
+                        const centre=3;
+                        let previous=null, travel=0, switches=0, supported=0, gaps=0, longestGap=0, runGap=0;
+                        const widths=[];const chosen=[];
+                        for(const row of rows) {
+                            const available=row.map((v,i)=>v===true?i:-1).filter(i=>i>=0);
+                            // Fixed narrow corridor: do not search elsewhere for a convenient wall.
+                            const nearest=available.length ? available.slice().sort((a,b)=>
+                                Math.abs(a-(previous??centre))-Math.abs(b-(previous??centre)) ||
+                                Math.abs(a-centre)-Math.abs(b-centre) || a-b)[0] : null;
+                            chosen.push(nearest);
+                            if(nearest===null) {gaps++;runGap++;longestGap=Math.max(longestGap,runGap);continue;}
+                            supported++;runGap=0;
+                            if(previous!==null) {travel+=Math.abs(nearest-previous);if(nearest!==previous)switches++;}
+                            previous=nearest;
+                            let width=1;
+                            for(let k=nearest-1;k>=0&&row[k]===true;k--)width++;
+                            for(let k=nearest+1;k<row.length&&row[k]===true;k++)width++;
+                            widths.push(width);
+                        }
+                        const meanWidth=widths.length?widths.reduce((a,b)=>a+b,0)/widths.length:0;
+                        const competing = r.competing;
+                        const lateralInk=rows.reduce((n,row)=>n+Number(row[0]===true)+Number(row[6]===true),0);
+                        const axialInk=rows.reduce((n,row)=>n+Number(row[2]===true||row[3]===true||row[4]===true),0);
+                        const hatchCompetes=lateralInk>=axialInk && lateralInk>0;
+                        const continuity=supported/steps;
+                        const classification=continuity>=.85 && longestGap<=1 && travel<=steps*.35 && !hatchCompetes
+                            ? (competing?'stroke-plausible-endpoint-conflict-review':'stroke-plausible-review-only')
+                            : hatchCompetes?'parallel-hatching-competes-review'
+                            : longestGap>1?'broken-stroke-review':'wandering-or-variable-stroke-review';
+                        return {endpointIds:r.endpointIds,classification,competing,samples:steps,supported,
+                            missing:gaps,longestGap,trackSwitches:switches,trackTravel:travel,
+                            meanWidthTracks:Math.round(meanWidth*100)/100,lateralInk,axialInk,
+                            continuityPermille:Math.round(continuity*1000),
+                            selectedTracks:chosen,wallCertified:false,keeperApproved:false};
+                    });
+                    return Object.freeze({phase:'IV.30.2C.4',diagnosticOnly:true,wallCertified:false,
+                        proposedGeometry:0,changedGeometry:0,examined:traces.length,
+                        endpointConflicts:traces.filter(t=>t.competing).length,
+                        plausible:traces.filter(t=>t.classification.startsWith('stroke-plausible')).length,
+                        traces});
+                })();
                 const publishedEvidenceAudit = {
                     evidenceModel: 'living-contour-evidence-audit-v10',
                     wholeRoomJudgement,
                     pippinsPencil,
                     pippinInkStudy,
+                    pippinStrokeTrace,
                     rawChains: contourChains.length,
                     recoverableChains: recoverableChains.length,
                     semanticRejected: recoverableChains.filter((entry) => !semanticRoleIsAutomaticWall(entry.semanticBoundary?.role)).length,
