@@ -10604,7 +10604,7 @@
                             const left=bits.slice(0,3),right=bits.slice(3);
                             const complete=!bits.includes('?')&&!lateral.some(t=>t.includes('?'));
                             const leftRun=[...left].reverse().findIndex(v=>v!=='1');
-                            const rightRun=right.findIndex(v=>v!=='1');
+                            const rightRun=[...right].findIndex(v=>v!=='1');
                             const nearRun=leftRun<0?3:leftRun;
                             const awayRun=rightRun<0?3:rightRun;
                             const missing=[...bits].filter(v=>v==='0').length;

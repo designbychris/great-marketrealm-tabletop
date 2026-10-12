@@ -16,6 +16,8 @@ final class CornerInkHoldingRegressionTest extends TestCase
         self::assertStringContainsString('for(const detail of rightful.details)', $source);
         self::assertStringContainsString("[...left].reverse().findIndex(v=>v!=='1')", $source);
         self::assertStringNotContainsString('left.reverse().findIndex', $source);
+        self::assertStringContainsString("[...right].findIndex(v=>v!=='1')", $source);
+        self::assertStringNotContainsString('right.findIndex(', $source);
         self::assertStringContainsString('line-holding-interrupted-direction-review', $source);
         self::assertStringContainsString('line-holding-ornament-competition-review', $source);
         self::assertStringContainsString('line-holding-window-incomplete-review', $source);
