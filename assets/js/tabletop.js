@@ -2653,6 +2653,10 @@
                     const pencil = audit.pippinsPencil;
                     cartographyAssistantStatus.textContent += ` · IV.30.2C.2 Pippin offers his pencil ${pencil.endpointCount} endpoints → ${pencil.candidateCount} nearby candidate pairs (strong ${pencil.strong}, plausible ${pencil.plausible}, uncertain ${pencil.uncertain}) · first 20 [${pencil.candidates.slice(0,20).map(c=>`${c.endpointIds.join('-')}:${c.distance}g/${c.classification}/${c.reasons.join('+')}`).join(';')}] · diagnostic-only;no-wall-certification;no-geometry-mutation`;
                 }
+                if (audit.pippinInkStudy) {
+                    const ink = audit.pippinInkStudy;
+                    cartographyAssistantStatus.textContent += ` · IV.30.2C.3 Pippin studies the ink ${ink.examined} plausible pairs / ${ink.directional} directional / ${ink.hatching} hatch-competing / ${ink.competing} shared-endpoint conflicts · first 20 [${ink.reviews.slice(0,20).map(r=>`${r.endpointIds.join('-')}:${r.classification}/run${r.longestRun}/${r.samples}/axis${r.axialInkPermille}/lateral${r.lateralInkPermille}${r.competing?'/competing':''}`).join(';')}] · diagnostic-only;no-wall-certification;no-geometry-mutation`;
+                }
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.1 corner certificates ${audit.illustratedPropagationBarrierCornerCertificates||0} diagnostic / ${audit.illustratedPropagationBarrierCornerCertificateControlFailures||0} control failures · reviews [${(audit.illustratedPropagationBarrierCornerCertificateReviews||[]).map((entry)=>`B${entry.id}:${entry.role}/legacy${entry.legacyMatched}/replay${entry.replayMatched}/${entry.replayTotal}/spineOnly${entry.legacySpineOnly?'yes':'no'}/reconciled${entry.reconciled?'yes':'no'}/certified${entry.certified?'yes':'no'}/${entry.classification}`).join(';')}] · diagnostic-only;no-wall-admission;no-geometry-mutation;G.5Z.50V-gate-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.2 certificate/boundary ${audit.illustratedPropagationBarrierCornerBoundaryReady||0} structurally ready / ${audit.illustratedPropagationBarrierCornerBoundaryUncertified||0} withheld · reviews [${(audit.illustratedPropagationBarrierCornerBoundaryReviews||[]).map((entry)=>`B${entry.id}:${entry.classification}/corner[${entry.corners.join('&')}]/new${entry.proposedEdges}/struct${entry.structuralEdges}/sides[${entry.interfaces.map((side)=>`${side.side}:${side.cornerPlayable?'c':''}${side.neighbourPlayable?'p':''}${side.existingBoundary?'existing':''}${side.counterfactualBoundary?'new':''}${side.exactStructural?'struct':''}@${side.localInkPermille}`).join('|')}]`).join(';')}] · diagnostic-only;exact-four-neighbour-boundary-counterfactual;no-wall-admission;no-recovery-replay;no-geometry-mutation`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.3 boundary witnesses ${audit.illustratedPropagationBarrierCornerBoundaryWitnessInterfaces||0} interfaces · reviews [${(audit.illustratedPropagationBarrierCornerBoundaryWitnessReviews||[]).map((entry)=>`B${entry.id}:${entry.classification}/[${entry.witnesses.map((w)=>`${w.side}:${w.classification}/ink[${w.inkSamplesPermille.join(',')}]/adj${w.adjacentRepresented}/struct${w.adjacentStructural}`).join('|')}]`).join(';')}] · diagnostic-only;original-ink-directional-witnesses;no-wall-admission;no-recovery-replay;no-geometry-mutation`;
@@ -10837,10 +10841,86 @@
                         // Keep every competing candidate for review; do not silently pair off endpoints.
                         candidates });
                 })();
+                // IV.30.2C.3 — Pippin Studies the Ink.
+                // Inspect the original illustration along each plausible C.2 chord.
+                // These are comparative review signals, never permission to draw walls.
+                const pippinInkStudy = (() => {
+                    const plausible = pippinsPencil.candidates.filter(c => c.classification !== 'uncertain-review-only');
+                    const usage = new Map();
+                    for (const c of plausible) for (const id of c.endpointIds)
+                        usage.set(id, (usage.get(id) || 0) + 1);
+                    const sampleInk = (x, y) => {
+                        const px = Math.round(originX + x * gridCanvasX);
+                        const py = Math.round(originY + y * gridCanvasY);
+                        let dark = 0, total = 0;
+                        for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+                            const sx = px + dx, sy = py + dy;
+                            if (sx < 0 || sy < 0 || sx >= canvas.width || sy >= canvas.height) continue;
+                            total++;
+                            if (luminance(sx, sy) <= darkThreshold) dark++;
+                        }
+                        return total ? dark / total : null;
+                    };
+                    const reviews = plausible.map(c => {
+                        const dx = c.to.x - c.from.x, dy = c.to.y - c.from.y;
+                        const distance = Math.hypot(dx, dy);
+                        const nx = -dy / distance, ny = dx / distance;
+                        const count = Math.max(5, Math.min(25, Math.ceil(distance * 8) + 1));
+                        const axis = [], flankLeft = [], flankRight = [];
+                        for (let i = 0; i < count; i++) {
+                            const t = (i + .5) / count;
+                            const x = c.from.x + dx * t, y = c.from.y + dy * t;
+                            axis.push(sampleInk(x, y));
+                            flankLeft.push(sampleInk(x + nx * .25, y + ny * .25));
+                            flankRight.push(sampleInk(x - nx * .25, y - ny * .25));
+                        }
+                        const valid = axis.filter(v => v !== null);
+                        const mean = a => {
+                            const values = a.filter(v => v !== null);
+                            return values.length ? values.reduce((sum, v) => sum + v, 0) / values.length : 0;
+                        };
+                        const present = axis.map(v => v !== null && v >= .34);
+                        let longest = 0, current = 0, interruptions = 0;
+                        for (const ink of present) {
+                            if (ink) { current++; longest = Math.max(longest, current); }
+                            else { if (current) interruptions++; current = 0; }
+                        }
+                        const axisDensity = mean(axis), lateralDensity = Math.max(mean(flankLeft), mean(flankRight));
+                        const continuity = valid.length === count ? longest / count : 0;
+                        const competing = c.endpointIds.some(id => usage.get(id) > 1);
+                        const hatchCompetition = lateralDensity >= axisDensity * .85 && lateralDensity >= .2;
+                        const classification = valid.length !== count ? 'ink-window-incomplete-review'
+                            : continuity >= .75 && !hatchCompetition ? 'directional-ink-review-only'
+                            : hatchCompetition ? 'hatching-or-parallel-ink-competes-review'
+                            : 'interrupted-or-unproven-ink-review';
+                        return {endpointIds:c.endpointIds, pathIndices:c.pathIndices, distance:c.distance,
+                            originalClassification:c.classification, classification, competing,
+                            samples:count, validSamples:valid.length,
+                            axialInkPermille:Math.round(axisDensity*1000),
+                            lateralInkPermille:Math.round(lateralDensity*1000),
+                            longestRun:longest, interruptions, continuityPermille:Math.round(continuity*1000),
+                            reasons:[...c.reasons, competing ? 'shared-endpoint-competition' : 'no-plausible-endpoint-competitor',
+                                hatchCompetition ? 'parallel-ink-competition' : 'parallel-ink-not-dominant'],
+                            wallCertified:false, keeperApproved:false};
+                    });
+                    const rank = {'directional-ink-review-only':0,'interrupted-or-unproven-ink-review':1,
+                        'hatching-or-parallel-ink-competes-review':2,'ink-window-incomplete-review':3};
+                    reviews.sort((a,b) => rank[a.classification]-rank[b.classification]
+                        || Number(a.competing)-Number(b.competing)
+                        || b.continuityPermille-a.continuityPermille || a.distance-b.distance
+                        || a.endpointIds[0]-b.endpointIds[0] || a.endpointIds[1]-b.endpointIds[1]);
+                    return Object.freeze({phase:'IV.30.2C.3',diagnosticOnly:true,wallCertified:false,
+                        proposedGeometry:0,changedGeometry:0,examined:reviews.length,
+                        directional:reviews.filter(r=>r.classification==='directional-ink-review-only').length,
+                        competing:reviews.filter(r=>r.competing).length,
+                        hatching:reviews.filter(r=>r.classification==='hatching-or-parallel-ink-competes-review').length,
+                        reviews});
+                })();
                 const publishedEvidenceAudit = {
                     evidenceModel: 'living-contour-evidence-audit-v10',
                     wholeRoomJudgement,
                     pippinsPencil,
+                    pippinInkStudy,
                     rawChains: contourChains.length,
                     recoverableChains: recoverableChains.length,
                     semanticRejected: recoverableChains.filter((entry) => !semanticRoleIsAutomaticWall(entry.semanticBoundary?.role)).length,
