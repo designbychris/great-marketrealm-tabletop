@@ -2661,6 +2661,10 @@
                     const choice = audit.pippinPathChoice;
                     cartographyAssistantStatus.textContent += ` · IV.30.2C.5 Pippin chooses his path ${choice.examined} plausible strokes / ${choice.groups.length} conflict groups / ${choice.unresolved} unresolved · reviews [${choice.groups.map(g=>`${g.endpointIds.join('-')}:${g.classification}/preferred${g.preferred?g.preferred.join('-'):'none'}/margin${g.margin??'na'}/candidates[${g.candidates.map(c=>`${c.endpointIds.join('-')}:${c.score}`).join('|')}]`).join(';')}] · diagnostic-only;no-wall-certification;no-geometry-mutation`;
                 }
+                if (audit.pippinHandshake) {
+                    const handshake = audit.pippinHandshake;
+                    cartographyAssistantStatus.textContent += ` · IV.30.2C.6 Pippin finds the right handshake ${handshake.examined} strokes / ${handshake.groups} groups / ${handshake.unresolved} unresolved · reviews [${handshake.reviews.map(g=>`${g.endpointIds.join('-')}:${g.classification}/candidates[${g.candidates.map(c=>`${c.endpointIds.join('-')}:${c.classification}/axis${c.axialAgreement.join(',')}/struct${c.structural?'yes':'no'}`).join('|')}]/junctions[${g.junctions.map(j=>`${j.sharedEndpoint}:${j.angleDegrees??'na'}deg/${j.classification}`).join('|')}]`).join(';')}] · diagnostic-only;no-wall-certification;no-geometry-mutation`;
+                }
                 if (audit.pippinInkStudy) {
                     const ink = audit.pippinInkStudy;
                     cartographyAssistantStatus.textContent += ` · IV.30.2C.3 Pippin studies the ink ${ink.examined} plausible pairs / ${ink.directional} directional / ${ink.hatching} hatch-competing / ${ink.competing} shared-endpoint conflicts · first 20 [${ink.reviews.slice(0,20).map(r=>`${r.endpointIds.join('-')}:${r.classification}/run${r.longestRun}/${r.samples}/axis${r.axialInkPermille}/lateral${r.lateralInkPermille}${r.competing?'/competing':''}`).join(';')}] · diagnostic-only;no-wall-certification;no-geometry-mutation`;
@@ -11029,6 +11033,66 @@
                         proposedGeometry:0,changedGeometry:0,examined:candidates.length,groups,
                         unresolved:groups.filter(g=>g.classification==='shared-endpoint-unresolved-review').length});
                 })();
+                // IV.30.2C.6 — Pippin Finds the Right Handshake.
+                // Compare existing endpoint directions and rival junction geometry; never admit walls.
+                const pippinHandshake = (() => {
+                    const endpoints = new Map(residualTerminations.map(e => [e.id, e]));
+                    const pencil = new Map(pippinsPencil.candidates.map(c => [c.endpointIds.join('-'), c]));
+                    const dot = (a,b) => a.x*b.x+a.y*b.y;
+                    const norm = v => Math.hypot(v.x,v.y);
+                    const reviews = pippinPathChoice.groups.map(group => {
+                        const candidates = group.candidates.map(candidate => {
+                            const [aId,bId] = candidate.endpointIds;
+                            const a=endpoints.get(aId), b=endpoints.get(bId);
+                            const link=pencil.get(candidate.endpointIds.join('-'));
+                            const vector=link ? {x:link.to.x-link.from.x,y:link.to.y-link.from.y} : null;
+                            const ta=a?.tangent, tb=b?.tangent;
+                            const valid=!!(vector && ta && tb && norm(vector)>0 && norm(ta)>0 && norm(tb)>0);
+                            // Tangent storage may point towards or away from an endpoint. Report
+                            // both signed orientation and unsigned axial agreement, never assume sign.
+                            const signedA=valid ? dot(ta,vector)/(norm(ta)*norm(vector)) : null;
+                            const signedB=valid ? dot(tb,vector)/(norm(tb)*norm(vector)) : null;
+                            const axialA=valid ? Math.abs(signedA) : null;
+                            const axialB=valid ? Math.abs(signedB) : null;
+                            const aligned=valid && axialA>=.8 && axialB>=.8;
+                            const ink=pippinStrokeTrace.traces.find(t=>t.endpointIds.join('-')===candidate.endpointIds.join('-'));
+                            const structural=!!(a?.exactStructural && b?.exactStructural);
+                            const classification=!valid?'endpoint-direction-unavailable-review'
+                                :!aligned?'endpoint-direction-disagrees-review'
+                                :!structural?'direction-compatible-structural-proof-missing-review'
+                                :'direction-compatible-structural-context-review';
+                            return {endpointIds:candidate.endpointIds,classification,
+                                axialAgreement:[axialA,axialB].map(v=>v===null?null:Math.round(v*1000)),
+                                signedDirection:[signedA,signedB].map(v=>v===null?null:Math.round(v*1000)),
+                                strokeContinuityPermille:ink?.continuityPermille??null,
+                                structural,wallCertified:false,keeperApproved:false};
+                        });
+                        const junctions=[];
+                        for(let i=0;i<candidates.length;i++) for(let j=i+1;j<candidates.length;j++) {
+                            const first=candidates[i],second=candidates[j];
+                            const shared=first.endpointIds.filter(id=>second.endpointIds.includes(id));
+                            if(shared.length!==1) continue;
+                            const centre=endpoints.get(shared[0])?.point;
+                            const otherA=endpoints.get(first.endpointIds.find(id=>id!==shared[0]))?.point;
+                            const otherB=endpoints.get(second.endpointIds.find(id=>id!==shared[0]))?.point;
+                            let angle=null;
+                            if(centre&&otherA&&otherB) {
+                                const u={x:otherA.x-centre.x,y:otherA.y-centre.y};
+                                const v={x:otherB.x-centre.x,y:otherB.y-centre.y};
+                                if(norm(u)>0&&norm(v)>0)angle=Math.round(Math.acos(Math.max(-1,Math.min(1,dot(u,v)/(norm(u)*norm(v)))))*180/Math.PI);
+                            }
+                            junctions.push({sharedEndpoint:shared[0],pairs:[first.endpointIds,second.endpointIds],
+                                angleDegrees:angle,classification:angle===null?'junction-angle-unavailable-review'
+                                    :angle<25?'near-collinear-rivals-review'
+                                    :angle>155?'opposed-rivals-review':'branching-junction-unproven-review'});
+                        }
+                        return {endpointIds:group.endpointIds,classification:'keeper-handshake-unresolved-review',
+                            candidates,junctions,preferred:null,wallCertified:false,keeperApproved:false};
+                    });
+                    return Object.freeze({phase:'IV.30.2C.6',diagnosticOnly:true,wallCertified:false,
+                        proposedGeometry:0,changedGeometry:0,examined:reviews.reduce((n,r)=>n+r.candidates.length,0),
+                        groups:reviews.length,unresolved:reviews.length,reviews});
+                })();
                 const publishedEvidenceAudit = {
                     evidenceModel: 'living-contour-evidence-audit-v10',
                     wholeRoomJudgement,
@@ -11036,6 +11100,7 @@
                     pippinInkStudy,
                     pippinStrokeTrace,
                     pippinPathChoice,
+                    pippinHandshake,
                     rawChains: contourChains.length,
                     recoverableChains: recoverableChains.length,
                     semanticRejected: recoverableChains.filter((entry) => !semanticRoleIsAutomaticWall(entry.semanticBoundary?.role)).length,
