@@ -2662,6 +2662,7 @@
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.15 rightful arms ${audit.illustratedPropagationBarrierCornerRightfulArmsSamples||0} approaches · reviews [${(audit.illustratedPropagationBarrierCornerRightfulArmsReviews||[]).map(r=>`B${r.id}:partner=${r.structuralPartner}/handshake=${r.structuralHandshake}/[${r.witnesses.map(w=>`${w.side}:${w.axis}/${w.target}/near${w.nearComponents}/arms${w.qualifiedComponents}/ornament${w.ornamentComponents}/spokes${w.bestLongitudinal},${w.bestTransverse}/largest${w.bestSize}/${w.classification}`).join(';')}]`).join(';')}] · diagnostic-only;fixed-nine-by-nine-same-component-sustained-orthogonal-spokes;no-snapping;no-wall-admission;no-recovery-replay;G.5Z.50-veto-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.16 broken arms ${audit.illustratedPropagationBarrierCornerBrokenArmsSamples||0} approaches · reviews [${(audit.illustratedPropagationBarrierCornerBrokenArmsReviews||[]).map(r=>`B${r.id}:partner=${r.structuralPartner}/handshake=${r.structuralHandshake}/[${r.witnesses.map(w=>`${w.side}:${w.axis}/${w.target}/bridges${w.onePixelBridges}/junctions${w.candidateJunctions}/unsupported${w.unsupportedGaps}/spokes${w.bestLongitudinal},${w.bestTransverse}/${w.classification}`).join(';')}]`).join(';')}] · diagnostic-only;fixed-nine-by-nine-single-pixel-bracketed-cardinal-gaps;no-pixel-joining;no-snapping;no-wall-admission;no-recovery-replay;G.5Z.50-veto-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50Z.17 false bridges ${audit.illustratedPropagationBarrierCornerFalseBridgesSamples||0} approaches · reviews [${(audit.illustratedPropagationBarrierCornerFalseBridgesReviews||[]).map(r=>`B${r.id}:partner=${r.structuralPartner}/handshake=${r.structuralHandshake}/[${r.witnesses.map(w=>`${w.side}:${w.axis}/${w.target}/distinct${w.distinctGaps}/clean${w.clean}/hatch${w.hatchRisk}/unknown${w.indeterminate}/${w.classification}`).join(';')}]`).join(';')}] · diagnostic-only;exact-Z16-single-pixel-gap-recheck;deduplicated-orientation-gaps;bounded-perpendicular-hatch-controls;no-pixel-joining;no-snapping;no-wall-admission;no-recovery-replay;G.5Z.50-veto-unchanged`;
+                cartographyAssistantStatus.textContent += ` · G.5Z.50Z.18 borrowed ink ${audit.illustratedPropagationBarrierCornerBorrowedInkSamples||0} approaches · reviews [${(audit.illustratedPropagationBarrierCornerBorrowedInkReviews||[]).map(r=>`B${r.id}:partner=${r.structuralPartner}/handshake=${r.structuralHandshake}/[${r.witnesses.map(w=>`${w.side}:${w.axis}/${w.target}/distinct${w.distinctGaps}/directional${w.directional}/ornament${w.ornament}/short${w.short}/unknown${w.unknown}/${w.classification}`).join(';')}]`).join(';')}] · diagnostic-only;exact-Z17-deduplicated-gaps;fixed-two-sample-longitudinal-context;bounded-lateral-ornament-competition;no-pixel-joining;no-snapping;no-wall-admission;no-recovery-replay;G.5Z.50-veto-unchanged`;
                 cartographyAssistantStatus.textContent += ` · G.5Z.50W spine reconciliation ${audit.illustratedPropagationBarrierSpineReconciliationFieldDisagreements||0} field disagreements / ${audit.illustratedPropagationBarrierSpineReconciliationLegacyMissing||0} missing legacy fields · reviews [${(audit.illustratedPropagationBarrierSpineReconciliationReviews||[]).map((entry)=>`B${entry.id}:${entry.role}/G:${entry.actualSpine}/V:${entry.legacySpine}/support${entry.supportedInterfaces}/${entry.length}/centre${entry.centreDarkInterfaces}/${entry.length}/gap${entry.longestUnsupported}/boundary${(entry.boundaryPermille/1000).toFixed(3)}/parallel${(entry.parallelPermille/1000).toFixed(3)}/width${entry.routeContinuous?'yes':'no'}/coherent${entry.routeCoherent?'yes':'no'}/otherFailures[${entry.otherFailures.join('&')}]/${entry.classification}`).join(';')}] · diagnostic-only;G.5Z.50V-gate-unchanged;G.5Z.50-veto-unchanged`;
             } else {
                 const doors = cartographySuggestions.filter((item) => item.type === 'door').length;
@@ -10483,6 +10484,83 @@
                 const illustratedPropagationBarrierCornerFalseBridgesReviews=barrierCornerFalseBridgesReviews;
                 const illustratedPropagationBarrierCornerFalseBridgesSamples=barrierCornerFalseBridgesReviews.reduce(
                     (n,r)=>n+r.witnesses.length,0);
+                // IV.30.1G.5Z.50Z.18 — The Corner's Borrowed Ink.
+                // Reconstruct only Z.17's bounded bracketed gaps. A neighbour's
+                // parallel stroke cannot lend its ink to a proposed structural arm.
+                const barrierCornerBorrowedInkReviews=barrierCornerFalseBridgesReviews.map((review)=>{
+                    const witnesses=review.witnesses.map((w)=>{
+                        const [tx,ty]=w.target.split(',').map(Number);
+                        const vertical=w.axis==='vertical',rows=[];
+                        for(let i=-4;i<=4;i++){
+                            const row=[];
+                            for(let j=-4;j<=4;j++){
+                                const x=tx+(vertical?j:i)*.125,y=ty+(vertical?i:j)*.125;
+                                const px=originX+x*gridCanvasX,py=originY+y*gridCanvasY;
+                                row.push(px>=0&&py>=0&&px<canvas.width&&py<canvas.height?
+                                    luminance(px,py)<=darkThreshold:null);
+                            }
+                            rows.push(row);
+                        }
+                        const gaps=new Map();
+                        for(let a=3;a<=5;a++)for(let b=3;b<=5;b++){
+                            if(rows[a][b]!==true)continue;
+                            for(const [di,dj] of [[1,0],[-1,0],[0,1],[0,-1]]){
+                                let usedGap=false;
+                                for(let k=1;k<=4;k++){
+                                    const i=a+di*k,j=b+dj*k;
+                                    if(i<0||i>=9||j<0||j>=9||rows[i][j]===null)break;
+                                    if(rows[i][j]===true)continue;
+                                    const ni=i+di,nj=j+dj;
+                                    if(usedGap||k>=4||ni<0||ni>=9||nj<0||nj>=9||rows[ni][nj]!==true)break;
+                                    usedGap=true;
+                                    const key=`${i},${j},${di!==0?'v':'h'}`;
+                                    if(gaps.has(key)){k++;continue;}
+                                    const pi=i-di,pj=j-dj;
+                                    const lateral=di!==0?[[0,-1],[0,1]]:[[-1,0],[1,0]];
+                                    const sideInk=lateral.map(([li,lj])=>({
+                                        before:rows[pi+li]?.[pj+lj],after:rows[ni+li]?.[nj+lj],
+                                        atGap:rows[i+li]?.[j+lj]
+                                    }));
+                                    const unknown=sideInk.some(v=>[v.before,v.after,v.atGap].includes(null));
+                                    const competing=sideInk.filter(v=>v.atGap===true||
+                                        (v.before===true&&v.after===true)).length;
+                                    // Fixed two-sample longitudinal context, never search
+                                    // for a more favourable line or borrow adjacent ink.
+                                    const bi=pi-di,bj=pj-dj,fi=ni+di,fj=nj+dj;
+                                    const before=rows[bi]?.[bj],after=rows[fi]?.[fj];
+                                    const aligned=rows[pi][pj]===true&&rows[ni][nj]===true;
+                                    const continuity=before===true&&after===true;
+                                    const lateralBorrow=sideInk.some(v=>v.atGap===true||
+                                        (v.before===true&&v.after===true));
+                                    const classification=unknown||before==null||after==null||!aligned?
+                                        'borrowed-ink-context-incomplete-review':
+                                        lateralBorrow?'neighbouring-ornament-favoured-review':
+                                        continuity?'isolated-directional-bridge-hypothesis-review':
+                                        'short-bracket-without-sustained-direction-review';
+                                    gaps.set(key,{classification,competing,continuity,lateralBorrow});
+                                    k++;
+                                }
+                            }
+                        }
+                        const counts={directional:0,ornament:0,short:0,unknown:0};
+                        for(const gap of gaps.values()){
+                            if(gap.classification==='isolated-directional-bridge-hypothesis-review')counts.directional++;
+                            else if(gap.classification==='neighbouring-ornament-favoured-review')counts.ornament++;
+                            else if(gap.classification==='short-bracket-without-sustained-direction-review')counts.short++;
+                            else counts.unknown++;
+                        }
+                        return {side:w.side,axis:w.axis,target:w.target,distinctGaps:gaps.size,
+                            ...counts,classification:counts.ornament>0?'borrowed-ink-competes-with-corner-review':
+                                counts.directional>0?'directional-ink-remains-uncertified-review':
+                                'no-sustained-unborrowed-bridge-review'};
+                    });
+                    return {id:review.id,certified:false,witnesses,
+                        structuralPartner:'unproven',structuralHandshake:'unproven',
+                        classification:'borrowed-ink-not-wall-certification-review'};
+                }).slice(0,24);
+                const illustratedPropagationBarrierCornerBorrowedInkReviews=barrierCornerBorrowedInkReviews;
+                const illustratedPropagationBarrierCornerBorrowedInkSamples=barrierCornerBorrowedInkReviews.reduce(
+                    (n,r)=>n+r.witnesses.length,0);
                 const publishedEvidenceAudit = {
                     evidenceModel: 'living-contour-evidence-audit-v10',
                     rawChains: contourChains.length,
@@ -10726,6 +10804,8 @@
                     illustratedPropagationBarrierCornerBrokenArmsSamples,
                     illustratedPropagationBarrierCornerFalseBridgesReviews,
                     illustratedPropagationBarrierCornerFalseBridgesSamples,
+                    illustratedPropagationBarrierCornerBorrowedInkReviews,
+                    illustratedPropagationBarrierCornerBorrowedInkSamples,
                     illustratedPropagationBarrierCornerBoundaryReady,
                     illustratedPropagationBarrierCornerBoundaryUncertified,
                     illustratedPropagationBarrierCornerCertificateControlFailures,
