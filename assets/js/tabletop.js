@@ -10603,7 +10603,7 @@
                             const near=bits.slice(1,3),far=bits.slice(3,5);
                             const left=bits.slice(0,3),right=bits.slice(3);
                             const complete=!bits.includes('?')&&!lateral.some(t=>t.includes('?'));
-                            const leftRun=left.reverse().findIndex(v=>v!=='1');
+                            const leftRun=[...left].reverse().findIndex(v=>v!=='1');
                             const rightRun=right.findIndex(v=>v!=='1');
                             const nearRun=leftRun<0?3:leftRun;
                             const awayRun=rightRun<0?3:rightRun;
